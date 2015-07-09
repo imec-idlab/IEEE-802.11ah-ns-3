@@ -39,7 +39,8 @@
 #include "interference-helper.h"
 
 namespace ns3 {
-
+    
+#define S1G_PHY 195
 #define HT_PHY 127
 
 class YansWifiChannel;
@@ -383,17 +384,17 @@ public:
    */
   virtual bool GetGreenfield (void) const;
   /**
-   * Return whether channel bonding is supported.
+   * Return channel width.
    *
-   * \return true if channel bonding is supported, false otherwise
+   * \return channel width
    */
-  virtual bool GetChannelBonding (void) const;
+  virtual uint32_t GetChannelWidth (void) const ;
   /**
-   * Enable or disable channel bonding support.
+   * Set channel width.
    *
-   * \param channelbonding Enable or disable channel bonding
+   * \param channel width
    */
-  virtual void SetChannelBonding (bool channelbonding);
+virtual void SetChannelWidth (uint32_t channelwidth) ;
 
   virtual uint32_t GetNBssMembershipSelectors (void) const;
   virtual uint32_t GetBssMembershipSelector (uint32_t selector) const;
@@ -444,6 +445,11 @@ private:
    * supported rates for 802.11n standard.
    */
   void Configure80211n (void);
+  /**
+   * Configure YansWifiPhy with appropriate channel frequency and
+   * supported rates for 802.11ah standard.
+   */
+void Configure80211ah (void);
   /**
    * Return the energy detection threshold.
    *
@@ -522,7 +528,7 @@ private:
   bool     m_greenfield;            //!< Flag if GreenField format is supported
   bool     m_guardInterval;         //!< Flag if short guard interval is used
   bool     m_channelBonding;        //!< Flag if channel bonding is used
-
+  uint32_t m_channelWidth;          //!< Channel width
 
   /**
    * This vector holds the set of transmission modes that this

@@ -715,6 +715,7 @@ RegularWifiMac::FinishConfigureStandard (enum WifiPhyStandard standard)
     case WIFI_PHY_STANDARD_80211_5MHZ:
     case WIFI_PHY_STANDARD_80211n_5GHZ:
     case WIFI_PHY_STANDARD_80211n_2_4GHZ:
+    case WIFI_PHY_STANDARD_80211ah:  // need to check parameter for 802.11ah
       cwmin = 15;
       cwmax = 1023;
       break;

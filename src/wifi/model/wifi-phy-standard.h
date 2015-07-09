@@ -48,7 +48,9 @@ enum WifiPhyStandard
   /** HT OFDM PHY for the 2.4 GHz band (clause 20) */
   WIFI_PHY_STANDARD_80211n_2_4GHZ,
   /** HT OFDM PHY for the 5 GHz band (clause 20) */
-  WIFI_PHY_STANDARD_80211n_5GHZ
+  WIFI_PHY_STANDARD_80211n_5GHZ,
+  /** ah support, Clause 24 */
+  WIFI_PHY_STANDARD_80211ah
 };
 
 } //namespace ns3

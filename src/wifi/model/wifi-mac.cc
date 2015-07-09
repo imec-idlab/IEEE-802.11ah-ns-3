@@ -314,6 +314,9 @@ WifiMac::ConfigureStandard (enum WifiPhyStandard standard)
     case WIFI_PHY_STANDARD_80211n_5GHZ:
       Configure80211n_5Ghz ();
       break;
+    case WIFI_PHY_STANDARD_80211ah:
+      Configure80211ah ();
+      break;
     default:
       NS_ASSERT (false);
       break;
@@ -390,6 +393,19 @@ WifiMac::Configure80211n_5Ghz (void)
 {
   Configure80211a ();
   SetRifs (MicroSeconds (2));
+  SetBasicBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultBasicBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
+  SetCompressedBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultCompressedBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
+}
+    
+void
+WifiMac::Configure80211ah (void)   //need to check following parameter for 802.11ah
+{
+  SetSifs (MicroSeconds (160));
+  SetSlot (MicroSeconds (52));
+  SetEifsNoDifs (MicroSeconds (160 + 440));
+  SetPifs (MicroSeconds (160 + 52));
+  SetCtsTimeout (MicroSeconds (160 + 440 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));
+  SetAckTimeout (MicroSeconds (160 + 440 + 1000 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));
   SetBasicBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultBasicBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
   SetCompressedBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultCompressedBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
 }

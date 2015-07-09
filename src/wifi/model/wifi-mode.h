@@ -54,7 +54,9 @@ enum WifiModulationClass
   /** OFDM PHY (Clause 17) */
   WIFI_MOD_CLASS_OFDM,
   /** HT PHY (Clause 20) */
-  WIFI_MOD_CLASS_HT
+  WIFI_MOD_CLASS_HT,
+  /** S1G PHY (Clause 24) */
+  WIFI_MOD_CLASS_S1G
 };
 
 /**
@@ -115,7 +117,7 @@ public:
   /**
    * \returns the size of the modulation constellation.
    */
-  uint8_t GetConstellationSize (void) const;
+  uint16_t GetConstellationSize (void) const;
   /**
    * \returns a human-readable representation of this WifiMode
    * instance.
@@ -229,7 +231,7 @@ public:
                                   uint32_t bandwidth,
                                   uint32_t dataRate,
                                   enum WifiCodeRate codingRate,
-                                  uint8_t constellationSize);
+                                  uint16_t constellationSize);
 
 
 private:
@@ -256,7 +258,7 @@ private:
     uint32_t dataRate;
     uint32_t phyRate;
     enum WifiModulationClass modClass;
-    uint8_t constellationSize;
+    uint16_t constellationSize;
     enum WifiCodeRate codingRate;
     bool isMandatory;
   };

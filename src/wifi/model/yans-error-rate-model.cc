@@ -184,9 +184,10 @@ YansErrorRateModel::GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbi
 {
   if (mode.GetModulationClass () == WIFI_MOD_CLASS_ERP_OFDM
       || mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM
-      || mode.GetModulationClass () == WIFI_MOD_CLASS_HT)
+      || mode.GetModulationClass () == WIFI_MOD_CLASS_HT
+      || mode.GetModulationClass () == WIFI_MOD_CLASS_S1G)
     {
-      if (mode.GetConstellationSize () == 2)
+      if (mode.GetConstellationSize () == 2) //SIG MCS=10 not supported
         {
           if (mode.GetCodeRate () == WIFI_CODE_RATE_1_2)
             {
@@ -292,6 +293,33 @@ YansErrorRateModel::GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbi
                                    5, //dFree
                                    8, //adFree
                                    31); //adFreePlusOne
+            }
+        }
+      else if (mode.GetConstellationSize () == 256)
+        {
+          if (mode.GetCodeRate () == WIFI_CODE_RATE_5_6)
+            {
+              return GetFecQamBer (snr,
+                                   nbits,
+                                   mode.GetBandwidth (), // signal spread
+                                   mode.GetPhyRate (), // phy rate
+                                   256, // m
+                                   4,  // dFree
+                                   14,  // adFree
+                                   69  // adFreePlusOne
+                                   );
+            }
+          else
+            {
+              return GetFecQamBer (snr,
+                                   nbits,
+                                   mode.GetBandwidth (), // signal spread
+                                   mode.GetPhyRate (), // phy rate
+                                   256, // m
+                                   5,  // dFree
+                                   8,  // adFree
+                                   31  // adFreePlusOne
+                                   );
             }
         }
     }

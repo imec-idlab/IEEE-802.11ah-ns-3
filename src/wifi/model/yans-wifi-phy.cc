@@ -166,12 +166,11 @@ YansWifiPhy::GetTypeId (void)
                    MakeBooleanAccessor (&YansWifiPhy::GetGreenfield,
                                         &YansWifiPhy::SetGreenfield),
                    MakeBooleanChecker ())
-    .AddAttribute ("ChannelBonding",
-                   "Whether 20MHz or 40MHz.",
-                   BooleanValue (false),
-                   MakeBooleanAccessor (&YansWifiPhy::GetChannelBonding,
-                                        &YansWifiPhy::SetChannelBonding),
-                   MakeBooleanChecker ())
+    .AddAttribute ("ChannelWidth", "Whether 1MHz, 2MHz, 4MHz, 8MHz, 16MHz, 20MHz or 40MHz.",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&YansWifiPhy::GetChannelWidth,
+                                         &YansWifiPhy::SetChannelWidth),
+                   MakeUintegerChecker<uint32_t> ())
   ;
   return tid;
 }
@@ -245,6 +244,9 @@ YansWifiPhy::ConfigureStandard (enum WifiPhyStandard standard)
     case WIFI_PHY_STANDARD_80211n_5GHZ:
       m_channelStartingFrequency = 5e3;
       Configure80211n ();
+      break;
+     case WIFI_PHY_STANDARD_80211ah:
+      Configure80211ah ();
       break;
     default:
       NS_ASSERT (false);
@@ -780,7 +782,7 @@ YansWifiPhy::SendPacket (Ptr<const Packet> packet, WifiTxVector txVector, WifiPr
     }
   NotifyTxBegin (packet);
   uint32_t dataRate500KbpsUnits;
-  if (txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
+  if (txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT || txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
     {
       dataRate500KbpsUnits = 128 + WifiModeToMcs (txVector.GetMode ());
     }
@@ -955,6 +957,24 @@ YansWifiPhy::Configure80211n (void)
       m_deviceMcsSet.push_back (i);
     }
 }
+    
+void
+YansWifiPhy::Configure80211ah (void)
+{
+    NS_LOG_FUNCTION (this);
+    m_channelStartingFrequency = 9e2;
+    
+    // need to check for 802.11ah
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6Mbps ());
+    //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate12Mbps ());
+    //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate24Mbps ());
+    m_bssMembershipSelectorSet.push_back(S1G_PHY);
+    for (uint8_t i=0; i <11; i++)
+    {
+        m_deviceMcsSet.push_back(i);
+    }
+}
+
 
 void
 YansWifiPhy::RegisterListener (WifiPhyListener *listener)
@@ -1098,7 +1118,7 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, enum WifiPreamble preamble, uint8_t
         {
           NotifyRxEnd (packet);
           uint32_t dataRate500KbpsUnits;
-          if ((event->GetPayloadMode ().GetModulationClass () == WIFI_MOD_CLASS_HT))
+          if ((event->GetPayloadMode ().GetModulationClass () == WIFI_MOD_CLASS_HT) || (event->GetPayloadMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G))
             {
               dataRate500KbpsUnits = 128 + WifiModeToMcs (event->GetPayloadMode ());
             }
@@ -1223,16 +1243,17 @@ YansWifiPhy::GetGreenfield (void) const
   return m_greenfield;
 }
 
-bool
-YansWifiPhy::GetChannelBonding (void) const
+void
+YansWifiPhy::SetChannelWidth(uint32_t channelwidth)
 {
-  return m_channelBonding;
+    NS_ASSERT_MSG (channelwidth == 1 || channelwidth == 2 || channelwidth == 4| channelwidth == 8| channelwidth ==16|| channelwidth == 20 || channelwidth == 40 || channelwidth == 80 || channelwidth == 160, "wrong channel width value");
+    m_channelWidth = channelwidth;
 }
 
-void
-YansWifiPhy::SetChannelBonding (bool channelbonding)
+uint32_t
+YansWifiPhy::GetChannelWidth(void) const
 {
-  m_channelBonding = channelbonding;
+    return m_channelWidth;
 }
 
 uint32_t
@@ -1264,6 +1285,29 @@ YansWifiPhy::GetMembershipSelectorModes (uint32_t selector)
       supportedmodes.push_back (WifiPhy::GetOfdmRate58_5MbpsBW20MHz ());
       supportedmodes.push_back (WifiPhy::GetOfdmRate65MbpsBW20MHz ());
     }
+  if (id == S1G_PHY)
+    {
+      //mandatory MCS 0 to 7, 1Mhz
+      supportedmodes.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate600KbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate900KbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate1_2MbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate1_8MbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate2_4MbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate2_7MbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate3MbpsBW1MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate150KbpsBW1MHz ());
+    //mandatory MCS 0 to 7, 2Mhz
+      supportedmodes.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate1_3MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate1_95MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate2_6MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate3_9MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate5_2MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate5_85MbpsBW2MHz ());
+      supportedmodes.push_back (WifiPhy::GetOfdmRate6_5MbpsBW2MHz ());
+    }
+
   return supportedmodes;
 }
 
@@ -1282,219 +1326,782 @@ YansWifiPhy::GetMcs (uint8_t mcs) const
 uint32_t
 YansWifiPhy::WifiModeToMcs (WifiMode mode)
 {
-  uint32_t mcs = 0;
-  if (mode.GetUniqueName () == "OfdmRate135MbpsBW40MHzShGi" || mode.GetUniqueName () == "OfdmRate65MbpsBW20MHzShGi")
+    uint32_t mcs = 0;
+    if (mode.GetUniqueName() == "OfdmRate5_85MbpsBW16MHz" || mode.GetUniqueName() == "OfdmRate6_5MbpsBW16MHz" )
     {
-      mcs = 6;
+        mcs = 0;
     }
-  else
+    else if (mode.GetUniqueName() == "OfdmRate3MbpsBW4MHz" || mode.GetUniqueName() == "OfdmRate5_85MbpsBW8MHz" )
     {
-      switch (mode.GetDataRate ())
+        mcs = 1;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate17_55MbpsBW16MHz" )
+    {
+        mcs =2;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate11_7MbpsBW8MHz" || mode.GetUniqueName() == "OfdmRate13MbpsBW8MHz"  || mode.GetUniqueName() == "OfdmRate23_4MbpsBW16MHz" || mode.GetUniqueName() == "OfdmRate26MbpsBW16MHz")
+    {
+        mcs = 3;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate19_5MbpsBW8MHz" || mode.GetUniqueName() == "OfdmRate35_1MbpsBW16MHz"  || mode.GetUniqueName() == "OfdmRate39MbpsBW16MHz" )
+    {
+        mcs = 4;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate2_7MbpsBW1MHz" || mode.GetUniqueName() == "OfdmRate3MbpsBW1MHzShGi" || mode.GetUniqueName() == "OfdmRate6_5MbpsBW2MHzShGi" || mode.GetUniqueName() == "OfdmRate13_5MbpsBW4MHzShGi" || mode.GetUniqueName() == "OfdmRate29_25MbpsBW8MHzShGi" ||
+             mode.GetUniqueName() == "OfdmRate58_5MbpsBW16MHzShGi" || mode.GetUniqueName() == "OfdmRate135MbpsBW40MHzShGi" || mode.GetUniqueName() == "OfdmRate65MbpsBW20MHzShGi" )
+    {
+        mcs = 6;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate6_5MbpsBW2MHz" )
+    {
+        mcs = 7;
+    }
+    else if (mode.GetUniqueName() == "OfdmRate4MbpsBW1MHzShGi" || mode.GetUniqueName() == "OfdmRate18MbpsBW4MHzShGi" || mode.GetUniqueName() == "OfdmRate39MbpsBW8MHzShGi" || mode.GetUniqueName() == "OfdmRate78MbpsBW16MHzShGi")
+    {
+        mcs = 8;
+    }
+    else if (mode.GetModulationClass() == WIFI_MOD_CLASS_S1G )
+    {
+        switch (mode.GetDataRate ())
         {
-        case 6500000:
-        case 7200000:
-        case 13500000:
-        case 15000000:
-          mcs = 0;
-          break;
-        case 13000000:
-        case 14400000:
-        case 27000000:
-        case 30000000:
-          mcs = 1;
-          break;
-        case 19500000:
-        case 21700000:
-        case 40500000:
-        case 45000000:
-          mcs = 2;
-          break;
-        case 26000000:
-        case 28900000:
-        case 54000000:
-        case 60000000:
-          mcs = 3;
-          break;
-        case 39000000:
-        case 43300000:
-        case 81000000:
-        case 90000000:
-          mcs = 4;
-          break;
-        case 52000000:
-        case 57800000:
-        case 108000000:
-        case 120000000:
-          mcs = 5;
-          break;
-        case 58500000:
-        case 121500000:
-          mcs = 6;
-          break;
-        case 65000000:
-        case 72200000:
-        case 135000000:
-        case 150000000:
-          mcs = 7;
-          break;
+            case 300000:
+            case 333300:
+            case 650000:
+            case 722200:
+            case 1350000:
+            case 1500000:
+            case 2925000:
+            case 3250000:
+                mcs = 0;
+                break;
+            case 600000:
+            case 666700:
+            case 1300000:
+            case 1444400:
+            case 2700000:
+            case 6500000:
+            case 11700000:
+            case 13000000:
+                mcs = 1;
+                break;
+            case 900000:
+            case 1000000:
+            case 1950000:
+            case 2166700:
+            case 4050000:
+            case 4500000:
+            case 8775000:
+            case 9750000:
+            case 19500000:
+                mcs=2;
+                break;
+            case 1200000:
+            case 1333300:
+            case 2600000:
+            case 2888900:
+            case 5400000:
+            case 6000000:
+                mcs=3;
+                break;
+            case 1800000:
+            case 2000000:
+            case 3900000:
+            case 4333300:
+            case 8100000:
+            case 9000000:
+            case 17550000:
+                mcs = 4;
+                break;
+            case 2400000:
+            case 2666700:
+            case 5200000:
+            case 5777800:
+            case 10800000:
+            case 12000000:
+            case 23400000:
+            case 26000000:
+            case 46800000:
+            case 52000000:
+                mcs=5;
+                break;
+            case 5850000:
+            case 12150000:
+            case 26325000:
+            case 52650000:
+                mcs=6;
+                break;
+            case 3000000:
+            case 3333300:
+            case 7222200:
+            case 13500000:
+            case 15000000:
+            case 29250000:
+            case 32500000:
+            case 58500000:
+            case 65000000:
+                mcs=7;
+                break;
+            case 3600000:
+            case 7800000:
+            case 8666700:
+            case 16200000:
+            case 35100000:
+            case 70200000:
+                mcs=8;
+                break;
+            case 4000000:
+            case 4444400:
+            case 18000000:
+            case 20000000:
+            case 39000000:
+            case 43333300:
+            case 78000000:
+            case 86666700:
+                mcs=9;
+                break;
+            case 150000:
+            case 166700:
+                mcs=10;
+                break;
         }
     }
-  return mcs;
+    else
+    {
+        switch (mode.GetDataRate())
+        {
+            case 6500000:
+            case 7200000:
+            case 13500000:
+            case 15000000:
+                mcs=0;
+                break;
+            case 13000000:
+            case 14400000:
+            case 27000000:
+            case 30000000:
+                mcs=1;
+                break;
+            case 19500000:
+            case 21700000:
+            case 40500000:
+            case 45000000:
+                mcs=2;
+                break;
+            case 26000000:
+            case 28900000:
+            case 54000000:
+            case 60000000:
+                mcs=3;
+                break;
+            case 39000000:
+            case 43300000:
+            case 81000000:
+            case 90000000:
+                mcs=4;
+                break;
+            case 52000000:
+            case 57800000:
+            case 108000000:
+            case 120000000:
+                mcs=5;
+                break;
+            case 58500000:
+            case 121500000:
+                mcs=6;
+                break;
+            case 65000000:
+            case 72200000:
+            case 135000000:
+            case 150000000:
+                mcs=7;
+                break;
+        }
+    }
+    return mcs;
 }
+
 
 WifiMode
 YansWifiPhy::McsToWifiMode (uint8_t mcs)
 {
-  WifiMode mode;
-  switch (mcs)
+    WifiMode mode;
+    switch (mcs)
     {
-    case 7:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode =  WifiPhy::GetOfdmRate65MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate72_2MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate135MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate150MbpsBW40MHz ();
-        }
-      break;
-    case 6:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate58_5MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate65MbpsBW20MHzShGi ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate121_5MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate135MbpsBW40MHzShGi ();
-        }
-      break;
-    case 5:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate52MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate57_8MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate108MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate120MbpsBW40MHz ();
-        }
-      break;
-    case 4:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate39MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate43_3MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate81MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate90MbpsBW40MHz ();
-        }
-      break;
-    case 3:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate26MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate28_9MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate54MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate60MbpsBW40MHz ();
-        }
-      break;
-    case 2:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate19_5MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate21_7MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode =  WifiPhy::GetOfdmRate40_5MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate45MbpsBW40MHz ();
-        }
-      break;
-    case 1:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate13MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode =  WifiPhy::GetOfdmRate14_4MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate27MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate30MbpsBW40MHz ();
-        }
-      break;
-    case 0:
-    default:
-      if (!GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate6_5MbpsBW20MHz ();
-        }
-      else if (GetGuardInterval () && !GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate7_2MbpsBW20MHz ();
-        }
-      else if (!GetGuardInterval () && GetChannelBonding ())
-        {
-          mode = WifiPhy::GetOfdmRate13_5MbpsBW40MHz ();
-        }
-      else
-        {
-          mode = WifiPhy::GetOfdmRate15MbpsBW40MHz ();
-        }
-      break;
+        case 10:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate150KbpsBW1MHz ();
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate166_7KbpsBW1MHz ();
+            }
+            break;
+        case 9:
+            
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate4MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate4_444_4MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate18MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate20MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate39MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate43_333_3MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate78MbpsBW16MHz ();
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate86_666_7MbpsBW16MHz ();
+            }
+            break;
+        case 8:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate3_6MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate4MbpsBW1MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate7_8MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate8_666_7MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate16_2MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate18MbpsBW4MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate35_1MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate39MbpsBW8MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate70_2MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate78MbpsBW16MHzShGi ();
+            }
+            break;
+        case 7:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate3MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate3_333_3MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate6_5MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate7_222_2MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate13_5MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate15MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate29_25MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate32_5MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate58_5MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate65MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode =  WifiPhy::GetOfdmRate65MbpsBW20MHz ();
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate72_2MbpsBW20MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate135MbpsBW40MHz ();
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate150MbpsBW40MHz ();
+            }
+            break;
+        case 6:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate2_7MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate3MbpsBW1MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate5_85MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate6_5MbpsBW2MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate12_15MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate13_5MbpsBW4MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate26_325MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate29_25MbpsBW8MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate52_65MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate58_5MbpsBW16MHzShGi ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate58_5MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode =  WifiPhy::GetOfdmRate65MbpsBW20MHzShGi ();
+                
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate121_5MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode= WifiPhy::GetOfdmRate135MbpsBW40MHzShGi ();
+                
+            }
+            break;
+        case 5:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate2_4MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate2_666_7MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate5_2MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate5_777_8MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate10_8MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate12MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate23_4MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate26MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate46_8MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate52MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate52MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate57_8MbpsBW20MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate108MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate120MbpsBW40MHz ();
+                
+            }
+            break;
+        case 4:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate1_8MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate2MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate3_9MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate4_333_3MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate8_1MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate9MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate17_55MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate19_5MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate35_1MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate39MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate39MbpsBW20MHz ();
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate43_3MbpsBW20MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate81MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate90MbpsBW40MHz ();
+                
+            }
+            break;
+        case 3:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate1_2MbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate1_333_3MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate2_6MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate2_8889MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate5_4MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate6MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate11_7MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate13MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate23_4MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate26MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode =  WifiPhy::GetOfdmRate26MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate28_9MbpsBW20MHz ();
+                
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate54MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate60MbpsBW40MHz ();
+            }
+            break;
+        case 2:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate900KbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate1MbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate1_95MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate2_166_7MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate4_05MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate4_5MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate8_775MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate9_75MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate17_55MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate19_5MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate19_5MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate21_7MbpsBW20MHz ();
+                
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode =  WifiPhy::GetOfdmRate40_5MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate45MbpsBW40MHz ();
+                
+            }
+            break;
+        case 1:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate600KbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate666_7KbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate1_3MbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate1_444_4MbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate2_7MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate3MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate5_85MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate6_5MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate11_7MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate13MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate13MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode =  WifiPhy::GetOfdmRate14_4MbpsBW20MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate27MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate30MbpsBW40MHz ();
+            }
+            break;
+        case 0:
+        default:
+            if (!GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate300KbpsBW1MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 1)
+            {
+                mode = WifiPhy::GetOfdmRate333_3KbpsBW1MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate650KbpsBW2MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 2)
+            {
+                mode = WifiPhy::GetOfdmRate722_2KbpsBW2MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate1_35MbpsBW4MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 4)
+            {
+                mode = WifiPhy::GetOfdmRate1_5MbpsBW4MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate2_925MbpsBW8MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 8)
+            {
+                mode = WifiPhy::GetOfdmRate3_25MbpsBW8MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate5_85MbpsBW16MHz ();
+            }
+            else if (GetGuardInterval() && GetChannelWidth() == 16)
+            {
+                mode = WifiPhy::GetOfdmRate6_5MbpsBW16MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate6_5MbpsBW20MHz ();
+                
+            }
+            else if(GetGuardInterval() && GetChannelWidth() == 20)
+            {
+                mode = WifiPhy::GetOfdmRate7_2MbpsBW20MHz ();
+            }
+            else if (!GetGuardInterval() && GetChannelWidth() == 40)
+            {
+                mode = WifiPhy::GetOfdmRate13_5MbpsBW40MHz ();
+                
+            }
+            else
+            {
+                mode = WifiPhy::GetOfdmRate15MbpsBW40MHz ();
+            }
+            break;
     }
-  return mode;
+    return mode;
 }
+
 
 } //namespace ns3

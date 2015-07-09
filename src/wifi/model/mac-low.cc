@@ -1238,7 +1238,7 @@ MacLow::GetAckDuration (Mac48Address to, WifiTxVector dataTxVector) const
 Time
 MacLow::GetAckDuration (WifiTxVector ackTxVector) const
 {
-  NS_ASSERT (ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT); // ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
+  NS_ASSERT (ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT || ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_S1G); // ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
   return m_phy->CalculateTxDuration (GetAckSize (), ackTxVector, WIFI_PREAMBLE_LONG, m_phy->GetFrequency (), 0, 0);
 }
 
@@ -1253,6 +1253,10 @@ MacLow::GetBlockAckDuration (Mac48Address to, WifiTxVector blockAckReqTxVector, 
   if (blockAckReqTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT && type == BASIC_BLOCK_ACK)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
+    }
+  else if (blockAckReqTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G && type == BASIC_BLOCK_ACK)
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;  // need to check for 802.11ah
     }
   else
     {
@@ -1272,6 +1276,7 @@ Time
 MacLow::GetCtsDuration (WifiTxVector ctsTxVector) const
 {
   NS_ASSERT (ctsTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT); // CTS should always use non-HT PPDU (HT PPDU cases not supported yet)
+  NS_ASSERT (ctsTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_S1G); //need to check for 802.11ah
   return m_phy->CalculateTxDuration (GetCtsSize (), ctsTxVector, WIFI_PREAMBLE_LONG, m_phy->GetFrequency (), 0, 0);
 }
 
@@ -1385,6 +1390,10 @@ MacLow::CalculateOverallTxTime (Ptr<const Packet> packet,
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
+  else if (dataTxVector.GetMode().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;  //need to add support on S1G_LONG and S1G_1M
+    }
   else
     {
       preamble = WIFI_PREAMBLE_LONG;
@@ -1416,6 +1425,10 @@ MacLow::CalculateTransmissionTime (Ptr<const Packet> packet,
       else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
         {
           preamble = WIFI_PREAMBLE_HT_MF;
+        }
+      else if (dataTxVector.GetMode().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+        {
+          preamble = WIFI_PREAMBLE_S1G_SHORT; //only support S1G_SHORT frame
         }
       else
         {
@@ -1798,6 +1811,10 @@ MacLow::StartDataTxTimers (WifiTxVector dataTxVector)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
+  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT; //only support S1G_SHORT
+    }
   else
     {
       preamble = WIFI_PREAMBLE_LONG;
@@ -1878,6 +1895,10 @@ MacLow::SendDataPacket (void)
   else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
+    }
+  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) //  only support S1G_SHORT
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
     }
   else
     {
@@ -1965,6 +1986,10 @@ MacLow::SendCtsToSelf (void)
   if (ctsTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
+    }
+   else if (ctsTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) //need to check for 802.11ah
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
     }
   else
     {
@@ -2104,6 +2129,10 @@ MacLow::SendDataAfterCts (Mac48Address source, Time duration)
   else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
+    }
+  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) // only support S1G_SHORT
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
     }
   else
     {
@@ -2516,6 +2545,10 @@ MacLow::SendBlockAckResponse (const CtrlBAckResponseHeader* blockAck, Mac48Addre
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
+  else if (blockAckReqTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) //need to check 802.11ah
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
   else
     {
       preamble = WIFI_PREAMBLE_LONG;
@@ -2726,6 +2759,10 @@ MacLow::StopMpduAggregation (Ptr<const Packet> peekedPacket, WifiMacHeader peeke
   else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
+    }
+  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) //only support S1G_SHORT
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
     }
   else
     {

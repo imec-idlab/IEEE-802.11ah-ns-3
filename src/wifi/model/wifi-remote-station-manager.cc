@@ -981,7 +981,8 @@ WifiRemoteStationManager::GetControlAnswerMode (Mac48Address address, WifiMode r
       if ((!found || i->GetPhyRate () > mode.GetPhyRate ())
           && (i->GetPhyRate () <= reqMode.GetPhyRate ())
           && ((i->GetModulationClass () == reqMode.GetModulationClass ())
-              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_HT)))
+              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_HT)
+              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_S1G)))
         {
           mode = *i;
           //We've found a potentially-suitable transmit rate, but we
@@ -1055,7 +1056,8 @@ WifiRemoteStationManager::GetControlAnswerMode (Mac48Address address, WifiMode r
           && (!found || thismode.GetPhyRate () > mode.GetPhyRate ())
           && (thismode.GetPhyRate () <= reqMode.GetPhyRate ())
           && ((thismode.GetModulationClass () == reqMode.GetModulationClass ())
-              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_HT)))
+              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_HT)
+              || (reqMode.GetModulationClass () == WIFI_MOD_CLASS_S1G)))
         {
           mode = thismode;
           //As above; we've found a potentially-suitable transmit
@@ -1366,9 +1368,9 @@ void
 WifiRemoteStationManager::AddBasicMode (WifiMode mode)
 {
   NS_LOG_FUNCTION (this << mode);
-  if (mode.GetModulationClass () == WIFI_MOD_CLASS_HT)
+  if (mode.GetModulationClass () == WIFI_MOD_CLASS_HT || mode.GetModulationClass () == WIFI_MOD_CLASS_S1G) //need to check for 802.11ah
     {
-      NS_FATAL_ERROR ("It is not allowed to add a HT rate in the BSSBasicRateSet!");
+      NS_FATAL_ERROR ("It is not allowed to add a HT/S1G rate in the BSSBasicRateSet!");
     }
   for (uint32_t i = 0; i < GetNBasicModes (); i++)
     {

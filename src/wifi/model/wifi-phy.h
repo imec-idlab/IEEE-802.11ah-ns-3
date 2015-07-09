@@ -346,6 +346,34 @@ public:
    */
   static Time GetPlcpPreambleDuration (WifiMode payloadMode, WifiPreamble preamble);
   /**
+   * \param preamble the type of preamble
+   * \param txvector the transmission parameters used for this packet
+   *
+   * \return S1G training symbol duration
+   */
+  static Time GetPlcpS1gTrainingSymbolDuration (WifiPreamble preamble, WifiTxVector txvector);
+  /**
+   * \param preamble the type of preamble
+   * \param txvector the transmission parameters used for this packet
+   *
+   * \return S1G-A  symbol duration
+   */
+  static Time GetPlcpSigADuration (WifiPreamble preamble);
+  /**
+   * \param preamble the type of preamble
+   * \param txvector the transmission parameters used for this packet
+   *
+   * \return S1G-B  symbol duration
+   */
+  static Time GetPlcpSigBDuration (WifiPreamble preamble);
+  /**
+   * \param preamble the type of preamble
+   * \param txvector the transmission parameters used for this packet
+   *
+   * \return Plcp Training  symbol duration
+   */
+  static Time GetPlcpTrainingSymbolDuration (WifiPreamble preamble, WifiTxVector txvector);
+  /**
    * \param size the number of bytes in the packet to send
    * \param txvector the transmission parameters used for this packet
    * \param preamble the type of preamble to use for this packet
@@ -938,7 +966,615 @@ public:
    * \return a WifiMode for OFDM at 150Mbps with 40MHz channel spacing
    */
   static WifiMode GetOfdmRate150MbpsBW40MHz ();
-
+/**
+ * Return a WifiMode for OFDM at 300Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 300Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate300KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 333.3Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 333.3Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate333_3KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 600Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 600Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate600KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 666_7Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 666_7Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate666_7KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 900Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 900Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate900KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 1Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate1MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.2Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.2Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_2MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.3333Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.3333Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_333_3MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.8Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.8Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_8MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 2Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate2MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.4Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.4Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_4MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.6667Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.6667Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_666_7MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.7Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.7Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_7MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 3Mbps with 1MHz channel spacing.
+ * The rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 3Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate3MbpsBW1MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 3Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate3MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 3.3333Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3.3333Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate3_333_3MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 3.6Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3.6Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate3_6MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 4Mbps with 1MHz channel spacing.
+ * The rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 4Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate4MbpsBW1MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 4Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 4Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate4MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 4.4444Mbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 4.4444Mbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate4_444_4MbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 150Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 150Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate150KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 166.7Kbps with 1MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 166.7Kbps with 1MHz channel spacing
+ */
+static WifiMode GetOfdmRate166_7KbpsBW1MHz ();
+/**
+ * Return a WifiMode for OFDM at 650Kbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 650Kbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate650KbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 722.2Kbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 722.2Kbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate722_2KbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.3Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.3Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_3MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.4444Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.4444Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_444_4MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.95Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.95Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_95MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.1667Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.1667Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_166_7MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.6Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.6Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_6MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.8889Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.8889Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_8889MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 3.9Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3.9Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate3_9MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 4.3333Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 4.3333Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate4_333_3MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.2Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.2Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_2MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.7778Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.7778Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_777_8MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.85Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.85Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_85MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 6.5Mbps with 2MHz channel spacing.
+ * The rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 6.5Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate6_5MbpsBW2MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 6.5Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 6.5Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate6_5MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 7.2222Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 7.2222Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate7_222_2MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 7.8Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 7.8Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate7_8MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 8.6667Mbps with 2MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 8.6667Mbps with 2MHz channel spacing
+ */
+static WifiMode GetOfdmRate8_666_7MbpsBW2MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.35Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.35Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_35MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 1.5Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 1.5Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate1_5MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.7Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.7Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_7MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 3Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate3MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 4.05Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 4.05Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate4_05MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 4.5Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 4.5Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate4_5MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.4Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.4Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_4MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 6Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 6Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate6MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 8.1Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 8.1Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate8_1MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 9Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 9Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate9MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 10.8Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 10.8Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate10_8MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 12Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 12Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate12MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 12.15Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 12.15Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate12_15MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 13.5Mbps with 4MHz channel spacing.
+ * The rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 13.5Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate13_5MbpsBW4MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 13.5Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 13.5Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate13_5MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 15Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 15Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate15MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 16.2Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 16.2Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate16_2MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 18Mbps with 4MHz channel spacing.
+ * The rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 18Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate18MbpsBW4MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 18Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 18Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate18MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 20Mbps with 4MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 20Mbps with 4MHz channel spacing
+ */
+static WifiMode GetOfdmRate20MbpsBW4MHz ();
+/**
+ * Return a WifiMode for OFDM at 2.925Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 2.925Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate2_925MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 3.25Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 3.25Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate3_25MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.85Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.85Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_85MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 6.5Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 6.5Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate6_5MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 8.775Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 8.775Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate8_775MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 9.75Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 9.75Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate9_75MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 11.7Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 11.7Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate11_7MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 13Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 13Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate13MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 17.55Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 17.55Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate17_55MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 19.5Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 19.5Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate19_5MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 23.4Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 23.4Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate23_4MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 26Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 26Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate26MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 26.325Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 26.325Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate26_325MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 29.25Mbps with 8MHz channel spacing.
+ * This rate supporrts short guard interval.
+ *
+ * \return a WifiMode for OFDM at 29.25Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate29_25MbpsBW8MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 29.25Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 29.25Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate29_25MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 32.5Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 32.5Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate32_5MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 35.1Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 35.1Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate35_1MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 39Mbps with 8MHz channel spacing.
+ * This rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 39Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate39MbpsBW8MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 39Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 39Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate39MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 43.3333Mbps with 8MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 43.3333Mbps with 8MHz channel spacing
+ */
+static WifiMode GetOfdmRate43_333_3MbpsBW8MHz ();
+/**
+ * Return a WifiMode for OFDM at 5.85Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 5.85Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate5_85MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 6.5Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 6.5Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate6_5MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 11.7Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 11.7Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate11_7MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 13Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 13Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate13MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 17.55Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 17.55Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate17_55MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 19.5Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 19.5Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate19_5MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 23.4Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 23.4Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate23_4MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 26Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 26Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate26MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 35.1Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 35.1Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate35_1MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 39Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 39Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate39MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 46.8Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 46.8Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate46_8MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 52Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 52Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate52MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 52.65Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 52.65Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate52_65MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 58.5Mbps with 16MHz channel spacing.
+ * This rate supports short guard interval.
+ *
+ * \return a WifiMode for OFDM at 58.5Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate58_5MbpsBW16MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 58.5Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 58.5Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate58_5MbpsBW16MHz();
+/**
+ * Return a WifiMode for OFDM at 65Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 65Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate65MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 70.2Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 70.2Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate70_2MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 78Mbps with 16MHz channel spacing.
+ * This rate supports short guards interval.
+ *
+ * \return a WifiMode for OFDM at 78Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate78MbpsBW16MHzShGi ();
+/**
+ * Return a WifiMode for OFDM at 78Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 78Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate78MbpsBW16MHz ();
+/**
+ * Return a WifiMode for OFDM at 86.6667Mbps with 16MHz channel spacing.
+ *
+ * \return a WifiMode for OFDM at 86.6667Mbps with 16MHz channel spacing
+ */
+static WifiMode GetOfdmRate86_666_7MbpsBW16MHz ();
   /**
    * Public method used to fire a PhyTxBegin trace.
    * Implemented for encapsulation purposes.
@@ -1132,14 +1768,13 @@ public:
    */
   virtual bool GetGreenfield (void) const = 0;
   /**
-   * \return true if channel bonding 40 MHz is supported, false otherwise
+   * \return the channel width
    */
-  virtual bool GetChannelBonding (void) const = 0;
+  virtual uint32_t GetChannelWidth (void) const = 0;
   /**
-   * \param channelbonding Enable or disable channel bonding
+   *  \param channelwidth channel width
    */
-  virtual void SetChannelBonding (bool channelbonding) = 0;
-
+  virtual void SetChannelWidth (uint32_t channelwidth) = 0;
 
 private:
   /**

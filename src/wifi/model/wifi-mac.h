@@ -290,6 +290,7 @@ public:
    * \sa WifiMac::Configure80211_5Mhz
    * \sa WifiMac::Configure80211n_2_4Ghz
    * \sa WifiMac::Configure80211n_5Ghz
+   * \sa WifiMac::Configure80211ah
    */
   void ConfigureStandard (enum WifiPhyStandard standard);
 
@@ -430,6 +431,11 @@ private:
    * Sifs, Slot, EifsNoDifs, Pifs, CtsTimeout, and AckTimeout.
    */
   void Configure80211n_5Ghz (void);
+  /**
+   * This method sets 802.11ah standards-compliant defaults for following attributes:
+   * Sifs, Slot, EifsNoDifs, Pifs, CtsTimeout, and AckTimeout.
+   */
+  void Configure80211ah (void); //some parameter need to be changed
 
   /**
    * The trace source fired when packets come into the "top" of the device

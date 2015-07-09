@@ -217,7 +217,8 @@ NistErrorRateModel::GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbi
 {
   if (mode.GetModulationClass () == WIFI_MOD_CLASS_ERP_OFDM
       || mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM
-      || mode.GetModulationClass () == WIFI_MOD_CLASS_HT)
+      || mode.GetModulationClass () == WIFI_MOD_CLASS_HT
+      || mode.GetModulationClass () == WIFI_MOD_CLASS_S1G) // no support on 256QAM
     {
       if (mode.GetConstellationSize () == 2)
         {

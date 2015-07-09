@@ -288,10 +288,31 @@ InterferenceHelper::CalculatePlcpPayloadPer (Ptr<const InterferenceHelper::Event
   Time previous = (*j).GetTime ();
   WifiMode payloadMode = event->GetPayloadMode ();
   WifiPreamble preamble = event->GetPreambleType ();
-  Time plcpHeaderStart = (*j).GetTime () + WifiPhy::GetPlcpPreambleDuration (payloadMode, preamble); //packet start time + preamble
-  Time plcpHsigHeaderStart = plcpHeaderStart + WifiPhy::GetPlcpHeaderDuration (payloadMode, preamble); //packet start time + preamble + L-SIG
-  Time plcpHtTrainingSymbolsStart = plcpHsigHeaderStart + WifiPhy::GetPlcpHtSigHeaderDuration (preamble); //packet start time + preamble + L-SIG + HT-SIG
-  Time plcpPayloadStart = plcpHtTrainingSymbolsStart + WifiPhy::GetPlcpHtTrainingSymbolDuration (preamble,event->GetTxVector ()); //packet start time + preamble + L-SIG + HT-SIG + HT Training
+  Time plcpHeaderStart;
+  Time plcpHsigHeaderStart;
+  Time plcpHtTrainingSymbolsStart;
+  Time plcpPayloadStart;
+
+  Time plcpTrainingSymbolsStart;
+  Time plcpSigAStart;
+  Time plcpS1gTrainingSymbolsStart;
+  Time plcpSigBStart;
+ if (payloadMode.GetModulationClass () != WIFI_MOD_CLASS_S1G)
+ {
+  plcpHeaderStart = (*j).GetTime () + WifiPhy::GetPlcpPreambleDuration (payloadMode, preamble); //packet start time + preamble
+  plcpHsigHeaderStart = plcpHeaderStart + WifiPhy::GetPlcpHeaderDuration (payloadMode, preamble); //packet start time + preamble + L-SIG
+  plcpHtTrainingSymbolsStart = plcpHsigHeaderStart + WifiPhy::GetPlcpHtSigHeaderDuration (preamble); //packet start time + preamble + L-SIG + HT-SIG
+  plcpPayloadStart = plcpHtTrainingSymbolsStart + WifiPhy::GetPlcpHtTrainingSymbolDuration (preamble,event->GetTxVector ()); //packet start time + preamble + L-SIG + HT-SIG + HT Training
+   }
+ else
+   {
+  plcpHeaderStart = (*j).GetTime () + WifiPhy::GetPlcpPreambleDuration (payloadMode, preamble); //packet start time + preamble
+  plcpTrainingSymbolsStart = plcpHeaderStart + WifiPhy::GetPlcpHeaderDuration (payloadMode, preamble); //packet start time + preamble + L-SIG
+  plcpSigAStart = plcpTrainingSymbolsStart + WifiPhy::GetPlcpTrainingSymbolDuration (preamble,event->GetTxVector()); //packet start time + preamble + L-SIG + LTF
+  plcpS1gTrainingSymbolsStart = plcpSigAStart + WifiPhy::GetPlcpSigADuration (preamble); //packet start time + preamble + L-SIG + LTF + S1G-A
+  plcpSigBStart = plcpS1gTrainingSymbolsStart + WifiPhy::GetPlcpS1gTrainingSymbolDuration (preamble,event->GetTxVector()); //packet start time + preamble + L-SIG + LTF + S1G-A + S1G Training
+  plcpPayloadStart = plcpSigBStart + WifiPhy::GetPlcpSigBDuration (preamble); ////packet start time + preamble + L-SIG + LTF + S1G-A + S1G Training + S1G-B
+   }
   double noiseInterferenceW = (*j).GetDelta ();
   double powerW = event->GetRxPowerW ();
   j++;
@@ -347,10 +368,31 @@ InterferenceHelper::CalculatePlcpHeaderPer (Ptr<const InterferenceHelper::Event>
       htHeaderMode = WifiPhy::GetHTPlcpHeaderMode (payloadMode, preamble);
     }
   WifiMode headerMode = WifiPhy::GetPlcpHeaderMode (payloadMode, preamble);
+  Time plcpHeaderStart;
+  Time plcpHsigHeaderStart;
+  Time plcpHtTrainingSymbolsStart;
+  Time plcpPayloadStart;
+
+  Time plcpTrainingSymbolsStart;
+  Time plcpSigAStart;
+  Time plcpS1gTrainingSymbolsStart;
+  Time plcpSigBStart;
+if (payloadMode.GetModulationClass () != WIFI_MOD_CLASS_S1G)
+ {
   Time plcpHeaderStart = (*j).GetTime () + WifiPhy::GetPlcpPreambleDuration (payloadMode, preamble); //packet start time + preamble
   Time plcpHsigHeaderStart = plcpHeaderStart + WifiPhy::GetPlcpHeaderDuration (payloadMode, preamble); //packet start time + preamble + L-SIG
   Time plcpHtTrainingSymbolsStart = plcpHsigHeaderStart + WifiPhy::GetPlcpHtSigHeaderDuration (preamble); //packet start time + preamble + L-SIG + HT-SIG
   Time plcpPayloadStart = plcpHtTrainingSymbolsStart + WifiPhy::GetPlcpHtTrainingSymbolDuration (preamble, event->GetTxVector ()); //packet start time + preamble + L-SIG + HT-SIG + HT Training
+ }
+else
+ {
+  Time plcpHeaderStart = (*j).GetTime () + WifiPhy::GetPlcpPreambleDuration (payloadMode, preamble); //packet start time + preamble
+  Time plcpTrainingSymbolsStart = plcpHeaderStart + WifiPhy::GetPlcpHeaderDuration (payloadMode, preamble); //packet start time + preamble + L-SIG
+  Time plcpSigAStart = plcpTrainingSymbolsStart + WifiPhy::GetPlcpTrainingSymbolDuration (preamble,event->GetTxVector()); //packet start time + preamble + L-SIG + LTF
+  Time plcpS1gTrainingSymbolsStart = plcpSigAStart + WifiPhy::GetPlcpSigADuration (preamble); //packet start time + preamble + L-SIG + LTF + S1G-A
+  Time plcpSigBStart = plcpS1gTrainingSymbolsStart + WifiPhy::GetPlcpS1gTrainingSymbolDuration (preamble,event->GetTxVector()); //packet start time + preamble + L-SIG + LTF + S1G-A + S1G Training
+  Time plcpPayloadStart = plcpSigBStart + WifiPhy::GetPlcpSigBDuration (preamble); ////packet start time + preamble + L-SIG + LTF + S1G-A + S1G Training + S1G-B
+ }
   double noiseInterferenceW = (*j).GetDelta ();
   double powerW = event->GetRxPowerW ();
   j++;
@@ -359,6 +401,8 @@ InterferenceHelper::CalculatePlcpHeaderPer (Ptr<const InterferenceHelper::Event>
       Time current = (*j).GetTime ();
       NS_LOG_DEBUG ("previous= " << previous << ", current=" << current);
       NS_ASSERT (current >= previous);
+   if (payloadMode.GetModulationClass () != WIFI_MOD_CLASS_S1G)
+    {
       //Case 1: previous and current after playload start: nothing to do
       if (previous >= plcpPayloadStart)
         {
@@ -525,6 +569,113 @@ InterferenceHelper::CalculatePlcpHeaderPer (Ptr<const InterferenceHelper::Event>
               NS_LOG_DEBUG ("Case 4c - previous is in the preamble: mode=" << headerMode << ", psr=" << psr);
             }
         }
+      }
+    else
+     {
+         //Case 1: previous and current after playload start: nothing to do
+         if (previous >= plcpPayloadStart)
+         {
+             psr *= 1;
+             NS_LOG_DEBUG ("Case 1 - previous and current after playload start: nothing to do");
+         }
+         //Case 2: previous is in S1G-A or in S1G training or in S1G-B. only SIG_LONG enter
+         else if (previous >= plcpSigAStart)
+         {
+             NS_ASSERT ((preamble != WIFI_PREAMBLE_S1G_SHORT) && (preamble != WIFI_PREAMBLE_S1G_1M));
+             //Case 2a: current after payload start
+             if (current >= plcpPayloadStart)
+             {
+                 psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                 noiseInterferenceW,
+                                                                 headerMode),
+                                                   plcpPayloadStart - previous,
+                                                   headerMode);
+                 
+                 NS_LOG_DEBUG ("Case 2a - previous is in S1G-A or in S1G training or in S1G-B and current after payload start: mode=" << htHeaderMode << ", psr=" << psr);
+             }
+             //Case 2b: current is in S1G-A or in S1G training or in S1G-B
+             else
+             {
+                 psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                 noiseInterferenceW,
+                                                                 headerMode),
+                                                   current - previous,
+                                                   headerMode);
+                 
+                 NS_LOG_DEBUG ("Case 2b - previous is in S1G-A or in S1G training or in S1G-B and current is S1G-A or in S1G training or in S1G-B: mode=" << htHeaderMode << ", psr=" << psr);
+             }
+         }
+         //Case 3: previous in LTF or SIG: S1G_LONG will not reach here because it will execute the previous if and exit
+         else if (previous >= plcpHeaderStart)
+         {
+             NS_ASSERT (preamble != WIFI_PREAMBLE_S1G_LONG);
+             //Case 3a: current after payload start
+             if (current >= plcpPayloadStart)
+             {
+
+                     psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                     noiseInterferenceW,
+                                                                     headerMode),
+                                                       plcpPayloadStart - previous,
+                                                       headerMode);
+                     
+                     NS_LOG_DEBUG ("Case 3aii - previous in LTF and current after payload start: HT mode=" << htHeaderMode << ", non-HT mode=" << headerMode << ", psr=" << psr);
+                 
+             }
+             //Case 3b: current with previous in LTF or SIG
+             else
+             {
+                 psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                 noiseInterferenceW,
+                                                                 headerMode),
+                                                   current - previous,
+                                                   headerMode);
+                 
+                 NS_LOG_DEBUG ("Case 3c - current with previous in LTF or SIG: mode=" << headerMode << ", psr=" << psr);
+             }
+         }
+         //Case 4: previous is in the preamble works for all cases
+         else
+         {
+             if (current >= plcpPayloadStart)
+             {
+                     psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                     noiseInterferenceW,
+                                                                     headerMode),
+                                                       plcpPayloadStart - plcpHeaderStart, //For S1G_LONG,  plcpHeaderStart equals plcpSigAStart
+                                                       headerMode);
+                     
+                     NS_LOG_DEBUG ("Case 4a - previous is in the preamble: mode=" << headerMode << ", psr=" << psr);
+                 
+             }
+             //only S1G_LONG come here
+             else if (current >= plcpSigAStart)
+             {
+                 NS_ASSERT ((preamble != WIFI_PREAMBLE_S1G_SHORT) && (preamble != WIFI_PREAMBLE_S1G_1M));
+                 
+                 psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                 noiseInterferenceW,
+                                                                 headerMode),
+                                                   current - plcpSigAStart,
+                                                   headerMode);
+                 
+                 NS_LOG_DEBUG ("Case 4b - previous is in the preamble: mode=" << headerMode << ", psr=" << psr);
+             }
+             //S1G_LONG will not come here
+             else if (current >= plcpHeaderStart)
+             {
+                 NS_ASSERT (preamble != WIFI_PREAMBLE_S1G_LONG);
+                 
+                 psr *= CalculateChunkSuccessRate (CalculateSnr (powerW,
+                                                                 noiseInterferenceW,
+                                                                 headerMode),
+                                                   current - plcpHeaderStart,
+                                                   headerMode);
+                 
+                 NS_LOG_DEBUG ("Case 4c - previous is in the preamble: mode=" << headerMode << ", psr=" << psr);
+             }
+         }
+      }      
 
       noiseInterferenceW += (*j).GetDelta ();
       previous = (*j).GetTime ();

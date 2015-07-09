@@ -95,7 +95,7 @@ WifiMode::GetCodeRate (void) const
   return item->codingRate;
 }
 
-uint8_t
+uint16_t
 WifiMode::GetConstellationSize (void) const
 {
   struct WifiModeFactory::WifiModeItem *item = WifiModeFactory::GetFactory ()->Get (m_uid);
@@ -157,7 +157,7 @@ WifiModeFactory::CreateWifiMode (std::string uniqueName,
                                  uint32_t bandwidth,
                                  uint32_t dataRate,
                                  enum WifiCodeRate codingRate,
-                                 uint8_t constellationSize)
+                                 uint16_t constellationSize)
 {
   WifiModeFactory *factory = GetFactory ();
   uint32_t uid = factory->AllocateUid (uniqueName);
