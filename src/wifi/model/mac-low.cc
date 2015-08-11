@@ -1238,8 +1238,17 @@ MacLow::GetAckDuration (Mac48Address to, WifiTxVector dataTxVector) const
 Time
 MacLow::GetAckDuration (WifiTxVector ackTxVector) const
 {
-  NS_ASSERT (ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT || ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_S1G); // ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
-  return m_phy->CalculateTxDuration (GetAckSize (), ackTxVector, WIFI_PREAMBLE_LONG, m_phy->GetFrequency (), 0, 0);
+  NS_ASSERT (ackTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT); // ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
+  WifiPreamble preamble;
+  if (ackTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else
+    {
+      preamble = WIFI_PREAMBLE_LONG;
+    }
+  return m_phy->CalculateTxDuration (GetAckSize (), ackTxVector, preamble, m_phy->GetFrequency (), 0, 0);
 }
 
 Time
@@ -1276,8 +1285,19 @@ Time
 MacLow::GetCtsDuration (WifiTxVector ctsTxVector) const
 {
   NS_ASSERT (ctsTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_HT); // CTS should always use non-HT PPDU (HT PPDU cases not supported yet)
-  NS_ASSERT (ctsTxVector.GetMode ().GetModulationClass () != WIFI_MOD_CLASS_S1G); //need to check for 802.11ah
-  return m_phy->CalculateTxDuration (GetCtsSize (), ctsTxVector, WIFI_PREAMBLE_LONG, m_phy->GetFrequency (), 0, 0);
+  WifiPreamble preamble;
+  if (ctsTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+        //to do
+        //implement P802.11AH_D4.0, 9.7.6.6
+        preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else
+    {
+        //CTS should always use non-HT PPDU (HT PPDU cases not supported yet)
+        preamble = WIFI_PREAMBLE_LONG;
+    }
+  return m_phy->CalculateTxDuration (GetCtsSize (), ctsTxVector, preamble, m_phy->GetFrequency (), 0, 0);
 }
 
 uint32_t
@@ -1372,6 +1392,19 @@ MacLow::CalculateOverallTxTime (Ptr<const Packet> packet,
         {
           preamble = WIFI_PREAMBLE_HT_GF;
         }
+      // P802.11AH_D4.0, 9.7.6.1
+      else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
+        {
+          preamble = WIFI_PREAMBLE_S1G_1M;
+        }
+      else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+        {
+          preamble = WIFI_PREAMBLE_S1G_SHORT;
+        }
+      else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+        {
+          preamble = WIFI_PREAMBLE_S1G_SHORT;
+        }
       else
         {
           //Otherwise, RTS should always use non-HT PPDU (HT PPDU cases not supported yet)
@@ -1390,9 +1423,17 @@ MacLow::CalculateOverallTxTime (Ptr<const Packet> packet,
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
-  else if (dataTxVector.GetMode().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+  else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
     {
-      preamble = WIFI_PREAMBLE_S1G_SHORT;  //need to add support on S1G_LONG and S1G_1M
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_LONG;
     }
   else
     {
@@ -1426,9 +1467,17 @@ MacLow::CalculateTransmissionTime (Ptr<const Packet> packet,
         {
           preamble = WIFI_PREAMBLE_HT_MF;
         }
-      else if (dataTxVector.GetMode().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+      else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
         {
-          preamble = WIFI_PREAMBLE_S1G_SHORT; //only support S1G_SHORT frame
+          preamble = WIFI_PREAMBLE_S1G_1M;
+        }
+      else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+        {
+          preamble = WIFI_PREAMBLE_S1G_SHORT;
+        }
+      else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+        {
+          preamble = WIFI_PREAMBLE_S1G_LONG;
         }
       else
         {
@@ -1614,7 +1663,7 @@ MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr,
             {
               delay = delay + m_phy->CalculateTxDuration (GetSize (newPacket, &newHdr), txVector, preamble, m_phy->GetFrequency (), packetType, 0);
             }
-          preamble = WIFI_PREAMBLE_NONE;
+          preamble = WIFI_PREAMBLE_NONE;  //need to check 802.11ah
         }
     }
 }
@@ -1737,6 +1786,19 @@ MacLow::SendRtsForPacket (void)
     {
       preamble = WIFI_PREAMBLE_HT_GF;
     }
+  // P802.11AH_D4.0, 9.7.6.1
+  else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
   else //Otherwise, RTS should always use non-HT PPDU (HT PPDU cases not supported yet)
     {
       preamble = WIFI_PREAMBLE_LONG;
@@ -1811,9 +1873,17 @@ MacLow::StartDataTxTimers (WifiTxVector dataTxVector)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
-  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+  else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
     {
-      preamble = WIFI_PREAMBLE_S1G_SHORT; //only support S1G_SHORT
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_LONG;
     }
   else
     {
@@ -1896,9 +1966,17 @@ MacLow::SendDataPacket (void)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
-  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) //  only support S1G_SHORT
+  else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
     {
       preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_LONG;
     }
   else
     {
@@ -2092,9 +2170,20 @@ MacLow::SendCtsAfterRts (Mac48Address source, Time duration, WifiTxVector rtsTxV
   SnrTag tag;
   tag.Set (rtsSnr);
   packet->AddPacketTag (tag);
-
-  //CTS should always use non-HT PPDU (HT PPDU cases not supported yet)
-  ForwardDown (packet, &cts, ctsTxVector, WIFI_PREAMBLE_LONG);
+  
+  WifiPreamble preamble;
+  if (ctsTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+      //to do
+      //implement P802.11AH_D4.0, 9.7.6.6
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else
+    {
+      //CTS should always use non-HT PPDU (HT PPDU cases not supported yet)
+      preamble = WIFI_PREAMBLE_LONG;
+    }
+  ForwardDown (packet, &cts, ctsTxVector, preamble);
 }
 
 void
@@ -2130,9 +2219,19 @@ MacLow::SendDataAfterCts (Mac48Address source, Time duration)
     {
       preamble = WIFI_PREAMBLE_HT_MF;
     }
-  else if (dataTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G) // only support S1G_SHORT
+  //To do, support non-STBC beacon, 9.7.5.1, P802.11ah D4.0
+  //See 9.7.5.7, P802.11ah D4.0
+  else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
     {
       preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+    {
+      preamble = WIFI_PREAMBLE_S1G_LONG;
     }
   else
     {
@@ -2246,9 +2345,20 @@ MacLow::SendAckAfterData (Mac48Address source, Time duration, WifiMode dataTxMod
   SnrTag tag;
   tag.Set (dataSnr);
   packet->AddPacketTag (tag);
-
-  //ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
-  ForwardDown (packet, &ack, ackTxVector, WIFI_PREAMBLE_LONG);
+  
+  WifiPreamble preamble;
+  if (ackTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+    {
+      //to do
+      // implement P802.11AH_D4.0, 9.7.6.6
+      preamble = WIFI_PREAMBLE_S1G_SHORT;
+    }
+  else
+    {
+     //ACK should always use non-HT PPDU (HT PPDU cases not supported yet)
+     preamble = WIFI_PREAMBLE_LONG;
+    }
+  ForwardDown (packet, &ack, ackTxVector, preamble);
 }
 
 bool

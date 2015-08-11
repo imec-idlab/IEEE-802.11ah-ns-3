@@ -1270,6 +1270,9 @@ WifiRemoteStationManager::LookupState (Mac48Address address) const
   state->m_operationalMcsSet.push_back (GetDefaultMcs ());
   state->m_shortGuardInterval = m_wifiPhy->GetGuardInterval ();
   state->m_greenfield = m_wifiPhy->GetGreenfield ();
+  state->m_s1g1mfield = m_wifiPhy->GetS1g1Mfield ();
+  state->m_s1gshortfield = m_wifiPhy->GetS1gShortfield ();
+  state->m_s1glongfield = m_wifiPhy->GetS1gLongfield ();
   state->m_rx = 1;
   state->m_tx = 1;
   state->m_ness = 0;
@@ -1327,6 +1330,8 @@ WifiRemoteStationManager::AddStationHtCapabilities (Mac48Address from, HtCapabil
   state = LookupState (from);
   state->m_shortGuardInterval = htcapabilities.GetShortGuardInterval20 ();
   state->m_greenfield = htcapabilities.GetGreenfield ();
+  // to do
+  //state->m_greenfield = s1gcapabilities.GetS1gLongfield ();
 }
 
 bool
@@ -1334,6 +1339,27 @@ WifiRemoteStationManager::GetGreenfieldSupported (Mac48Address address) const
 {
   //Used by mac low to choose format used GF, MF or Non HT
   return LookupState (address)->m_greenfield;
+}
+    
+bool
+WifiRemoteStationManager::GetS1g1MfieldSupported (Mac48Address address) const
+{
+  //Used by mac low to choose format
+  return LookupState (address)->m_s1g1mfield;
+}
+
+bool
+WifiRemoteStationManager::GetS1gShortfieldSupported (Mac48Address address) const
+{
+    //Used by mac low to choose format
+    return LookupState (address)->m_s1gshortfield;
+}
+
+bool
+WifiRemoteStationManager::GetS1gLongfieldSupported (Mac48Address address) const
+{
+    //Used by mac low to choose format
+    return LookupState (address)->m_s1glongfield;
 }
 
 WifiMode
@@ -1487,6 +1513,24 @@ bool
 WifiRemoteStationManager::GetGreenfield (const WifiRemoteStation *station) const
 {
   return station->m_state->m_greenfield;
+}
+    
+bool
+WifiRemoteStationManager::GetS1g1Mfield (const WifiRemoteStation *station) const
+{
+  return station->m_state->m_s1g1mfield;
+}
+
+bool
+WifiRemoteStationManager::GetS1gShortfield (const WifiRemoteStation *station) const
+{
+  return station->m_state->m_s1gshortfield;
+}
+
+bool
+WifiRemoteStationManager::GetS1gLongfield (const WifiRemoteStation *station) const
+{
+  return station->m_state->m_s1glongfield;
 }
 
 bool

@@ -219,6 +219,33 @@ public:
    */
   bool GetGreenfieldSupported (Mac48Address address) const;
   /**
+   * Return whether the station supports S1g1Mfield or not.
+   *
+   * \param address the address of the station
+   *
+   * \return true if S1g1Mfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1g1MfieldSupported (Mac48Address address) const;
+  /**
+   * Return whether the station supports S1gShortfield or not.
+   *
+   * \param address the address of the station
+   *
+   * \return true if S1gShortfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1gShortfieldSupported (Mac48Address address) const;
+  /**
+   * Return whether the station supports S1gLongfield or not.
+   *
+   * \param address the address of the station
+   *
+   * \return true if S1gLongfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1gLongfieldSupported (Mac48Address address) const;
+  /**
    * Add a given Modulation and Coding Scheme (MCS) index to
    * the set of basic MCS.
    *
@@ -654,6 +681,33 @@ protected:
    */
   bool GetGreenfield (const WifiRemoteStation *station) const;
   /**
+   * Return whether the station supports S1g1Mfield or not.
+   *
+   * \param station the station being queried
+   *
+   * \return true if S1g1Mfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1g1Mfield (const WifiRemoteStation *station) const;
+  /**
+   * Return whether the station supports S1gShortfield or not.
+   *
+   * \param station the station being queried
+   *
+   * \return true if S1gShortfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1gShortfield (const WifiRemoteStation *station) const;
+  /**
+   * Return whether the station supports S1gLongfield or not.
+   *
+   * \param station the station being queried
+   *
+   * \return true if S1gLongfield is supported by the station,
+   *         false otherwise
+   */
+  bool GetS1gLongfield (const WifiRemoteStation *station) const;
+  /**
    * Return the number of receive antennas the station has.
    *
    * \param station the station being queried
@@ -1050,6 +1104,9 @@ struct WifiRemoteStationState
   uint32_t m_ness;            //!< Number of streams in beamforming of the remote station
   bool m_stbc;                //!< Flag if STBC is used by the remote station
   bool m_greenfield;          //!< Flag if green field is used by the remote station
+  bool m_s1g1mfield;          //!< Flag if green field is used by the remote station
+  bool m_s1gshortfield;       //!< Flag if green field is used by the remote station
+  bool m_s1glongfield;        //!< Flag if green field is used by the remote station
 };
 
 /**

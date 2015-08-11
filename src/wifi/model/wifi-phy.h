@@ -1768,6 +1768,30 @@ static WifiMode GetOfdmRate86_666_7MbpsBW16MHz ();
    */
   virtual bool GetGreenfield (void) const = 0;
   /**
+   * \param S1g1Mfield Enable or disable GreenField
+   */
+  virtual void SetS1g1Mfield (bool s1g1mfield) = 0;
+  /**
+   * \return true if S1g1Mfield is supported, false otherwise
+   */
+  virtual bool GetS1g1Mfield (void) const = 0;
+  /**
+   * \param S1gShortfield Enable or disable GreenField
+   */
+  virtual void SetS1gShortfield (bool s1gshortfield) = 0;
+  /**
+   * \return true if S1gShortfield is supported, false otherwise
+   */
+  virtual bool GetS1gShortfield (void) const = 0;
+  /**
+   * \param S1gLongfield Enable or disable GreenField
+   */
+  virtual void SetS1gLongfield (bool s1glongfield) = 0;
+  /**
+   * \return true if S1gLongfield is supported, false otherwise
+   */
+  virtual bool GetS1gLongfield (void) const = 0;
+  /**
    * \return the channel width
    */
   virtual uint32_t GetChannelWidth (void) const = 0;

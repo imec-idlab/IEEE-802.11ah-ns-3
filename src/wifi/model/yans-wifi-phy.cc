@@ -166,6 +166,24 @@ YansWifiPhy::GetTypeId (void)
                    MakeBooleanAccessor (&YansWifiPhy::GetGreenfield,
                                         &YansWifiPhy::SetGreenfield),
                    MakeBooleanChecker ())
+    .AddAttribute ("S1g1MfieldEnabled",
+                   "Whether or not STBC is enabled.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&YansWifiPhy::GetS1g1Mfield,
+                                        &YansWifiPhy::SetS1g1Mfield),
+                   MakeBooleanChecker ())
+    .AddAttribute ("S1gShortfieldEnabled",
+                   "Whether or not STBC is enabled.",
+                   BooleanValue (true),   // for test, temporarily
+                   MakeBooleanAccessor (&YansWifiPhy::GetS1gShortfield,
+                                        &YansWifiPhy::SetS1gShortfield),
+                   MakeBooleanChecker ())
+    .AddAttribute ("S1gLongfieldEnabled",
+                   "Whether or not STBC is enabled.",
+                   BooleanValue (false),
+                   MakeBooleanAccessor (&YansWifiPhy::GetS1gLongfield,
+                                        &YansWifiPhy::SetS1gLongfield),
+                   MakeBooleanChecker ())
     .AddAttribute ("ChannelWidth", "Whether 1MHz, 2MHz, 4MHz, 8MHz, 16MHz, 20MHz or 40MHz.",
                    UintegerValue (1),
                    MakeUintegerAccessor (&YansWifiPhy::GetChannelWidth,
@@ -1194,6 +1212,24 @@ YansWifiPhy::SetGreenfield (bool greenfield)
 {
   m_greenfield = greenfield;
 }
+    
+void
+YansWifiPhy::SetS1g1Mfield (bool s1g1mfield)
+{
+  m_s1g1mfield = s1g1mfield;
+}
+
+void
+YansWifiPhy::SetS1gShortfield (bool s1gshortfield)
+{
+  m_s1gshortfield = s1gshortfield;
+}
+
+void
+YansWifiPhy::SetS1gLongfield (bool s1glongfield)
+{
+  m_s1glongfield = s1glongfield;
+}
 
 bool
 YansWifiPhy::GetGuardInterval (void) const
@@ -1241,6 +1277,24 @@ bool
 YansWifiPhy::GetGreenfield (void) const
 {
   return m_greenfield;
+}
+
+bool
+YansWifiPhy::GetS1g1Mfield (void) const
+{
+    return m_s1g1mfield;
+}
+
+bool
+YansWifiPhy::GetS1gShortfield (void) const
+{
+    return m_s1gshortfield;
+}
+
+bool
+YansWifiPhy::GetS1gLongfield (void) const
+{
+    return m_s1glongfield;
 }
 
 void

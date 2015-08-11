@@ -384,6 +384,30 @@ public:
    */
   virtual bool GetGreenfield (void) const;
   /**
+   * \param S1g1Mfield Enable or disable GreenField
+   */
+  virtual void SetS1g1Mfield (bool s1g1mfield);
+  /**
+   * \return true if S1g1Mfield is supported, false otherwise
+   */
+  virtual bool GetS1g1Mfield (void) const;
+  /**
+   * \param S1gShortfield Enable or disable GreenField
+   */
+  virtual void SetS1gShortfield (bool s1gshortfield);
+  /**
+   * \return true if S1gShortfield is supported, false otherwise
+   */
+  virtual bool GetS1gShortfield (void) const;
+  /**
+   * \param S1gLongfield Enable or disable GreenField
+   */
+  virtual void SetS1gLongfield (bool s1glongfield);
+  /**
+   * \return true if S1gLongfield is supported, false otherwise
+   */
+  virtual bool GetS1gLongfield (void) const;
+  /**
    * Return channel width.
    *
    * \return channel width
@@ -526,6 +550,9 @@ void Configure80211ah (void);
   bool     m_ldpc;                  //!< Flag if LDPC is used
   bool     m_stbc;                  //!< Flag if STBC is used
   bool     m_greenfield;            //!< Flag if GreenField format is supported
+  bool     m_s1g1mfield;            //!< Flag if m_s1g1mfield format is supported
+  bool     m_s1gshortfield;           //!< Flag if s1gshortfield format is supported
+  bool     m_s1glongfield;            //!< Flag if s1glongfield format is supported
   bool     m_guardInterval;         //!< Flag if short guard interval is used
   bool     m_channelBonding;        //!< Flag if channel bonding is used
   uint32_t m_channelWidth;          //!< Channel width
