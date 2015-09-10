@@ -40,14 +40,38 @@ NS_LOG_COMPONENT_DEFINE ("DcfManager");
 
 DcfState::DcfState ()
   : m_backoffSlots (0),
+    m_backoffSlots_temp (0),
     m_backoffStart (Seconds (0.0)),
+    m_backoffStart_temp (Seconds (0.0)),
     m_cwMin (0),
     m_cwMax (0),
     m_cw (0),
+    m_cw_temp (0),
     m_accessRequested (false)
 {
 }
 
+void
+DcfState::RawStart (void)
+{
+  m_cw_temp = m_cw;
+  m_backoffSlots_temp = m_backoffSlots;
+  //NS_LOG_UNCOND ("DcfState::RawStart 59, " << m_backoffSlots_temp ); //for test
+  //m_backoffStart_temp = m_backoffStart;
+  ResetCw ();
+  //m_backoffSlots;
+  //m_backoffStart = simulator::now();
+}
+ 
+void
+DcfState::OutsideRawStart (void)
+{
+  m_cw = m_cw_temp;
+  m_backoffSlots = m_backoffSlots_temp;
+  //m_backoffStart = m_backoffStart_nonraw;
+ // NS_ASSERT (m_backoffSlots != 0); // test whether m_backoffSlots could be zero when RAW   begin //for test
+}
+    
 DcfState::~DcfState ()
 {
 }
@@ -114,10 +138,11 @@ DcfState::UpdateBackoffSlotsNow (uint32_t nSlots, Time backoffUpdateBound)
 void
 DcfState::StartBackoffNow (uint32_t nSlots)
 {
-  NS_ASSERT (m_backoffSlots == 0);
   MY_DEBUG ("start backoff=" << nSlots << " slots");
+  //NS_ASSERT (m_backoffSlots == 0); for RAW, m_backoffSlots can be not zero
   m_backoffSlots = nSlots;
   m_backoffStart = Simulator::Now ();
+  //NS_LOG_UNCOND ("DcfState::StartBackoffNow, " << m_backoffSlots <<  m_backoffStart); //for test
 }
 
 uint32_t

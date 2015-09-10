@@ -162,6 +162,18 @@ public:
    * \param code the status code
    */
   void SetStatusCode (StatusCode code);
+  /**
+   * Set the AID.
+   *
+   * \param AID the status code
+   */
+  void SetAID (uint16_t aid);
+  /**
+   * Return the AID.
+   *
+   * \return AID
+   */
+  uint16_t GetAID (void) const;
 
   /**
    * Register this type.

@@ -33,6 +33,7 @@
 #include "mac-rx-middle.h"
 #include "mac-tx-middle.h"
 #include "mgt-headers.h"
+#include "extension-headers.h"
 #include "mac-low.h"
 #include "amsdu-subframe-header.h"
 #include "msdu-aggregator.h"
@@ -312,6 +313,7 @@ ApWifiMac::GetSupportedRates (void) const
     }
   //Send the set of supported rates and make sure that we indicate
   //the Basic Rate set in this set of supported rates.
+ // NS_LOG_LOGIC ("ApWifiMac::GetSupportedRates  1 " ); //for test
   for (uint32_t i = 0; i < m_phy->GetNModes (); i++)
     {
       WifiMode mode = m_phy->GetMode (i);
@@ -325,13 +327,14 @@ ApWifiMac::GetSupportedRates (void) const
           m_stationManager->AddBasicMode (mode);
         }
     }
+  // NS_LOG_LOGIC ("ApWifiMac::GetSupportedRates  2 " ); //for test
   //set the basic rates
   for (uint32_t j = 0; j < m_stationManager->GetNBasicModes (); j++)
     {
       WifiMode mode = m_stationManager->GetBasicMode (j);
       rates.SetBasicRate (mode.GetDataRate ());
     }
-
+  //NS_LOG_LOGIC ("ApWifiMac::GetSupportedRates   " ); //for test
   return rates;
 }
 
@@ -393,6 +396,14 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success)
   hdr.SetDsNotTo ();
   Ptr<Packet> packet = Create<Packet> ();
   MgtAssocResponseHeader assoc;
+  //
+  uint8_t mac[6];
+  to.CopyTo (mac);
+  uint8_t aid_l = mac[0];
+  uint8_t aid_h = mac[1] & 0x1f;
+  uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
+  //
+  assoc.SetAID(aid); //
   StatusCode code;
   if (success)
     {
@@ -424,26 +435,81 @@ ApWifiMac::SendOneBeacon (void)
 {
   NS_LOG_FUNCTION (this);
   WifiMacHeader hdr;
-  hdr.SetBeacon ();
-  hdr.SetAddr1 (Mac48Address::GetBroadcast ());
-  hdr.SetAddr2 (GetAddress ());
-  hdr.SetAddr3 (GetAddress ());
-  hdr.SetDsNotFrom ();
-  hdr.SetDsNotTo ();
-  Ptr<Packet> packet = Create<Packet> ();
-  MgtBeaconHeader beacon;
-  beacon.SetSsid (GetSsid ());
-  beacon.SetSupportedRates (GetSupportedRates ());
-  beacon.SetBeaconIntervalUs (m_beaconInterval.GetMicroSeconds ());
-  if (m_htSupported)
-    {
-      beacon.SetHtCapabilities (GetHtCapabilities ());
-      hdr.SetNoOrder ();
-    }
-  packet->AddHeader (beacon);
-
-  //The beacon has it's own special queue, so we load it in there
-  m_beaconDca->Queue (packet, hdr);
+    if (m_s1gSupported)
+     {
+      hdr.SetS1gBeacon ();
+      hdr.SetAddr1 (Mac48Address::GetBroadcast ());
+      hdr.SetAddr2 (GetAddress ()); // for debug, not accordance with draft, need change
+      hdr.SetAddr3 (GetAddress ()); // for debug
+      Ptr<Packet> packet = Create<Packet> ();
+      S1gBeaconHeader beacon;
+      //beacon.SetSA (GetAddress ()); according to draft, shold be the address of AP, to make it easily, use broadcast temporarily
+      S1gBeaconCompatibility compatibility;
+      compatibility.SetBeaconInterval (m_beaconInterval.GetMicroSeconds ());
+      beacon.SetBeaconCompatibility (compatibility);
+      /* According to draft, one TIM can carry information of one page stations
+         to make it simple, we only support at most 64 stations(one block)
+      */
+      TIM m_tim;
+        //m_tim.SetDTIMCount (uint8_t count); //no configure, do not ues current
+        //m_tim.SetDTIMPeriod (uint8_t count); //no configure, do not ues current
+      m_tim.SetBitmapControl (4); // (b7-b6, page index), (b5-b1, page slice, no support) (b0 traffice indicator, no support)
+      TIM::EncodedBlock block;
+        //block.SetBlockControl (enum BlockCoding coding); //no configure, support Block Bitmap coding in dafault
+      block.SetBlockOffset (1);  // (0-31)
+      uint8_t codeinfo[4]={7,2,3,4};
+      uint8_t * encodedInfo = codeinfo;
+      block.SetEncodedInfo (encodedInfo, 3); //(encodedInfo, include bitmap and subblock)(subblocklength, length of subblock)
+      m_tim.SetPartialVBitmap (block);
+      beacon.SetTIM (m_tim);
+      RPS m_rps;
+      RPS::RawAssignment raw;
+        //raw.SetRawControl (uint8_t control)//not used currently  ***************this should be used to support paged STA or not
+        //raw.SetRawSlot (uint16_t slot); //not used currently
+        //raw.SetRawStart (uint8_t start); //not used currently
+      uint32_t group = 1;
+      raw.SetRawGroup (1); // (b0-b1, page index) (b2-b12, raw start AID) (b13-b23, raw end AID)
+        //raw.SetChannelInd (uint16_t channel); //not used currently
+        //raw.SetPRAW (uint32_t praw);//not used currently
+      m_rps.SetRawAssignment(raw);
+      beacon.SetRPS (m_rps);
+      /*if (m_htSupported)
+        {
+           beacon.SetHtCapabilities (GetHtCapabilities ());
+           hdr.SetNoOrder ();
+         }*/
+         //uint16_t adf = hdr.GetFrameControl (); //for test
+         //NS_LOG_UNCOND ("DcaTxop::ApWifiMac::SendOneBeacon = wlh," << adf); //for test
+      packet->AddHeader (beacon);
+      //The beacon has it's own special queue, so we load it in there
+      m_beaconDca->Queue (packet, hdr);
+     }
+    else
+     {
+         //NS_LOG_LOGIC ("send  beacon " ); //for test
+      hdr.SetBeacon ();
+      hdr.SetAddr1 (Mac48Address::GetBroadcast ());
+      hdr.SetAddr2 (GetAddress ());
+      hdr.SetAddr3 (GetAddress ());
+      hdr.SetDsNotFrom ();
+      hdr.SetDsNotTo ();
+      Ptr<Packet> packet = Create<Packet> ();
+      MgtBeaconHeader beacon;
+      beacon.SetSsid (GetSsid ());
+      beacon.SetSupportedRates (GetSupportedRates ());
+      beacon.SetBeaconIntervalUs (m_beaconInterval.GetMicroSeconds ());
+     // NS_LOG_LOGIC ("send  beacon 1" ); //for test
+      if (m_htSupported)
+        {
+          beacon.SetHtCapabilities (GetHtCapabilities ());
+          hdr.SetNoOrder ();
+        }
+      //NS_LOG_LOGIC ("send  beacon 2" ); //for test
+      packet->AddHeader (beacon);
+      //The beacon has it's own special queue, so we load it in there
+      m_beaconDca->Queue (packet, hdr);
+      }
+ // NS_LOG_LOGIC ("send  beacon 3" );  //for test
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
 }
 
@@ -479,7 +545,8 @@ void
 ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 {
   NS_LOG_FUNCTION (this << packet << hdr);
-
+  //uint16_t segg =  hdr->GetFrameControl (); // for test
+  //NS_LOG_LOGIC ("AP waiting   " << segg); //for test
   Mac48Address from = hdr->GetAddr2 ();
 
   if (hdr->IsData ())
@@ -563,6 +630,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         {
           if (hdr->IsAssocReq ())
             {
+              //NS_LOG_LOGIC ("Received AssocReq "); // for test
               //first, verify that the the station's supported
               //rate set is compatible with our Basic Rate set
               MgtAssocRequestHeader assocReq;

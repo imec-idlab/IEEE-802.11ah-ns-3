@@ -1316,10 +1316,35 @@ WifiRemoteStationManager::Lookup (Mac48Address address, uint8_t tid) const
   station->m_tid = tid;
   station->m_ssrc = 0;
   station->m_slrc = 0;
+  station->m_ssrc_temp = 0;
+  station->m_slrc_temp = 0;
   const_cast<WifiRemoteStationManager *> (this)->m_stations.push_back (station);
   return station;
 
 }
+
+void
+WifiRemoteStationManager::RawStart (void)
+{
+  for (Stations::const_iterator i = m_stations.begin (); i != m_stations.end (); i++)
+   {
+     (*i)->m_ssrc_temp = (*i)->m_ssrc;
+     (*i)->m_slrc_temp = (*i)->m_slrc;
+     (*i)->m_ssrc = 0;
+     (*i)->m_slrc = 0;
+   }
+}
+
+void
+WifiRemoteStationManager::OutsideRawStart (void)
+{
+  for (Stations::const_iterator i = m_stations.begin (); i != m_stations.end (); i++)
+    {
+      (*i)->m_ssrc = (*i)->m_ssrc_temp;  //for station added during RAW, (*i)->m_ssrc_temp is zero
+      (*i)->m_slrc = (*i)->m_slrc_temp;
+    }
+}
+
 
 void
 WifiRemoteStationManager::AddStationHtCapabilities (Mac48Address from, HtCapabilities htcapabilities)

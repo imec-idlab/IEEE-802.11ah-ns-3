@@ -153,6 +153,9 @@ public:
    */
   int64_t AssignStreams (int64_t stream);
 
+  void AccessAllowedIfRaw (bool allowed);
+  void RawStart (void);
+  void OutsideRawStart (void);
 
 private:
   class TransmissionListener;
@@ -344,6 +347,8 @@ private:
   Ptr<const Packet> m_currentPacket;
   WifiMacHeader m_currentHdr;
   uint8_t m_fragmentNumber;
+    
+  bool AccessIfRaw;
 };
 
 } //namespace ns3

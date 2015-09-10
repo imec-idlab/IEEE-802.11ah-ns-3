@@ -116,10 +116,15 @@ public:
    *          has not been granted already, false otherwise.
    */
   bool IsAccessRequested (void) const;
+    
+  void RawStart (void);
+  void OutsideRawStart (void);
 
 
 private:
   friend class DcfManager;
+  friend class DcaTxop;
+  friend class EdcaTxopN;
 
   /**
    * Return the current number of backoff slots.
@@ -223,13 +228,16 @@ private:
 
   uint32_t m_aifsn;
   uint32_t m_backoffSlots;
+  uint32_t m_backoffSlots_temp;
   //the backoffStart variable is used to keep track of the
   //time at which a backoff was started or the time at which
   //the backoff counter was last updated.
   Time m_backoffStart;
+  Time m_backoffStart_temp;
   uint32_t m_cwMin;
   uint32_t m_cwMax;
   uint32_t m_cw;
+  uint32_t m_cw_temp;
   bool m_accessRequested;
 };
 

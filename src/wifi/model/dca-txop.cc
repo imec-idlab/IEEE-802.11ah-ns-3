@@ -159,6 +159,7 @@ DcaTxop::DcaTxop ()
   m_dcf = new DcaTxop::Dcf (this);
   m_queue = CreateObject<WifiMacQueue> ();
   m_rng = new RealRandomStream ();
+  AccessAllowedIfRaw (true);
 }
 
 DcaTxop::~DcaTxop ()
@@ -293,12 +294,19 @@ DcaTxop::AssignStreams (int64_t stream)
 }
 
 void
+DcaTxop::AccessAllowedIfRaw (bool allowed)
+{
+  AccessIfRaw = allowed;
+}
+    
+void
 DcaTxop::RestartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
   if ((m_currentPacket != 0
        || !m_queue->IsEmpty ())
-      && !m_dcf->IsAccessRequested ())
+      && !m_dcf->IsAccessRequested ()
+      && AccessIfRaw)          // always TRUE outside RAW
     {
       m_manager->RequestAccess (m_dcf);
     }
@@ -310,10 +318,33 @@ DcaTxop::StartAccessIfNeeded (void)
   NS_LOG_FUNCTION (this);
   if (m_currentPacket == 0
       && !m_queue->IsEmpty ()
-      && !m_dcf->IsAccessRequested ())
+      && !m_dcf->IsAccessRequested ()
+      && AccessIfRaw)      // always TRUE outside RAW
     {
       m_manager->RequestAccess (m_dcf);
     }
+}
+    
+void
+DcaTxop::RawStart (void)
+{
+  NS_LOG_FUNCTION (this);
+  m_dcf->RawStart ();
+  m_stationManager->RawStart ();
+       //NS_LOG_UNCOND ("DcaTxop::RawStart 335, " << m_dcf->GetCw () ); //for test
+  m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
+  StartAccessIfNeeded ();
+}
+
+void
+DcaTxop::OutsideRawStart ()  //move to DcfManager Class?
+{
+  NS_LOG_FUNCTION (this);
+  AccessAllowedIfRaw (true); // very important
+  m_dcf->OutsideRawStart ();
+  m_stationManager->OutsideRawStart ();
+  m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
+  StartAccessIfNeeded ();
 }
 
 Ptr<MacLow>
@@ -434,6 +465,8 @@ void
 DcaTxop::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+  //uint16_t adf = m_currentHdr.GetFrameControl (); //for test
+  //NS_LOG_UNCOND ("DcaTxop::NotifyAccessGranted = 468,") ; //for test
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty ())
@@ -455,7 +488,7 @@ DcaTxop::NotifyAccessGranted (void)
     }
   MacLowTransmissionParameters params;
   params.DisableOverrideDurationId ();
-  if (m_currentHdr.GetAddr1 ().IsGroup ())
+  if (m_currentHdr.GetAddr1 ().IsGroup () || m_currentHdr.IsPsPoll ())
     {
       params.DisableRts ();
       params.DisableAck ();

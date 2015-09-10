@@ -85,9 +85,37 @@ typedef uint8_t WifiInformationElementId;
 #define IE_EXTENDED_SUPPORTED_RATES            ((WifiInformationElementId)50)
 // 51 to 126 are reserved in 802.11-2007
 #define IE_EXTENDED_CAPABILITIES               ((WifiInformationElementId)127)
-// 128 to 220 are reserved in 802.11-2007
-#define IE_VENDOR_SPECIFIC                     ((WifiInformationElementId)221)
-// 222 to 255 are reserved in 802.11-2007
+// 128 to 206 are reserved in 802.11-2007
+#define IE_S1G_OPEN_LOOP                      ((WifiInformationElementId)207)
+#define IE_RPS                                ((WifiInformationElementId)208)
+#define IE_PAGE_SLICE                         ((WifiInformationElementId)209)
+#define IE_AID_REQUEST                        ((WifiInformationElementId)210)
+#define IE_AID_RESPONSE                       ((WifiInformationElementId)211)
+#define IE_S1G_SECTOR_OPERATION               ((WifiInformationElementId)212)
+#define IE_S1G_BEACON_COMPATIBILITY           ((WifiInformationElementId)213)
+#define IE_SHORT_BEACON_INTERVAL              ((WifiInformationElementId)214)
+#define IE_CHANGE_SEQUENCE                    ((WifiInformationElementId)215)
+#define IE_TWT                                ((WifiInformationElementId)216)
+#define IE_S1G_CAPABILITIES                   ((WifiInformationElementId)217)
+// 218 to 219 are reserved in P802.11ah_D4.0
+#define IE_SUBCHANNEL_SELECTIVE_TRANSMISSION  ((WifiInformationElementId)220)
+#define IE_VENDOR_SPECIFIC                    ((WifiInformationElementId)221)
+#define IE_AUTHENTICATION_CONTROL             ((WifiInformationElementId)222)
+#define IE_TSF_TIMER_ACCURACY                 ((WifiInformationElementId)223)
+#define IE_RELAY                              ((WifiInformationElementId)224)
+#define IE_RECHABLE_ADDRESS                   ((WifiInformationElementId)225)
+#define IE_RELAY_DISCOVERY                    ((WifiInformationElementId)226)
+// 227 is reserved in P802.11ah_D4.0
+#define IE_AID_ANNOUNCEMENT                   ((WifiInformationElementId)228)
+#define IE_SHORT_PROBE_RESPONSE_OPTION        ((WifiInformationElementId)229)
+#define IE_ACTIVITY_SPECIFICATION             ((WifiInformationElementId)230)
+#define IE_SECTORIZED_GROUP_ID_LIST           ((WifiInformationElementId)231)
+#define IE_S1G_OPERATION                      ((WifiInformationElementId)232)
+#define IE_HEADER_COMPRESSION                 ((WifiInformationElementId)233)
+#define IE_SST_OPERATION                      ((WifiInformationElementId)234)
+#define IE_MAD                                ((WifiInformationElementId)235)
+#define IE_RELAY_ACTIVATION                   ((WifiInformationElementId)236)
+// 237 to 255 are reserved P802.11ah_D4.0
 
 
 /**

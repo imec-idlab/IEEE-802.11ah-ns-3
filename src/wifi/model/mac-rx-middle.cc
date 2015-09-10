@@ -302,7 +302,7 @@ void
 MacRxMiddle::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 {
   NS_LOG_FUNCTION (packet << hdr);
-  NS_ASSERT (hdr->IsData () || hdr->IsMgt ());
+  NS_ASSERT (hdr->IsData () || hdr->IsMgt () || hdr->IsS1gBeacon ());
   OriginatorRxStatus *originator = Lookup (hdr);
   /**
    * The check below is really uneeded because it can fail in a lot of

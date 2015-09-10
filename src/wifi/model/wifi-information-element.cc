@@ -19,8 +19,11 @@
  */
 
 #include "ns3/wifi-information-element.h"
+#include "ns3/log.h"
 
 namespace ns3 {
+    
+NS_LOG_COMPONENT_DEFINE ("WifiInformationElement"); // for test
 
 WifiInformationElement::~WifiInformationElement ()
 {
@@ -63,7 +66,8 @@ WifiInformationElement::DeserializeIfPresent (Buffer::Iterator i)
 {
   Buffer::Iterator start = i;
   uint8_t elementId = i.ReadU8 ();
-
+   // NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 67" << ElementId ()); //for test
+  
   //If the element here isn't the one we're after then we immediately
   //return the iterator we were passed indicating that we haven't
   //taken anything from the buffer.
@@ -71,9 +75,10 @@ WifiInformationElement::DeserializeIfPresent (Buffer::Iterator i)
     {
       return start;
     }
-
+   // NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 76" << elementId); //for test
   uint8_t length = i.ReadU8 ();
-
+   // NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 78" ); //for test
+  NS_ASSERT (i.GetDistanceFrom (start) != 0); // for test
   DeserializeInformationField (i, length);
   i.Next (length);
 

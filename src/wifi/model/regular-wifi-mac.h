@@ -425,6 +425,7 @@ protected:
     * however.
     */
   bool m_htSupported;
+  bool m_s1gSupported;
 
   /**
    * Enable or disable HT support for the device.
@@ -438,6 +439,19 @@ protected:
    * \return true if HT is supported, false otherwise
    */
   bool GetHtSupported () const;
+    
+  /**
+   * Enable or disable S1G support for the device.
+   *
+   * \param enable whether S1G is supported
+   */
+  void SetS1gSupported (bool enable);
+  /**
+   * Return whether the device supports QoS.
+   *
+   * \return true if S1G is supported, false otherwise
+   */
+  bool GetS1gSupported () const;
 
 
 private:

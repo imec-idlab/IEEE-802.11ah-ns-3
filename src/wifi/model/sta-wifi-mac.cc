@@ -33,6 +33,7 @@
 #include "mac-rx-middle.h"
 #include "mac-tx-middle.h"
 #include "wifi-mac-header.h"
+#include "extension-headers.h"
 #include "msdu-aggregator.h"
 #include "amsdu-subframe-header.h"
 #include "mgt-headers.h"
@@ -107,6 +108,16 @@ StaWifiMac::StaWifiMac ()
     m_beaconWatchdogEnd (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
+  m_rawStart = false;
+  uint32_t cwmin = 15;
+  uint32_t cwmax = 1023;
+  m_pspollDca = CreateObject<DcaTxop> ();
+  m_pspollDca->SetAifsn (2);
+  m_pspollDca->SetMinCw ((cwmin + 1) / 4 - 1);
+  m_pspollDca->SetMaxCw ((cwmin + 1) / 2 - 1);  //same as AC_VO
+  m_pspollDca->SetLow (m_low);
+  m_pspollDca->SetManager (m_dcfManager);
+  m_pspollDca->SetTxMiddle (m_txMiddle);
 
   //Let the lower layers know that we are acting as a non-AP STA in
   //an infrastructure BSS.
@@ -118,6 +129,58 @@ StaWifiMac::~StaWifiMac ()
   NS_LOG_FUNCTION (this);
 }
 
+void
+StaWifiMac::DoDispose ()
+{
+  NS_LOG_FUNCTION (this);
+  m_pspollDca = 0;
+  RegularWifiMac::DoDispose ();
+}
+
+uint16_t
+StaWifiMac::GetAID (void) const
+{
+  //NS_ASSERT ( 1 <= m_aid <= 8191);
+  return m_aid;
+}
+ 
+bool
+StaWifiMac::Is(uint8_t blockbitmap, uint8_t j)
+{
+  return (((blockbitmap >> j) & 0x01) == 0x01);
+}
+    
+void
+StaWifiMac::SetAID (uint16_t aid)
+{
+  //NS_ASSERT ( 1 <= aid <= 8191 );
+  m_aid = aid;
+}
+    
+void
+StaWifiMac::SetDataBuffered()
+{
+  m_dataBuffered = true;
+}
+    
+void
+StaWifiMac::ClearDataBuffered()
+{
+  m_dataBuffered = false;
+}
+    
+void
+StaWifiMac::SetInRAWgroup()
+{
+  m_inRawGroup = true;
+}
+    
+void
+StaWifiMac::UnsetInRAWgroup()
+{
+  m_inRawGroup = false;
+}
+        
 void
 StaWifiMac::SetMaxMissedBeacons (uint32_t missed)
 {
@@ -166,6 +229,117 @@ bool StaWifiMac::GetActiveProbing (void) const
   return m_activeProbing;
 }
 
+void
+StaWifiMac::SendPspoll (void)
+{
+  NS_LOG_FUNCTION (this);
+  WifiMacHeader hdr;
+  hdr.SetType (WIFI_MAC_CTL_PSPOLL);
+  hdr.SetId (GetAID());
+  hdr.SetAddr1 (GetBssid());
+  hdr.SetAddr2 (GetAddress ());
+    
+  Ptr<Packet> packet = Create<Packet> ();
+  packet->AddHeader (hdr);
+
+  //The standard is not clear on the correct queue for management
+  //frames if we are a QoS AP. The approach taken here is to always
+  //use the DCF for these regardless of whether we have a QoS
+  //association or not.
+  m_pspollDca->Queue (packet, hdr);
+}
+    
+void
+StaWifiMac::SendPspollIfnecessary (void)
+{
+  //assume only send one beacon during RAW
+  if ( m_rawStart & m_inRawGroup && m_pagedStaRaw && m_dataBuffered )
+    {
+      SendPspoll ();  //pspoll not really send, just put ps-poll frame in m_pspollDca queue
+    }
+  else if (!m_rawStart && m_dataBuffered && !m_outsideRawEvent.IsRunning ()) //in case the next beacon coming during RAW, could it happen?
+   {
+      SendPspoll ();
+   }
+}
+
+void
+StaWifiMac::S1gBeaconReceived (void)
+{
+  if (m_rawStart & m_inRawGroup && m_pagedStaRaw && m_dataBuffered )
+    {
+      m_pspollDca->AccessAllowedIfRaw (true);
+      m_dca->AccessAllowedIfRaw (false);
+      m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
+      StartRawbackoff();
+    }
+  else if (m_rawStart && m_inRawGroup && !m_pagedStaRaw  )
+    {
+      m_pspollDca->AccessAllowedIfRaw (true);
+      m_dca->AccessAllowedIfRaw (true);
+      m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
+      m_edca.find (AC_VI)->second->AccessAllowedIfRaw (true);
+      m_edca.find (AC_BE)->second->AccessAllowedIfRaw (true);
+      m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
+      StartRawbackoff();
+    }
+  else if (m_rawStart && !m_inRawGroup) //|| (m_rawStart && m_inRawGroup && m_pagedStaRaw && !m_dataBuffered)
+    {
+      m_pspollDca->AccessAllowedIfRaw (false);
+      m_dca->AccessAllowedIfRaw (false);
+      m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
+      m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
+      StartRawbackoff();
+    }
+    // else (!m_rawStart),  this case cannot happen, since we assume s1g beacon always indicating one raw
+    m_rawStart = false;
+}
+
+void
+StaWifiMac::StartRawbackoff (void)
+{
+    //NS_LOG_UNCOND ("StaWifiMac::StartRawbackoff, 306" ); //for test
+  m_pspollDca->RawStart (); //not really start raw useless allowedAccessRaw is true;
+    //NS_LOG_UNCOND ("StaWifiMac::StartRawbackoff, 308" ); //for test
+  m_dca->RawStart ();
+    //NS_LOG_UNCOND ("StaWifiMac::StartRawbackoff, 310 "); //for test
+  m_edca.find (AC_VO)->second->RawStart ();
+  m_edca.find (AC_VI)->second->RawStart ();
+  m_edca.find (AC_BE)->second->RawStart ();
+  m_edca.find (AC_BK)->second->RawStart ();
+  if (m_outsideRawEvent.IsRunning ())
+    {
+      m_outsideRawEvent.Cancel ();
+    }
+  m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
+}
+
+void
+StaWifiMac::OutsideRawStartBackoff (void)
+{
+  
+  Simulator::Schedule(m_lastRawDurationus, &DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
+  Simulator::Schedule(m_lastRawDurationus, &DcaTxop::OutsideRawStart, StaWifiMac::m_dca);
+  Simulator::Schedule(m_lastRawDurationus, &EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VO)->second);
+  Simulator::Schedule(m_lastRawDurationus, &EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VI)->second);
+  Simulator::Schedule(m_lastRawDurationus, &EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BE)->second);
+  Simulator::Schedule(m_lastRawDurationus, &EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BK)->second);
+  
+}
+    
+void
+StaWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager)
+{
+  NS_LOG_FUNCTION (this << stationManager);
+  m_pspollDca->SetWifiRemoteStationManager (stationManager);
+  RegularWifiMac::SetWifiRemoteStationManager (stationManager);
+}
+    
 void
 StaWifiMac::SendProbeRequest (void)
 {
@@ -419,6 +593,8 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 {
   NS_LOG_FUNCTION (this << packet << hdr);
   NS_ASSERT (!hdr->IsCtl ());
+  //uint16_t segg =  hdr->GetFrameControl (); // for test
+  //NS_LOG_UNCOND ("StaWifiMac::Receive waiting  beacon " << segg); //for test
   if (hdr->GetAddr3 () == GetAddress ())
     {
       NS_LOG_LOGIC ("packet sent by us.");
@@ -433,6 +609,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
     }
   else if (hdr->IsData ())
     {
+      //NS_LOG_UNCOND ("packet sent by us. ---");//for test
       if (!IsAssociated ())
         {
           NS_LOG_LOGIC ("Received data frame while not associated: ignore");
@@ -461,11 +638,13 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             }
           else
             {
+              //NS_LOG_UNCOND ("Received Qos data frame "); //for test
               ForwardUp (packet, hdr->GetAddr3 (), hdr->GetAddr1 ());
             }
         }
       else
         {
+          //NS_LOG_UNCOND ("Received non Qos data frame "); // for test
           ForwardUp (packet, hdr->GetAddr3 (), hdr->GetAddr1 ());
         }
       return;
@@ -474,11 +653,13 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
            || hdr->IsAssocReq ())
     {
       //This is a frame aimed at an AP, so we can safely ignore it.
+      //NS_LOG_UNCOND ("packet sent by us. 999");//for test
       NotifyRxDrop (packet);
       return;
     }
   else if (hdr->IsBeacon ())
     {
+      //NS_LOG_UNCOND ("stawifimac::Received beacon "); // for test
       MgtBeaconHeader beacon;
       packet->RemoveHeader (beacon);
       bool goodBeacon = false;
@@ -513,8 +694,141 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
       return;
     }
+  else if (hdr->IsS1gBeacon ())
+    {
+      //NS_LOG_UNCOND ("stawifimac::Received S1G beacon "); // for test
+      S1gBeaconHeader beacon;
+      packet->RemoveHeader (beacon);
+      //NS_LOG_UNCOND ("stawifimac::Received S1G beacon 699 "); // for test
+      bool goodBeacon = false;
+      //bool goodBeacon = false;
+      /* SupportedRates rates = beacon.GetSupportedRates ();
+      for (uint32_t i = 0; i < m_phy->GetNBssMembershipSelectors (); i++)
+        {
+        uint32_t selector = m_phy->GetBssMembershipSelector (i);
+        if (!rates.IsSupportedRate (selector))
+          {
+            goodBeacon = false;
+          }
+        }*/
+    //if ((IsWaitAssocResp () || IsAssociated ()) && beacon.GetSA () != GetBssid ())
+    if ((IsWaitAssocResp () || IsAssociated ()) && hdr->GetAddr3 () != GetBssid ()) // for debug
+     {
+       goodBeacon = false;
+     }
+    else
+     {
+      goodBeacon = true;
+     }
+    if (goodBeacon)
+     {
+       Time delay = MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * m_maxMissedBeacons);
+       RestartBeaconWatchdog (delay);
+       //SetBssid (beacon.GetSA ());
+       SetBssid (hdr->GetAddr3 ()); //for debug
+     }
+    if (goodBeacon && m_state == BEACON_MISSED)
+     {
+       SetState (WAIT_ASSOC_RESP);
+       SendAssociationRequest ();
+     }
+    if (goodBeacon)
+     {
+        UnsetInRAWgroup ();
+        uint8_t * rawassign = beacon.GetRPS().GetRawAssignment();
+        uint8_t raw_len = beacon.GetRPS().GetInformationFieldSize();
+        uint8_t rawtypeindex = rawassign[0] & 0x07;
+        uint8_t pageindex = rawassign[4] & 0x03;
+         if (pageindex == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
+           {
+             uint8_t rawgroup_l = rawassign[4];
+             uint8_t rawgroup_m = rawassign[5];
+             uint8_t rawgroup_h = rawassign[6];
+             uint32_t rawgroup = (uint32_t(rawassign[6]) << 16) | (uint32_t(rawassign[5]) << 8) | uint32_t(rawassign[4]);
+             uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
+             uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
+             if (raw_start <= (GetAID() & 0x03ff) <= raw_end )
+               {
+                 SetInRAWgroup ();
+               }
+            }
+         m_lastRawDurationus = MicroSeconds(1100); //to do, set raw duratoin based on received S1G beacon
+         //m_lastRawStart = Simulator::Now (); // assumes s1g beacon always indicating one raw
+         m_rawStart = true;
+         if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
+           {
+             m_pagedStaRaw = true;
+           }
+         else
+           {
+             m_pagedStaRaw = false;
+           }
+     }
+    if (goodBeacon)
+     {
+         ClearDataBuffered ();
+         uint16_t m_pageindex = (beacon.GetTIM().GetBitmapControl() >> 6) & 0x03;
+         if (((GetAID() >> 11 ) & 0x0003) != m_pageindex)
+         {
+           return; //not in the page indexed
+         }
+         uint8_t * m = beacon.GetTIM().GetPartialVBitmap();
+         uint8_t len = beacon.GetTIM().GetInformationFieldSize() - 3;
+         //NS_LOG_UNCOND ("StaWifiMac::Receive waiting  beacon 775, " ); //for test
+         NS_ASSERT (len > 0);
+         uint8_t i = 0;
+         while ( i < len )  // support multiple EncodedBlock
+         {
+           uint8_t offcont = m[i];
+           uint16_t blockoffset = (offcont << 3) & 0x1f;
+           i++;
+           if (blockoffset != ((GetAID() >> 6 ) & 0x001f)) //not in the block indexed
+             {
+                uint8_t blockbitmap = m[i];
+                uint8_t subblock_len = 0;
+                for (uint8_t j = 0; j <= 7; j++)
+                 {
+                   if (Is(blockbitmap, j))
+                    {
+                      subblock_len++;
+                    }
+                  }
+               i = i + subblock_len;
+               i++;
+              }    //in the block indexed
+            else
+              {
+                uint8_t blockbitmap = m[i];
+                uint8_t subblock_len = 0;  //length of subblock
+                for (uint8_t j = 0; j <= 7; j++)
+                 {
+                   if (Is(blockbitmap, j))  //the jth subblock indicator is '1'
+                     {
+                       subblock_len++;
+                       if (j == ((GetAID() >> 3) & 0x0003))  //in the subblock indexed
+                         {
+                           uint8_t k = i + subblock_len;
+                           uint8_t subblockmap = m[k];
+                           if (Is(subblockmap , GetAID() & 0x0003)) //in the station indexed
+                             {
+                               SetDataBuffered ();
+                               break;
+                             }
+                         }
+                     }
+                 }
+                NS_ASSERT (m_dataBuffered == true);
+                break;
+              }
+          }
+     }
+    SendPspollIfnecessary ();
+    S1gBeaconReceived ();
+    return;
+   }
   else if (hdr->IsProbeResp ())
     {
+      //NS_LOG_UNCOND ("receiving ProbeResp");//for test
       if (m_state == WAIT_PROBE_RESP)
         {
           MgtProbeResponseHeader probeResp;
@@ -547,6 +861,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
     }
   else if (hdr->IsAssocResp ())
     {
+      //NS_LOG_UNCOND ("receiving AssocResp");//for test
       if (m_state == WAIT_ASSOC_RESP)
         {
           MgtAssocResponseHeader assocResp;
@@ -559,6 +874,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             {
               SetState (ASSOCIATED);
               NS_LOG_DEBUG ("assoc completed");
+              SetAID (assocResp.GetAID ());
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
                 {

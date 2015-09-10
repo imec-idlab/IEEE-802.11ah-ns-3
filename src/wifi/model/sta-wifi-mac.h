@@ -47,6 +47,11 @@ public:
   virtual ~StaWifiMac ();
 
   /**
+   * \param stationManager the station manager attached to this MAC.
+   */
+  virtual void SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager);
+    
+  /**
    * \param packet the packet to send.
    * \param to the address to which the packet should be sent.
    *
@@ -176,6 +181,36 @@ private:
    * \return the HT capability that we support
    */
   HtCapabilities GetHtCapabilities (void) const;
+  /**
+   * Set the AID.
+   *
+   * \param aid the AID received from assoc response frame
+   */
+  void SetAID (uint16_t aid);
+  /**
+   * Get Station AID.
+   */
+  uint16_t GetAID (void) const;
+    
+  void SendPspoll (void);
+  void SendPspollIfnecessary (void);
+  void S1gBeaconReceived (void);
+  void StartRawbackoff (void);
+  void OutsideRawStartBackoff (void);
+  bool Is(uint8_t blockbitmap, uint8_t j);
+
+  void SetDataBuffered (void);
+  void ClearDataBuffered (void);
+  void SetInRAWgroup(void);
+  void UnsetInRAWgroup(void);
+
+  Time m_lastRawDurationus;
+  Time m_lastRawStart;
+  bool m_rawStart;
+  bool m_inRawGroup;
+  bool m_pagedStaRaw;
+  bool m_dataBuffered;
+  EventId m_outsideRawEvent;
 
   enum MacState m_state;
   Time m_probeRequestTimeout;
@@ -185,7 +220,11 @@ private:
   EventId m_beaconWatchdog;
   Time m_beaconWatchdogEnd;
   uint32_t m_maxMissedBeacons;
+  uint16_t m_aid;
+  
   bool m_activeProbing;
+  Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons
+  virtual void DoDispose (void);
 
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;

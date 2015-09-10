@@ -448,7 +448,19 @@ MgtAssocResponseHeader::GetSupportedRates (void)
 {
   return m_rates;
 }
+    
+void
+MgtAssocResponseHeader::SetAID (uint16_t aid)
+{
+  m_aid = aid;
+}
 
+uint16_t
+MgtAssocResponseHeader::GetAID (void) const
+{
+  return m_aid;
+}
+    
 void
 MgtAssocResponseHeader::SetStatusCode (StatusCode code)
 {

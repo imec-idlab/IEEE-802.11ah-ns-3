@@ -460,6 +460,10 @@ public:
    * \return the number of stream indices assigned by this model
    */
   int64_t AssignStreams (int64_t stream);
+    
+  void AccessAllowedIfRaw (bool allowed);
+  void RawStart (void);
+  void OutsideRawStart (void);
 
 
 private:
@@ -556,6 +560,8 @@ private:
   uint16_t m_blockAckInactivityTimeout;
   struct Bar m_currentBar;
   bool m_ampduExist;
+    
+  bool AccessIfRaw;
 };
 
 } //namespace ns3

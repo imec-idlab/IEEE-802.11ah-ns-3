@@ -37,6 +37,7 @@ enum WifiMacType
   WIFI_MAC_CTL_RTS = 0,
   WIFI_MAC_CTL_CTS,
   WIFI_MAC_CTL_ACK,
+  WIFI_MAC_CTL_PSPOLL,
   WIFI_MAC_CTL_BACKREQ,
   WIFI_MAC_CTL_BACKRESP,
   WIFI_MAC_CTL_CTLWRAPPER,
@@ -54,7 +55,9 @@ enum WifiMacType
   WIFI_MAC_MGT_ACTION,
   WIFI_MAC_MGT_ACTION_NO_ACK,
   WIFI_MAC_MGT_MULTIHOP_ACTION,
-
+  
+  WIFI_MAC_EXTENSION_S1G_BEACON,
+    
   WIFI_MAC_DATA,
   WIFI_MAC_DATA_CFACK,
   WIFI_MAC_DATA_CFPOLL,
@@ -70,6 +73,18 @@ enum WifiMacType
   WIFI_MAC_QOSDATA_NULL,
   WIFI_MAC_QOSDATA_NULL_CFPOLL,
   WIFI_MAC_QOSDATA_NULL_CFACK_CFPOLL,
+};
+    
+enum S1G_BSS_BW
+{
+    S1G_BSS_BW_F1_T2 = 0,
+    S1G_BSS_BW_F_T,
+    S1G_BSS_BW_F1_T4,
+    S1G_BSS_BW_F2_T4,
+    S1G_BSS_BW_F1_T8,
+    S1G_BSS_BW_F2_T8,
+    S1G_BSS_BW_F1_T16,
+    S1G_BSS_BW_F2_T16,
 };
 
 /**
@@ -132,6 +147,10 @@ public:
    * Set Type/Subtype values for a beacon header.
    */
   void SetBeacon (void);
+  /**
+   * Set Type/Subtype values for a S1G beacon header.
+   */
+  void SetS1gBeacon (void);
   /**
    * Set Type/Subtype values for a data packet with
    * no subtype equal to 0.
@@ -247,6 +266,50 @@ public:
    * Un-set the Retry bit in the Frame Control field.
    */
   void SetNoRetry (void);
+  /**
+   * Set the Next TBTT Present bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNextTBTT (void);
+  /**
+   * Un-set the Next TBTT Present bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNoNextTBTT (void);
+  /**
+   * Set the Compressed SSID bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetCompressedSSID (void);
+  /**
+   * Un-set the Compressed SSID Present bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNoCompressedSSID (void);
+  /**
+   * Set the ANO Present bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetANO (void);
+  /**
+   * Un-set the ANO Present bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNoANO (void);
+  /**
+   * Set the Security bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetSecurity (void);
+  /**
+   * Un-set the Security bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNoSecurity (void);
+  /**
+   * Set the AP PM bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetAPPM (void);
+  /**
+   * Un-set the AP PM bit in the Frame Control field of S1G beacon frame.
+   */
+  void SetNoAPPM (void);
+  /**
+   * Set the BSS BW in the Frame Control field of S1G beacon frame.
+   */
+  void SetBSSBW (enum S1G_BSS_BW S1g_BW);
   /**
    * Set the TID for the QoS header.
    *
@@ -392,6 +455,12 @@ public:
    */
   bool IsAck (void) const;
   /**
+   * Return true if the header is an Ps-Poll header.
+   *
+   * \return true if the header is an Ps-Poll header, false otherwise
+   */
+  bool IsPsPoll (void) const;
+  /**
    * Return true if the header is a Block ACK Request header.
    *
    * \return true if the header is a Block ACK Request header, false otherwise
@@ -446,6 +515,12 @@ public:
    */
   bool IsBeacon (void) const;
   /**
+   * Return true if the header is a S1G Beacon header.
+   *
+   * \return true if the header is a S1G Beacon header, false otherwise
+   */
+  bool IsS1gBeacon (void) const;
+  /**
    * Return true if the header is a Disassociation header.
    *
    * \return true if the header is a Disassociation header, false otherwise
@@ -489,6 +564,12 @@ public:
    */
   Time GetDuration (void) const;
   /**
+   * Return the AID from the Duration/ID field.
+   *
+   * \return the AID from the Duration/ID field
+   */
+  uint16_t GetAID (void) const;
+  /**
    * Return the raw Sequence Control field.
    *
    * \return the raw Sequence Control field
@@ -518,6 +599,30 @@ public:
    * \return true if the More Fragment bit is set, false otherwise
    */
   bool IsMoreFragments (void) const;
+  /**
+   * Return if the Next TBTT Present bit is set.
+   *
+   * \return true if the Next TBTT Present bit is set, false otherwise
+   */
+  bool IsNextTBTT (void) const;
+  /**
+   * Return if the Compressed SSID Present bit is set.
+   *
+   * \return true if the Compressed SSID Present bit is set, false otherwise
+   */
+  bool IsCompressedSSID (void) const;
+  /**
+   * Return if the ANO Present bit is set.
+   *
+   * \return true if the ANO Present bit is set, false otherwise
+   */
+  bool IsANO (void) const;
+ /**
+   * Return the BSS BW  of the S1G beacon frame header.
+   *
+   * \return the BSS BW  of the S1G beacon frame header
+   */
+  enum S1G_BSS_BW GetBSSBW (void) const;
   /**
    * Return if the QoS ACK policy is Block ACK.
    *
@@ -588,14 +693,14 @@ public:
    */
   typedef void (* TracedCallback)(const WifiMacHeader &header);
 
-
+  uint16_t GetFrameControl (void) const; //for test
 private:
   /**
    * Return the raw Frame Control field.
    *
    * \return the raw Frame Control field
    */
-  uint16_t GetFrameControl (void) const;
+  //uint16_t GetFrameControl (void) const; for test
   /**
    * Return the raw QoS Control field.
    *
@@ -605,9 +710,11 @@ private:
   /**
    * Set the Frame Control field with the given raw value.
    *
+   * \param S1gBeacon frame is S1g Beacon Frame or not
+   *
    * \param control the raw Frame Control field value
    */
-  void SetFrameControl (uint16_t control);
+  void SetFrameControl (bool S1gBeacon, uint16_t control);//for test
   /**
    * Set the Sequence Control field with the given raw value.
    *
@@ -626,7 +733,8 @@ private:
    * \param os the output stream to print to
    */
   void PrintFrameControl (std::ostream &os) const;
-
+  
+  uint8_t m_protVersion;
   uint8_t m_ctrlType;
   uint8_t m_ctrlSubtype;
   uint8_t m_ctrlToDs;
@@ -648,6 +756,13 @@ private:
   uint8_t m_qosAckPolicy;
   uint8_t m_amsduPresent;
   uint16_t m_qosStuff;
+    
+  uint8_t m_nextTBTT;
+  uint8_t m_compressed_SSID;
+  uint8_t m_ANO;
+  uint8_t m_BSS_BW;
+  uint8_t m_security;
+  uint8_t m_AP_PM;
 };
 
 } //namespace ns3

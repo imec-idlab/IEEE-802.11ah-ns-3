@@ -615,7 +615,9 @@ public:
    * \return the number of transmit antennas supported by the phy layer
    */
   uint32_t GetNumberOfTransmitAntennas (void);
-
+  
+  void RawStart (void);
+  void OutsideRawStart (void);
 
 protected:
   virtual void DoDispose (void);
@@ -1127,6 +1129,8 @@ struct WifiRemoteStation
   uint32_t m_ssrc;                  //!< STA short retry count
   uint32_t m_slrc;                  //!< STA long retry count
   uint8_t m_tid;                    //!< traffic ID
+  uint32_t m_ssrc_temp;
+  uint32_t m_slrc_temp;
 };
 
 } //namespace ns3

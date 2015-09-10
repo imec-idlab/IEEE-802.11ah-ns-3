@@ -258,6 +258,7 @@ EdcaTxopN::EdcaTxopN ()
     m_ampduExist (false)
 {
   NS_LOG_FUNCTION (this);
+  AccessAllowedIfRaw (true);
   m_transmissionListener = new EdcaTxopN::TransmissionListener (this);
   m_blockAckListener = new EdcaTxopN::AggregationCapableTransmissionListener (this);
   m_dcf = new EdcaTxopN::Dcf (this);
@@ -521,7 +522,7 @@ EdcaTxopN::NotifyAccessGranted (void)
     }
   MacLowTransmissionParameters params;
   params.DisableOverrideDurationId ();
-  if (m_currentHdr.GetAddr1 ().IsGroup ())
+  if (m_currentHdr.GetAddr1 ().IsGroup () || m_currentHdr.IsPsPoll ())
     {
       params.DisableRts ();
       params.DisableAck ();
@@ -932,12 +933,19 @@ EdcaTxopN::GetMsduAggregator (void) const
 }
 
 void
+EdcaTxopN::AccessAllowedIfRaw (bool allowed)
+{
+  AccessIfRaw = allowed;
+}
+
+void
 EdcaTxopN::RestartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
   if ((m_currentPacket != 0
        || !m_queue->IsEmpty () || m_baManager->HasPackets ())
-      && !m_dcf->IsAccessRequested ())
+      && !m_dcf->IsAccessRequested ()
+      && AccessIfRaw)
     {
       m_manager->RequestAccess (m_dcf);
     }
@@ -949,10 +957,32 @@ EdcaTxopN::StartAccessIfNeeded (void)
   NS_LOG_FUNCTION (this);
   if (m_currentPacket == 0
       && (!m_queue->IsEmpty () || m_baManager->HasPackets ())
-      && !m_dcf->IsAccessRequested ())
+      && !m_dcf->IsAccessRequested ()
+      && AccessIfRaw)    // always TRUE outside RAW
     {
       m_manager->RequestAccess (m_dcf);
     }
+}
+    
+void
+EdcaTxopN::RawStart (void)
+{
+  NS_LOG_FUNCTION (this);
+  m_dcf->RawStart ();
+  m_stationManager->RawStart ();
+  m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
+  StartAccessIfNeeded ();
+}
+
+void
+EdcaTxopN::OutsideRawStart ()
+{
+  NS_LOG_FUNCTION (this);
+  AccessAllowedIfRaw (true); // very important
+  m_dcf-> OutsideRawStart ();
+  m_stationManager->OutsideRawStart ();
+  m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
+  StartAccessIfNeeded ();
 }
 
 bool

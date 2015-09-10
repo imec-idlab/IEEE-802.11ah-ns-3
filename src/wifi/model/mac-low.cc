@@ -39,6 +39,8 @@
 #include "wifi-mac-queue.h"
 #include "mpdu-aggregator.h"
 
+#include "extension-headers.h"
+
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT std::clog << "[mac=" << m_self << "] "
 
@@ -717,6 +719,56 @@ MacLow::IsAmpdu (Ptr<const Packet> packet, const WifiMacHeader hdr)
       return false;
     }
 }
+    
+uint32_t
+MacLow::GetPspollSize (void) const
+{
+  WifiMacHeader pspoll;
+  pspoll.SetType (WIFI_MAC_CTL_PSPOLL);
+  return pspoll.GetSize () + 4;
+}
+
+void
+MacLow::SendPspoll ()  //packet is null for ps-poll frame
+{
+    NS_LOG_FUNCTION (this);
+    
+    Ptr<Packet> packet = Create<Packet> ();
+    WifiTxVector pspollTxVector;
+    pspollTxVector = GetRtsTxVector (packet, &m_currentHdr); // use GetRtsTxVector() for PS-poll, need change
+    
+    WifiPreamble preamble;
+    if (m_phy->GetGreenfield () && m_stationManager->GetGreenfieldSupported (m_currentHdr.GetAddr1 ()))
+      {
+        preamble = WIFI_PREAMBLE_HT_GF;
+      }
+    // P802.11AH_D4.0, 9.7.6.1
+    else if (m_phy->GetS1g1Mfield () && m_stationManager->GetS1g1MfieldSupported (m_currentHdr.GetAddr1 ()))
+      {
+        preamble = WIFI_PREAMBLE_S1G_1M;
+      }
+    else if (m_phy->GetS1gShortfield () && m_stationManager->GetS1gShortfieldSupported (m_currentHdr.GetAddr1 ()))
+      {
+        preamble = WIFI_PREAMBLE_S1G_SHORT;
+      }
+    else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
+      {
+        preamble = WIFI_PREAMBLE_S1G_SHORT;
+      }
+    else //Otherwise, RTS should always use non-HT PPDU (HT PPDU cases not supported yet)
+      {
+        preamble = WIFI_PREAMBLE_LONG;
+      }
+    
+    Time txDuration = m_phy->CalculateTxDuration (GetPspollSize (), pspollTxVector, preamble, m_phy->GetFrequency (), 0, 0);
+    
+    packet->AddHeader (m_currentHdr);
+    WifiMacTrailer fcs;
+    packet->AddTrailer (fcs);
+    
+    Simulator::Schedule (txDuration, &MacLow::EndTxNoAck, this);
+    ForwardDown (packet, &m_currentHdr, pspollTxVector,preamble);
+}
 
 void
 MacLow::StartTransmission (Ptr<const Packet> packet,
@@ -739,11 +791,27 @@ MacLow::StartTransmission (Ptr<const Packet> packet,
    * QapScheduler has taken access to the channel from
    * one of the Edca of the QAP.
    */
+    //uint16_t adf = hdr->GetFrameControl (); //for test
+    //NS_LOG_UNCOND ("MacLow::StartTransmission = lee" << adf); //for test
   m_currentHdr = *hdr;
+  //NS_LOG_LOGIC ("MacLow::StartTransmission   "); //for test
   CancelAllEvents ();
   m_listener = listener;
   m_txParams = params;
-
+  //NS_LOG_LOGIC ("MacLow::StartTransmission   22"); //for test
+  //uint16_t segg; //for test
+  //segg  =  hdr->GetFrameControl (); // for test
+  //NS_LOG_LOGIC ("MacLow::StartTransmission   " << segg); //for test
+  //NS_LOG_LOGIC ("MacLow::StartTransmission   20"); //for test
+  if (m_currentHdr.IsPsPoll ())
+    {
+     // NS_LOG_LOGIC ("MacLow::StartTransmission   23"); //for test
+      SendPspoll ();   // no change on m_currentPacket
+      //NS_LOG_LOGIC ("MacLow::StartTransmission   24"); //for test
+      NS_ASSERT (m_phy->IsStateTx ());
+      return;
+    }
+ // NS_LOG_LOGIC ("MacLow::StartTransmission 45  "); //for test
   if (m_aggregateQueue->GetSize () == 0)
     {
       m_currentPacket = packet->Copy ();
@@ -878,9 +946,17 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, Wifi
 
   bool isPrevNavZero = IsNavZero ();
   NS_LOG_DEBUG ("duration/id=" << hdr.GetDuration ());
-  NotifyNav (packet, hdr, preamble);
+   uint16_t adf = hdr.GetFrameControl (); //for test
+     if (hdr.IsS1gBeacon())
+       {
+           //NS_LOG_UNCOND ("MacLow::ReceiveOk = 949," );
+       } //for test}
+  // NS_LOG_UNCOND ("MacLow::ReceiveOk = 950," << adf); //for test
+  // NS_LOG_UNCOND ("MacLow::ReceiveOk = 951," << hdr.GetAddr1 ()); //for test
+   NotifyNav (packet, hdr, preamble);
   if (hdr.IsRts ())
     {
+      //NS_LOG_DEBUG ("MacLow::ReceiveOk hdr.IsRts"); //for test
       /* see section 9.2.5.7 802.11-1999
        * A STA that is addressed by an RTS frame shall transmit a CTS frame after a SIFS
        * period if the NAV at the STA receiving the RTS frame indicates that the medium is
@@ -1129,13 +1205,14 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, Wifi
     }
   else if (hdr.GetAddr1 ().IsGroup ())
     {
+        //NS_LOG_UNCOND ("WifiMacHeader::IsS1gBeacon  1208"); //for test
       if (ampduSubframe)
         {
           NS_FATAL_ERROR ("Received group addressed packet as part of an A-MPDU");
         }
       else
         {
-          if (hdr.IsData () || hdr.IsMgt ())
+          if (hdr.IsData () || hdr.IsMgt () || hdr.IsS1gBeacon () )
             {
               NS_LOG_DEBUG ("rx group from=" << hdr.GetAddr2 ());
               m_receivedAtLeastOneMpdu = false;
@@ -1494,12 +1571,24 @@ MacLow::NotifyNav (Ptr<const Packet> packet,const WifiMacHeader &hdr, WifiPreamb
 {
   NS_ASSERT (m_lastNavStart <= Simulator::Now ());
   Time duration = hdr.GetDuration ();
-
+  //NS_LOG_LOGIC ("MacLow::NotifyNav 11  "); //for test
   if (hdr.IsCfpoll ()
       && hdr.GetAddr2 () == m_bssid)
     {
+      //NS_LOG_LOGIC ("MacLow::NotifyNav 22  "); //for test
       // see section 9.3.2.2 802.11-1999
       DoNavResetNow (duration);
+      return;
+    }
+  else if (hdr.IsPsPoll ()
+        && hdr.GetAddr1 () != m_self)
+    {
+      // see section 9.3.2.4 802.11-2012
+      // to do, support NDP
+      WifiTxVector dataTxVector = GetDataTxVector (packet, &hdr);
+      Time acktime = GetAckDuration (hdr.GetAddr1(), dataTxVector);
+      Time pspollNav = acktime + GetSifs ();
+      DoNavStartNow (pspollNav) ;
       return;
     }
   /// \todo We should also handle CF_END specially here
@@ -1609,6 +1698,8 @@ void
 MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr,
                      WifiTxVector txVector, WifiPreamble preamble)
 {
+  //uint16_t adf = hdr->GetFrameControl (); //for test
+  //NS_LOG_UNCOND ("MacLow::ForwardDown = le," << adf); //for test
   NS_LOG_FUNCTION (this << packet << hdr << txVector);
   NS_LOG_DEBUG ("send " << hdr->GetTypeString () <<
                 ", to=" << hdr->GetAddr1 () <<
@@ -1616,7 +1707,7 @@ MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr,
                 ", mode=" << txVector.GetMode  () <<
                 ", duration=" << hdr->GetDuration () <<
                 ", seq=0x" << std::hex << m_currentHdr.GetSequenceControl () << std::dec);
-  if (!m_ampdu || hdr->IsRts ())
+  if (!m_ampdu || hdr->IsRts () || hdr->IsRts ())
     {
       m_phy->SendPacket (packet, txVector, preamble, 0);
     }

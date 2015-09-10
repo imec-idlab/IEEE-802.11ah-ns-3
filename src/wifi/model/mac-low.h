@@ -854,6 +854,8 @@ private:
    * \return the total RTS size
    */
   uint32_t GetRtsSize (void) const;
+    
+  uint32_t GetPspollSize (void) const;
   /**
    * Return the total CTS size (including FCS trailer).
    *
@@ -1137,6 +1139,7 @@ private:
    * Send RTS to begin RTS-CTS-DATA-ACK transaction.
    */
   void SendRtsForPacket (void);
+  void SendPspoll (void);
   /**
    * Send DATA packet, which can be DATA-ACK or
    * RTS-CTS-DATA-ACK transaction.

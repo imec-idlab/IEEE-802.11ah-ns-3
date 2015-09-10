@@ -22,6 +22,7 @@
 #include "ns3/udp-echo-client.h"
 #include "ns3/uinteger.h"
 #include "ns3/names.h"
+#include "ns3/log.h"
 
 namespace ns3 {
 
