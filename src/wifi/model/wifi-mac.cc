@@ -398,14 +398,14 @@ WifiMac::Configure80211n_5Ghz (void)
 }
     
 void
-WifiMac::Configure80211ah (void)   //need to check following parameter for 802.11ah
+WifiMac::Configure80211ah (void)   
 {
   SetSifs (MicroSeconds (160));
   SetSlot (MicroSeconds (52));
-  SetEifsNoDifs (MicroSeconds (160 + 440));
+  SetEifsNoDifs (MicroSeconds (160 + 700)); //have no idea how to calculate ACKTxTime, choose
   SetPifs (MicroSeconds (160 + 52));
-  SetCtsTimeout (MicroSeconds (160 + 440 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));
-  SetAckTimeout (MicroSeconds (160 + 440 + 1000 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));
+  SetCtsTimeout (MicroSeconds (160 + 700 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
+  SetAckTimeout (MicroSeconds (160 + 700 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
   SetBasicBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultBasicBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
   SetCompressedBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultCompressedBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
 }

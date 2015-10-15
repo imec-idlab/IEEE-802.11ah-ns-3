@@ -186,11 +186,13 @@ private:
    *
    * \param aid the AID received from assoc response frame
    */
-  void SetAID (uint16_t aid);
+  void SetAID (uint32_t aid);
   /**
    * Get Station AID.
    */
-  uint16_t GetAID (void) const;
+  uint32_t GetAID (void) const;
+  void SetRawDuration (Time interval);
+  Time GetRawDuration (void) const;
     
   void SendPspoll (void);
   void SendPspollIfnecessary (void);
@@ -206,6 +208,7 @@ private:
 
   Time m_lastRawDurationus;
   Time m_lastRawStart;
+  Time m_rawDuration;
   bool m_rawStart;
   bool m_inRawGroup;
   bool m_pagedStaRaw;
@@ -220,7 +223,7 @@ private:
   EventId m_beaconWatchdog;
   Time m_beaconWatchdogEnd;
   uint32_t m_maxMissedBeacons;
-  uint16_t m_aid;
+  uint32_t m_aid;
   
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons

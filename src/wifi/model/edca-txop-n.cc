@@ -34,6 +34,7 @@
 #include "msdu-aggregator.h"
 #include "mgt-headers.h"
 #include "qos-blocked-destinations.h"
+#include "ns3/simulator.h" // for debug
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT if (m_low != 0) { std::clog << "[mac=" << m_low->GetAddress () << "] "; }
@@ -474,6 +475,11 @@ void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+  //NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted = " << m_low->GetAddress () << ", AccessIfRaw =" << AccessIfRaw);
+  if (!AccessIfRaw) //wrong
+    {
+        return;
+    }
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty () && !m_baManager->HasPackets ())
@@ -936,17 +942,20 @@ void
 EdcaTxopN::AccessAllowedIfRaw (bool allowed)
 {
   AccessIfRaw = allowed;
+  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw);
 }
 
 void
 EdcaTxopN::RestartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
+  //NS_LOG_UNCOND ("EdcaTxopN::ReStartAccessIfNeeded 950, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket );
   if ((m_currentPacket != 0
        || !m_queue->IsEmpty () || m_baManager->HasPackets ())
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)
     {
+      //NS_LOG_UNCOND ("EdcaTxopN::can request access 956, mac address" << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
     }
 }
@@ -955,12 +964,28 @@ void
 EdcaTxopN::StartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
+  //NS_LOG_UNCOND ("EdcaTxopN::StartAccessIfNeeded 965, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
   if (m_currentPacket == 0
       && (!m_queue->IsEmpty () || m_baManager->HasPackets ())
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)    // always TRUE outside RAW
     {
+      //NS_LOG_UNCOND ("EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
+    }
+}
+    
+void
+EdcaTxopN::StartAccessIfNeededRaw (void)
+{
+    NS_LOG_FUNCTION (this);
+    //NS_LOG_UNCOND ("EdcaTxopN::StartAccessIfNeeded 965, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
+    if ((!m_queue->IsEmpty () || m_baManager->HasPackets ())
+        && !m_dcf->IsAccessRequested ()
+        && AccessIfRaw)    // always TRUE outside RAW
+    {
+        //NS_LOG_UNCOND ("EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
+        m_manager->RequestAccess (m_dcf);
     }
 }
     
@@ -971,18 +996,21 @@ EdcaTxopN::RawStart (void)
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
-  StartAccessIfNeeded ();
+  StartAccessIfNeededRaw (); //some bug, access could start even no packet
 }
 
 void
 EdcaTxopN::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
+    
+  //NS_LOG_UNCOND ("EdcaTxopN::OutsideRawStart ,time =" << Simulator::Now ().GetMicroSeconds () << "," << m_low->GetAddress ());
   AccessAllowedIfRaw (true); // very important
   m_dcf-> OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
-  StartAccessIfNeeded ();
+    //NS_LOG_UNCOND ("EDCATXOPN 992, AccessIfRaw = " <<  AccessIfRaw);
+  StartAccessIfNeededRaw ();
 }
 
 bool

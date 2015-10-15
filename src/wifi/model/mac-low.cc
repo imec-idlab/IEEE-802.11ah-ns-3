@@ -936,6 +936,7 @@ void
 MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, WifiPreamble preamble, bool ampduSubframe)
 {
   NS_LOG_FUNCTION (this << packet << rxSnr << txVector.GetMode () << preamble);
+  NS_LOG_DEBUG ("MacLow::ReceiveOk, time =" << Simulator::Now ().GetMicroSeconds () ); // for debug
   /* A packet is received from the PHY.
    * When we have handled this packet,
    * we handle any packet present in the
@@ -1790,7 +1791,7 @@ void
 MacLow::NormalAckTimeout (void)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_DEBUG ("normal ack timeout");
+  //NS_LOG_DEBUG ("normal ack timeout");
   /// \todo should check that there was no rx start before now.
   /// we should restart a new ack timeout now until the expected
   /// end of rx if there was a rx start before now.
@@ -1940,6 +1941,7 @@ MacLow::SendRtsForPacket (void)
 
   NS_ASSERT (m_ctsTimeoutEvent.IsExpired ());
   NotifyCtsTimeoutStartNow (timerDelay);
+    NS_LOG_UNCOND ("MacLow::CtsTimeout  =" << timerDelay);
   m_ctsTimeoutEvent = Simulator::Schedule (timerDelay, &MacLow::CtsTimeout, this);
 
   Ptr<Packet> packet = Create<Packet> ();
@@ -1987,6 +1989,8 @@ MacLow::StartDataTxTimers (WifiTxVector dataTxVector)
       Time timerDelay = txDuration + GetAckTimeout ();
       NS_ASSERT (m_normalAckTimeoutEvent.IsExpired ());
       NotifyAckTimeoutStartNow (timerDelay);
+        //NS_LOG_UNCOND ("MacLow::NormalAckTimeout =" <<  timerDelay << ", GetAckTimeout = " << GetAckTimeout () << ", txDuration =" << txDuration);
+      //NS_LOG_DEBUG ("MacLow::StartDataTxTimers, time =" << Simulator::Now ().GetMicroSeconds () ); // for debug
       m_normalAckTimeoutEvent = Simulator::Schedule (timerDelay, &MacLow::NormalAckTimeout, this);
     }
   else if (m_txParams.MustWaitFastAck ())

@@ -82,6 +82,8 @@ public:
 
   DcaTxop ();
   ~DcaTxop ();
+    
+  bool AccessIfRaw;
 
   /**
    * Set MacLow associated with this DcaTxop.
@@ -258,6 +260,7 @@ private:
    */
   void StartAccessIfNeeded (void);
 
+  void StartAccessIfNeededRaw (void);
   /**
    * Check if the current packet should be sent with a RTS protection.
    *
@@ -347,8 +350,7 @@ private:
   Ptr<const Packet> m_currentPacket;
   WifiMacHeader m_currentHdr;
   uint8_t m_fragmentNumber;
-    
-  bool AccessIfRaw;
+
 };
 
 } //namespace ns3

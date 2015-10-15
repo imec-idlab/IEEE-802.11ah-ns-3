@@ -97,7 +97,8 @@ public:
   EdcaTxopN ();
   virtual ~EdcaTxopN ();
   void DoDispose ();
-
+    
+    bool AccessIfRaw;
   /**
    * Set MacLow associated with this EdcaTxopN.
    *
@@ -287,6 +288,7 @@ public:
    * Request access from DCF manager if needed.
    */
   void StartAccessIfNeeded (void);
+  void StartAccessIfNeededRaw (void);
   /**
    * Check if the current packet should be sent with a RTS protection.
    *
@@ -561,7 +563,7 @@ private:
   struct Bar m_currentBar;
   bool m_ampduExist;
     
-  bool AccessIfRaw;
+  
 };
 
 } //namespace ns3

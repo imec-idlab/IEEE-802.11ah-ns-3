@@ -204,10 +204,17 @@ private:
    * \return true if beacons are periodically generated, false otherwise
    */
   bool GetBeaconGeneration (void) const;
-
+    
+  void SetRawGroupInterval (uint32_t interval);
+  uint32_t GetRawGroupInterval (void) const;
+  void SetTotalStaNum (uint32_t num);
+  uint32_t GetTotalStaNum (void) const;
+    
   virtual void DoDispose (void);
   virtual void DoInitialize (void);
-
+  
+  uint32_t m_totalStaNum;
+  uint32_t m_rawGroupInterval;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
   bool m_enableBeaconGeneration;             //!< Flag if beacons are being generated

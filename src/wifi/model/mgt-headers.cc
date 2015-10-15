@@ -429,7 +429,7 @@ MgtAssocRequestHeader::Deserialize (Buffer::Iterator start)
 NS_OBJECT_ENSURE_REGISTERED (MgtAssocResponseHeader);
 
 MgtAssocResponseHeader::MgtAssocResponseHeader ()
-  : m_aid (0)
+  : m_aid (1)
 {
 }
 
