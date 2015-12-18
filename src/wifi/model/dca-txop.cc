@@ -160,7 +160,6 @@ DcaTxop::DcaTxop ()
   m_dcf = new DcaTxop::Dcf (this);
   m_queue = CreateObject<WifiMacQueue> ();
   m_rng = new RealRandomStream ();
-  AccessAllowedIfRaw (true);
 }
 
 DcaTxop::~DcaTxop ()
@@ -333,7 +332,7 @@ DcaTxop::StartAccessIfNeeded (void)
 }
     
 void
-DcaTxop::StartAccessIfNeededRaw (void)
+DcaTxop::StartAccessIfNeededRaw (void) //possibilely necessary, start new backoff immdeiately,  even when m_currentPacket == 1. if no, start new backoff when current transimission is successful(StartAccessIfNeeded) or failed(RestartAccessIfNeeded).
 {
     NS_LOG_FUNCTION (this);
     //NS_LOG_UNCOND ("dcatxop 320, AccessIfRaw = " << AccessIfRaw << "," << m_low->GetAddress ());
@@ -355,7 +354,7 @@ DcaTxop::RawStart (void)
   m_stationManager->RawStart ();
        //NS_LOG_UNCOND ("DcaTxop::RawStart 335, " << m_dcf->GetCw () ); //for test
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
-  StartAccessIfNeededRaw ();
+  StartAccessIfNeededRaw (); //how about remove it?
 }
 
 void
@@ -366,7 +365,7 @@ DcaTxop::OutsideRawStart ()  //move to DcfManager Class?
   m_dcf->OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
-  StartAccessIfNeededRaw ();
+  StartAccessIfNeededRaw (); //how about remove it?
 }
 
 Ptr<MacLow>

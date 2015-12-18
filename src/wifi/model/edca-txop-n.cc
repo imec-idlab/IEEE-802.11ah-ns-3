@@ -35,6 +35,8 @@
 #include "mgt-headers.h"
 #include "qos-blocked-destinations.h"
 #include "ns3/simulator.h" // for debug
+#include "ns3/trace-source-accessor.h"
+#include "ns3/time-series-adaptor.h"
 
 #undef NS_LOG_APPEND_CONTEXT
 #define NS_LOG_APPEND_CONTEXT if (m_low != 0) { std::clog << "[mac=" << m_low->GetAddress () << "] "; }
@@ -246,6 +248,11 @@ EdcaTxopN::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&EdcaTxopN::GetEdcaQueue),
                    MakePointerChecker<WifiMacQueue> ())
+    .AddTraceSource ("AccessQuest_record",
+                     "The header of successfully transmitted packet"
+                     "The header of successfully transmitted packet",
+                     MakeTraceSourceAccessor (&EdcaTxopN::m_AccessQuest_record),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
   ;
   return tid;
 }
@@ -475,11 +482,14 @@ void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+    
   //NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted = " << m_low->GetAddress () << ", AccessIfRaw =" << AccessIfRaw);
   if (!AccessIfRaw) //wrong
     {
         return;
     }
+    int newdata=99;
+    m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty () && !m_baManager->HasPackets ())
@@ -769,6 +779,8 @@ EdcaTxopN::GotAck (double snr, WifiMode txMode)
       || m_currentHdr.IsQosAmsdu ())
     {
       NS_LOG_DEBUG ("got ack. tx done.");
+      int newdata=77;
+      m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
       if (!m_txOkCallback.IsNull ())
         {
           m_txOkCallback (m_currentHdr);
@@ -942,7 +954,7 @@ void
 EdcaTxopN::AccessAllowedIfRaw (bool allowed)
 {
   AccessIfRaw = allowed;
-  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw);
+  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw << "time = " << Simulator::Now ().GetMicroSeconds ()  );
 }
 
 void
@@ -957,6 +969,8 @@ EdcaTxopN::RestartAccessIfNeeded (void)
     {
       //NS_LOG_UNCOND ("EdcaTxopN::can request access 956, mac address" << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
+        int newdata=10;
+        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
     }
 }
 
@@ -970,8 +984,10 @@ EdcaTxopN::StartAccessIfNeeded (void)
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)    // always TRUE outside RAW
     {
-      //NS_LOG_UNCOND ("EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
+      //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "，EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
+        int newdata=20;
+        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
     }
 }
     
@@ -984,7 +1000,7 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
         && !m_dcf->IsAccessRequested ()
         && AccessIfRaw)    // always TRUE outside RAW
     {
-        //NS_LOG_UNCOND ("EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
+        //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "，EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
         m_manager->RequestAccess (m_dcf);
     }
 }
@@ -993,16 +1009,33 @@ void
 EdcaTxopN::RawStart (void)
 {
   NS_LOG_FUNCTION (this);
+   //if (AccessIfRaw)
+   // {
+      int newdata=66;
+      m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+    //}
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
+    if ((!m_queue->IsEmpty () || m_baManager->HasPackets ()) && AccessIfRaw)    // always TRUE outside RAW
+      {
+        int newdata=30;
+        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+      }
   StartAccessIfNeededRaw (); //some bug, access could start even no packet
+  
 }
 
 void
 EdcaTxopN::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
+    
+    /*if (AccessIfRaw)
+    {
+        int newdata=88;
+        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+    }*/
     
   //NS_LOG_UNCOND ("EdcaTxopN::OutsideRawStart ,time =" << Simulator::Now ().GetMicroSeconds () << "," << m_low->GetAddress ());
   AccessAllowedIfRaw (true); // very important
@@ -1011,6 +1044,7 @@ EdcaTxopN::OutsideRawStart ()
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
     //NS_LOG_UNCOND ("EDCATXOPN 992, AccessIfRaw = " <<  AccessIfRaw);
   StartAccessIfNeededRaw ();
+
 }
 
 bool

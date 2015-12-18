@@ -165,13 +165,13 @@ UdpServer::HandleRead (Ptr<Socket> socket)
           uint32_t currentSequenceNumber = seqTs.GetSeq ();
           if (InetSocketAddress::IsMatchingType (from))
             {
-              NS_LOG_INFO ("TraceDelay: RX " << packet->GetSize () <<
-                           " bytes from "<< InetSocketAddress::ConvertFrom (from).GetIpv4 () <<
-                           " Sequence Number: " << currentSequenceNumber <<
-                           " Uid: " << packet->GetUid () <<
-                           " TXtime: " << seqTs.GetTs () <<
-                           " RXtime: " << Simulator::Now () <<
-                           " Delay: " << Simulator::Now () - seqTs.GetTs ());
+              NS_LOG_INFO ("RX " << packet->GetSize () <<
+                           " f "<< InetSocketAddress::ConvertFrom (from).GetIpv4 () <<
+                           " S: " << currentSequenceNumber <<
+                           " U: " << packet->GetUid () <<
+                           " T " << seqTs.GetTs () <<
+                           " R: " << Simulator::Now () <<
+                           " D: " << Simulator::Now () - seqTs.GetTs ());
             }
           else if (Inet6SocketAddress::IsMatchingType (from))
             {

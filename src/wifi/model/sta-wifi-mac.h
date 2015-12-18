@@ -209,6 +209,8 @@ private:
   Time m_lastRawDurationus;
   Time m_lastRawStart;
   Time m_rawDuration;
+  Time m_slotDuration;
+  Time m_statSlotStart;
   bool m_rawStart;
   bool m_inRawGroup;
   bool m_pagedStaRaw;

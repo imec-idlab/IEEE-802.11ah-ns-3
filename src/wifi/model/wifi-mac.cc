@@ -402,10 +402,10 @@ WifiMac::Configure80211ah (void)
 {
   SetSifs (MicroSeconds (160));
   SetSlot (MicroSeconds (52));
-  SetEifsNoDifs (MicroSeconds (160 + 700)); //have no idea how to calculate ACKTxTime, choose
+  SetEifsNoDifs (MicroSeconds (160 + 1120)); //have no idea how to calculate ACKTxTime, choose
   SetPifs (MicroSeconds (160 + 52));
-  SetCtsTimeout (MicroSeconds (160 + 700 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
-  SetAckTimeout (MicroSeconds (160 + 700 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
+  SetCtsTimeout (MicroSeconds (160 + 1120 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
+  SetAckTimeout (MicroSeconds (160 + 1120 + 52 + GetDefaultMaxPropagationDelay ().GetMicroSeconds () * 2));//
   SetBasicBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultBasicBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
   SetCompressedBlockAckTimeout (GetSifs () + GetSlot () + GetDefaultCompressedBlockAckDelay () + GetDefaultMaxPropagationDelay () * 2);
 }

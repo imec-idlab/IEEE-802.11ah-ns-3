@@ -34,6 +34,7 @@
 #include "block-ack-manager.h"
 #include <map>
 #include <list>
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -469,6 +470,8 @@ public:
 
 
 private:
+    TracedCallback<double, double > m_AccessQuest_record;
+    
   void DoInitialize ();
   /**
    * This functions are used only to correctly set addresses in a-msdu subframe.

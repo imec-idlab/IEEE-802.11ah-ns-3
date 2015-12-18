@@ -586,6 +586,7 @@ YansWifiPhy::StartReceivePreambleAndHeader (Ptr<Packet> packet,
 {
   //This function should be later split to check separately wether plcp preamble and plcp header can be successfully received.
   //Note: plcp preamble reception is not yet modeled.
+  //NS_LOG_UNCOND (this << packet << rxPowerDbm << txVector.GetMode () << preamble << (uint32_t)packetType); //test
   NS_LOG_FUNCTION (this << packet << rxPowerDbm << txVector.GetMode () << preamble << (uint32_t)packetType);
   AmpduTag ampduTag;
   rxPowerDbm += m_rxGainDb;
@@ -645,6 +646,9 @@ YansWifiPhy::StartReceivePreambleAndHeader (Ptr<Packet> packet,
       break;
     case YansWifiPhy::CCA_BUSY:
     case YansWifiPhy::IDLE:
+      
+      //NS_LOG_UNCOND ("rxPowerW " << rxPowerW << "\t" << ",m_edThresholdW " << m_edThresholdW << "," << packet);
+            
       if (rxPowerW > m_edThresholdW) //checked here, no need to check in the payload reception (current implementation assumes constant rx power over the packet duration)
         {
           if (preamble == WIFI_PREAMBLE_NONE && m_mpdusNum == 0)
@@ -705,6 +709,8 @@ YansWifiPhy::StartReceivePreambleAndHeader (Ptr<Packet> packet,
         {
           NS_LOG_DEBUG ("drop packet because signal power too Small (" <<
                         rxPowerW << "<" << m_edThresholdW << ")");
+            //NS_LOG_UNCOND ("drop packet because signal power too Small (" <<
+            //              rxPowerW << "<" << m_edThresholdW << ")");
           NotifyRxDrop (packet);
           m_plcpSuccess = false;
           goto maybeCcaBusy;
@@ -760,6 +766,7 @@ YansWifiPhy::StartReceivePacket (Ptr<Packet> packet,
       else     //mode is not allowed
         {
           NS_LOG_DEBUG ("drop packet because it was sent using an unsupported mode (" << txMode << ")");
+          //NS_LOG_UNCOND ("drop packet because it was sent using an unsupported mode (" << txMode << ")");
           NotifyRxDrop (packet);
           m_plcpSuccess = false;
         }
@@ -841,13 +848,16 @@ YansWifiPhy::IsModeSupported (WifiMode mode) const
 bool
 YansWifiPhy::IsMcsSupported (WifiMode mode)
 {
+    //NS_LOG_UNCOND ("IsMcsSupported, " << mode << "\t" << GetNMcs ());
   for (uint32_t i = 0; i < GetNMcs (); i++)
     {
+      //NS_LOG_UNCOND ("IsMcsSupported-aa, " << mode << "\t" << McsToWifiMode (GetMcs (i)));
       if (mode == McsToWifiMode (GetMcs (i)))
         {
           return true;
         }
     }
+    //NS_LOG_UNCOND ("IsMcsSupported not supported, " << mode);
   return false;
 }
 
@@ -984,11 +994,15 @@ YansWifiPhy::Configure80211ah (void)
     
     // need to check for 802.11ah
     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6Mbps ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
+    
     //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate12Mbps ());
     //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate24Mbps ());
     m_bssMembershipSelectorSet.push_back(S1G_PHY);
     for (uint8_t i=0; i <11; i++)
     {
+        //NS_LOG_UNCOND ("YansWifiPhy::Configure80211ah");
         m_deviceMcsSet.push_back(i);
     }
 }
@@ -1127,10 +1141,18 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, enum WifiPreamble preamble, uint8_t
   snrPer = m_interference.CalculatePlcpPayloadSnrPer (event);
   m_interference.NotifyRxEnd ();
 
+    //NS_LOG_UNCOND ("YansWifiPhy::EndReceive, mode=" << (event->GetPayloadMode ().GetDataRate ()) <<
+               //   ", snr=" << snrPer.snr << ", per=" << snrPer.per << ", size=" << packet->GetSize ());
   if (m_plcpSuccess == true)
     {
-      NS_LOG_DEBUG ("mode=" << (event->GetPayloadMode ().GetDataRate ()) <<
-                    ", snr=" << snrPer.snr << ", per=" << snrPer.per << ", size=" << packet->GetSize ());
+      NS_LOG_DEBUG ("mode=" << (event->GetPayloadMode ().GetDataRate ()) << ", snr=" << snrPer.snr << ", per=" << snrPer.per << ", size=" << packet->GetSize ());
+        
+        //double snrtest1 = CalculateSnr (WifiPhy::GetOfdmRate300KbpsBW1MHz (), 0.1); //test
+        //double snrtest2 = CalculateSnr (WifiPhy::GetOfdmRate300KbpsBW1MHz (), 5.07867e-11); //test
+        //double snrtest3 = CalculateSnr (WifiPhy::GetOfdmRate300KbpsBW1MHz (), 0); //test
+        //NS_LOG_UNCOND ("1153--YansWifiPhy::EndReceive, snrtest1=" << snrtest1 << ", snrtest2=" << snrtest2 << ", snrtest3=" << snrtest3);
+        
+       // NS_LOG_UNCOND ("YansWifiPhy::EndReceive, mode=" << (event->GetPayloadMode ().GetDataRate ()) << ", snr=" << snrPer.snr << ", per=" << snrPer.per << ", size=" << packet->GetSize () << "," << packet);
 
       if (m_random->GetValue () > snrPer.per)
         {
@@ -1149,10 +1171,13 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, enum WifiPreamble preamble, uint8_t
           double noiseDbm = RatioToDb (event->GetRxPowerW () / snrPer.snr) - GetRxNoiseFigure () + 30;
           NotifyMonitorSniffRx (packet, (uint16_t)GetChannelFrequencyMhz (), GetChannelNumber (), dataRate500KbpsUnits, isShortPreamble, event->GetTxVector (), signalDbm, noiseDbm);
           m_state->SwitchFromRxEndOk (packet, snrPer.snr, event->GetTxVector (), event->GetPreambleType ());
+            
+          //NS_LOG_UNCOND ("YansWifiPhy::EndReceive, SwitchFromRxEndOk, "  << packet);
         }
       else
         {
           /* failure. */
+          //NS_LOG_UNCOND ("YansWifiPhy::EndReceive-reason1");
           NotifyRxDrop (packet);
           m_state->SwitchFromRxEndError (packet, snrPer.snr);
         }
@@ -1160,6 +1185,7 @@ YansWifiPhy::EndReceive (Ptr<Packet> packet, enum WifiPreamble preamble, uint8_t
   else
     {
       //notify rx end
+      NS_LOG_UNCOND ("YansWifiPhy::EndReceive-reason2");
       m_state->SwitchFromRxEndError (packet, snrPer.snr);
     }
 
@@ -1326,6 +1352,7 @@ WifiModeList
 YansWifiPhy::GetMembershipSelectorModes (uint32_t selector)
 {
   uint32_t id = GetBssMembershipSelector (selector);
+    //NS_LOG_UNCOND ("YansWifiPhy id " << id);
   WifiModeList supportedmodes;
   if (id == HT_PHY)
     {
@@ -1578,6 +1605,7 @@ YansWifiPhy::WifiModeToMcs (WifiMode mode)
 WifiMode
 YansWifiPhy::McsToWifiMode (uint8_t mcs)
 {
+    //NS_LOG_UNCOND ("YansWifiPhy::McsToWifiMode (uint8_t mcs) " << mcs);
     WifiMode mode;
     switch (mcs)
     {

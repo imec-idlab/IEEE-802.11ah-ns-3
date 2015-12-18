@@ -608,17 +608,32 @@ WifiRemoteStationManager::GetDataTxVector (Mac48Address address, const WifiMacHe
                                            Ptr<const Packet> packet, uint32_t fullPacketSize)
 {
   NS_LOG_FUNCTION (this << address << *header << packet << fullPacketSize);
-  if (address.IsGroup ())
-    {
-      WifiTxVector v;
-      v.SetMode (GetNonUnicastMode ());
-      v.SetTxPowerLevel (m_defaultTxPowerLevel);
-      v.SetShortGuardInterval (false);
-      v.SetNss (1);
-      v.SetNess (0);
-      v.SetStbc (false);
-      return v;
-    }
+
+  enum WifiMacType sigheader = WIFI_MAC_EXTENSION_S1G_BEACON;
+    
+  if (address.IsGroup () && (header->GetType () == sigheader)) //use temporary, need change
+      {
+        WifiTxVector v;
+        v.SetMode (WifiPhy::GetOfdmRate300KbpsBW1MHz ());  //maybe should be 150k
+        v.SetTxPowerLevel (m_defaultTxPowerLevel);
+        v.SetShortGuardInterval (false);
+        v.SetNss (1);
+        v.SetNess (0);
+        v.SetStbc (false);
+        return v;
+      }
+    else if (address.IsGroup ())
+     {
+        WifiTxVector v;
+        v.SetMode (GetNonUnicastMode ());
+        v.SetTxPowerLevel (m_defaultTxPowerLevel);
+        v.SetShortGuardInterval (false);
+        v.SetNss (1);
+        v.SetNess (0);
+        v.SetStbc (false);
+        return v;
+     }
+    
   if (!IsLowLatency ())
     {
       HighLatencyDataTxVectorTag datatag;
@@ -971,6 +986,7 @@ WifiRemoteStationManager::GetControlAnswerMode (Mac48Address address, WifiMode r
    * sequence (as defined in Annex G) and that is of the same
    * modulation class (see Section 9.7.8) as the received frame...
    */
+    //NS_LOG_UNCOND ("WifiRemoteStationManager::GetControlAnswerMode" << address << "\t" << reqMode);
   NS_LOG_FUNCTION (this << address << reqMode);
   WifiMode mode = GetDefaultMode ();
   bool found = false;
@@ -1131,6 +1147,7 @@ WifiRemoteStationManager::GetAckTxVector (Mac48Address address, WifiMode dataMod
   v.SetNss (DoGetAckTxNss (address, v.GetMode ()));
   v.SetNess (DoGetAckTxNess (address, v.GetMode ()));
   v.SetStbc (DoGetAckTxStbc (address, v.GetMode ()));
+    //NS_LOG_UNCOND ("WifiRemoteStationManager::GetAckTxVector" << v.GetMode ());
   return v;
 }
 
@@ -1419,7 +1436,8 @@ void
 WifiRemoteStationManager::AddBasicMode (WifiMode mode)
 {
   NS_LOG_FUNCTION (this << mode);
-  if (mode.GetModulationClass () == WIFI_MOD_CLASS_HT || mode.GetModulationClass () == WIFI_MOD_CLASS_S1G) //need to check for 802.11ah
+  //if (mode.GetModulationClass () == WIFI_MOD_CLASS_HT || mode.GetModulationClass () == WIFI_MOD_CLASS_S1G) //need to check for 802.11ah
+  if (mode.GetModulationClass () == WIFI_MOD_CLASS_HT ) //test
     {
       NS_FATAL_ERROR ("It is not allowed to add a HT/S1G rate in the BSSBasicRateSet!");
     }

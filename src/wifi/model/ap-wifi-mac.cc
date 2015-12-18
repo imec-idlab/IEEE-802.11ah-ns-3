@@ -443,6 +443,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success)
   uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
     //NS_LOG_UNCOND ("ap-wifi-mac, set aid = " << aid << ", sta address =" <<  to);
   //
+    //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "ap send, aid= " << aid );
   assoc.SetAID(aid); //
   StatusCode code;
   if (success)
@@ -687,7 +688,11 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         {
           if (hdr->IsAssocReq ())
             {
-              //NS_LOG_LOGIC ("Received AssocReq "); // for test
+              if (m_stationManager->IsAssociated (from))
+                {
+                  return;  //test, avoid repeate assoc
+                 }
+               //NS_LOG_LOGIC ("Received AssocReq "); // for test
               //first, verify that the the station's supported
               //rate set is compatible with our Basic Rate set
               MgtAssocRequestHeader assocReq;
