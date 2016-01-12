@@ -200,7 +200,10 @@ private:
   void StartRawbackoff (void);
   void OutsideRawStartBackoff (void);
   bool Is(uint8_t blockbitmap, uint8_t j);
-
+  void InsideBackoff (void);
+  void RawSlotStartBackoff (void);
+    
+    
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
   void SetInRAWgroup(void);
@@ -226,6 +229,9 @@ private:
   Time m_beaconWatchdogEnd;
   uint32_t m_maxMissedBeacons;
   uint32_t m_aid;
+  bool fasTAssocType;
+  uint16_t fastAssocThreshold;
+    uint16_t assocVaule;
   
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons

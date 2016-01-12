@@ -38,6 +38,7 @@
 #include "amsdu-subframe-header.h"
 #include "msdu-aggregator.h"
 #include "ns3/uinteger.h"
+#include "wifi-mac-queue.h"
 
 namespace ns3 {
 
@@ -81,7 +82,26 @@ ApWifiMac::GetTypeId (void)
                    MakeUintegerAccessor (&ApWifiMac::GetTotalStaNum,
                                          &ApWifiMac::SetTotalStaNum),
                    MakeUintegerChecker<uint32_t> ())
-  ;
+    .AddAttribute ("SlotFormat", "Slot format",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&ApWifiMac::GetSlotFormat,
+                                         &ApWifiMac::SetSlotFormat),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("SlotCrossBoundary", "cross slot boundary or not",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&ApWifiMac::GetSlotCrossBoundary,
+                                         &ApWifiMac::SetSlotCrossBoundary),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("SlotDurationCount", "slot duration count",
+                   UintegerValue (1000),
+                   MakeUintegerAccessor (&ApWifiMac::GetSlotDurationCount,
+                                         &ApWifiMac::SetSlotDurationCount),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("SlotNum", "Number of slot",
+                   UintegerValue (2),
+                   MakeUintegerAccessor (&ApWifiMac::GetSlotNum,
+                                         &ApWifiMac::SetSlotNum),
+                   MakeUintegerChecker<uint32_t> ());
   return tid;
 }
 
@@ -100,6 +120,8 @@ ApWifiMac::ApWifiMac ()
   SetTypeOfStation (AP);
 
   m_enableBeaconGeneration = false;
+  AuthenThreshold = 0;
+  //m_SlotFormat = 0;
 }
 
 ApWifiMac::~ApWifiMac ()
@@ -169,6 +191,31 @@ ApWifiMac::GetTotalStaNum (void) const
   NS_LOG_FUNCTION (this);
   return m_totalStaNum;
 }
+    
+uint32_t
+ApWifiMac::GetSlotFormat (void) const
+{
+    return m_SlotFormat;
+}
+    
+uint32_t
+ApWifiMac::GetSlotCrossBoundary (void) const
+{
+    return  m_slotCrossBoundary;
+}
+    
+uint32_t
+ApWifiMac::GetSlotDurationCount (void) const
+{
+    return m_slotDurationCount;
+}
+    
+uint32_t
+ApWifiMac::GetSlotNum (void) const
+{
+    return m_slotNum;
+}
+    
 
 void
 ApWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager)
@@ -206,6 +253,8 @@ ApWifiMac::SetRawGroupInterval (uint32_t interval)
 {
   NS_LOG_FUNCTION (this << interval);
   m_rawGroupInterval = interval;
+    //NS_LOG_UNCOND ("ApWifiMac::SetRawGroupInterval =" << m_rawGroupInterval);
+
 }
     
 void
@@ -214,6 +263,39 @@ ApWifiMac::SetTotalStaNum (uint32_t num)
   NS_LOG_FUNCTION (this << num);
   m_totalStaNum = num;
 }
+    
+void
+ApWifiMac::SetSlotFormat (uint32_t format)
+{
+    NS_ASSERT (format <= 1);
+    m_SlotFormat = format;
+    //NS_LOG_UNCOND ("ApWifiMac::SetSlotFormat =" << m_SlotFormat);
+
+}
+    
+void
+ApWifiMac::SetSlotCrossBoundary (uint32_t cross)
+{
+    NS_ASSERT (cross <= 1);
+    m_slotCrossBoundary = cross;
+}
+    
+void
+ApWifiMac::SetSlotDurationCount (uint32_t count)
+{
+    NS_ASSERT((!m_SlotFormat & (count < 256)) || (m_SlotFormat & (count < 2048)));
+    m_slotDurationCount = count;
+}
+    
+void
+ApWifiMac::SetSlotNum (uint32_t count)
+{
+    NS_ASSERT((!m_SlotFormat & (count < 64)) || (m_SlotFormat & (count < 8)));
+    m_slotNum = count;
+    //NS_LOG_UNCOND ("ApWifiMac::SetSlotNum =" << m_slotNum);
+
+}
+
 
 void
 ApWifiMac::StartBeaconing (void)
@@ -508,6 +590,16 @@ ApWifiMac::SendOneBeacon (void)
       uint8_t control = 0;
       raw.SetRawControl (control);//support paged STA or not
         //raw.SetRawSlot (uint16_t slot); //not used currently
+          raw.SetSlotFormat (m_SlotFormat);
+         //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << ", m_SlotFormat =" << m_SlotFormat << ",m_slotCrossBoundary=" << m_slotCrossBoundary << ", m_slotDurationCount=" << m_slotDurationCount << ", m_slotNum="  << m_slotNum);
+
+          raw.SetSlotCrossBoundary (m_slotCrossBoundary);
+          raw.SetSlotDurationCount (m_slotDurationCount);
+          raw.SetSlotNum (m_slotNum);
+          //raw.SetSlotFormat (1);
+          //raw.SetSlotCrossBoundary (1);
+          //raw.SetSlotDurationCount (2000);
+          //raw.SetSlotNum (4);
         //raw.SetRawStart (uint8_t start); //not used currently
       //
          uint32_t page = 0;
@@ -515,7 +607,7 @@ ApWifiMac::SendOneBeacon (void)
          static uint32_t aid_end = m_rawGroupInterval; //m_rawGroupInterval;
          uint32_t rawinfo = (aid_end << 13) | (aid_start << 2) | page;
          //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << ",  ap-wifi-mac-476, aid_start =" << aid_start << ", aid_end = " << aid_end);
-         //NS_LOG_UNCOND ("rawinfo = " << rawinfo);
+         //NS_LOG_UNCOND ("rawinfo = " << m_rawGroupInterval);
       //
       raw.SetRawGroup (rawinfo); // (b0-b1, page index) (b2-b12, raw start AID) (b13-b23, raw end AID)
         //
@@ -538,9 +630,35 @@ ApWifiMac::SendOneBeacon (void)
          }*/
          //uint16_t adf = hdr.GetFrameControl (); //for test
          //NS_LOG_UNCOND ("DcaTxop::ApWifiMac::SendOneBeacon = wlh," << adf); //for test
+      AuthenticationCtrl  AuthenCtrl;
+      AuthenCtrl.SetControlType (false); //centralized
+          //MgtQueue;
+         Ptr<WifiMacQueue> MgtQueue = m_dca->GetQueue ();
+         uint32_t MgtQueueSize= MgtQueue->GetSize ();
+      if  (MgtQueueSize < 10 )
+        {
+          if (AuthenThreshold <= 950)
+           {
+             AuthenThreshold += 50;
+           }
+        }
+      else
+        {
+          if (AuthenThreshold > 50)
+           {
+               AuthenThreshold -=50;
+           }
+        }
+      AuthenCtrl.SetThreshold (AuthenThreshold); //centralized
+      beacon.SetAuthCtrl (AuthenCtrl);
       packet->AddHeader (beacon);
       //The beacon has it's own special queue, so we load it in there
+         //if (MgtQueueSize != 0)
+         // {
+            NS_LOG_UNCOND ("send  beacon, threshold"  << AuthenThreshold << ",MgtQueueSize=" << MgtQueueSize); //for test
+          // }
       m_beaconDca->Queue (packet, hdr);
+         
      }
     else
      {

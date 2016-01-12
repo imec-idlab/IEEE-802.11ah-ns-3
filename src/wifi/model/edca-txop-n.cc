@@ -954,7 +954,7 @@ void
 EdcaTxopN::AccessAllowedIfRaw (bool allowed)
 {
   AccessIfRaw = allowed;
-  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw << "time = " << Simulator::Now ().GetMicroSeconds ()  );
+  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw << "time = " << Simulator::Now ().GetMicroSeconds () );
 }
 
 void

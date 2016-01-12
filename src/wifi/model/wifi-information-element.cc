@@ -75,9 +75,9 @@ WifiInformationElement::DeserializeIfPresent (Buffer::Iterator i)
     {
       return start;
     }
-   // NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 76" << elementId); //for test
+   //NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 76" << elementId); //for test
   uint8_t length = i.ReadU8 ();
-   // NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 78" ); //for test
+    //NS_LOG_UNCOND ("WifiInformationElement::DeserializeIfPresent 78" << length); //for test
   NS_ASSERT (i.GetDistanceFrom (start) != 0); // for test
   DeserializeInformationField (i, length);
   i.Next (length);

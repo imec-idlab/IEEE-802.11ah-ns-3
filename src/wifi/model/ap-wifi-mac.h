@@ -207,14 +207,31 @@ private:
     
   void SetRawGroupInterval (uint32_t interval);
   uint32_t GetRawGroupInterval (void) const;
+  void SetSlotFormat (uint32_t format);
+  void SetSlotCrossBoundary (uint32_t cross);
+  void SetSlotDurationCount (uint32_t count);
+  void SetSlotNum (uint32_t count);
+  uint32_t GetSlotFormat (void) const;
+  uint32_t GetSlotCrossBoundary (void) const;
+  uint32_t GetSlotDurationCount (void) const;
+  uint32_t GetSlotNum (void) const;
+    
+    
+    
   void SetTotalStaNum (uint32_t num);
   uint32_t GetTotalStaNum (void) const;
     
   virtual void DoDispose (void);
   virtual void DoInitialize (void);
   
+  uint16_t  AuthenThreshold;
   uint32_t m_totalStaNum;
   uint32_t m_rawGroupInterval;
+    uint32_t m_SlotFormat;
+    uint32_t m_slotCrossBoundary;
+    uint32_t m_slotDurationCount;
+    uint32_t  m_slotNum;
+    
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
   bool m_enableBeaconGeneration;             //!< Flag if beacons are being generated
