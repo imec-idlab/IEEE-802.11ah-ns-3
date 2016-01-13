@@ -227,10 +227,10 @@ private:
   uint16_t  AuthenThreshold;
   uint32_t m_totalStaNum;
   uint32_t m_rawGroupInterval;
-    uint32_t m_SlotFormat;
-    uint32_t m_slotCrossBoundary;
-    uint32_t m_slotDurationCount;
-    uint32_t  m_slotNum;
+  uint32_t m_SlotFormat;
+  uint32_t m_slotCrossBoundary;
+  uint32_t m_slotDurationCount;
+  uint32_t  m_slotNum;
     
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons

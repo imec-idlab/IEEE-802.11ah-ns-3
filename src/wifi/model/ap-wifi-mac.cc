@@ -253,8 +253,6 @@ ApWifiMac::SetRawGroupInterval (uint32_t interval)
 {
   NS_LOG_FUNCTION (this << interval);
   m_rawGroupInterval = interval;
-    //NS_LOG_UNCOND ("ApWifiMac::SetRawGroupInterval =" << m_rawGroupInterval);
-
 }
     
 void
@@ -269,8 +267,6 @@ ApWifiMac::SetSlotFormat (uint32_t format)
 {
     NS_ASSERT (format <= 1);
     m_SlotFormat = format;
-    //NS_LOG_UNCOND ("ApWifiMac::SetSlotFormat =" << m_SlotFormat);
-
 }
     
 void
@@ -292,8 +288,6 @@ ApWifiMac::SetSlotNum (uint32_t count)
 {
     NS_ASSERT((!m_SlotFormat & (count < 64)) || (m_SlotFormat & (count < 8)));
     m_slotNum = count;
-    //NS_LOG_UNCOND ("ApWifiMac::SetSlotNum =" << m_slotNum);
-
 }
 
 
@@ -517,15 +511,12 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success)
   hdr.SetDsNotTo ();
   Ptr<Packet> packet = Create<Packet> ();
   MgtAssocResponseHeader assoc;
-  //
+  
   uint8_t mac[6];
   to.CopyTo (mac);
   uint8_t aid_l = mac[5];
   uint8_t aid_h = mac[4] & 0x1f;
   uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
-    //NS_LOG_UNCOND ("ap-wifi-mac, set aid = " << aid << ", sta address =" <<  to);
-  //
-    //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "ap send, aid= " << aid );
   assoc.SetAID(aid); //
   StatusCode code;
   if (success)
@@ -566,51 +557,25 @@ ApWifiMac::SendOneBeacon (void)
       hdr.SetAddr3 (GetAddress ()); // for debug
       Ptr<Packet> packet = Create<Packet> ();
       S1gBeaconHeader beacon;
-      //beacon.SetSA (GetAddress ()); according to draft, shold be the address of AP, to make it easily, use broadcast temporarily
       S1gBeaconCompatibility compatibility;
       compatibility.SetBeaconInterval (m_beaconInterval.GetMicroSeconds ());
       beacon.SetBeaconCompatibility (compatibility);
-      /* According to draft, one TIM can carry information of one page stations
-         to make it simple, we only support at most 64 stations(one block)
-      */
-      /*TIM m_tim;
-        //m_tim.SetDTIMCount (uint8_t count); //no configure, do not ues current
-        //m_tim.SetDTIMPeriod (uint8_t count); //no configure, do not ues current
-      m_tim.SetBitmapControl (192); // (b7-b6, page index), (b5-b1, page slice, no support) (b0 traffice indicator, no support)
-      TIM::EncodedBlock block;
-        //block.SetBlockControl (enum BlockCoding coding); //no configure, support Block Bitmap coding in dafault
-      block.SetBlockOffset (1);  // (0-31)
-      uint8_t codeinfo[4]={7,2,3,4};
-      uint8_t * encodedInfo = codeinfo;
-      block.SetEncodedInfo (encodedInfo, 3); //(encodedInfo, include bitmap and subblock)(subblocklength, length of subblock)
-      m_tim.SetPartialVBitmap (block);
-      beacon.SetTIM (m_tim);*/
       RPS m_rps;
       RPS::RawAssignment raw;
       uint8_t control = 0;
       raw.SetRawControl (control);//support paged STA or not
-        //raw.SetRawSlot (uint16_t slot); //not used currently
-          raw.SetSlotFormat (m_SlotFormat);
-         //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << ", m_SlotFormat =" << m_SlotFormat << ",m_slotCrossBoundary=" << m_slotCrossBoundary << ", m_slotDurationCount=" << m_slotDurationCount << ", m_slotNum="  << m_slotNum);
+      raw.SetSlotFormat (m_SlotFormat);
+      raw.SetSlotCrossBoundary (m_slotCrossBoundary);
+      raw.SetSlotDurationCount (m_slotDurationCount);
+      raw.SetSlotNum (m_slotNum);
 
-          raw.SetSlotCrossBoundary (m_slotCrossBoundary);
-          raw.SetSlotDurationCount (m_slotDurationCount);
-          raw.SetSlotNum (m_slotNum);
-          //raw.SetSlotFormat (1);
-          //raw.SetSlotCrossBoundary (1);
-          //raw.SetSlotDurationCount (2000);
-          //raw.SetSlotNum (4);
-        //raw.SetRawStart (uint8_t start); //not used currently
-      //
-         uint32_t page = 0;
-         static uint32_t aid_start = 1;
-         static uint32_t aid_end = m_rawGroupInterval; //m_rawGroupInterval;
-         uint32_t rawinfo = (aid_end << 13) | (aid_start << 2) | page;
-         //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << ",  ap-wifi-mac-476, aid_start =" << aid_start << ", aid_end = " << aid_end);
-         //NS_LOG_UNCOND ("rawinfo = " << m_rawGroupInterval);
-      //
+      uint32_t page = 0;
+      static uint32_t aid_start = 1;
+      static uint32_t aid_end = m_rawGroupInterval; //m_rawGroupInterval;
+      uint32_t rawinfo = (aid_end << 13) | (aid_start << 2) | page;
+
       raw.SetRawGroup (rawinfo); // (b0-b1, page index) (b2-b12, raw start AID) (b13-b23, raw end AID)
-        //
+      
          aid_start = aid_start + m_rawGroupInterval;
          aid_end = aid_end + m_rawGroupInterval;
          if (aid_end > m_totalStaNum)
@@ -618,23 +583,13 @@ ApWifiMac::SendOneBeacon (void)
              aid_start = 1;
              aid_end = m_rawGroupInterval;
            }
-         //
-        //raw.SetChannelInd (uint16_t channel); //not used currently
-        //raw.SetPRAW (uint32_t praw);//not used currently
       m_rps.SetRawAssignment(raw);
       beacon.SetRPS (m_rps);
-      /*if (m_htSupported)
-        {
-           beacon.SetHtCapabilities (GetHtCapabilities ());
-           hdr.SetNoOrder ();
-         }*/
-         //uint16_t adf = hdr.GetFrameControl (); //for test
-         //NS_LOG_UNCOND ("DcaTxop::ApWifiMac::SendOneBeacon = wlh," << adf); //for test
+
       AuthenticationCtrl  AuthenCtrl;
       AuthenCtrl.SetControlType (false); //centralized
-          //MgtQueue;
-         Ptr<WifiMacQueue> MgtQueue = m_dca->GetQueue ();
-         uint32_t MgtQueueSize= MgtQueue->GetSize ();
+      Ptr<WifiMacQueue> MgtQueue = m_dca->GetQueue ();
+      uint32_t MgtQueueSize= MgtQueue->GetSize ();
       if  (MgtQueueSize < 10 )
         {
           if (AuthenThreshold <= 950)
@@ -652,17 +607,11 @@ ApWifiMac::SendOneBeacon (void)
       AuthenCtrl.SetThreshold (AuthenThreshold); //centralized
       beacon.SetAuthCtrl (AuthenCtrl);
       packet->AddHeader (beacon);
-      //The beacon has it's own special queue, so we load it in there
-         //if (MgtQueueSize != 0)
-         // {
-            NS_LOG_UNCOND ("send  beacon, threshold"  << AuthenThreshold << ",MgtQueueSize=" << MgtQueueSize); //for test
-          // }
       m_beaconDca->Queue (packet, hdr);
          
      }
     else
      {
-         //NS_LOG_LOGIC ("send  beacon " ); //for test
       hdr.SetBeacon ();
       hdr.SetAddr1 (Mac48Address::GetBroadcast ());
       hdr.SetAddr2 (GetAddress ());
@@ -674,18 +623,15 @@ ApWifiMac::SendOneBeacon (void)
       beacon.SetSsid (GetSsid ());
       beacon.SetSupportedRates (GetSupportedRates ());
       beacon.SetBeaconIntervalUs (m_beaconInterval.GetMicroSeconds ());
-     // NS_LOG_LOGIC ("send  beacon 1" ); //for test
       if (m_htSupported)
         {
           beacon.SetHtCapabilities (GetHtCapabilities ());
           hdr.SetNoOrder ();
         }
-      //NS_LOG_LOGIC ("send  beacon 2" ); //for test
       packet->AddHeader (beacon);
       //The beacon has it's own special queue, so we load it in there
       m_beaconDca->Queue (packet, hdr);
       }
- // NS_LOG_LOGIC ("send  beacon 3" );  //for test
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
 }
 

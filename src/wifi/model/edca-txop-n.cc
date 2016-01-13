@@ -482,9 +482,7 @@ void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
-    
-  //NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted = " << m_low->GetAddress () << ", AccessIfRaw =" << AccessIfRaw);
-  if (!AccessIfRaw) //wrong
+  if (!AccessIfRaw)
     {
         return;
     }
@@ -954,20 +952,17 @@ void
 EdcaTxopN::AccessAllowedIfRaw (bool allowed)
 {
   AccessIfRaw = allowed;
-  //NS_LOG_UNCOND ("EdcaTxopN::AccessAllowedIfRaw = " << AccessIfRaw << "time = " << Simulator::Now ().GetMicroSeconds () );
 }
 
 void
 EdcaTxopN::RestartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND ("EdcaTxopN::ReStartAccessIfNeeded 950, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket );
   if ((m_currentPacket != 0
        || !m_queue->IsEmpty () || m_baManager->HasPackets ())
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)
     {
-      //NS_LOG_UNCOND ("EdcaTxopN::can request access 956, mac address" << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
         int newdata=10;
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
@@ -978,13 +973,11 @@ void
 EdcaTxopN::StartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND ("EdcaTxopN::StartAccessIfNeeded 965, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
   if (m_currentPacket == 0
       && (!m_queue->IsEmpty () || m_baManager->HasPackets ())
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)    // always TRUE outside RAW
     {
-      //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "，EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
         int newdata=20;
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
@@ -995,12 +988,10 @@ void
 EdcaTxopN::StartAccessIfNeededRaw (void)
 {
     NS_LOG_FUNCTION (this);
-    //NS_LOG_UNCOND ("EdcaTxopN::StartAccessIfNeeded 965, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
     if ((!m_queue->IsEmpty () || m_baManager->HasPackets ())
         && !m_dcf->IsAccessRequested ()
         && AccessIfRaw)    // always TRUE outside RAW
     {
-        //NS_LOG_UNCOND ("time = " << Simulator::Now ().GetMicroSeconds () << "，EdcaTxopN::can reuqest access 971, mac address = " << m_low->GetAddress ());
         m_manager->RequestAccess (m_dcf);
     }
 }
@@ -1009,20 +1000,19 @@ void
 EdcaTxopN::RawStart (void)
 {
   NS_LOG_FUNCTION (this);
-   //if (AccessIfRaw)
-   // {
-      int newdata=66;
-      m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
-    //}
+
+  int newdata=66;
+  m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+    
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
-    if ((!m_queue->IsEmpty () || m_baManager->HasPackets ()) && AccessIfRaw)    // always TRUE outside RAW
+    if ((!m_queue->IsEmpty () || m_baManager->HasPackets ()) && AccessIfRaw)
       {
         int newdata=30;
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
       }
-  StartAccessIfNeededRaw (); //some bug, access could start even no packet
+  StartAccessIfNeededRaw (); //access could start even no packet
   
 }
 
@@ -1031,18 +1021,10 @@ EdcaTxopN::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
     
-    /*if (AccessIfRaw)
-    {
-        int newdata=88;
-        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
-    }*/
-    
-  //NS_LOG_UNCOND ("EdcaTxopN::OutsideRawStart ,time =" << Simulator::Now ().GetMicroSeconds () << "," << m_low->GetAddress ());
-  AccessAllowedIfRaw (true); // very important
+  AccessAllowedIfRaw (true);
   m_dcf-> OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
-    //NS_LOG_UNCOND ("EDCATXOPN 992, AccessIfRaw = " <<  AccessIfRaw);
   StartAccessIfNeededRaw ();
 
 }

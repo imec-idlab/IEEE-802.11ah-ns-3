@@ -58,7 +58,6 @@ YansErrorRateModel::GetBpskBer (double snr, uint32_t signalSpread, uint32_t phyR
   double z = std::sqrt (EbNo);
   double ber = 0.5 * erfc (z);
   NS_LOG_INFO ("bpsk snr=" << snr << " ber=" << ber);
-  //NS_LOG_UNCOND ("YansErrorRateModel::GetBpskBer, bpsk snr=" << snr << " ber=" << ber << ", EbNo =" << EbNo << ", signalSpread" << signalSpread << ", phyRate " << phyRate);
   return ber;
 }
 
@@ -71,7 +70,6 @@ YansErrorRateModel::GetQamBer (double snr, unsigned int m, uint32_t signalSpread
   double z2 = 1 - std::pow ((1 - z1), 2);
   double ber = z2 / Log2 (m);
   NS_LOG_INFO ("Qam m=" << m << " rate=" << phyRate << " snr=" << snr << " ber=" << ber);
-   //NS_LOG_UNCOND ("YansErrorRateModel::GetQamBer, EbNo =" << EbNo << " ber=" << ber << ", m= " << m << ", signalSpread" << signalSpread << ", phyRate " << phyRate);
   return ber;
 }
 
@@ -155,9 +153,7 @@ YansErrorRateModel::GetFecBpskBer (double snr, double nbits,
   double pd = CalculatePd (ber, dFree);
   double pmu = adFree * pd;
   pmu = std::min (pmu, 1.0);
- //double   pmu = ber; //for test
   double pms = std::pow (1 - pmu, nbits);
-    //NS_LOG_UNCOND ("YansErrorRateModel::GetFecBpskBer COME HERE,pms = " << pms << ", ber = " << ber << ", pd =" << pd << ", nbits =" << nbits);
   return pms;
 }
 
@@ -181,14 +177,12 @@ YansErrorRateModel::GetFecQamBer (double snr, uint32_t nbits,
   pmu += adFreePlusOne * pd;
   pmu = std::min (pmu, 1.0);
   double pms = std::pow (1 - pmu, static_cast<double> (nbits));
-     //NS_LOG_UNCOND ("YansErrorRateModel::GetFecQamBer ****,pms = " << pms << ", ber = " << ber << ", pd =" << pd << ", nbits =" << nbits);
   return pms;
 }
 
 double
 YansErrorRateModel::GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbits) const
 {
-    //NS_LOG_UNCOND ("YansErrorRateModel::GetChunkSuccessRate" <<  mode << ", snr=" << snr << ", nbit=" << nbits);
   if (mode.GetModulationClass () == WIFI_MOD_CLASS_ERP_OFDM
       || mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM
       || mode.GetModulationClass () == WIFI_MOD_CLASS_HT
@@ -204,7 +198,6 @@ YansErrorRateModel::GetChunkSuccessRate (WifiMode mode, double snr, uint32_t nbi
                                                   mode.GetPhyRate (), //phy rate
                                                   10, //dFree
                                                   11); //adFree
-                  //NS_LOG_UNCOND ("YansErrorRateModel::calculate error rate," << ErrorRate);
               return GetFecBpskBer (snr,
                                     nbits,
                                     mode.GetBandwidth (), //signal spread

@@ -303,14 +303,11 @@ void
 DcaTxop::RestartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND ("dcatxop 306, AccessIfRaw = " << AccessIfRaw << "," << m_low->GetAddress ());
-  //NS_LOG_UNCOND ("DcaTxop::ReStartAccessIfNeeded 307, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
   if ((m_currentPacket != 0
        || !m_queue->IsEmpty ())
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)          // always TRUE outside RAW
     {
-      //NS_LOG_UNCOND ("DcaTxop::can request access 313, mac address = " << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
     }
 }
@@ -319,14 +316,11 @@ void
 DcaTxop::StartAccessIfNeeded (void)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND ("dcatxop 320, AccessIfRaw = " << AccessIfRaw << "," << m_low->GetAddress ());
-  //NS_LOG_UNCOND ("DcaTxop::StartAccessIfNeeded 323, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
   if (m_currentPacket == 0
       && !m_queue->IsEmpty ()
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)      // always TRUE outside RAW
     {
-      //NS_LOG_UNCOND ("DcaTxopN::can request access 329, mac address = " << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
     }
 }
@@ -335,14 +329,11 @@ void
 DcaTxop::StartAccessIfNeededRaw (void) //possibilely necessary, start new backoff immdeiately,  even when m_currentPacket == 1. if no, start new backoff when current transimission is successful(StartAccessIfNeeded) or failed(RestartAccessIfNeeded).
 {
     NS_LOG_FUNCTION (this);
-    //NS_LOG_UNCOND ("dcatxop 320, AccessIfRaw = " << AccessIfRaw << "," << m_low->GetAddress ());
-    //NS_LOG_UNCOND ("DcaTxop::StartAccessIfNeeded 323, mac address = "  << m_low->GetAddress () << ",m_dcf->IsAccessRequested () = " << m_dcf->IsAccessRequested () << ", packet =" << m_currentPacket);
     if (!m_queue->IsEmpty ()
         && !m_dcf->IsAccessRequested ()
         && AccessIfRaw)      // always TRUE outside RAW
     {
-        //NS_LOG_UNCOND ("DcaTxopN::can request access 329, mac address = " << m_low->GetAddress ());
-        m_manager->RequestAccess (m_dcf);
+       m_manager->RequestAccess (m_dcf);
     }
 }
     
@@ -352,16 +343,15 @@ DcaTxop::RawStart (void)
   NS_LOG_FUNCTION (this);
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
-       //NS_LOG_UNCOND ("DcaTxop::RawStart 335, " << m_dcf->GetCw () ); //for test
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
   StartAccessIfNeededRaw (); //how about remove it?
 }
 
 void
-DcaTxop::OutsideRawStart ()  //move to DcfManager Class?
+DcaTxop::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
-  AccessAllowedIfRaw (true); // very important
+  AccessAllowedIfRaw (true);
   m_dcf->OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
@@ -486,13 +476,10 @@ void
 DcaTxop::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND ("DcaTxop::NotifyAccessGranted =" << m_low->GetAddress () << ", AccessIfRaw =" << AccessIfRaw);
-  if (!AccessIfRaw) //wrong
+  if (!AccessIfRaw) 
     {
         return;
     }
-  //uint16_t adf = m_currentHdr.GetFrameControl (); //for test
-  //NS_LOG_UNCOND ("DcaTxop::NotifyAccessGranted = 468,") ; //for test
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty ())

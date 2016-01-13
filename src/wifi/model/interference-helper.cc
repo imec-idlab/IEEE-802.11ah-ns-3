@@ -245,7 +245,6 @@ InterferenceHelper::CalculateSnr (double signal, double noiseInterference, WifiM
   double noise = noiseFloor + noiseInterference;
   double snr = signal / noise;
   NS_LOG_DEBUG ("signal= " << signal << ", noise=" << noiseFloor << ", interference=" << noiseInterference << ", snr=" << snr);
-  //NS_LOG_UNCOND ("InterferenceHelper::CalculateSnr, signal= " << signal << ", snr=" << snr << ", interference=" << noiseInterference << ", wifimode=" << mode);
   return snr;
 }
 
@@ -276,7 +275,6 @@ InterferenceHelper::CalculateChunkSuccessRate (double snir, Time duration, WifiM
     }
   uint32_t rate = mode.GetPhyRate ();
   uint64_t nbits = (uint64_t)(rate * duration.GetSeconds ());
-    //NS_LOG_UNCOND ("InterferenceHelper::CalculateChunkSuccessRate" << rate << ", nbits=" << nbits << "duration=" << duration);
   double csr = m_errorRateModel->GetChunkSuccessRate (mode, snir, (uint32_t)nbits);
   return csr;
 }

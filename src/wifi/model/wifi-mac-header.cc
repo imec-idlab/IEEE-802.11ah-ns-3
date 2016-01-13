@@ -161,9 +161,6 @@ WifiMacHeader::SetBeacon (void)
 {
   m_ctrlType = TYPE_MGT;
   m_ctrlSubtype = 8;
-   // uint8_t aa; //for test
-   // aa = m_ctrlSubtype; //for test
- // NS_LOG_UNCOND ("WifiMacHeader::SetBeacon = " << aa); //for test
 }
     
 void
@@ -602,9 +599,6 @@ WifiMacHeader::GetAddr4 (void) const
 enum WifiMacType
 WifiMacHeader::GetType (void) const
 {
-  //uint8_t segg = 4; // for test
-  //NS_LOG_DEBUG ("WifiMacHeader::GetType   " << segg); //for test
-  //NS_LOG_DEBUG ("WifiMacHeader::GetType" << GetTypeString () );
   switch (m_ctrlType)
     {
     case TYPE_MGT:
@@ -729,14 +723,12 @@ WifiMacHeader::GetType (void) const
         {
         case 1:
         default:
-          //NS_ASSERT (false);
           return WIFI_MAC_EXTENSION_S1G_BEACON;
           break;
         }
       break;
     }
   // NOTREACHED
-  //NS_LOG_DEBUG("WifiMacHeader::GetType" ); //for test
   NS_ASSERT (false);
   return (enum WifiMacType) -1;
 }
@@ -781,7 +773,6 @@ WifiMacHeader::IsMgt (void) const
 bool
 WifiMacHeader::IsCfpoll (void) const
 {
-  //NS_LOG_LOGIC ("WifiMacHeader::IsCfpoll  "); //for test
   switch (GetType ())
     {
     case WIFI_MAC_DATA_CFPOLL:
@@ -803,7 +794,6 @@ WifiMacHeader::IsCfpoll (void) const
 bool
 WifiMacHeader::IsRts (void) const
 {
-  //NS_LOG_DEBUG ("WifiMacHeader::IsRts"); //for test
   return (GetType () == WIFI_MAC_CTL_RTS);
 }
 
@@ -822,7 +812,6 @@ WifiMacHeader::IsAck (void) const
 bool
 WifiMacHeader::IsPsPoll (void) const
 {
-  //NS_LOG_DEBUG ("WifiMacHeader::IsPsPoll"); //for test
   return (GetType () == WIFI_MAC_CTL_PSPOLL);
 }
 
@@ -871,7 +860,6 @@ WifiMacHeader::IsBeacon (void) const
 bool
 WifiMacHeader::IsS1gBeacon (void) const
 {
-  //NS_LOG_LOGIC ("WifiMacHeader::IsS1gBeacon  875"); //for test
   return (GetType () == WIFI_MAC_EXTENSION_S1G_BEACON);
 }
     
@@ -1097,7 +1085,6 @@ WifiMacHeader::GetFrameControl (void) const
   uint16_t val = 0;
   if (IsS1gBeacon ())
     {
-      //NS_LOG_LOGIC ("WifiMacHeader::GetFrameControl IsS1gBeacon  "); //for test
       val |= (m_ctrlType << 2) & (0x3 << 2);
       val |= (m_ctrlSubtype << 4) & (0xf << 4);
       val |= (m_nextTBTT << 8) & (0x1 << 8);
@@ -1110,13 +1097,8 @@ WifiMacHeader::GetFrameControl (void) const
     }
   else
     {
-      //NS_LOG_LOGIC ("WifiMacHeader::GetFrameControl   " << val); //for test
-      //val |= m_protVersion; for test
-      //NS_LOG_LOGIC ("WifiMacHeader::GetFrameControl  val-1 " << val << m_protVersion);
       val |= (m_ctrlType << 2) & (0x3 << 2);
-      //NS_LOG_LOGIC ("WifiMacHeader::GetFrameControl  val-2 " << val);
       val |= (m_ctrlSubtype << 4) & (0xf << 4);
-      //NS_LOG_LOGIC ("WifiMacHeader::GetFrameControl  val-3 " << val);
       val |= (m_ctrlToDs << 8) & (0x1 << 8);
       val |= (m_ctrlFromDs << 9) & (0x1 << 9);
       val |= (m_ctrlMoreFrag << 10) & (0x1 << 10);
@@ -1127,24 +1109,6 @@ WifiMacHeader::GetFrameControl (void) const
       return val;
     }
 }
-
-/*
-uint16_t
-WifiMacHeader::GetFrameControl_S1gBeacon (void) const
-{
-  uint16_t val = 0;
-  val |= m_protVersion;
-  val |= (m_ctrlType << 2) & (0x3 << 2);
-  val |= (m_ctrlSubtype << 4) & (0xf << 4);
-  val |= (m_nextTBTT << 8) & (0x1 << 8);
-  val |= (m_compressed_SSID << 9) & (0x1 << 9);
-  val |= (m_ANO << 10) & (0x1 << 10);
-  val |= (m_BSS_BW << 11) & (0x7 << 11);
-  val |= (m_security << 14) & (0x01 << 14)
-  val |= (m_AP_PM << 15) & (0x01 << 15);
-  return val;
-}
-*/
     
 uint16_t
 WifiMacHeader::GetQosControl (void) const
@@ -1160,7 +1124,6 @@ WifiMacHeader::GetQosControl (void) const
 
 void
 WifiMacHeader::SetFrameControl (bool S1gBeacon, uint16_t ctrl)
-//WifiMacHeader::SetFrameControl (uint16_t ctrl) //for test
 {
   if (S1gBeacon)
     {
@@ -1524,7 +1487,6 @@ WifiMacHeader::Deserialize (Buffer::Iterator start)
   uint8_t frame_ctrlSubtype = (frame_control >> 4) & 0x0f;
   bool frame_S1gbeacon = ((frame_ctrlType == 3) && (frame_ctrlSubtype == 1));
   SetFrameControl (frame_S1gbeacon, frame_control);
-  //SetFrameControl (frame_control); //for test
   m_duration = i.ReadLsbtohU16 ();
   
   switch (m_ctrlType)
