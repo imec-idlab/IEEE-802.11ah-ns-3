@@ -52,6 +52,36 @@ WifiPhyStateHelper::GetTypeId (void)
     .AddTraceSource ("Tx", "Packet transmission is starting.",
                      MakeTraceSourceAccessor (&WifiPhyStateHelper::m_txTrace),
                      "ns3::WifiPhyStateHelper::TxTracedCallback")
+    .AddTraceSource ("RxStart",
+                     "The time Rx start"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&WifiPhyStateHelper::m_RxStart),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")
+    .AddTraceSource ("RxEndOk",
+                     "The time Rx start"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&WifiPhyStateHelper::m_RxEndOk),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")
+    .AddTraceSource ("RxEndError",
+                     "The time Rx start"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&WifiPhyStateHelper::m_RxEndError),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")
+    /*.AddTraceSource ("RxingTrace",
+                     "The time Rx be true"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&DcfManager::m_RxingTrace),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")*/
+    .AddTraceSource ("TxStart",
+                     "The time Tx start"
+                     "The duration of Tx",
+                     MakeTraceSourceAccessor (&WifiPhyStateHelper::m_TxStart),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")
+    .AddTraceSource ("CcaBusyStart",
+                     "The time CcaBusyS start"
+                     "The duration CcaBusyS",
+                     MakeTraceSourceAccessor (&WifiPhyStateHelper::m_CcaBusyStart),
+                     "ns3::WifiPhyStateHelper::StateTracedCallback")
   ;
   return tid;
 }
@@ -226,6 +256,7 @@ WifiPhyStateHelper::NotifyTxStart (Time duration, double txPowerDbm)
     {
       (*i)->NotifyTxStart (duration, txPowerDbm);
     }
+    m_TxStart (Simulator::Now (), duration, WifiPhy::TX);
 }
 
 void
@@ -235,6 +266,7 @@ WifiPhyStateHelper::NotifyRxStart (Time duration)
     {
       (*i)->NotifyRxStart (duration);
     }
+   m_RxStart (Simulator::Now (), duration, WifiPhy::TX);
 }
 
 void
@@ -244,6 +276,7 @@ WifiPhyStateHelper::NotifyRxEndOk (void)
     {
       (*i)->NotifyRxEndOk ();
     }
+  m_RxEndOk (Simulator::Now (), Simulator::Now (), WifiPhy::RX);
 }
 
 void
@@ -253,6 +286,7 @@ WifiPhyStateHelper::NotifyRxEndError (void)
     {
       (*i)->NotifyRxEndError ();
     }
+  m_RxEndError (Simulator::Now (), Simulator::Now (), WifiPhy::RX);
 }
 
 void
@@ -262,6 +296,7 @@ WifiPhyStateHelper::NotifyMaybeCcaBusyStart (Time duration)
     {
       (*i)->NotifyMaybeCcaBusyStart (duration);
     }
+   m_CcaBusyStart (Simulator::Now (), duration, WifiPhy::CCA_BUSY);
 }
 
 void

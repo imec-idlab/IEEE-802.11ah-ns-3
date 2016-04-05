@@ -24,6 +24,9 @@
 #include "ns3/nstime.h"
 #include "ns3/event-id.h"
 #include <vector>
+#include "ns3/traced-callback.h"
+#include "ns3/object.h"
+
 
 namespace ns3 {
 
@@ -257,11 +260,13 @@ private:
  * access to the medium and the other DcfState suffers a "internal"
  * collision.
  */
-class DcfManager
+class DcfManager : public Object
 {
 public:
   DcfManager ();
   ~DcfManager ();
+    
+  static TypeId GetTypeId (void);
 
   /**
    * Set up listener for Phy events.
@@ -413,6 +418,12 @@ public:
 
 
 private:
+    TracedCallback<double, double > m_RxStart;
+    TracedCallback<double, double > m_RxEndOk;
+    TracedCallback<double, double > m_RxEndError;
+    TracedCallback<double, double > m_RxingTrace;
+    TracedCallback<double, double > m_TxStart;
+    TracedCallback<double, double > m_CcaBusyStart;
   /**
    * Update backoff slots for all DcfStates.
    */

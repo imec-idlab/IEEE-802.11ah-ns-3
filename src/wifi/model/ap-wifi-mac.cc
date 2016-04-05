@@ -101,7 +101,11 @@ ApWifiMac::GetTypeId (void)
                    UintegerValue (2),
                    MakeUintegerAccessor (&ApWifiMac::GetSlotNum,
                                          &ApWifiMac::SetSlotNum),
-                   MakeUintegerChecker<uint32_t> ());
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("RPSsetup", "configuration of RAW",
+                   RPSVectorValue (),
+                   MakeRPSVectorAccessor (&ApWifiMac::m_rpsset),
+                   MakeRPSVectorChecker ());
   return tid;
 }
 
@@ -560,31 +564,22 @@ ApWifiMac::SendOneBeacon (void)
       S1gBeaconCompatibility compatibility;
       compatibility.SetBeaconInterval (m_beaconInterval.GetMicroSeconds ());
       beacon.SetBeaconCompatibility (compatibility);
-      RPS m_rps;
-      RPS::RawAssignment raw;
-      uint8_t control = 0;
-      raw.SetRawControl (control);//support paged STA or not
-      raw.SetSlotFormat (m_SlotFormat);
-      raw.SetSlotCrossBoundary (m_slotCrossBoundary);
-      raw.SetSlotDurationCount (m_slotDurationCount);
-      raw.SetSlotNum (m_slotNum);
-
-      uint32_t page = 0;
-      static uint32_t aid_start = 1;
-      static uint32_t aid_end = m_rawGroupInterval; //m_rawGroupInterval;
-      uint32_t rawinfo = (aid_end << 13) | (aid_start << 2) | page;
-
-      raw.SetRawGroup (rawinfo); // (b0-b1, page index) (b2-b12, raw start AID) (b13-b23, raw end AID)
-      
-         aid_start = aid_start + m_rawGroupInterval;
-         aid_end = aid_end + m_rawGroupInterval;
-         if (aid_end > m_totalStaNum)
-           {
-             aid_start = 1;
-             aid_end = m_rawGroupInterval;
-           }
-      m_rps.SetRawAssignment(raw);
-      beacon.SetRPS (m_rps);
+     
+      RPS *m_rps;
+      static uint16_t RpsIndex = 0;
+      if (RpsIndex < m_rpsset.rpsset.size())
+         {
+            m_rps = m_rpsset.rpsset.at(RpsIndex);
+            NS_LOG_DEBUG ("< RpsIndex =" << RpsIndex);
+            RpsIndex++;
+          }
+      else
+         {
+            m_rps = m_rpsset.rpsset.at(0);
+            NS_LOG_DEBUG ("RpsIndex =" << RpsIndex);
+            RpsIndex = 1;
+          }
+      beacon.SetRPS (*m_rps);
 
       AuthenticationCtrl  AuthenCtrl;
       AuthenCtrl.SetControlType (false); //centralized

@@ -28,6 +28,7 @@
 #include "amsdu-subframe-header.h"
 #include "supported-rates.h"
 #include "ns3/random-variable-stream.h"
+#include "rps.h"
 
 namespace ns3 {
 
@@ -216,10 +217,11 @@ private:
   uint32_t GetSlotDurationCount (void) const;
   uint32_t GetSlotNum (void) const;
     
-    
-    
+  RPSVector m_rpsset;
   void SetTotalStaNum (uint32_t num);
   uint32_t GetTotalStaNum (void) const;
+    
+  typedef std::vector<ns3::RPS *>::iterator RPSlistCI;
     
   virtual void DoDispose (void);
   virtual void DoInitialize (void);

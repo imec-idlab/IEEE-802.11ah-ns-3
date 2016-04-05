@@ -26,6 +26,8 @@
 #include "wifi-phy.h"
 #include "wifi-mac.h"
 #include "mac-low.h"
+#include "ns3/time-series-adaptor.h"
+
 
 #define MY_DEBUG(x) \
   NS_LOG_DEBUG (Simulator::Now () << " " << this << " " << x)
@@ -346,6 +348,50 @@ DcfManager::~DcfManager ()
   m_phyListener = 0;
   m_lowListener = 0;
 }
+   
+NS_OBJECT_ENSURE_REGISTERED (DcfManager);
+    
+TypeId
+DcfManager::GetTypeId (void)
+{
+   static TypeId tid = TypeId ("ns3::DcfManager")
+     .SetParent<Object> ()
+     .SetGroupName ("Wifi")
+     .AddConstructor<DcfManager> ()
+     .AddTraceSource ("RxStart",
+                       "The time Rx start"
+                       "The duration of Rx",
+                        MakeTraceSourceAccessor (&DcfManager::m_RxStart),
+                        "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddTraceSource ("RxEndOk",
+                     "The time Rx start"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&DcfManager::m_RxEndOk),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddTraceSource ("RxEndError",
+                     "The time Rx start"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&DcfManager::m_RxEndError),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddTraceSource ("RxingTrace",
+                     "The time Rx be true"
+                     "The duration of Rx",
+                     MakeTraceSourceAccessor (&DcfManager::m_RxingTrace),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddTraceSource ("TxStart",
+                     "The time Tx start"
+                     "The duration of Tx",
+                     MakeTraceSourceAccessor (&DcfManager::m_TxStart),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddTraceSource ("CcaBusyStart",
+                     "The time CcaBusyS start"
+                     "The duration CcaBusyS",
+                     MakeTraceSourceAccessor (&DcfManager::m_CcaBusyStart),
+                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    ;
+    return tid;
+}
+
 
 void
 DcfManager::SetupPhyListener (Ptr<WifiPhy> phy)
@@ -708,36 +754,44 @@ DcfManager::NotifyRxStartNow (Time duration)
 {
   NS_LOG_FUNCTION (this << duration);
   MY_DEBUG ("rx start for=" << duration);
+  m_RxStart (Simulator::Now ().GetMicroSeconds (), duration.GetMicroSeconds ());
   UpdateBackoff ();
   m_lastRxStart = Simulator::Now ();
   m_lastRxDuration = duration;
   m_rxing = true;
+  m_RxingTrace (1, Simulator::Now ().GetMicroSeconds ());
 }
 
 void
 DcfManager::NotifyRxEndOkNow (void)
 {
   NS_LOG_FUNCTION (this);
+  m_RxEndOk (Simulator::Now ().GetMicroSeconds (), 5.0);
   MY_DEBUG ("rx end ok");
   m_lastRxEnd = Simulator::Now ();
   m_lastRxReceivedOk = true;
   m_rxing = false;
+  m_RxingTrace (0, Simulator::Now ().GetMicroSeconds ());
+
 }
 
 void
 DcfManager::NotifyRxEndErrorNow (void)
 {
   NS_LOG_FUNCTION (this);
+  m_RxEndError (Simulator::Now ().GetMicroSeconds (), 5.0);
   MY_DEBUG ("rx end error");
   m_lastRxEnd = Simulator::Now ();
   m_lastRxReceivedOk = false;
   m_rxing = false;
+  m_RxingTrace (0, Simulator::Now ().GetMicroSeconds ());
 }
 
 void
 DcfManager::NotifyTxStartNow (Time duration)
 {
   NS_LOG_FUNCTION (this << duration);
+  m_TxStart (Simulator::Now ().GetMicroSeconds (), duration.GetMicroSeconds ());
   if (m_rxing)
     {
       //this may be caused only if PHY has started to receive a packet
@@ -747,6 +801,7 @@ DcfManager::NotifyTxStartNow (Time duration)
       m_lastRxDuration = m_lastRxEnd - m_lastRxStart;
       m_lastRxReceivedOk = true;
       m_rxing = false;
+      m_RxingTrace (0, Simulator::Now ().GetMicroSeconds ());
     }
   MY_DEBUG ("tx start for " << duration);
   UpdateBackoff ();
@@ -758,6 +813,7 @@ void
 DcfManager::NotifyMaybeCcaBusyStartNow (Time duration)
 {
   NS_LOG_FUNCTION (this << duration);
+  m_CcaBusyStart (Simulator::Now ().GetMicroSeconds (), duration.GetMicroSeconds ());
   MY_DEBUG ("busy start for " << duration);
   UpdateBackoff ();
   m_lastBusyStart = Simulator::Now ();
@@ -779,6 +835,7 @@ DcfManager::NotifySwitchingStartNow (Time duration)
       m_lastRxDuration = m_lastRxEnd - m_lastRxStart;
       m_lastRxReceivedOk = true;
       m_rxing = false;
+      m_RxingTrace (0, Simulator::Now ().GetMicroSeconds ());
     }
   if (m_lastNavStart + m_lastNavDuration > now)
     {

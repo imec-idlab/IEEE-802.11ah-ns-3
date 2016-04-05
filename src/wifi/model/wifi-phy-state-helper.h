@@ -188,6 +188,13 @@ public:
 
   /** \todo Why is this public? */
   TracedCallback<Time,Time,enum WifiPhy::State> m_stateLogger;
+    
+  TracedCallback<Time,Time,enum WifiPhy::State> m_RxStart;
+  TracedCallback<Time,Time,enum WifiPhy::State> m_RxEndOk;
+  TracedCallback<Time,Time,enum WifiPhy::State> m_RxEndError;
+  TracedCallback<Time,Time,enum WifiPhy::State> m_RxingTrace;
+  TracedCallback<Time,Time,enum WifiPhy::State> m_TxStart;
+  TracedCallback<Time,Time,enum WifiPhy::State> m_CcaBusyStart;
 
   /**
    * TracedCallback signature for state changes.
