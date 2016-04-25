@@ -29,6 +29,7 @@
 #include "supported-rates.h"
 #include "ns3/random-variable-stream.h"
 #include "rps.h"
+#include "s1g-raw-control.h"
 
 namespace ns3 {
 
@@ -234,6 +235,7 @@ private:
   uint32_t m_slotDurationCount;
   uint32_t  m_slotNum;
     
+  S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
   bool m_enableBeaconGeneration;             //!< Flag if beacons are being generated
