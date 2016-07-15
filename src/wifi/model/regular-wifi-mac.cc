@@ -280,6 +280,20 @@ RegularWifiMac::GetS1gSupported () const
 {
   return m_s1gSupported;
 }
+    
+void
+RegularWifiMac::SetS1gStaType (uint8_t type)
+{
+  NS_LOG_FUNCTION (this);
+  m_s1gStaType = type;
+}
+    
+uint8_t
+RegularWifiMac::GetS1gStaType (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_s1gStaType;
+}
 
 void
 RegularWifiMac::SetCtsToSelfSupported (bool enable)
@@ -488,6 +502,8 @@ RegularWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 {
   NS_LOG_FUNCTION (this << packet << hdr);
 
+
+
   Mac48Address to = hdr->GetAddr1 ();
   Mac48Address from = hdr->GetAddr2 ();
 
@@ -679,6 +695,12 @@ RegularWifiMac::GetTypeId (void)
                    MakeBooleanAccessor (&RegularWifiMac::SetS1gSupported,
                                         &RegularWifiMac::GetS1gSupported),
                    MakeBooleanChecker ())
+    .AddAttribute ("S1gStaType",
+                   "S1g STA type, for non-AP STA, 1 for sensor STA, 2 for non-sensor STA; for AP STA, 1 for sensor STA, 2 for non-sensor STA, 0 for both STA",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&RegularWifiMac::SetS1gStaType,
+                                        &RegularWifiMac::GetS1gStaType),
+                   MakeUintegerChecker<uint32_t> ())
     //
     .AddAttribute ("CtsToSelfSupported",
                    "Use CTS to Self when using a rate that is not in the basic set rate",

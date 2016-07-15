@@ -31,6 +31,7 @@
 #include "supported-rates.h"
 #include "ssid.h"
 #include "ht-capabilities.h"
+#include "s1g-capabilities.h"
 
 namespace ns3 {
 
@@ -104,6 +105,9 @@ public:
   virtual uint32_t GetSerializedSize (void) const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
+    
+  void  SetS1gCapabilities (S1gCapabilities s1gcapabilities);
+  S1gCapabilities  GetS1gCapabilities (void) const;
 
 
 private:
@@ -112,6 +116,8 @@ private:
   CapabilityInformation m_capability; //!< Capability information
   HtCapabilities m_htCapability;      //!< HT capabilities
   uint16_t m_listenInterval;
+   
+  S1gCapabilities m_s1gCapability;
 };
 
 
@@ -185,7 +191,7 @@ public:
   virtual uint32_t GetSerializedSize (void) const;
   virtual void Serialize (Buffer::Iterator start) const;
   virtual uint32_t Deserialize (Buffer::Iterator start);
-
+    
 
 private:
   SupportedRates m_rates;             //!< List of supported rates

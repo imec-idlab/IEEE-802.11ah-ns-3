@@ -30,6 +30,8 @@
 #include "ns3/random-variable-stream.h"
 #include "rps.h"
 #include "s1g-raw-control.h"
+#include "ns3/string.h"
+
 
 namespace ns3 {
 
@@ -176,7 +178,7 @@ private:
    * \param to the address of the STA we are sending an association response to
    * \param success indicates whether the association was successful or not
    */
-  void SendAssocResp (Mac48Address to, bool success);
+  void SendAssocResp (Mac48Address to, bool success, uint8_t staType);
   /**
    * Forward a beacon packet to the beacon special DCF.
    */
@@ -235,6 +237,10 @@ private:
   uint32_t m_slotDurationCount;
   uint32_t  m_slotNum;
     
+  std::vector<uint16_t> m_sensorList; //stations allowed to transmit in last beacon
+  std::vector<uint16_t> m_OffloadList;
+  std::vector<uint16_t> m_receivedAid;
+    
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
@@ -242,6 +248,7 @@ private:
   EventId m_beaconEvent;                     //!< Event to generate one beacon
   Ptr<UniformRandomVariable> m_beaconJitter; //!< UniformRandomVariable used to randomize the time of the first beacon
   bool m_enableBeaconJitter;                 //!< Flag if the first beacon should be generated at random time
+  std::string  m_outputpath;
 };
 
 } //namespace ns3

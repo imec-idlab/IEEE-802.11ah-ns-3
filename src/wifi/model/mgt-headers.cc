@@ -23,6 +23,7 @@
 #include "mgt-headers.h"
 #include "ns3/simulator.h"
 #include "ns3/assert.h"
+#include "ns3/log.h" //for test
 
 namespace ns3 {
 
@@ -327,6 +328,12 @@ MgtAssocRequestHeader::SetHtCapabilities (HtCapabilities htcapabilities)
 {
   m_htCapability = htcapabilities;
 }
+    
+void
+MgtAssocRequestHeader::SetS1gCapabilities (S1gCapabilities s1gcapabilities)
+{
+  m_s1gCapability = s1gcapabilities;
+}
 
 void
 MgtAssocRequestHeader::SetListenInterval (uint16_t interval)
@@ -338,6 +345,12 @@ HtCapabilities
 MgtAssocRequestHeader::GetHtCapabilities (void) const
 {
   return m_htCapability;
+}
+    
+S1gCapabilities
+MgtAssocRequestHeader::GetS1gCapabilities (void) const
+{
+  return m_s1gCapability;
 }
 
 Ssid
@@ -384,6 +397,7 @@ MgtAssocRequestHeader::GetSerializedSize (void) const
   size += m_ssid.GetSerializedSize ();
   size += m_rates.GetSerializedSize ();
   size += m_htCapability.GetSerializedSize ();
+  size += m_s1gCapability.GetSerializedSize ();
   size += m_rates.extended.GetSerializedSize ();
   return size;
 }
@@ -406,6 +420,7 @@ MgtAssocRequestHeader::Serialize (Buffer::Iterator start) const
   i = m_rates.Serialize (i);
   i = m_rates.extended.Serialize (i);
   i = m_htCapability.Serialize (i);
+  i = m_s1gCapability.Serialize (i);
 }
 
 uint32_t
@@ -418,6 +433,11 @@ MgtAssocRequestHeader::Deserialize (Buffer::Iterator start)
   i = m_rates.Deserialize (i);
   i = m_rates.extended.DeserializeIfPresent (i);
   i = m_htCapability.DeserializeIfPresent (i);
+    //NS_LOG_UNCOND ("assoc failed with sta55=");
+  
+  i = m_s1gCapability.DeserializeIfPresent (i);
+    //NS_LOG_UNCOND ("assoc failed with sta66=");
+
   return i.GetDistanceFrom (start);
 }
 

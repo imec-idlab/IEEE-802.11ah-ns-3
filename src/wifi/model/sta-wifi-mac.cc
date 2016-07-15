@@ -38,6 +38,7 @@
 #include "amsdu-subframe-header.h"
 #include "mgt-headers.h"
 #include "ht-capabilities.h"
+
 #include "random-stream.h"
 
 /*
@@ -87,6 +88,12 @@ StaWifiMac::GetTypeId (void)
                    "we attempt to restart association.",
                    UintegerValue (10),
                    MakeUintegerAccessor (&StaWifiMac::m_maxMissedBeacons),
+                   MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("StaType",
+                   "Type of station, '1' sensor, '2' offload station ",
+                   UintegerValue (1),
+                   MakeUintegerAccessor (&StaWifiMac::GetStaType,
+                                         &StaWifiMac::SetStaType),
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("ActiveProbing",
                    "If true, we send probe requests. If false, we don't."
@@ -149,6 +156,18 @@ StaWifiMac::DoDispose ()
   RegularWifiMac::DoDispose ();
 }
 
+uint32_t
+StaWifiMac::GetStaType (void) const
+{
+   return m_staType;
+}
+    
+void
+StaWifiMac::SetStaType (uint32_t statype)
+{
+   m_staType = statype;
+}
+    
 uint32_t
 StaWifiMac::GetAID (void) const
 {
@@ -345,7 +364,11 @@ StaWifiMac::S1gBeaconReceived (void)
 void
 StaWifiMac::RawSlotStartBackoff (void)
 {
-    Simulator::Schedule(m_slotDuration, &StaWifiMac::InsideBackoff, this);
+    if (m_insideBackoffEvent.IsRunning ())
+     {
+        m_insideBackoffEvent.Cancel ();
+     } //a bug is fixed, prevent previous RAW from disabling current RAW.
+    m_insideBackoffEvent = Simulator::Schedule(m_currentslotDuration, &StaWifiMac::InsideBackoff, this);
     m_pspollDca->AccessAllowedIfRaw (true);
     m_dca->AccessAllowedIfRaw (true);
     m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
@@ -364,6 +387,7 @@ StaWifiMac::InsideBackoff (void)
    m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
+    
 }
     
     
@@ -440,6 +464,8 @@ void
 StaWifiMac::SendAssociationRequest (void)
 {
   NS_LOG_FUNCTION (this << GetBssid ());
+    //NS_LOG_UNCOND ("StaWifiMac::SendAssociationRequest (void)");
+  
   if (!m_s1gSupported)
     {
         fastAssocThreshold = 1023;
@@ -462,6 +488,13 @@ if (assocVaule < fastAssocThreshold)
     {
       assoc.SetHtCapabilities (GetHtCapabilities ());
       hdr.SetNoOrder ();
+    }
+   
+  if (m_s1gSupported)
+    {
+        assoc.SetS1gCapabilities (GetS1gCapabilities ());
+        NS_LOG_UNCOND ("StaWifiMac::SendAssociationRequest (void)");
+
     }
 
   packet->AddHeader (assoc);
@@ -784,16 +817,36 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         UnsetInRAWgroup ();
         uint8_t * rawassign;
         rawassign = beacon.GetRPS().GetRawAssignment();
-        uint8_t raw_len = beacon.GetRPS().GetInformationFieldSize();
-        uint8_t rawtypeindex = rawassign[0] & 0x07;
-        uint8_t pageindex = rawassign[4] & 0x03;
+        uint16_t raw_len = beacon.GetRPS().GetInformationFieldSize();
+        if (raw_len % 12 !=0)
+          {
+             NS_ASSERT ("RAW configuration incorrect!");
+          }
+        uint8_t RAW_number = raw_len/12;
+        
+         uint16_t m_slotDurationCount=0;
+         uint16_t m_slotNum=0;
+         uint64_t m_currentRAW_start=0;
+         m_lastRawDurationus = MicroSeconds(0);
+    for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
+      {
+        uint8_t rawtypeindex = rawassign[raw_index*12+0] & 0x07;
+        if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
+          {
+            m_pagedStaRaw = true;
+          }
+        else
+          {
+            m_pagedStaRaw = false;
+          }
+        uint8_t pageindex = rawassign[raw_index*12+4] & 0x03;
          
          uint16_t m_rawslot;
-         m_rawslot = (uint16_t(rawassign[2]) << 8) | (uint16_t(rawassign[1]));
+         m_rawslot = (uint16_t(rawassign[raw_index*12+2]) << 8) | (uint16_t(rawassign[raw_index*12+1]));
          uint8_t m_SlotFormat = uint8_t (m_rawslot >> 15) & 0x0001;
          uint8_t m_slotCrossBoundary = uint8_t (m_rawslot >> 14) & 0x0002;
-         uint16_t m_slotDurationCount;
-         uint16_t m_slotNum;
+         
+          m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;
 
          NS_ASSERT (m_SlotFormat <= 1);
          
@@ -809,51 +862,47 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
            }
 
         m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);
-        m_lastRawDurationus = m_slotDuration * m_slotNum;
+        m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;
  
          if (pageindex == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
            {
-             uint8_t rawgroup_l = rawassign[4];
-             uint8_t rawgroup_m = rawassign[5];
-             uint8_t rawgroup_h = rawassign[6];
-             uint32_t rawgroup = (uint32_t(rawassign[6]) << 16) | (uint32_t(rawassign[5]) << 8) | uint32_t(rawassign[4]);
+               
+             uint8_t rawgroup_l = rawassign[raw_index*12+4];
+             uint8_t rawgroup_m = rawassign[raw_index*12+5];
+             uint8_t rawgroup_h = rawassign[raw_index*12+6];
+             uint32_t rawgroup = (uint32_t(rawassign[raw_index*12+6]) << 16) | (uint32_t(rawassign[raw_index*12+5]) << 8) | uint32_t(rawassign[raw_index*12+4]);
              uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
              uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
+               
+               uint16_t statsPerSlot = 0;
+               uint16_t statRawSlot = 0;
+               
+               Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+               uint16_t offset = m_rv->GetValue (0, 1023);
+               offset =0; // for test
+               statsPerSlot = (raw_end - raw_start + 1)/m_slotNum;
+               //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
+               statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
+               
              if ((raw_start <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= raw_end))
                {
+                 m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);
                  SetInRAWgroup ();
-                   
-                 uint16_t statsPerSlot = 0;
-                 uint16_t statRawSlot = 0;
-                 
-                  Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
-                 uint16_t offset = m_rv->GetValue (0, 1023);
-                 offset =0; // for test
-                 statsPerSlot = (raw_end - raw_start + 1)/m_slotNum;
-                 //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
-                 statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
-                 m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot);
+                 m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
+                   //NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+                  //break; //break should not used if multiple RAW is supported
                }
-            }
-         
-         m_rawStart = true;
-         if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
-           {
-             m_pagedStaRaw = true;
            }
-         else
+      }
+         m_rawStart = true; //?
+
+         AuthenticationCtrl AuthenCtrl;
+         AuthenCtrl = beacon.GetAuthCtrl ();
+         fasTAssocType = AuthenCtrl.GetControlType ();
+         if (!fasTAssocType)  //only support centralized cnotrol
            {
-             m_pagedStaRaw = false;
+             fastAssocThreshold = AuthenCtrl.GetThreshold();
            }
-         
-         
-            AuthenticationCtrl AuthenCtrl;
-            AuthenCtrl = beacon.GetAuthCtrl ();
-            fasTAssocType = AuthenCtrl.GetControlType ();
-            if (!fasTAssocType)  //only support centralized cnotrol
-             {
-               fastAssocThreshold = AuthenCtrl.GetThreshold();
-             }
      }
     S1gBeaconReceived ();
     return;
@@ -988,6 +1037,16 @@ StaWifiMac::GetHtCapabilities (void) const
     {
       capabilities.SetRxMcsBitmask (m_phy->GetMcs (i));
     }
+  return capabilities;
+}
+    
+S1gCapabilities
+StaWifiMac::GetS1gCapabilities (void) const
+{
+  S1gCapabilities capabilities;
+  capabilities.SetS1gSupported (1);
+  capabilities.SetStaType (GetStaType ()); //need to define/change
+
   return capabilities;
 }
 

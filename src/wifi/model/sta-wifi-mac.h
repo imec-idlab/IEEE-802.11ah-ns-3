@@ -28,6 +28,7 @@
 #include "ns3/traced-callback.h"
 #include "supported-rates.h"
 #include "amsdu-subframe-header.h"
+#include "s1g-capabilities.h"
 
 namespace ns3  {
 
@@ -86,8 +87,11 @@ public:
    */
   void StartActiveAssociation (void);
 
-
+    uint32_t GetStaType (void) const;
+    void SetStaType (uint32_t statype);
 private:
+    uint32_t m_staType;
+    Time m_currentslotDuration;
   /**
    * The current MAC state of the STA.
    */
@@ -181,6 +185,7 @@ private:
    * \return the HT capability that we support
    */
   HtCapabilities GetHtCapabilities (void) const;
+  S1gCapabilities GetS1gCapabilities (void) const;
   /**
    * Set the AID.
    *
@@ -219,7 +224,7 @@ private:
   bool m_pagedStaRaw;
   bool m_dataBuffered;
   EventId m_outsideRawEvent;
-
+  EventId m_insideBackoffEvent;
   enum MacState m_state;
   Time m_probeRequestTimeout;
   Time m_assocRequestTimeout;

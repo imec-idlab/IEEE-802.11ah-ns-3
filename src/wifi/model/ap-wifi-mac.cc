@@ -63,6 +63,10 @@ ApWifiMac::GetTypeId (void)
                    StringValue ("ns3::UniformRandomVariable"),
                    MakePointerAccessor (&ApWifiMac::m_beaconJitter),
                    MakePointerChecker<UniformRandomVariable> ())
+    .AddAttribute ("Outputpath", "output path to store info of sensors and offload stations",
+                   StringValue ("stationfile"),
+                   MakeStringAccessor (&ApWifiMac::m_outputpath),
+                   MakeStringChecker ())
     .AddAttribute ("EnableBeaconJitter", "If beacons are enabled, whether to jitter the initial send event.",
                    BooleanValue (false),
                    MakeBooleanAccessor (&ApWifiMac::m_enableBeaconJitter),
@@ -250,6 +254,7 @@ ApWifiMac::SetBeaconInterval (Time interval)
       NS_LOG_WARN ("beacon interval should be multiple of 1024us (802.11 time unit), see IEEE Std. 802.11-2012");
     }
   m_beaconInterval = interval;
+  //NS_LOG_UNCOND("beacon interval = " << m_beaconInterval);
 }
 
 void
@@ -264,8 +269,9 @@ ApWifiMac::SetTotalStaNum (uint32_t num)
 {
   NS_LOG_FUNCTION (this << num);
   m_totalStaNum = num;
-  m_S1gRawCtr.RAWGroupping (m_totalStaNum, 1);
-  m_S1gRawCtr.configureRAW ();
+    std::cout << "ApWifiMac::SetTotalStaNum = " << m_totalStaNum  << "  \n";
+  //m_S1gRawCtr.RAWGroupping (m_totalStaNum, 1, m_beaconInterval.GetMicroSeconds ());
+  //m_S1gRawCtr.configureRAW ();
     
 }
     
@@ -506,7 +512,7 @@ ApWifiMac::SendProbeResp (Mac48Address to)
 }
 
 void
-ApWifiMac::SendAssocResp (Mac48Address to, bool success)
+ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
 {
   NS_LOG_FUNCTION (this << to << success);
   WifiMacHeader hdr;
@@ -542,6 +548,35 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success)
       assoc.SetHtCapabilities (GetHtCapabilities ());
       hdr.SetNoOrder ();
     }
+    NS_LOG_UNCOND ("ApWifiMac::SendAssocResp =" );
+
+   
+  if (m_s1gSupported && success)
+    {
+      //assign AID based on station type, to do.
+       if (staType == 1)
+        {
+          for (std::vector<uint16_t>::iterator it = m_sensorList.begin(); it != m_sensorList.end(); it++)
+            {
+              if (*it == aid)
+                 goto Addheader;
+            }
+          m_sensorList.push_back (aid);
+          NS_LOG_UNCOND ("m_sensorList =" << m_sensorList.size ());
+  
+        }
+       else if (staType == 2)
+        {
+           for (std::vector<uint16_t>::iterator it = m_OffloadList.begin(); it != m_OffloadList.end(); it++)
+            {
+                if (*it == aid)
+                  goto Addheader;
+            }
+          m_OffloadList.push_back (aid);
+          NS_LOG_UNCOND ("m_OffloadList =" << m_OffloadList.size ());
+        }
+    }
+Addheader:
   packet->AddHeader (assoc);
 
   //The standard is not clear on the correct queue for management
@@ -556,6 +591,8 @@ ApWifiMac::SendOneBeacon (void)
 {
   NS_LOG_FUNCTION (this);
   WifiMacHeader hdr;
+    
+
     if (m_s1gSupported)
      {
       hdr.SetS1gBeacon ();
@@ -585,8 +622,10 @@ ApWifiMac::SendOneBeacon (void)
       beacon.SetRPS (*m_rps);*/
         
       RPS m_rps;
-      m_S1gRawCtr.UpdateRAWGroupping (m_totalStaNum);
-      m_rps = m_S1gRawCtr.GetRPS ();
+   
+      m_rps = m_S1gRawCtr.UpdateRAWGroupping (m_sensorList, m_OffloadList, m_receivedAid, m_beaconInterval.GetMicroSeconds (), m_outputpath);
+      m_receivedAid.clear (); //release storage
+      //m_rps = m_S1gRawCtr.GetRPS ();
       beacon.SetRPS (m_rps);
 
       AuthenticationCtrl  AuthenCtrl;
@@ -611,10 +650,11 @@ ApWifiMac::SendOneBeacon (void)
       beacon.SetAuthCtrl (AuthenCtrl);
       packet->AddHeader (beacon);
       m_beaconDca->Queue (packet, hdr);
-         
+
      }
     else
      {
+      m_receivedAid.clear (); //release storage
       hdr.SetBeacon ();
       hdr.SetAddr1 (Mac48Address::GetBroadcast ());
       hdr.SetAddr2 (GetAddress ());
@@ -632,7 +672,7 @@ ApWifiMac::SendOneBeacon (void)
           hdr.SetNoOrder ();
         }
       packet->AddHeader (beacon);
-      //The beacon has it's own special queue, so we load it in there
+         //The beacon has it's own special queue, so we load it in there
       m_beaconDca->Queue (packet, hdr);
       }
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
@@ -671,7 +711,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 {
   NS_LOG_FUNCTION (this << packet << hdr);
   //uint16_t segg =  hdr->GetFrameControl (); // for test
-  //NS_LOG_LOGIC ("AP waiting   " << segg); //for test
+  //NS_LOG_UNCOND ("AP waiting   " << segg); //for test
   Mac48Address from = hdr->GetAddr2 ();
 
   if (hdr->IsData ())
@@ -703,6 +743,12 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                 {
                   ForwardUp (packet, from, bssid);
                 }
+                uint8_t mac[6];
+                from.CopyTo (mac);
+                uint8_t aid_l = mac[5];
+                uint8_t aid_h = mac[4] & 0x1f;
+                uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
+                m_receivedAid.push_back(aid); //to change
             }
           else if (to.IsGroup ()
                    || m_stationManager->IsAssociated (to))
@@ -763,7 +809,9 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               //first, verify that the the station's supported
               //rate set is compatible with our Basic Rate set
               MgtAssocRequestHeader assocReq;
+
               packet->RemoveHeader (assocReq);
+
               SupportedRates rates = assocReq.GetSupportedRates ();
               bool problem = false;
               for (uint32_t i = 0; i < m_stationManager->GetNBasicModes (); i++)
@@ -775,6 +823,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                       break;
                     }
                 }
+
               if (m_htSupported)
                 {
                   //check that the STA supports all MCSs in Basic MCS Set
@@ -790,12 +839,14 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                     }
 
                 }
+
+                
               if (problem)
                 {
                   //One of the Basic Rate set mode is not
                   //supported by the station. So, we return an assoc
                   //response with an error status.
-                  SendAssocResp (hdr->GetAddr2 (), false);
+                  SendAssocResp (hdr->GetAddr2 (), false, 0);
                 }
               else
                 {
@@ -822,9 +873,23 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                             }
                         }
                     }
+                    
                   m_stationManager->RecordWaitAssocTxOk (from);
-                  //send assoc response with success status.
-                  SendAssocResp (hdr->GetAddr2 (), true);
+                  
+                  if (m_s1gSupported)
+                    {
+                        NS_LOG_UNCOND ("assoc failed with sta=");
+
+                        S1gCapabilities s1gcapabilities = assocReq.GetS1gCapabilities ();
+                      uint8_t sta_type = s1gcapabilities.GetStaType ();
+                      SendAssocResp (hdr->GetAddr2 (), true, sta_type);
+                    }
+                  else
+                    {
+                      //send assoc response with success status.
+                      SendAssocResp (hdr->GetAddr2 (), true, 0);
+                    }
+
                 }
               return;
             }

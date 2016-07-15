@@ -486,6 +486,7 @@ EdcaTxopN::NotifyAccessGranted (void)
     {
         return;
     }
+   //NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted, " << Simulator::Now ()<< ", " << m_low->GetAddress ());
     int newdata=99;
     m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
   if (m_currentPacket == 0)
@@ -952,6 +953,11 @@ void
 EdcaTxopN::AccessAllowedIfRaw (bool allowed)
 {
   AccessIfRaw = allowed;
+    /*if (Simulator::Now ().GetMicroSeconds () > 50000000)
+    {
+         NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted, " << Simulator::Now () << ", " << allowed << ", " << m_low->GetAddress ());
+    }*/
+ 
 }
 
 void
