@@ -64,7 +64,7 @@ public:
     
     void SetAid (uint16_t aid); //to indify station
     void SetTransmissionSuccess (bool success);
-    void EstimateTransmissionInterval (uint64_t currentId);
+    void EstimateTransmissionInterval (uint64_t currentId, uint64_t beaconinterval);
     void EstimateNextTransmissionId (uint64_t intervalId);
     void SetStaType (uint8_t statype);
     void SetDataRate (uint16_t m_dataRate); //question, how to get datarate info? Impossibile
@@ -82,10 +82,21 @@ public:
     uint16_t GetDataRate (uint16_t m_dataRate);
     uint16_t GetPacketSize (uint16_t m_packetSize);
     
+    void SetNumPacketsReceived (uint16_t numReceived);
+    uint16_t GetNumPacketsReceived (void) const;
+    
+    uint16_t GetTransInOneBeacon (void) const;
+    void SetTransInOneBeacon (uint16_t num);
+
+
+
+    
     UpdateInfo m_snesorUpdatInfo;
     
 private:
     uint64_t m_transmissionInterval; // beacon as unit
+    uint64_t m_transInOneBeacon; // beacon as unit
+
     uint64_t last_transmissionInterval;
     uint64_t m_nextTransmissionId; // beacon as unit
     uint16_t m_packetSize;
@@ -95,6 +106,9 @@ private:
     bool m_transmissionSuccess;
     uint64_t m_transmissionIntervalMin;
     uint64_t m_transmissionIntervalMax;
+    
+    uint16_t m_receivedNum;
+    uint64_t last2_transmissionInterval;
     
     bool m_everSuccess;
 };
@@ -176,6 +190,9 @@ public:
     typedef std::vector<OffloadStation *>::iterator OffloadStationsCI;
     OffloadStations m_offloadStations;
     
+    
+    uint16_t MaxSlotForSensor;
+    
     std::vector<uint16_t> m_aidList; //stations allowed to transmit in last beacon
     std::vector<uint16_t>::iterator m_aidListCI;
     std::vector<uint16_t> m_aidOffloadList;
@@ -188,6 +205,10 @@ private:
   uint64_t m_maybeAirtimeSensor;
   uint16_t m_numSensorAllowedToSend;
   uint16_t m_numSensorWantToSend;
+    
+  uint16_t  m_numSendSensorAllowed;
+  uint16_t  m_numSendSensorWant;
+
    
   uint64_t m_offloadRawslotDuration;
   uint16_t m_numOffloadStaActive;
@@ -197,6 +218,9 @@ private:
   uint64_t m_beaconInterval;
   uint16_t  sensorpacketsize;
   uint16_t  offloadpacketsize;
+    
+  uint16_t  m_slotDurationCount;
+  uint64_t m_beaconOverhead;
     
   uint64_t currentId;
   std::vector<RPS::RawAssignment *> RawAssignmentList;
