@@ -984,9 +984,9 @@ EdcaTxopN::StartAccessIfNeeded (void)
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)    // always TRUE outside RAW
     {
-      m_manager->RequestAccess (m_dcf);
         int newdata=20;
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+        m_manager->RequestAccess (m_dcf);
     }
 }
     
@@ -1018,7 +1018,7 @@ EdcaTxopN::RawStart (void)
         int newdata=30;
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
       }
-  StartAccessIfNeededRaw (); //access could start even no packet
+  StartAccessIfNeededRaw (); //access could start even no packet (this comment seems incorrect)
   
 }
 

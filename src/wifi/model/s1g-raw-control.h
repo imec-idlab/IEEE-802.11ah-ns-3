@@ -163,8 +163,8 @@ public:
 
   void configureRAW ();
   RPS GetRPS ();
-
     
+  void deleteRps ();
   void UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<uint16_t> m_receivedAid, std::string outputpath); //need to change, controlled by AP
   void UdpateOffloadStaInfo (std::vector<uint16_t> m_OffloadList, std::vector<uint16_t>  receivedStas, std::string outputpath);
   void calculateActiveOffloadSta ();

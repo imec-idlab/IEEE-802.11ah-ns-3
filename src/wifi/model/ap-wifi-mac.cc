@@ -623,6 +623,7 @@ ApWifiMac::SendOneBeacon (void)
         
       RPS m_rps;
       NS_LOG_UNCOND ("send beacon at" << Simulator::Now ());
+      m_S1gRawCtr.deleteRps ();
       m_rps = m_S1gRawCtr.UpdateRAWGroupping (m_sensorList, m_OffloadList, m_receivedAid, m_beaconInterval.GetMicroSeconds (), m_outputpath);
       m_receivedAid.clear (); //release storage
       //m_rps = m_S1gRawCtr.GetRPS ();

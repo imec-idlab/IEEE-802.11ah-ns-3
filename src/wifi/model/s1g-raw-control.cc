@@ -217,6 +217,7 @@ S1gRawCtr::S1gRawCtr ()
     m_beaconOverhead = 100; // us
     
     MaxSlotForSensor = 8; //In order to guarantee channel for offload stations.
+    m_rps = new RPS;
 
 }
 
@@ -892,10 +893,16 @@ S1gRawCtr::UpdateRAWGroupping (std::vector<uint16_t> m_sensorlist, std::vector<u
      SetOffloadAllowedToSend ();
      
      //NS_LOG_UNCOND ("S1gRawCtr::UpdateRAWGrouppingcc =");
-
+     m_rps = new RPS;
      configureRAW ();
-     return GetRPS ();
-     
+     RPS m_rpsAP =  GetRPS ();
+     return m_rpsAP;
+}
+    
+void
+S1gRawCtr::deleteRps ()
+{
+    delete m_rps;
 }
     
     /*
@@ -963,7 +970,8 @@ S1gRawCtr::configureRAW ( )
     uint32_t aid_end = 0;
     uint32_t rawinfo;
     
-    m_rps = new RPS;
+    //Release storage.
+    rpslist.rpsset.clear();
     
     //uint16_t NGroups = m_aidList.size () + m_aidOffloadList.size();
     uint16_t NGroups = m_numSendSensorAllowed + m_aidOffloadList.size();
@@ -992,16 +1000,6 @@ S1gRawCtr::configureRAW ( )
     //SlotDurationCount = ((m_beaconInterval-100)/(SlotNum*NGroups) - 500)/120;
     //SlotDurationCount = (m_rawslotDuration - 500)/120;
     //NS_ASSERT (SlotDurationCount <= 2037);
-
-  
-    
-    if (m_rps != nullptr)
-      {
-        delete m_rps;
-      }
-    
-    //Release storage.
-    rpslist.rpsset.clear();
 
     
     //NS_LOG_UNCOND ("m_aidList =" << m_aidList.size () << ", m_aidOffloadList=" << m_aidOffloadList.size ());
