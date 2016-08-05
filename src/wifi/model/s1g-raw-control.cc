@@ -206,8 +206,8 @@ S1gRawCtr::S1gRawCtr ()
 {
    RpsIndex = 0;
    m_offloadFailedMax = 5;
-   sensorpacketsize = 256;
-   offloadpacketsize = 256;
+   sensorpacketsize = 1;
+   offloadpacketsize = 1;
    m_slotDurationCount = 87;
 
  
@@ -425,6 +425,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
                  stationTransmit->m_snesorUpdatInfo = (UpdateInfo){currentId-1,currentId-1,currentId-1,false,currentId-1,currentId-1,currentId-1,false};
                  stationTransmit->SetEverSuccess (true);
              }
+             stationTransmit->SetTransmissionSuccess (true);
              
              stationTransmit->m_snesorUpdatInfo.lastTryBFpreSuccessId = stationTransmit->m_snesorUpdatInfo.lastTryBFCurrentSuccessId; //update, swith current to pre
              
