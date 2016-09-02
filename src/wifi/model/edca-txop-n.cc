@@ -957,7 +957,7 @@ EdcaTxopN::AccessAllowedIfRaw (bool allowed)
     {
          NS_LOG_UNCOND ("EdcaTxopN::NotifyAccessGranted, " << Simulator::Now () << ", " << allowed << ", " << m_low->GetAddress ());
     }*/
- 
+    
 }
 
 void
@@ -989,7 +989,7 @@ EdcaTxopN::StartAccessIfNeeded (void)
         m_manager->RequestAccess (m_dcf);
     }
 }
-    
+
 void
 EdcaTxopN::StartAccessIfNeededRaw (void)
 {
@@ -1001,7 +1001,7 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
         m_manager->RequestAccess (m_dcf);
     }
 }
-    
+
 void
 EdcaTxopN::RawStart (void)
 {
@@ -1009,7 +1009,7 @@ EdcaTxopN::RawStart (void)
 
   int newdata=66;
   m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
-    
+
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
@@ -1019,14 +1019,14 @@ EdcaTxopN::RawStart (void)
         m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
       }
   StartAccessIfNeededRaw (); //access could start even no packet (this comment seems incorrect)
-  
+
 }
 
 void
 EdcaTxopN::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
-    
+
   AccessAllowedIfRaw (true);
   m_dcf-> OutsideRawStart ();
   m_stationManager->OutsideRawStart ();

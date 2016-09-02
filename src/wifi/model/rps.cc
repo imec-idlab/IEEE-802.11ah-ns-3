@@ -24,14 +24,14 @@
 #include <sstream>
 
 namespace ns3 {
-    
+
 NS_LOG_COMPONENT_DEFINE ("RPS");
-    
+
 RPS::RawAssignment::RawAssignment ()
 {
     m_SlotFormat = 1;
 }
-    
+
 RPS::RawAssignment::~RawAssignment ()
 {
 }
@@ -50,35 +50,35 @@ RPS::RawAssignment::SetSlotFormat (uint8_t format)
     //printf("SetSlotFormat is %u\n",  m_SlotFormat);
 
 }
-    
+
 void
 RPS::RawAssignment::SetSlotCrossBoundary (uint8_t cross)
 {
     NS_ASSERT (cross <= 1);
     m_slotCrossBoundary = cross;
 }
-    
+
 void
 RPS::RawAssignment::SetSlotDurationCount (uint16_t count)
 {
     NS_ASSERT((!m_SlotFormat & (count < 256)) || (m_SlotFormat & (count < 2048)));
     m_slotDurationCount = count;
 }
-    
+
 void
 RPS::RawAssignment::SetSlotNum (uint16_t count)
 {
    NS_ASSERT((!m_SlotFormat & (count < 64)) || (m_SlotFormat & (count < 8)));
    m_slotNum = count;
-    
+
 }
-  
+
 void
 RPS::RawAssignment::SetRawStart (uint8_t start)
 {
   m_rawstart = start;
 }
-    
+
 void
 RPS::RawAssignment::SetRawGroup (uint32_t group)
 {
@@ -86,13 +86,13 @@ RPS::RawAssignment::SetRawGroup (uint32_t group)
 //NS_LOG_UNCOND ("SetRawGroup =" << m_rawgroup);
     //NS_LOG_UNCOND (" set m_rawgroup address=" << &m_rawgroup);
 }
-   
+
 void
 RPS::RawAssignment::SetChannelInd (uint16_t channel)
 {
   m_channelind = channel;
 }
-    
+
 void
 RPS::RawAssignment::SetPRAW (uint32_t praw)
 {
@@ -110,25 +110,25 @@ RPS::RawAssignment::GetSlotFormat (void) const
 {
    return m_SlotFormat;
 }
-    
+
 uint8_t
 RPS::RawAssignment::GetSlotCrossBoundary (void) const
 {
    return  m_slotCrossBoundary;
 }
-    
+
 uint16_t
 RPS::RawAssignment::GetSlotDurationCount (void) const
 {
    return m_slotDurationCount;
 }
-    
+
 uint16_t
 RPS::RawAssignment::GetSlotNum (void) const
 {
    return m_slotNum;
 }
-    
+
 uint16_t
 RPS::RawAssignment::GetRawSlot (void)
 {
@@ -173,15 +173,16 @@ RPS::RawAssignment::GetPRAW (void) const
 {
   return m_prawparam;
 }
-    
+
 uint8_t
 RPS::RawAssignment::GetSize (void) const
 {
   //return raw_length;
-  return 12;
+  //return 12;
+  return 6;
 }
 
-    
+
 RPS::RPS ()
 {
   m_length = 0;
@@ -193,9 +194,9 @@ RPS::~RPS ()
 
 //suppose all subfield of RAW Assignment are presented, 12 octets
 // change in future
-    
-    
-    
+
+
+
 void
 RPS::SetRawAssignment (RPS::RawAssignment raw)
 {
@@ -208,30 +209,30 @@ RPS::SetRawAssignment (RPS::RawAssignment raw)
     m_length++;
     m_rpsarry.push_back((uint8_t)(raw.GetRawSlot () >> 8));
     m_length++;
-    m_rpsarry.push_back(raw.GetRawStart ());
-    m_length++;
+    //m_rpsarry.push_back(raw.GetRawStart ());
+    //m_length++;
     m_rpsarry.push_back((uint8_t)(raw.GetRawGroup ()));//(7-0)
     m_length++;
     m_rpsarry.push_back((uint8_t)(raw.GetRawGroup () >> 8));//(15-8)
     m_length++;
     m_rpsarry.push_back( (uint8_t)(raw.GetRawGroup () >> 16));//(23-16)
     m_length++;
-    m_rpsarry.push_back((uint8_t)raw.GetChannelInd ());
-    m_length++;
-    m_rpsarry.push_back((uint8_t)(raw.GetChannelInd () >> 16));
-    m_length++;
-    m_rpsarry.push_back((uint8_t)raw.GetPRAW ());
-    m_length++;
-    m_rpsarry.push_back((uint8_t)(raw.GetPRAW () >> 8));
-    m_length++;
-    m_rpsarry.push_back( (uint8_t)(raw.GetPRAW () >> 16));
-    m_length++;
-    
+    //m_rpsarry.push_back((uint8_t)raw.GetChannelInd ());
+    //m_length++;
+    //m_rpsarry.push_back((uint8_t)(raw.GetChannelInd () >> 16));
+    //m_length++;
+    //m_rpsarry.push_back((uint8_t)raw.GetPRAW ());
+    //m_length++;
+    //m_rpsarry.push_back((uint8_t)(raw.GetPRAW () >> 8));
+    //m_length++;
+    //m_rpsarry.push_back( (uint8_t)(raw.GetPRAW () >> 16));
+    //m_length++;
+
     m_rps = &m_rpsarry[0];
     //printf (" set m_rps %x\n" , m_rps[6]);
 
 }
-    
+
 uint8_t *
 RPS::GetRawAssignment (void) const
 {
@@ -239,13 +240,13 @@ RPS::GetRawAssignment (void) const
     //printf (" get m_rps %x\n" , m_rps[6]);
     return m_rps;
 }
-    
+
 WifiInformationElementId
 RPS::ElementId () const
 {
   return IE_RPS;
 }
-    
+
 uint8_t
 RPS::GetInformationFieldSize () const
 {
@@ -257,7 +258,7 @@ RPS::SerializeInformationField (Buffer::Iterator start) const
 {
   start.Write (m_rps, m_length);
 }
-    
+
 uint8_t
 RPS::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 {
@@ -269,7 +270,7 @@ RPS::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 }
 
 ATTRIBUTE_HELPER_CPP (RPS);
-    
+
 std::ostream &
 operator << (std::ostream &os, const RPS &rps)
     {
@@ -289,24 +290,24 @@ operator << (std::ostream &os, const RPS &rps)
         is >> rps.m_length;
         return is;
     }
-    
+
     ////////////
-    
-    
+
+
     uint32_t RPSVector::getlen ()
     {
         return length;
     }
-    
+
     ATTRIBUTE_HELPER_CPP (RPSVector);
-    
+
     std::ostream &
     operator << (std::ostream &os, const RPSVector &rpsv)
     {
         os <<  "|" ;
         return os;
     }
-    
+
     std::istream &
     operator >> (std::istream &is, RPSVector &rpsv)
     {
@@ -314,10 +315,5 @@ operator << (std::ostream &os, const RPS &rps)
         return is;
     }
 
-    
+
 } //namespace ns3
-
-
-
-
-

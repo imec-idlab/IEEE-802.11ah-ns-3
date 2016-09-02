@@ -161,71 +161,71 @@ StaWifiMac::GetStaType (void) const
 {
    return m_staType;
 }
-    
+
 void
 StaWifiMac::SetStaType (uint32_t statype)
 {
    m_staType = statype;
 }
-    
+
 uint32_t
 StaWifiMac::GetAID (void) const
 {
   NS_ASSERT ((1 <= m_aid) && (m_aid<= 8191) || (m_aid == 8192));
   return m_aid;
 }
-    
+
 Time
 StaWifiMac::GetRawDuration (void) const
 {
   NS_LOG_FUNCTION (this);
   return m_rawDuration;
 }
- 
+
 bool
 StaWifiMac::Is(uint8_t blockbitmap, uint8_t j)
 {
   return (((blockbitmap >> j) & 0x01) == 0x01);
 }
-    
+
 void
 StaWifiMac::SetAID (uint32_t aid)
 {
   NS_ASSERT ((1 <= aid) && (aid <= 8191));
   m_aid = aid;
 }
-    
+
 void
 StaWifiMac::SetRawDuration (Time interval)
 {
   NS_LOG_FUNCTION (this << interval);
   m_rawDuration = interval;
 }
-    
+
 void
 StaWifiMac::SetDataBuffered()
 {
   m_dataBuffered = true;
 }
-    
+
 void
 StaWifiMac::ClearDataBuffered()
 {
   m_dataBuffered = false;
 }
-    
+
 void
 StaWifiMac::SetInRAWgroup()
 {
   m_inRawGroup = true;
 }
-    
+
 void
 StaWifiMac::UnsetInRAWgroup()
 {
   m_inRawGroup = false;
 }
-        
+
 void
 StaWifiMac::SetMaxMissedBeacons (uint32_t missed)
 {
@@ -283,7 +283,7 @@ StaWifiMac::SendPspoll (void)
   hdr.SetId (GetAID());
   hdr.SetAddr1 (GetBssid());
   hdr.SetAddr2 (GetAddress ());
-    
+
   Ptr<Packet> packet = Create<Packet> ();
   packet->AddHeader (hdr);
 
@@ -293,7 +293,7 @@ StaWifiMac::SendPspoll (void)
   //association or not.
   m_pspollDca->Queue (packet, hdr);
 }
-    
+
 void
 StaWifiMac::SendPspollIfnecessary (void)
 {
@@ -315,8 +315,9 @@ StaWifiMac::S1gBeaconReceived (void)
      {
         m_outsideRawEvent.Cancel ();          //avoid error when actual beacon interval become shorter, otherwise, AccessAllowedIfRaw will set again after raw starting
         //Simulator::ScheduleNow(&StaWifiMac::OutsideRawStartBackoff, this);
+
      }
-    
+
   if (m_aid == 8192) // send assoication request when Staion is not assoicated
     {
       m_dca->AccessAllowedIfRaw (true);
@@ -324,7 +325,7 @@ StaWifiMac::S1gBeaconReceived (void)
   else if (m_rawStart & m_inRawGroup && m_pagedStaRaw && m_dataBuffered ) // if m_pagedStaRaw is true, only m_dataBuffered can access channel
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-        
+
       m_pspollDca->AccessAllowedIfRaw (true);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
@@ -336,7 +337,7 @@ StaWifiMac::S1gBeaconReceived (void)
   else if (m_rawStart && m_inRawGroup && !m_pagedStaRaw  )
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-        
+
       m_pspollDca->AccessAllowedIfRaw (false);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
@@ -348,13 +349,14 @@ StaWifiMac::S1gBeaconReceived (void)
   else if (m_rawStart && !m_inRawGroup) //|| (m_rawStart && m_inRawGroup && m_pagedStaRaw && !m_dataBuffered)
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-        
+
       m_pspollDca->AccessAllowedIfRaw (false);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
       m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
       m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
       m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
+
       StartRawbackoff();
     }
     // else (!m_rawStart),  this case cannot happen, since we assume s1g beacon always indicating one raw
@@ -377,7 +379,7 @@ StaWifiMac::RawSlotStartBackoff (void)
     m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
     StartRawbackoff();
 }
-    
+
 void
 StaWifiMac::InsideBackoff (void)
 {
@@ -387,10 +389,10 @@ StaWifiMac::InsideBackoff (void)
    m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
-    
+
 }
-    
-    
+
+
 void
 StaWifiMac::StartRawbackoff (void)
 {
@@ -407,14 +409,49 @@ StaWifiMac::StartRawbackoff (void)
 void
 StaWifiMac::OutsideRawStartBackoff (void)
 {
-  Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
+  /*Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
   Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_dca);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VO)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VI)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BE)->second);
-  Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BK)->second);
+  Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BK)->second);*/
+  StaWifiMac::m_pspollDca->OutsideRawStart ();
+  m_dca->OutsideRawStart();
+  m_edca.find (AC_VO)->second->OutsideRawStart();
+  m_edca.find (AC_VI)->second->OutsideRawStart();
+  m_edca.find (AC_BE)->second->OutsideRawStart();
+  m_edca.find (AC_BK)->second->OutsideRawStart();
+  /*
+  It seems Simulator::ScheduleNow take longer time to execuate than without schedule.
+
+  During debugging, we found that when OutsideRawStartBackoff and StaWifiMac::S1gBeaconReceived execuate at the
+  same time, even  function OutsideRawStartBackoff() at first execute, and function S1gBeaconReceived() execuate
+  later, the function OutsideRawStartBackoff calls executate later than functions called by S1gBeaconReceived ().
+
+  Here is an example, (m_rawStart && !m_inRawGroup) execuated in S1gBeaconReceived. We log the info,
+
+  first, OutsideRawStartBackoff calls
+  OutsideRawStartBackoff ,20	+42302720123.0ns	00:00:00:00:00:14, start to schedule
+  seconds, (m_rawStart && !m_inRawGroup) related functions is execuated,
+    raw start but not inRAWgroup
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 0, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 0, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 0, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 0, 00:00:00:00:00:14
+    m_rawStart && !m_inRawGroup, +42302720123.0ns, 00:00:00:00:00:14
+  Last, functions called by OutsideRawStartBackoff is execuated.
+    ousideRAW
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 1, 00:00:00:00:00:14
+    EdcaTxopN::OutsideRawStart, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 1, 00:00:00:00:00:14
+    EdcaTxopN::OutsideRawStart, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 1, 00:00:00:00:00:14
+    EdcaTxopN::OutsideRawStart, 00:00:00:00:00:14
+    EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 1, 00:00:00:00:00:14
+    EdcaTxopN::OutsideRawStart, 00:00:00:00:00:14
+  */
 }
-    
+
 void
 StaWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager)
 {
@@ -422,7 +459,7 @@ StaWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationMa
   m_pspollDca->SetWifiRemoteStationManager (stationManager);
   RegularWifiMac::SetWifiRemoteStationManager (stationManager);
 }
-    
+
 void
 StaWifiMac::SendProbeRequest (void)
 {
@@ -465,7 +502,7 @@ StaWifiMac::SendAssociationRequest (void)
 {
   NS_LOG_FUNCTION (this << GetBssid ());
     //NS_LOG_UNCOND ("StaWifiMac::SendAssociationRequest (void)");
-  
+
   if (!m_s1gSupported)
     {
         fastAssocThreshold = 1023;
@@ -489,7 +526,7 @@ if (assocVaule < fastAssocThreshold)
       assoc.SetHtCapabilities (GetHtCapabilities ());
       hdr.SetNoOrder ();
     }
-   
+
   if (m_s1gSupported)
     {
         assoc.SetS1gCapabilities (GetS1gCapabilities ());
@@ -818,19 +855,20 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         uint8_t * rawassign;
         rawassign = beacon.GetRPS().GetRawAssignment();
         uint16_t raw_len = beacon.GetRPS().GetInformationFieldSize();
-        if (raw_len % 12 !=0)
+        uint16_t rawAssignment_len = 6;
+        if (raw_len % rawAssignment_len !=0)
           {
              NS_ASSERT ("RAW configuration incorrect!");
           }
-        uint8_t RAW_number = raw_len/12;
-        
+        uint8_t RAW_number = raw_len/rawAssignment_len;
+
          uint16_t m_slotDurationCount=0;
          uint16_t m_slotNum=0;
          uint64_t m_currentRAW_start=0;
          m_lastRawDurationus = MicroSeconds(0);
     for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
       {
-        uint8_t rawtypeindex = rawassign[raw_index*12+0] & 0x07;
+        uint8_t rawtypeindex = rawassign[raw_index*rawAssignment_len+0] & 0x07;
         if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
           {
             m_pagedStaRaw = true;
@@ -839,17 +877,17 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           {
             m_pagedStaRaw = false;
           }
-        uint8_t pageindex = rawassign[raw_index*12+4] & 0x03;
-         
+        uint8_t pageindex = rawassign[raw_index*rawAssignment_len+3] & 0x03;
+
          uint16_t m_rawslot;
-         m_rawslot = (uint16_t(rawassign[raw_index*12+2]) << 8) | (uint16_t(rawassign[raw_index*12+1]));
+         m_rawslot = (uint16_t(rawassign[raw_index*rawAssignment_len+2]) << 8) | (uint16_t(rawassign[raw_index*rawAssignment_len+1]));
          uint8_t m_SlotFormat = uint8_t (m_rawslot >> 15) & 0x0001;
          uint8_t m_slotCrossBoundary = uint8_t (m_rawslot >> 14) & 0x0002;
-         
+
           m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;
 
          NS_ASSERT (m_SlotFormat <= 1);
-         
+
          if (m_SlotFormat == 0)
            {
              m_slotDurationCount = (m_rawslot >> 6) & 0x00ff;
@@ -863,35 +901,37 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 
         m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);
         m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;
- 
+
          if (pageindex == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
            {
-               
-             uint8_t rawgroup_l = rawassign[raw_index*12+4];
-             uint8_t rawgroup_m = rawassign[raw_index*12+5];
-             uint8_t rawgroup_h = rawassign[raw_index*12+6];
-             uint32_t rawgroup = (uint32_t(rawassign[raw_index*12+6]) << 16) | (uint32_t(rawassign[raw_index*12+5]) << 8) | uint32_t(rawassign[raw_index*12+4]);
+
+             uint8_t rawgroup_l = rawassign[raw_index*rawAssignment_len+3];
+             uint8_t rawgroup_m = rawassign[raw_index*rawAssignment_len+4];
+             uint8_t rawgroup_h = rawassign[raw_index*rawAssignment_len+5];
+             uint32_t rawgroup = (uint32_t(rawassign[raw_index*rawAssignment_len+5]) << 16) | (uint32_t(rawassign[raw_index*rawAssignment_len+4]) << 8) | uint32_t(rawassign[raw_index*rawAssignment_len+3]);
              uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
              uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
-               
+
                uint16_t statsPerSlot = 0;
                uint16_t statRawSlot = 0;
-               
+
                Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
                uint16_t offset = m_rv->GetValue (0, 1023);
                offset =0; // for test
                statsPerSlot = (raw_end - raw_start + 1)/m_slotNum;
                //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
                statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
-               
+
              if ((raw_start <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= raw_end))
                {
                  m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);
                  SetInRAWgroup ();
                  m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
-                   //NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+                  // NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
                   //break; //break should not used if multiple RAW is supported
                }
+               //NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+
            }
       }
          m_rawStart = true; //?
@@ -1039,7 +1079,7 @@ StaWifiMac::GetHtCapabilities (void) const
     }
   return capabilities;
 }
-    
+
 S1gCapabilities
 StaWifiMac::GetS1gCapabilities (void) const
 {
@@ -1067,4 +1107,3 @@ StaWifiMac::SetState (MacState value)
 }
 
 } //namespace ns3
-
