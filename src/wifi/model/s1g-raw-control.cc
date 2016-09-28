@@ -208,7 +208,7 @@ S1gRawCtr::S1gRawCtr ()
    m_offloadFailedMax = 5;
    sensorpacketsize = 1;
    offloadpacketsize = 1;
-   m_slotDurationCount = 87;
+   m_slotDurationCount = 16;
 
 
     m_rawslotDuration = (m_slotDurationCount*120) +500; //for test.
@@ -216,7 +216,7 @@ S1gRawCtr::S1gRawCtr ()
     currentId = 1;
     m_beaconOverhead = 100; // us
 
-    MaxSlotForSensor = 8; //In order to guarantee channel for offload stations.
+    MaxSlotForSensor = 42; //In order to guarantee channel for offload stations.
     m_rps = new RPS;
 
 }

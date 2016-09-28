@@ -409,6 +409,10 @@ StaWifiMac::StartRawbackoff (void)
 void
 StaWifiMac::OutsideRawStartBackoff (void)
 {
+   if (m_insideBackoffEvent.IsRunning ())
+     {
+       m_insideBackoffEvent.Cancel ();
+     }
   /*Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
   Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_dca);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VO)->second);
