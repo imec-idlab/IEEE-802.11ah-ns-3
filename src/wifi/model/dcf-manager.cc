@@ -59,6 +59,7 @@ DcfState::RawStart (void)
   m_cw_temp = m_cw;
   m_backoffSlots_temp = m_backoffSlots;
   ResetCw ();
+  m_accessRequested = false;
 }
  
 void
@@ -66,6 +67,7 @@ DcfState::OutsideRawStart (void)
 {
   m_cw = m_cw_temp;
   m_backoffSlots = m_backoffSlots_temp;
+  m_accessRequested = false;  
 }
     
 DcfState::~DcfState ()
