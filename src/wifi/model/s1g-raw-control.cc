@@ -303,7 +303,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
 
              if (*ci == *it)
               {
-                NS_LOG_UNCOND ("stations of aid " << *it << " received");
+                //NS_LOG_UNCOND ("stations of aid " << *it << " received");
                 stationTransmit->SetTransmissionSuccess (true);
                   //output to files.
                   //write into currentID  coulumn
@@ -548,7 +548,7 @@ S1gRawCtr::calculateSensorNumWantToSend ()
 
     for (StationsCI it = m_stations.begin(); it != m_stations.end(); it++)
       {
-          NS_LOG_UNCOND ("aid " << (*it)->GetAid () <<  "," << (*it)->GetEstimateNextTransmissionId () << ", " <<currentId);
+          //NS_LOG_UNCOND ("aid " << (*it)->GetAid () <<  "," << (*it)->GetEstimateNextTransmissionId () << ", " <<currentId);
           NS_ASSERT ((*it)->GetEstimateNextTransmissionId () >= currentId);
         if ((*it)->GetEstimateNextTransmissionId () == currentId)
           {
@@ -638,15 +638,15 @@ S1gRawCtr::SetSensorAllowedToSend ()
              {
                 stationTransmit->EstimateNextTransmissionId (currentId+1);
                 //Postpone transmission to next interval
-                NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " not allwed to send, since its full ");
-                NS_LOG_UNCOND ("update NextTransmissionId to = " << currentId+1);
+                //NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " not allwed to send, since its full ");
+                //NS_LOG_UNCOND ("update NextTransmissionId to = " << currentId+1);
              }
            else if ( SendNum + stationTransmit->GetTransInOneBeacon () > m_numSendSensorAllowed)
             {
                 stationTransmit->EstimateNextTransmissionId (currentId+1);
                 //Postpone transmission to next interval
-                NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " not allwed to send, since transmit number is " << stationTransmit->GetTransInOneBeacon () );
-                NS_LOG_UNCOND ("update NextTransmissionId to = " << currentId+1);
+                //NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " not allwed to send, since transmit number is " << stationTransmit->GetTransInOneBeacon () );
+                //NS_LOG_UNCOND ("update NextTransmissionId to = " << currentId+1);
 
                 uint8_t numleft = m_numSendSensorAllowed - SendNum;
                 if (numleft > 0)
@@ -658,7 +658,7 @@ S1gRawCtr::SetSensorAllowedToSend ()
                      m_lastTransmissionList.erase (position);
                      m_lastTransmissionList.push_back (stationTransmit->GetAid ());
                      SendNum = SendNum + numleft;
-                     NS_LOG_UNCOND ("reset Trans number to = " << numleft << " to send");
+                     //NS_LOG_UNCOND ("reset Trans number to = " << numleft << " to send");
                  }
             }
            else
@@ -669,7 +669,7 @@ S1gRawCtr::SetSensorAllowedToSend ()
                m_lastTransmissionList.erase (position);
                m_lastTransmissionList.push_back (stationTransmit->GetAid ());
                SendNum = SendNum + stationTransmit->GetTransInOneBeacon ();
-               NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " allowed to send");
+               //NS_LOG_UNCOND ("aid = " << stationTransmit->GetAid () << " allowed to send");
 
             }
          ////put first send stations to m_aidList, choose stations based on last transmission time.
@@ -768,7 +768,7 @@ S1gRawCtr::UdpateOffloadStaInfo (std::vector<uint16_t> m_OffloadList, std::vecto
         {
             if (*ci == *it)
             {
-                NS_LOG_UNCOND ("stations of aid " << *it << " received, " << *ci);
+                //NS_LOG_UNCOND ("stations of aid " << *it << " received, " << *ci);
                 //output to files.
                 APId.clear ();
                 APId.str ("");
@@ -786,7 +786,7 @@ S1gRawCtr::UdpateOffloadStaInfo (std::vector<uint16_t> m_OffloadList, std::vecto
         }
 
         //output to files.
-        NS_LOG_UNCOND ("stations of aid " << *it << " not received");
+        //NS_LOG_UNCOND ("stations of aid " << *it << " not received");
         APId.clear ();
         APId.str ("");
         APId << (*it);
