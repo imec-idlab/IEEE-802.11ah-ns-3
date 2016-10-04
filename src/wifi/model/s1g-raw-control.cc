@@ -513,7 +513,7 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
         m_transmissionIntervalMin = m_snesorUpdatInfo.CurrentUnSuccessId - m_snesorUpdatInfo.preSuccessId + 1;
         //necessary to update Min here, in order to update min properly when first packets received.
         //m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.lastTryBFpreSuccessId - 1;
-         m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId - 1;
+         m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId;
 
      }
     else
@@ -521,12 +521,13 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
         m_transmissionIntervalMin = currentId - m_snesorUpdatInfo.CurrentSuccessId + 1;
         //m_transmissionIntervalMax remains
      }
-
+    
+    /*
     if (m_transmissionIntervalMax < m_transmissionIntervalMin)
      {
          //m_transmissionIntervalMax = 2 * m_transmissionIntervalMin;
          m_transmissionIntervalMax = m_transmissionIntervalMin;
-     }
+     }*/
     //NS_LOG_UNCOND ("aid = " << m_aid << " ,m_transmissionIntervalMin = " << m_transmissionIntervalMin << ", m_transmissionIntervalMax = " << m_transmissionIntervalMax );
     m_transmissionInterval = (m_transmissionIntervalMin + m_transmissionIntervalMax)/2;
     uint64_t m_nextId = m_snesorUpdatInfo.CurrentSuccessId + m_transmissionInterval; ////** AP update info after RAW ends(right before next beacon is sent)
@@ -549,8 +550,8 @@ S1gRawCtr::calculateSensorNumWantToSend ()
     for (StationsCI it = m_stations.begin(); it != m_stations.end(); it++)
       {
           //NS_LOG_UNCOND ("aid " << (*it)->GetAid () <<  "," << (*it)->GetEstimateNextTransmissionId () << ", " <<currentId);
-          NS_ASSERT ((*it)->GetEstimateNextTransmissionId () >= currentId);
-        if ((*it)->GetEstimateNextTransmissionId () == currentId)
+          //NS_ASSERT ((*it)->GetEstimateNextTransmissionId () >= currentId);
+        if ((*it)->GetEstimateNextTransmissionId () <= currentId)
           {
             m_numSensorWantToSend++;
             if ((*it)->GetTransInOneBeacon () > (m_beaconInterval-m_beaconOverhead)/m_rawslotDuration - 1)
@@ -632,7 +633,7 @@ S1gRawCtr::SetSensorAllowedToSend ()
      {
          Sensor * stationTransmit = LookupSensorSta (*it);
          it++;
-       if (stationTransmit->GetEstimateNextTransmissionId () == currentId)
+       if (stationTransmit->GetEstimateNextTransmissionId () <= currentId)
         {
            if (SendNum == m_numSendSensorAllowed)
              {
