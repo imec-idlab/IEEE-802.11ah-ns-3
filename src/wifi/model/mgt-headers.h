@@ -39,6 +39,91 @@ namespace ns3 {
  * \ingroup wifi
  * Implement the header for management frames of type association request.
  */
+
+class MgtDisAssocRequestHeader : public Header
+{
+public:
+    MgtDisAssocRequestHeader ();
+    ~MgtDisAssocRequestHeader ();
+    
+    /**
+     * Set the Service Set Identifier (SSID).
+     *
+     * \param ssid SSID
+     */
+    void SetSsid (Ssid ssid);
+    /**
+     * Set the supported rates.
+     *
+     * \param rates the supported rates
+     */
+    void SetSupportedRates (SupportedRates rates);
+    /**
+     * Set the listen interval.
+     *
+     * \param interval the listen interval
+     */
+    void SetListenInterval (uint16_t interval);
+    /**
+     * Set the HT capabilities.
+     *
+     * \param htcapabilities HT capabilities
+     */
+    void SetHtCapabilities (HtCapabilities htcapabilities);
+    
+    /**
+     * Return the HT capabilities.
+     *
+     * \return HT capabilities
+     */
+    HtCapabilities GetHtCapabilities (void) const;
+    /**
+     * Return the Service Set Identifier (SSID).
+     *
+     * \return SSID
+     */
+    Ssid GetSsid (void) const;
+    /**
+     * Return the supported rates.
+     *
+     * \return the supported rates
+     */
+    SupportedRates GetSupportedRates (void) const;
+    /**
+     * Return the listen interval.
+     *
+     * \return the listen interval
+     */
+    uint16_t GetListenInterval (void) const;
+    
+    /**
+     * Register this type.
+     * \return The TypeId.
+     */
+    static TypeId GetTypeId (void);
+    virtual TypeId GetInstanceTypeId (void) const;
+    virtual void Print (std::ostream &os) const;
+    virtual uint32_t GetSerializedSize (void) const;
+    virtual void Serialize (Buffer::Iterator start) const;
+    virtual uint32_t Deserialize (Buffer::Iterator start);
+    
+    void  SetS1gCapabilities (S1gCapabilities s1gcapabilities);
+    S1gCapabilities  GetS1gCapabilities (void) const;
+    
+    
+private:
+    Ssid m_ssid;                        //!< Service Set ID (SSID)
+    SupportedRates m_rates;             //!< List of supported rates
+    CapabilityInformation m_capability; //!< Capability information
+    HtCapabilities m_htCapability;      //!< HT capabilities
+    uint16_t m_listenInterval;
+    
+    S1gCapabilities m_s1gCapability;
+};
+/**
+ * \ingroup wifi
+ * Implement the header for management frames of type association request.
+ */
 class MgtAssocRequestHeader : public Header
 {
 public:
@@ -119,7 +204,7 @@ private:
    
   S1gCapabilities m_s1gCapability;
 };
-
+    
 
 /**
  * \ingroup wifi

@@ -130,6 +130,7 @@ public:
   /**
    * Set Type/Subtype values for an association request header.
    */
+  void SetDisAssocReq (void);
   void SetAssocReq (void);
   /**
    * Set Type/Subtype values for an association response header.

@@ -89,6 +89,7 @@ public:
 
     uint32_t GetStaType (void) const;
     void SetStaType (uint32_t statype);
+    void SendDisAssociationRequest (void);
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;

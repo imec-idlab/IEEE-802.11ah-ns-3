@@ -134,6 +134,13 @@ WifiMacHeader::SetAssocReq (void)
   m_ctrlType = TYPE_MGT;
   m_ctrlSubtype = 0;
 }
+    
+void
+WifiMacHeader::SetDisAssocReq (void)
+{
+  m_ctrlType = TYPE_MGT;
+  m_ctrlSubtype = 10;
+}
 
 void
 WifiMacHeader::SetAssocResp (void)

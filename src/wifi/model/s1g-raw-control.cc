@@ -285,6 +285,28 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
             m_lastTransmissionList.push_back (*ci);
         }
     }
+    
+    bool disassoc;
+    for (StationsCI it = m_stations.begin(); it != m_stations.end(); it++)
+    {
+        disassoc = true;
+        for (std::vector<uint16_t>::iterator ci = m_sensorlist.begin(); ci != m_sensorlist.end(); ci++)
+        {
+            if ((*it)->GetAid ()  == *ci)
+             {
+                 disassoc = false;
+                 break;
+             }
+            
+        }
+        
+      if (disassoc == true)
+        {
+            NS_LOG_UNCOND ( "Aid " << (*it)->GetAid () << " erased since disassociated = ");
+            m_stations.erase(it);
+
+        }
+    }
 
     NS_LOG_UNCOND ("m_aidList.size() = " << m_aidList.size() << ", m_receivedAid = " << m_receivedAid.size () << ", m_stations.size() = " << m_stations.size() << ", currentId = " << currentId);
 
@@ -402,11 +424,9 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
          stationTransmit->EstimateTransmissionInterval (currentId, m_beaconInterval);
      }
 
-
-
  for (std::vector<uint16_t>::iterator ci = m_receivedAid.begin(); ci != m_receivedAid.end(); ci++)
     {
-      uint16_t m_numReceived = 1;
+      uint16_t m_numReceived = 0;
       bool match = false;
       for (std::vector<uint16_t>::iterator it = m_aidList.begin(); it != m_aidList.end(); it++)
          {
@@ -420,6 +440,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
         Sensor * stationTransmit = LookupSensorSta (*ci);
     if (stationTransmit != nullptr && !match)
         {
+            m_aidList.push_back (*ci); //trick, avoid same receiveAid repeate several times
              if (stationTransmit->GetEverSuccess () == false)
              {
                  stationTransmit->m_snesorUpdatInfo = (UpdateInfo){currentId-1,currentId-1,currentId-1,false,currentId-1,currentId-1,currentId-1,false};
@@ -438,7 +459,15 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
              stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess = true;
 
              //NS_LOG_UNCOND ("stations of aid " << *it << " received " << m_numReceived << " packets");
-
+            
+            for (std::vector<uint16_t>::iterator ct = m_receivedAid.begin(); ct != m_receivedAid.end(); ct++)
+            {
+                if (*ci == *ct)
+                {
+                    m_numReceived++;
+                }
+            }
+            
              APId.clear ();
              APId.str ("");
              APId << (*ci);
@@ -448,7 +477,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
              outputfile.open (sensorfile, std::ios::out | std::ios::app);
              outputfile << currentId << "\t" << "0" << "\t" << m_numReceived << "\t" << stationTransmit->GetTransInOneBeacon () << "\n";
              outputfile.close();
-
+            
              stationTransmit->SetNumPacketsReceived (m_numReceived);
              stationTransmit->EstimateTransmissionInterval (currentId, m_beaconInterval);
         }
@@ -631,7 +660,13 @@ S1gRawCtr::SetSensorAllowedToSend ()
    //for (std::vector<uint16_t>::iterator it = m_lastTransmissionList.begin(); it != m_lastTransmissionList.end(); it++)
     for (uint16_t i = 0; i < m_lastTransmissionList.size (); i++)
      {
-         Sensor * stationTransmit = LookupSensorSta (*it);
+         Sensor * stationTransmit;
+         if (LookupSensorSta (*it) == nullptr) //disassociated station
+           {
+             it++;
+             continue;
+           }
+         stationTransmit = LookupSensorSta (*it);
          it++;
        if (stationTransmit->GetEstimateNextTransmissionId () <= currentId)
         {

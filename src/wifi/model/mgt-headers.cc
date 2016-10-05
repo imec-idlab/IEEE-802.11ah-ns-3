@@ -440,6 +440,152 @@ MgtAssocRequestHeader::Deserialize (Buffer::Iterator start)
 
   return i.GetDistanceFrom (start);
 }
+    
+/***********************************************************
+ *          DisAssoc Request
+ ***********************************************************/
+
+NS_OBJECT_ENSURE_REGISTERED (MgtDisAssocRequestHeader);
+
+MgtDisAssocRequestHeader::MgtDisAssocRequestHeader ()
+: m_listenInterval (0)
+{
+}
+
+MgtDisAssocRequestHeader::~MgtDisAssocRequestHeader ()
+{
+}
+
+void
+MgtDisAssocRequestHeader::SetSsid (Ssid ssid)
+{
+    m_ssid = ssid;
+}
+
+void
+MgtDisAssocRequestHeader::SetSupportedRates (SupportedRates rates)
+{
+    m_rates = rates;
+}
+
+void
+MgtDisAssocRequestHeader::SetHtCapabilities (HtCapabilities htcapabilities)
+{
+    m_htCapability = htcapabilities;
+}
+
+void
+MgtDisAssocRequestHeader::SetS1gCapabilities (S1gCapabilities s1gcapabilities)
+{
+    m_s1gCapability = s1gcapabilities;
+}
+
+void
+MgtDisAssocRequestHeader::SetListenInterval (uint16_t interval)
+{
+    m_listenInterval = interval;
+}
+
+HtCapabilities
+MgtDisAssocRequestHeader::GetHtCapabilities (void) const
+{
+    return m_htCapability;
+}
+
+S1gCapabilities
+MgtDisAssocRequestHeader::GetS1gCapabilities (void) const
+{
+    return m_s1gCapability;
+}
+
+Ssid
+MgtDisAssocRequestHeader::GetSsid (void) const
+{
+    return m_ssid;
+}
+
+SupportedRates
+MgtDisAssocRequestHeader::GetSupportedRates (void) const
+{
+    return m_rates;
+}
+
+uint16_t
+MgtDisAssocRequestHeader::GetListenInterval (void) const
+{
+    return m_listenInterval;
+}
+
+TypeId
+MgtDisAssocRequestHeader::GetTypeId (void)
+{
+    static TypeId tid = TypeId ("ns3::MgtDisAssocRequestHeader")
+    .SetParent<Header> ()
+    .SetGroupName ("Wifi")
+    .AddConstructor<MgtAssocRequestHeader> ()
+    ;
+    return tid;
+}
+
+TypeId
+MgtDisAssocRequestHeader::GetInstanceTypeId (void) const
+{
+    return GetTypeId ();
+}
+
+uint32_t
+MgtDisAssocRequestHeader::GetSerializedSize (void) const
+{
+    uint32_t size = 0;
+    size += m_capability.GetSerializedSize ();
+    size += 2;
+    size += m_ssid.GetSerializedSize ();
+    size += m_rates.GetSerializedSize ();
+    size += m_htCapability.GetSerializedSize ();
+    size += m_s1gCapability.GetSerializedSize ();
+    size += m_rates.extended.GetSerializedSize ();
+    return size;
+}
+
+void
+MgtDisAssocRequestHeader::Print (std::ostream &os) const
+{
+    os << "ssid=" << m_ssid << ", "
+    << "rates=" << m_rates << ", "
+    << "HT Capabilities=" << m_htCapability;
+}
+
+void
+MgtDisAssocRequestHeader::Serialize (Buffer::Iterator start) const
+{
+    Buffer::Iterator i = start;
+    i = m_capability.Serialize (i);
+    i.WriteHtolsbU16 (m_listenInterval);
+    i = m_ssid.Serialize (i);
+    i = m_rates.Serialize (i);
+    i = m_rates.extended.Serialize (i);
+    i = m_htCapability.Serialize (i);
+    i = m_s1gCapability.Serialize (i);
+}
+
+uint32_t
+MgtDisAssocRequestHeader::Deserialize (Buffer::Iterator start)
+{
+    Buffer::Iterator i = start;
+    i = m_capability.Deserialize (i);
+    m_listenInterval = i.ReadLsbtohU16 ();
+    i = m_ssid.Deserialize (i);
+    i = m_rates.Deserialize (i);
+    i = m_rates.extended.DeserializeIfPresent (i);
+    i = m_htCapability.DeserializeIfPresent (i);
+    //NS_LOG_UNCOND ("assoc failed with sta55=");
+    
+    i = m_s1gCapability.DeserializeIfPresent (i);
+    //NS_LOG_UNCOND ("assoc failed with sta66=");
+    
+    return i.GetDistanceFrom (start);
+}
+
 
 
 /***********************************************************

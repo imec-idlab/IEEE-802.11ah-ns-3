@@ -787,6 +787,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           //we can ignore these frames since
           //they are not targeted at the AP
           NotifyRxDrop (packet);
+          NS_LOG_UNCOND ("not assciate, drop, from=" << from );
         }
       return;
     }
@@ -897,6 +898,18 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           else if (hdr->IsDisassociation ())
             {
               m_stationManager->RecordDisassociated (from);
+              uint8_t mac[6];
+              from.CopyTo (mac);
+              uint8_t aid_l = mac[5];
+              uint8_t aid_h = mac[4] & 0x1f;
+              uint16_t aid = (aid_h << 8) | (aid_l << 0);
+              NS_LOG_UNCOND (from << "  Disassociation");
+
+             for (std::vector<uint16_t>::iterator it = m_sensorList.begin(); it != m_sensorList.end(); it++)
+                {
+                    if (*it == aid)
+                        m_sensorList.erase (it); //remove from association list
+                }
               return;
             }
         }

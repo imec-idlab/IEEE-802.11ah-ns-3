@@ -502,6 +502,43 @@ StaWifiMac::SendProbeRequest (void)
 }
 
 void
+StaWifiMac::SendDisAssociationRequest (void)
+{
+   NS_LOG_FUNCTION (this);
+    WifiMacHeader hdr;
+    hdr.SetDisAssocReq ();
+    hdr.SetAddr1 (GetBssid ());
+    hdr.SetAddr2 (GetAddress ());
+    hdr.SetAddr3 (GetBssid ());
+    hdr.SetDsNotFrom ();
+    hdr.SetDsNotTo ();
+    Ptr<Packet> packet = Create<Packet> ();
+    MgtDisAssocRequestHeader disassoc;
+    disassoc.SetSsid (GetSsid ());
+    
+    if (m_htSupported)
+    {
+        disassoc.SetHtCapabilities (GetHtCapabilities ());
+        hdr.SetNoOrder ();
+    }
+    
+    if (m_s1gSupported)
+    {
+        disassoc.SetS1gCapabilities (GetS1gCapabilities ());
+        NS_LOG_UNCOND ("StaWifiMac::SendDisAssociationRequest (void)");
+        
+    }
+    
+    SetState (REFUSED);  // temporary used, should create another state
+    SetAID (8192); //ensure disassociated station is not affected by Raw
+    packet->AddHeader (disassoc);
+    m_dca->Queue (packet, hdr);
+
+    //to do, check weather Disassociation request is received by Ap or not.
+
+}
+    
+void
 StaWifiMac::SendAssociationRequest (void)
 {
   NS_LOG_FUNCTION (this << GetBssid ());
@@ -667,6 +704,7 @@ StaWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
     {
       NotifyTxDrop (packet);
       TryToEnsureAssociated ();
+      NS_LOG_UNCOND (m_low->GetAddress () << "  cannot send since not associated");
       return;
     }
   WifiMacHeader hdr;
