@@ -90,6 +90,7 @@ public:
     uint32_t GetStaType (void) const;
     void SetStaType (uint32_t statype);
     void SendDisAssociationRequest (void);
+    void SendAssociationRequest (void);
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;
@@ -129,7 +130,7 @@ private:
    * Forward an association request packet to the DCF. The standard is not clear on the correct
    * queue for management frames if QoS is supported. We always use the DCF.
    */
-  void SendAssociationRequest (void);
+  //void SendAssociationRequest (void);
   /**
    * Try to ensure that we are associated with an AP by taking an appropriate action
    * depending on the current association status.

@@ -530,7 +530,7 @@ StaWifiMac::SendDisAssociationRequest (void)
     }
     
     SetState (REFUSED);  // temporary used, should create another state
-    SetAID (8192); //ensure disassociated station is not affected by Raw
+    m_aid = 8192; //ensure disassociated station is not affected by Raw
     packet->AddHeader (disassoc);
     m_dca->Queue (packet, hdr);
 
@@ -582,6 +582,7 @@ if (assocVaule < fastAssocThreshold)
   //use the DCF for these regardless of whether we have a QoS
   //association or not.
   m_dca->Queue (packet, hdr);
+  SetState (WAIT_ASSOC_RESP);
 }
 
   if (m_assocRequestEvent.IsRunning ())

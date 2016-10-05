@@ -279,7 +279,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
             APId << (*ci);
             ApNode = APId.str();
             sensorfile = outputpath + ApNode + ".txt";
-            outputfile.open (sensorfile, std::ios::out | std::ios::trunc);
+            outputfile.open (sensorfile, std::ios::out | std::ios::app);
             outputfile.close();
             //
             m_lastTransmissionList.push_back (*ci);

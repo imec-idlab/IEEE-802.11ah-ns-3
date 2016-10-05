@@ -880,9 +880,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                   
                   if (m_s1gSupported)
                     {
-                        NS_LOG_UNCOND ("assoc failed with sta=");
-
-                        S1gCapabilities s1gcapabilities = assocReq.GetS1gCapabilities ();
+                      S1gCapabilities s1gcapabilities = assocReq.GetS1gCapabilities ();
                       uint8_t sta_type = s1gcapabilities.GetStaType ();
                       SendAssocResp (hdr->GetAddr2 (), true, sta_type);
                     }
