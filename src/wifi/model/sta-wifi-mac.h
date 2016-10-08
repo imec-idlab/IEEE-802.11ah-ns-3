@@ -51,7 +51,7 @@ public:
    * \param stationManager the station manager attached to this MAC.
    */
   virtual void SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager);
-    
+
   /**
    * \param packet the packet to send.
    * \param to the address to which the packet should be sent.
@@ -86,6 +86,7 @@ public:
    * Start an active association sequence immediately.
    */
   void StartActiveAssociation (void);
+  void TxOk (const WifiMacHeader &hdr);
 
     uint32_t GetStaType (void) const;
     void SetStaType (uint32_t statype);
@@ -102,6 +103,7 @@ private:
     ASSOCIATED,
     WAIT_PROBE_RESP,
     WAIT_ASSOC_RESP,
+    WAIT_DISASSOC_ACK,
     BEACON_MISSED,
     REFUSED
   };
@@ -157,6 +159,7 @@ private:
    *
    * \return true if we are waiting for an association response from an AP, false otherwise
    */
+  bool IsWaitDisAssocTxOk (void) const;
   bool IsWaitAssocResp (void) const;
   /**
    * This method is called after we have not received a beacon from the AP
@@ -200,7 +203,7 @@ private:
   uint32_t GetAID (void) const;
   void SetRawDuration (Time interval);
   Time GetRawDuration (void) const;
-    
+
   void SendPspoll (void);
   void SendPspollIfnecessary (void);
   void S1gBeaconReceived (void);
@@ -209,8 +212,8 @@ private:
   bool Is(uint8_t blockbitmap, uint8_t j);
   void InsideBackoff (void);
   void RawSlotStartBackoff (void);
-    
-    
+
+
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
   void SetInRAWgroup(void);
@@ -232,6 +235,7 @@ private:
   Time m_assocRequestTimeout;
   EventId m_probeRequestEvent;
   EventId m_assocRequestEvent;
+  EventId m_disassocRequestEvent;
   EventId m_beaconWatchdog;
   Time m_beaconWatchdogEnd;
   uint32_t m_maxMissedBeacons;
@@ -239,7 +243,7 @@ private:
   bool fasTAssocType;
   uint16_t fastAssocThreshold;
     uint16_t assocVaule;
-  
+
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons
   virtual void DoDispose (void);

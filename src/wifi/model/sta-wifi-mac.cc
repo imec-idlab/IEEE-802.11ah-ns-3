@@ -118,6 +118,7 @@ StaWifiMac::StaWifiMac ()
   : m_state (BEACON_MISSED),
     m_probeRequestEvent (),
     m_assocRequestEvent (),
+    m_disassocRequestEvent (),
     m_beaconWatchdogEnd (Seconds (0.0))
 {
   NS_LOG_FUNCTION (this);
@@ -501,6 +502,25 @@ StaWifiMac::SendProbeRequest (void)
                                              &StaWifiMac::ProbeRequestTimeout, this);
 }
 
+
+void
+StaWifiMac::TxOk (const WifiMacHeader &hdr)
+{
+  NS_LOG_FUNCTION (this);
+  RegularWifiMac::TxOk (hdr);
+
+  if (hdr.IsDisassociation ()
+      && IsWaitDisAssocTxOk ())
+    {
+      NS_LOG_UNCOND ( GetAddress () << " disassociation request is received bt " << hdr.GetAddr1 () );
+      SetState (REFUSED);  //use REFUSED
+      if (m_disassocRequestEvent.IsRunning ())
+        {
+          m_disassocRequestEvent.Cancel ();
+        }
+    }
+}
+
 void
 StaWifiMac::SendDisAssociationRequest (void)
 {
@@ -515,29 +535,36 @@ StaWifiMac::SendDisAssociationRequest (void)
     Ptr<Packet> packet = Create<Packet> ();
     MgtDisAssocRequestHeader disassoc;
     disassoc.SetSsid (GetSsid ());
-    
+
     if (m_htSupported)
     {
         disassoc.SetHtCapabilities (GetHtCapabilities ());
         hdr.SetNoOrder ();
     }
-    
+
     if (m_s1gSupported)
     {
         disassoc.SetS1gCapabilities (GetS1gCapabilities ());
-        NS_LOG_UNCOND ("StaWifiMac::SendDisAssociationRequest (void)");
-        
+        NS_LOG_UNCOND (GetAddress () << " StaWifiMac::SendDisAssociationRequest ");
+
     }
-    
-    SetState (REFUSED);  // temporary used, should create another state
+
+    SetState (WAIT_DISASSOC_ACK);  // temporary used, should create another state
     m_aid = 8192; //ensure disassociated station is not affected by Raw
     packet->AddHeader (disassoc);
     m_dca->Queue (packet, hdr);
 
     //to do, check weather Disassociation request is received by Ap or not.
+    if (m_disassocRequestEvent.IsRunning ())
+      {
+        m_disassocRequestEvent.Cancel ();
+      }
+    m_disassocRequestEvent = Simulator::Schedule (m_assocRequestTimeout,
+                                             &StaWifiMac::SendDisAssociationRequest, this);
+                                             //use same timeout as assocRequest
 
 }
-    
+
 void
 StaWifiMac::SendAssociationRequest (void)
 {
@@ -629,6 +656,7 @@ StaWifiMac::TryToEnsureAssociated (void)
        */
       break;
     case REFUSED:
+    case WAIT_DISASSOC_ACK:
       /* we have sent an assoc request and received a negative
          assoc resp. We wait until someone restarts an
          association with a given ssid.
@@ -695,6 +723,12 @@ bool
 StaWifiMac::IsWaitAssocResp (void) const
 {
   return m_state == WAIT_ASSOC_RESP;
+}
+
+bool
+StaWifiMac::IsWaitDisAssocTxOk (void) const
+{
+  return m_state == WAIT_DISASSOC_ACK;
 }
 
 void

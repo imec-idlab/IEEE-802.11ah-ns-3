@@ -901,12 +901,15 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
               uint8_t aid_l = mac[5];
               uint8_t aid_h = mac[4] & 0x1f;
               uint16_t aid = (aid_h << 8) | (aid_l << 0);
-              NS_LOG_UNCOND (from << "  Disassociation");
+              NS_LOG_UNCOND ("Disassociation request from aid " << aid);
 
              for (std::vector<uint16_t>::iterator it = m_sensorList.begin(); it != m_sensorList.end(); it++)
                 {
                     if (*it == aid)
-                        m_sensorList.erase (it); //remove from association list
+                    {   m_sensorList.erase (it); //remove from association list
+                        NS_LOG_UNCOND ("erase aid " << aid << " by Ap from m_sensorList ");
+                        break;
+                    }
                 }
               return;
             }

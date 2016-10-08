@@ -89,7 +89,8 @@ public:
     void SetTransInOneBeacon (uint16_t num);
 
 
-
+    std::vector<uint16_t> m_transIntervalList;
+    uint16_t m_transIntervalListSize;
     
     UpdateInfo m_snesorUpdatInfo;
     
@@ -109,6 +110,8 @@ private:
     
     uint16_t m_receivedNum;
     uint64_t last2_transmissionInterval;
+    
+    uint16_t m_index;
     
     bool m_everSuccess;
 };

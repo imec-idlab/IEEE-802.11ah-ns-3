@@ -68,6 +68,8 @@ Sensor::Sensor ()
     m_transmissionIntervalMax =1;
     m_transmissionIntervalMin = 1;
     m_transInOneBeacon = 1;
+    m_transIntervalListSize = 5;
+    m_index = 0;
 }
 
 Sensor::~Sensor ()
@@ -271,6 +273,10 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
             //initialize UpdateInfo struct
             m_sta->SetEverSuccess (false);
             m_sta->m_snesorUpdatInfo = (UpdateInfo){currentId,currentId,currentId,false,currentId,currentId,currentId,false};
+            for (uint16_t i = 0; i < m_sta->m_transIntervalListSize; i++)
+            {
+                m_sta->m_transIntervalList.push_back(1);
+            }
             //
             m_stations.push_back (m_sta); // should create a Dispose function?
             //
@@ -285,28 +291,33 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
             m_lastTransmissionList.push_back (*ci);
         }
     }
-    
+
     bool disassoc;
-    for (StationsCI it = m_stations.begin(); it != m_stations.end(); it++)
+    //for (StationsCI it = m_stations.begin(); it != m_stations.end(); it++)
+    StationsCI itcheck = m_stations.begin();
+    for (uint16_t i = 0; i < m_stations.size(); i++)
+
     {
         disassoc = true;
         for (std::vector<uint16_t>::iterator ci = m_sensorlist.begin(); ci != m_sensorlist.end(); ci++)
         {
-            if ((*it)->GetAid ()  == *ci)
+            if ((*itcheck)->GetAid ()  == *ci)
              {
                  disassoc = false;
+                 if (i < m_stations.size() - 1)
+                     itcheck++;  //avoid itcheck increase to m_sensorlist.end()
                  break;
              }
-            
         }
-        
+
       if (disassoc == true)
         {
-            NS_LOG_UNCOND ( "Aid " << (*it)->GetAid () << " erased since disassociated = ");
-            m_stations.erase(it);
-
+            NS_LOG_UNCOND ( "Aid " << (*itcheck)->GetAid () << " erased from m_stations since disassociated");
+            m_stations.erase(itcheck);
         }
     }
+
+
 
     NS_LOG_UNCOND ("m_aidList.size() = " << m_aidList.size() << ", m_receivedAid = " << m_receivedAid.size () << ", m_stations.size() = " << m_stations.size() << ", currentId = " << currentId);
 
@@ -346,6 +357,14 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
                   {
                       stationTransmit->m_snesorUpdatInfo = (UpdateInfo){currentId-1,currentId-1,currentId-1,false,currentId-1,currentId-1,currentId-1,false};
                       stationTransmit->SetEverSuccess (true);
+                      /*for (uint16_t i = 0; i < stationTransmit->m_transIntervalListSize; i++)
+                      {
+                          stationTransmit->m_transIntervalList.push_back(1);
+                      }*/
+                      for (std::vector<uint16_t>::iterator ci = stationTransmit->m_transIntervalList.begin(); ci != stationTransmit->m_transIntervalList.end(); ci++)
+                      {
+                          (*ci) = 1;
+                      }
                   }
 
                 stationTransmit->m_snesorUpdatInfo.lastTryBFpreSuccessId = stationTransmit->m_snesorUpdatInfo.lastTryBFCurrentSuccessId; //update, swith current to pre
@@ -357,6 +376,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
 
                 stationTransmit->m_snesorUpdatInfo.preTrySuccess = stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess;
                 stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess = true;
+
                 goto EstimateInterval;
               }
          }
@@ -445,6 +465,10 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
              {
                  stationTransmit->m_snesorUpdatInfo = (UpdateInfo){currentId-1,currentId-1,currentId-1,false,currentId-1,currentId-1,currentId-1,false};
                  stationTransmit->SetEverSuccess (true);
+                 for (std::vector<uint16_t>::iterator ci = stationTransmit->m_transIntervalList.begin(); ci != stationTransmit->m_transIntervalList.end(); ci++)
+                 {
+                     (*ci) = 1;
+                 }
              }
              stationTransmit->SetTransmissionSuccess (true);
 
@@ -459,7 +483,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
              stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess = true;
 
              //NS_LOG_UNCOND ("stations of aid " << *it << " received " << m_numReceived << " packets");
-            
+
             for (std::vector<uint16_t>::iterator ct = m_receivedAid.begin(); ct != m_receivedAid.end(); ct++)
             {
                 if (*ci == *ct)
@@ -467,7 +491,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
                     m_numReceived++;
                 }
             }
-            
+
              APId.clear ();
              APId.str ("");
              APId << (*ci);
@@ -477,7 +501,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
              outputfile.open (sensorfile, std::ios::out | std::ios::app);
              outputfile << currentId << "\t" << "0" << "\t" << m_numReceived << "\t" << stationTransmit->GetTransInOneBeacon () << "\n";
              outputfile.close();
-            
+
              stationTransmit->SetNumPacketsReceived (m_numReceived);
              stationTransmit->EstimateTransmissionInterval (currentId, m_beaconInterval);
         }
@@ -503,6 +527,7 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
 {
     if (m_snesorUpdatInfo.preTrySuccess && m_transmissionSuccess)
      {
+         m_index = 0;
         last2_transmissionInterval = last_transmissionInterval;
         last_transmissionInterval = m_transmissionInterval;
         /*
@@ -515,12 +540,25 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
 
          if (GetNumPacketsReceived () > 1 && m_transmissionInterval > 1)
            {
-             m_transmissionIntervalMin = last_transmissionInterval - 1;
-             m_transmissionIntervalMax = last_transmissionInterval - 1;
+             //m_transmissionIntervalMin = last_transmissionInterval - 1;
+             //m_transmissionIntervalMax = last_transmissionInterval - 1;
+             m_transmissionInterval = m_transmissionInterval - 1;
              m_transInOneBeacon = 1;
+               uint16_t intervalsum = m_transmissionInterval;
+
+               for (std::vector<uint16_t>::iterator ci = m_transIntervalList.begin(); ci != m_transIntervalList.end(); ci++)
+               {
+                   intervalsum = intervalsum + *ci;
+               }
+
+               m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1);
+               m_transIntervalList.pop_back ();
+               m_transIntervalList.push_back(m_transmissionInterval);
            }
          else if (GetNumPacketsReceived () > 1 && m_transmissionInterval == 1)
           {
+              m_transIntervalList.pop_back ();
+              m_transIntervalList.push_back(m_transmissionInterval);
              if ( GetNumPacketsReceived () > m_transInOneBeacon)
               {
                   m_transInOneBeacon++;
@@ -533,24 +571,47 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
          else if (GetNumPacketsReceived () == 1)
           {
              m_transInOneBeacon = 1;
+             //m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId;
+              m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
+              m_transIntervalList.pop_back ();
+              m_transIntervalList.push_back(m_transmissionInterval);
           }
 
          //NS_LOG_UNCOND ("aid = " << m_aid << " ,m_transmissionIntervalMin = " << m_transmissionIntervalMin << ", m_transmissionIntervalMin = " << m_transmissionIntervalMax << " , GetNumPacketsReceived = " << GetNumPacketsReceived ()<< ", m_transmissionInterval = " << m_transmissionInterval);
      }
     else if (m_transmissionSuccess == true && m_snesorUpdatInfo.preTrySuccess == false)
      {
-        m_transmissionIntervalMin = m_snesorUpdatInfo.CurrentUnSuccessId - m_snesorUpdatInfo.preSuccessId + 1;
+        //m_transmissionIntervalMin = m_snesorUpdatInfo.CurrentUnSuccessId - m_snesorUpdatInfo.preSuccessId + 1;
         //necessary to update Min here, in order to update min properly when first packets received.
         //m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.lastTryBFpreSuccessId - 1;
-         m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId;
+         //m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId;
+         m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
+         m_index = 0;
+         uint16_t intervalsum = m_transmissionInterval;
 
+         for (std::vector<uint16_t>::iterator ci = m_transIntervalList.begin(); ci != m_transIntervalList.end(); ci++)
+         {
+             intervalsum = intervalsum + *ci;
+         }
+
+         m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1);
+         m_transIntervalList.pop_back ();
+         m_transIntervalList.push_back(m_transmissionInterval);
      }
     else
      {
-        m_transmissionIntervalMin = currentId - m_snesorUpdatInfo.CurrentSuccessId + 1;
+        //m_transmissionIntervalMin = currentId - m_snesorUpdatInfo.CurrentSuccessId + 1;
         //m_transmissionIntervalMax remains
+         m_transInOneBeacon = 1;
+
+        m_index++;
+        m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
+        m_transmissionInterval = m_transmissionInterval + 2*m_index - 1;
+        m_transIntervalList.pop_back ();
+        m_transIntervalList.push_back(m_transmissionInterval);
      }
-    
+    //NS_LOG_UNCOND ("aid = " << GetAid () <<  ",  m_transmissionInterval = " << m_transmissionInterval << ", m_index = " << m_index << ", m_transIntervalListSize = " << m_transIntervalList.size());
+
     /*
     if (m_transmissionIntervalMax < m_transmissionIntervalMin)
      {
@@ -558,7 +619,7 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
          m_transmissionIntervalMax = m_transmissionIntervalMin;
      }*/
     //NS_LOG_UNCOND ("aid = " << m_aid << " ,m_transmissionIntervalMin = " << m_transmissionIntervalMin << ", m_transmissionIntervalMax = " << m_transmissionIntervalMax );
-    m_transmissionInterval = (m_transmissionIntervalMin + m_transmissionIntervalMax)/2;
+    //m_transmissionInterval = (m_transmissionIntervalMin + m_transmissionIntervalMax)/2;
     uint64_t m_nextId = m_snesorUpdatInfo.CurrentSuccessId + m_transmissionInterval; ////** AP update info after RAW ends(right before next beacon is sent)
     EstimateNextTransmissionId (m_nextId);
     //NS_LOG_UNCOND (m_snesorUpdatInfo.lastTryBFpreSuccessId << "," << m_snesorUpdatInfo.lastTryBFCurrentSuccessId << ", " << m_snesorUpdatInfo.preSuccessId << ", " << currentId << ", " << m_snesorUpdatInfo.preTrySuccess << ", " << m_snesorUpdatInfo.preUnsuccessId);
