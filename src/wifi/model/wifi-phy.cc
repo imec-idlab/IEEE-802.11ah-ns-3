@@ -498,7 +498,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
         if (packetType == 1 && preamble != WIFI_PREAMBLE_NONE)
           {
             //First packet in an A-MPDU
-            numSymbols = ceil ((16 + size * 8.0 + 6) / numDataBitsPerSymbol);
+            numSymbols = ceil ((8 + size * 8.0 + 6) / numDataBitsPerSymbol);
             if (incFlag == 1)
               {
                 m_totalAmpduSize += size;
@@ -519,7 +519,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
           {
             //last packet in an A-MPDU
             uint32_t totalAmpduSize = m_totalAmpduSize + size;
-            numSymbols = lrint (ceil ((16 + totalAmpduSize * 8.0 + 6) / numDataBitsPerSymbol));
+            numSymbols = lrint (ceil ((8 + totalAmpduSize * 8.0 + 6) / numDataBitsPerSymbol));
             numSymbols -= m_totalAmpduNumSymbols;
             if (incFlag == 1)
               {
@@ -530,7 +530,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
         else if (packetType == 0 && preamble != WIFI_PREAMBLE_NONE)
           {
             //Not an A-MPDU
-            numSymbols = lrint (ceil ((16 + size * 8.0 + 6.0) / numDataBitsPerSymbol));
+            numSymbols = lrint (ceil ((8 + size * 8.0 + 6.0) / numDataBitsPerSymbol));
           }
         else
           {
@@ -602,7 +602,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
         if (packetType == 1 && preamble != WIFI_PREAMBLE_NONE)
           {
             //First packet in an A-MPDU
-            numSymbols = ceil (m_Stbc * (16 + size * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol));
+            numSymbols = ceil (m_Stbc * (8 + size * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol));
             if (incFlag == 1)
               {
                 m_totalAmpduSize += size;
@@ -623,7 +623,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
           {
             //last packet in an A-MPDU
             uint32_t totalAmpduSize = m_totalAmpduSize + size;
-            numSymbols = lrint (m_Stbc * ceil ((16 + totalAmpduSize * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
+            numSymbols = lrint (m_Stbc * ceil ((8 + totalAmpduSize * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
             NS_ASSERT (m_totalAmpduNumSymbols <= numSymbols);
             numSymbols -= m_totalAmpduNumSymbols;
             if (incFlag == 1)
@@ -635,7 +635,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
         else if (packetType == 0 && preamble != WIFI_PREAMBLE_NONE)
           {
             //Not an A-MPDU
-            numSymbols = lrint (m_Stbc * ceil ((16 + size * 8.0 + 6.0 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
+            numSymbols = lrint (m_Stbc * ceil ((8 + size * 8.0 + 6.0 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
           }
         else
           {
@@ -728,7 +728,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
         if (packetType == 1 && preamble != WIFI_PREAMBLE_NONE)
           {
             //First packet in an A-MPDU
-            numSymbols = ceil(m_Stbc*(16 + size * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol));
+            numSymbols = ceil(m_Stbc*(8 + size * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol));
             if (incFlag == 1)
               {
                 m_totalAmpduSize += size;
@@ -749,7 +749,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
             {
               //last packet in an A-MPDU
               uint32_t totalAmpduSize = m_totalAmpduSize+size;
-              numSymbols = lrint (m_Stbc* ceil((16 + totalAmpduSize * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
+              numSymbols = lrint (m_Stbc* ceil((8 + totalAmpduSize * 8.0 + 6 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
               NS_ASSERT (m_totalAmpduNumSymbols <= numSymbols);
               numSymbols -= m_totalAmpduNumSymbols;
               if (incFlag == 1)
@@ -761,7 +761,7 @@ WifiPhy::GetPayloadDuration (uint32_t size, WifiTxVector txvector, WifiPreamble 
            else if (packetType == 0 && preamble != WIFI_PREAMBLE_NONE)
              //Not an A-MPDU
              {
-               numSymbols = lrint (m_Stbc*ceil ((16 + size * 8.0 + 6.0 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
+               numSymbols = lrint (m_Stbc*ceil ((8 + size * 8.0 + 6.0 * Nes) / (m_Stbc * numDataBitsPerSymbol)));
              }
            else
              {

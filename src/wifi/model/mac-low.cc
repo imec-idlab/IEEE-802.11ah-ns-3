@@ -753,7 +753,7 @@ MacLow::SendPspoll ()  //packet is null for ps-poll frame
       }
     else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
       {
-        preamble = WIFI_PREAMBLE_S1G_SHORT;
+        preamble = WIFI_PREAMBLE_S1G_LONG;
       }
     else //Otherwise, RTS should always use non-HT PPDU (HT PPDU cases not supported yet)
       {
@@ -1869,7 +1869,7 @@ MacLow::SendRtsForPacket (void)
     }
   else if (m_phy->GetS1gLongfield () && m_stationManager->GetS1gLongfieldSupported (m_currentHdr.GetAddr1 ()))
     {
-      preamble = WIFI_PREAMBLE_S1G_SHORT;
+      preamble = WIFI_PREAMBLE_S1G_LONG;
     }
   else //Otherwise, RTS should always use non-HT PPDU (HT PPDU cases not supported yet)
     {
@@ -2055,7 +2055,6 @@ MacLow::SendDataPacket (void)
     {
       preamble = WIFI_PREAMBLE_LONG;
     }
-
   StartDataTxTimers (dataTxVector);
 
   Time duration = Seconds (0.0);
@@ -2419,11 +2418,15 @@ MacLow::SendAckAfterData (Mac48Address source, Time duration, WifiMode dataTxMod
   packet->AddPacketTag (tag);
   
   WifiPreamble preamble;
-  if (ackTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
+  if (ackTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G && ackTxVector.GetMode ().GetBandwidth () == 1000000)
     {
       //to do
       // implement P802.11AH_D4.0, 9.7.6.6
-      preamble = WIFI_PREAMBLE_S1G_SHORT;
+      preamble = WIFI_PREAMBLE_S1G_1M;
+    }
+  else if (ackTxVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G )
+    {
+       preamble = WIFI_PREAMBLE_S1G_SHORT;
     }
   else
     {

@@ -174,7 +174,7 @@ YansWifiPhy::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddAttribute ("S1gShortfieldEnabled",
                    "Whether or not STBC is enabled.",
-                   BooleanValue (true),   // for test, temporarily
+                   BooleanValue (false),   // for test, temporarily
                    MakeBooleanAccessor (&YansWifiPhy::GetS1gShortfield,
                                         &YansWifiPhy::SetS1gShortfield),
                    MakeBooleanChecker ())
