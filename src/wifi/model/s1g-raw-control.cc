@@ -210,7 +210,7 @@ S1gRawCtr::S1gRawCtr ()
    m_offloadFailedMax = 5;
    sensorpacketsize = 1;
    offloadpacketsize = 1;
-   m_slotDurationCount = 16;
+   m_slotDurationCount = 34;
 
 
     m_rawslotDuration = (m_slotDurationCount*120) +500; //for test.
@@ -289,6 +289,8 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
             outputfile.close();
             //
             m_lastTransmissionList.push_back (*ci);
+            NS_LOG_UNCOND ("initial, aid = " << *ci);
+
         }
     }
 
@@ -401,6 +403,7 @@ S1gRawCtr::UdpateSensorStaInfo (std::vector<uint16_t> m_sensorlist, std::vector<
 
             stationTransmit->m_snesorUpdatInfo.preUnsuccessId = stationTransmit->m_snesorUpdatInfo.CurrentUnSuccessId; //update, swith current to pre
             stationTransmit->m_snesorUpdatInfo.CurrentUnSuccessId = currentId;
+            stationTransmit->m_snesorUpdatInfo.preSuccessId = stationTransmit->m_snesorUpdatInfo.CurrentSuccessId;
 
             stationTransmit->m_snesorUpdatInfo.preTrySuccess = stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess;
             stationTransmit->m_snesorUpdatInfo.CurrentTrySuccess = false;
@@ -545,20 +548,26 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
              m_transmissionInterval = m_transmissionInterval - 1;
              m_transInOneBeacon = 1;
                uint16_t intervalsum = m_transmissionInterval;
-
+               /*
                for (std::vector<uint16_t>::iterator ci = m_transIntervalList.begin(); ci != m_transIntervalList.end(); ci++)
                {
                    intervalsum = intervalsum + *ci;
                }
 
-               m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1);
+               m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1); */
                m_transIntervalList.pop_back ();
-               m_transIntervalList.push_back(m_transmissionInterval);
+               
+               std::vector<uint16_t>::iterator ci;
+               ci = m_transIntervalList.begin();
+               m_transIntervalList.insert (ci,m_transmissionInterval);
            }
          else if (GetNumPacketsReceived () > 1 && m_transmissionInterval == 1)
           {
               m_transIntervalList.pop_back ();
-              m_transIntervalList.push_back(m_transmissionInterval);
+              
+              std::vector<uint16_t>::iterator ci;
+              ci = m_transIntervalList.begin();
+              m_transIntervalList.insert (ci,m_transmissionInterval);
              if ( GetNumPacketsReceived () > m_transInOneBeacon)
               {
                   m_transInOneBeacon++;
@@ -574,7 +583,10 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
              //m_transmissionIntervalMax = currentId - m_snesorUpdatInfo.preSuccessId;
               m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
               m_transIntervalList.pop_back ();
-              m_transIntervalList.push_back(m_transmissionInterval);
+              
+              std::vector<uint16_t>::iterator ci;
+              ci = m_transIntervalList.begin();
+              m_transIntervalList.insert (ci,m_transmissionInterval);
           }
 
          //NS_LOG_UNCOND ("aid = " << m_aid << " ,m_transmissionIntervalMin = " << m_transmissionIntervalMin << ", m_transmissionIntervalMin = " << m_transmissionIntervalMax << " , GetNumPacketsReceived = " << GetNumPacketsReceived ()<< ", m_transmissionInterval = " << m_transmissionInterval);
@@ -588,15 +600,19 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
          m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
          m_index = 0;
          uint16_t intervalsum = m_transmissionInterval;
-
+         /*
          for (std::vector<uint16_t>::iterator ci = m_transIntervalList.begin(); ci != m_transIntervalList.end(); ci++)
          {
              intervalsum = intervalsum + *ci;
+             //NS_LOG_UNCOND ("aid = " << GetAid () <<  ",  list = " << *ci);
          }
 
-         m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1);
+         m_transmissionInterval = intervalsum/(m_transIntervalListSize + 1); */
          m_transIntervalList.pop_back ();
-         m_transIntervalList.push_back(m_transmissionInterval);
+         
+         std::vector<uint16_t>::iterator ci;
+         ci = m_transIntervalList.begin();
+         m_transIntervalList.insert (ci,m_transmissionInterval);
      }
     else
      {
@@ -608,9 +624,12 @@ Sensor::EstimateTransmissionInterval (uint64_t currentId, uint64_t m_beaconInter
         m_transmissionInterval = currentId - m_snesorUpdatInfo.preSuccessId;
         m_transmissionInterval = m_transmissionInterval + 2*m_index - 1;
         m_transIntervalList.pop_back ();
-        m_transIntervalList.push_back(m_transmissionInterval);
+         
+         std::vector<uint16_t>::iterator ci;
+         ci = m_transIntervalList.begin();
+         m_transIntervalList.insert (ci,m_transmissionInterval);
      }
-    //NS_LOG_UNCOND ("aid = " << GetAid () <<  ",  m_transmissionInterval = " << m_transmissionInterval << ", m_index = " << m_index << ", m_transIntervalListSize = " << m_transIntervalList.size());
+    //NS_LOG_UNCOND ("aid = " << GetAid () <<  ",  m_transmissionInterval = " << m_transmissionInterval << ", m_index = " << m_index << ", m_transIntervalListSize = " << m_transIntervalList.size() << ", m_snesorUpdatInfo.preSuccessId = " << m_snesorUpdatInfo.preSuccessId);
 
     /*
     if (m_transmissionIntervalMax < m_transmissionIntervalMin)
@@ -643,6 +662,8 @@ S1gRawCtr::calculateSensorNumWantToSend ()
           //NS_ASSERT ((*it)->GetEstimateNextTransmissionId () >= currentId);
         if ((*it)->GetEstimateNextTransmissionId () <= currentId)
           {
+              //NS_LOG_UNCOND ("Sensor = " << (*it)->GetAid () << ", want to send  = " << (*it)->GetTransInOneBeacon ());
+
             m_numSensorWantToSend++;
             if ((*it)->GetTransInOneBeacon () > (m_beaconInterval-m_beaconOverhead)/m_rawslotDuration - 1)
               {
@@ -717,6 +738,7 @@ S1gRawCtr::SetSensorAllowedToSend ()
    NS_LOG_UNCOND ("m_numSendSensorWant = " << m_numSendSensorWant << ", numAllowed based on faireness = " << numAllowed);
 
    uint32_t SendNum = 0;
+     
    std::vector<uint16_t>::iterator it = m_lastTransmissionList.begin();
    //for (std::vector<uint16_t>::iterator it = m_lastTransmissionList.begin(); it != m_lastTransmissionList.end(); it++)
     for (uint16_t i = 0; i < m_lastTransmissionList.size (); i++)
@@ -724,6 +746,7 @@ S1gRawCtr::SetSensorAllowedToSend ()
          Sensor * stationTransmit;
          if (LookupSensorSta (*it) == nullptr) //disassociated station
            {
+             m_lastTransmissionList.erase (it);
              it++;
              continue;
            }
