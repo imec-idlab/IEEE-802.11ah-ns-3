@@ -210,15 +210,15 @@ S1gRawCtr::S1gRawCtr ()
    m_offloadFailedMax = 5;
    sensorpacketsize = 1;
    offloadpacketsize = 1;
-   m_slotDurationCount = 34;
+   m_slotDurationCount = 15;
 
 
     m_rawslotDuration = (m_slotDurationCount*120) +500; //for test.
     m_offloadRawslotDuration = (m_slotDurationCount*120) +500;
     currentId = 1;
-    m_beaconOverhead = 100; // us
+    m_beaconOverhead = 0; // us
 
-    MaxSlotForSensor = 42; //In order to guarantee channel for offload stations.
+    MaxSlotForSensor = 40; //In order to guarantee channel for offload stations.
     m_rps = new RPS;
 
 }
@@ -952,6 +952,7 @@ S1gRawCtr::SetOffloadAllowedToSend ()
     m_numOffloadAllowedToSend =  std::min(m_numOffloadStaActive, numAllowed);
     if (m_numOffloadAllowedToSend == 0)
       {
+          m_offloadRawslotDuration = ((m_beaconInterval-m_beaconOverhead) - m_numSendSensorAllowed * m_rawslotDuration);
           return;
       }
 
@@ -1124,14 +1125,21 @@ S1gRawCtr::configureRAW ( )
 
 
     //NS_LOG_UNCOND ("m_aidList =" << m_aidList.size () << ", m_aidOffloadList=" << m_aidOffloadList.size ());
+    
+    m_beaconOverhead = ((m_aidList.size () * 6 + 60) * 8 + 14 )/12 * 40 + 560;
+    NS_LOG_UNCOND ("m_beaconOverhead = " << m_beaconOverhead);
 
+    
     for (std::vector<uint16_t>::iterator it = m_aidList.begin(); it != m_aidList.end(); it++)
       {
 
           RPS::RawAssignment *m_raw = new RPS::RawAssignment;
           Sensor * stationTransmit = LookupSensorSta (*it);
           uint16_t num = stationTransmit->GetTransInOneBeacon ();
-          SlotDurationCount = (num * m_rawslotDuration - 500)/120;
+          //SlotDurationCount = (num * m_rawslotDuration - 500)/120;
+          uint64_t revisedslotduration = std::ceil(num * (m_beaconInterval-m_beaconOverhead) * 1.0 / m_numSendSensorAllowed);
+          SlotDurationCount = std::ceil((revisedslotduration - 500.0)/120.0);
+
           NS_ASSERT (SlotDurationCount <= 2037);
 
 
@@ -1157,6 +1165,29 @@ S1gRawCtr::configureRAW ( )
           m_rps->SetRawAssignment(*m_raw);
           delete m_raw;
       }
+    
+    //set remaining channel to another raw
+    /*
+    RPS::RawAssignment *m_rawAll = new RPS::RawAssignment;
+    SlotDurationCount = (m_offloadRawslotDuration - 500)/120;
+    NS_ASSERT (SlotDurationCount <= 2037);
+    
+    m_rawAll->SetRawControl (RawControl);//support paged STA or not
+    m_rawAll->SetSlotCrossBoundary (SlotCrossBoundary);
+    m_rawAll->SetSlotFormat (SlotFormat);
+    m_rawAll->SetSlotDurationCount (SlotDurationCount);//to change
+    m_rawAll->SetSlotNum (SlotNum);
+    aid_start = 1;
+    aid_end = m_stations.size();
+    NS_LOG_UNCOND ("sensor, aid_start =" << aid_start << ", aid_end=" << aid_end << ", SlotDurationCount = " << SlotDurationCount);
+    
+    rawinfo = (aid_end << 13) | (aid_start << 2) | page;
+    m_rawAll->SetRawGroup (rawinfo);
+    
+    m_rps->SetRawAssignment(*m_rawAll);
+    delete m_rawAll;
+    //finished
+    */
 
 
 

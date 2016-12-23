@@ -1144,6 +1144,7 @@ WifiMacHeader::SetFrameControl (bool S1gBeacon, uint16_t ctrl)
       m_security = (ctrl >> 14) & 0x01;
       m_AP_PM = (ctrl >> 15) & 0x01;
       NS_ASSERT (m_ctrlType == TYPE_EXTENSION && m_ctrlSubtype == 1);
+      m_ctrlMoreFrag = 0;
     }
   else
     {
