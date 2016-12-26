@@ -605,7 +605,7 @@ ApWifiMac::SendOneBeacon (void)
       compatibility.SetBeaconInterval (m_beaconInterval.GetMicroSeconds ());
       beacon.SetBeaconCompatibility (compatibility);
      
-      /*RPS *m_rps;
+      RPS *m_rps;
       static uint16_t RpsIndex = 0;
       if (RpsIndex < m_rpsset.rpsset.size())
          {
@@ -619,15 +619,15 @@ ApWifiMac::SendOneBeacon (void)
             NS_LOG_DEBUG ("RpsIndex =" << RpsIndex);
             RpsIndex = 1;
           }
-      beacon.SetRPS (*m_rps);*/
-        
+      beacon.SetRPS (*m_rps);
+      /*
       RPS m_rps;
       NS_LOG_UNCOND ("send beacon at" << Simulator::Now ());
       m_S1gRawCtr.deleteRps ();
       m_rps = m_S1gRawCtr.UpdateRAWGroupping (m_sensorList, m_OffloadList, m_receivedAid, m_beaconInterval.GetMicroSeconds (), m_outputpath);
       m_receivedAid.clear (); //release storage
       //m_rps = m_S1gRawCtr.GetRPS ();
-      beacon.SetRPS (m_rps);
+      beacon.SetRPS (m_rps); */
 
       AuthenticationCtrl  AuthenCtrl;
       AuthenCtrl.SetControlType (false); //centralized

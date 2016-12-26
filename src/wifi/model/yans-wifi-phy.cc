@@ -586,7 +586,7 @@ YansWifiPhy::StartReceivePreambleAndHeader (Ptr<Packet> packet,
 {
   //This function should be later split to check separately wether plcp preamble and plcp header can be successfully received.
   //Note: plcp preamble reception is not yet modeled.
-  //NS_LOG_UNCOND (this << packet << rxPowerDbm << txVector.GetMode () << preamble << (uint32_t)packetType); //test
+  //NS_LOG_UNCOND (packet << "\t" << rxPowerDbm << " dbm " << "\t" << txVector.GetMode () << "\t" << packet->GetSize ()); //test
   NS_LOG_FUNCTION (this << packet << rxPowerDbm << txVector.GetMode () << preamble << (uint32_t)packetType);
   AmpduTag ampduTag;
   rxPowerDbm += m_rxGainDb;

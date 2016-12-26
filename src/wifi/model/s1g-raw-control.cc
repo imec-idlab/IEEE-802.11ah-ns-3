@@ -996,6 +996,8 @@ S1gRawCtr::GetRPS ()
 RPS
 S1gRawCtr::UpdateRAWGroupping (std::vector<uint16_t> m_sensorlist, std::vector<uint16_t> m_OffloadList, std::vector<uint16_t> m_receivedAid, uint64_t BeaconInterval, std::string outputpath)
  {
+     NS_ASSERT ("S1gRawCtr should not be called");
+     
      m_beaconInterval = BeaconInterval;
      //currentId++; //beaconInterval counter
      //work here
