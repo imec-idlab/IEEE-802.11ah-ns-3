@@ -3,7 +3,7 @@
 * Change into ./802.11ah-ns3/ns-3 directory.  
 * Build and run:
 
-    ./waf --run "s1g-mac-test --seed=1 --simulationTime=60 --payloadSize=256 --Nsta=32 --NRawSta=32 --BeaconInterval=100000 --DataMode="OfdmRate7_8MbpsBW2MHz" --datarate=7.8  --bandWidth=2 --rho="50" --TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt" --S1g1MfieldEnabled=false --RAWConfigFile="./OptimalRawGroup/RawConfig-32-1-4.txt" "
+    ./waf --run "s1g-mac-test --seed=1 --simulationTime=60 --payloadSize=256 --Nsta=32 --NRawSta=32 --BeaconInterval=100000 --DataMode="OfdmRate7_8MbpsBW2MHz" --datarate=7.8  --bandWidth=2 --rho="50" --TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt" --S1g1MfieldEnabled=false --RAWConfigFile="./OptimalRawGroup/RawConfig-32-2-2.txt" "
 
 Note: if errors related to nullptr arise when compiling, CXXFLAGS should be included into the "./waf configure" command,as follows:   
 
@@ -14,7 +14,7 @@ CXXFLAGS="-std=c++0x" ./waf configure --disable-examples --disable-tests
 * NRawSta:             Number of stations supporting RAW. 
 * RAWConfigFile:       RAW configuration are stored in this file.
 
-      The RAWConfigFile "./OptimalRawGroup/RawConfig-32-1-4.txt" used in the above command sets 1 RAW group and 4 RAW slots for 32 stations. This file contains three lines:
+      The RAWConfigFile "./OptimalRawGroup/RawConfig-32-2-2.txt" used in the above command sets 2 RAW group for 32 stations, each RAW group contains 2 RAW slots. This file contains three lines:
 
     2                                                                                                          
     0	1	1	412	2	0	1	16	
