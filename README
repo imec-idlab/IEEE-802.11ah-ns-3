@@ -56,4 +56,4 @@ Notes:
 * rho:                Maximal distance between AP and stations.   
 * seed:               Seed of RandomVariableStream.
 * TrafficPath:        Include traffic of each stations, packet sending interval can be automatically calcualted based on payloadSize. The above TrafficPath "./OptimalRawGroup/traffic/data-32-0.82.txt" contains traffic of 32 stations, and the total traffic is 0.82 Mbps.
-* S1g1MfieldEnabled:     Packet using 1 Mhz if set to "true".
+* S1g1MfieldEnabled:     Packet using 1 Mhz bandwidth if set to "true".
