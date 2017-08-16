@@ -41,14 +41,15 @@ class TIM : public WifiInformationElement
 public:
   TIM ();
   ~TIM ();
-    
+
+
   enum BlockCoding
   {
     BLOCK_BITMAP = 0,
     SINGAL_AID = 1,
     // to do
   };
-    
+    /*
   class EncodedBlock
    {
       public:
@@ -77,7 +78,7 @@ public:
         uint8_t * m_subblock;
         uint8_t subb_length; //!< length of Subblock field
      };
-    
+    */
 
  
   /**
@@ -103,7 +104,7 @@ public:
    *
    * \Set the Partial Virtual Bitmap
    */
-  void SetPartialVBitmap (TIM::EncodedBlock block);
+  void SetPartialVBitmap (uint32_t map);
     
   /**
    * Return the TIM Count.
@@ -128,7 +129,7 @@ public:
    *
    * \Return the Partial Virtual Bitmap
    */
-  unsigned char * GetPartialVBitmap (void) const;
+  uint32_t GetPartialVBitmap (void) const;
     
 
   WifiInformationElementId ElementId () const;
@@ -136,14 +137,20 @@ public:
   void SerializeInformationField (Buffer::Iterator start) const;
   uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
     
+  virtual void Print (std::ostream &os) const;
+        
 
 private:
   uint8_t m_DTIMCount; //!< DTIM Count
   uint8_t m_DTIMPeriod; //!< DTIM Period
   uint8_t m_BitmapControl; //!< Bitmap Control
-  TIM::EncodedBlock m_encodeblock; //!< encoded block subfield of partial Virtual Bitmap field
+
+  // slightly simplified representation of the vbitmap
+  uint32_t m_partialVBitmap;
+
+  /*TIM::EncodedBlock m_encodeblock; //!< encoded block subfield of partial Virtual Bitmap field
   uint8_t * m_partialVBitmap;
-  uint8_t m_length; //!< length of partial Virtual Bitmap field
+  uint8_t m_length; //!< length of partial Virtual Bitmap field*/
 };
 
 

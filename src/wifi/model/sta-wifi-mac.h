@@ -92,6 +92,10 @@ public:
     void SetStaType (uint32_t statype);
     void SendDisAssociationRequest (void);
     void SendAssociationRequest (void);
+  /**
+   * Get Station AID.
+   */
+  uint32_t GetAID (void) const;
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;
@@ -197,10 +201,7 @@ private:
    * \param aid the AID received from assoc response frame
    */
   void SetAID (uint32_t aid);
-  /**
-   * Get Station AID.
-   */
-  uint32_t GetAID (void) const;
+
   void SetRawDuration (Time interval);
   Time GetRawDuration (void) const;
 

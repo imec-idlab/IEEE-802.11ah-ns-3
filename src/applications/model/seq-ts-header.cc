@@ -57,6 +57,13 @@ SeqTsHeader::GetTs (void) const
   return TimeStep (m_ts);
 }
 
+void
+SeqTsHeader::SetTs (Time ts)
+{
+  m_ts = ts.GetTimeStep();
+}
+
+
 TypeId
 SeqTsHeader::GetTypeId (void)
 {
@@ -98,8 +105,12 @@ SeqTsHeader::Deserialize (Buffer::Iterator start)
 {
   NS_LOG_FUNCTION (this << &start);
   Buffer::Iterator i = start;
-  m_seq = i.ReadNtohU32 ();
-  m_ts = i.ReadNtohU64 ();
+  if(i.CanRead(4))
+	  m_seq = i.ReadNtohU32 ();
+
+  if(i.CanRead(8))
+	  m_ts = i.ReadNtohU64 ();
+
   return GetSerializedSize ();
 }
 

@@ -34,6 +34,7 @@
 #include "ns3/rps.h"
 #include <utility> // std::pair
 #include <map>
+#include "tcpsim/Configuration.h"
 
 using namespace std;
 using namespace ns3;
@@ -46,7 +47,7 @@ uint32_t StaNum=0;
 string traffic_filepath;
 uint32_t payloadLength;
 NetDeviceContainer staDeviceCont;
-
+Configuration config;
 
 class assoc_record
 {
@@ -298,7 +299,7 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpServer", LOG_INFO);
 
 
-  double simulationTime = 10;
+  /*double simulationTime = 10;
   uint32_t seed = 1;
   uint32_t  payloadSize = 256;
   uint32_t Nsta =1;
@@ -315,10 +316,11 @@ int main (int argc, char *argv[])
   uint16_t Nactive;
   double poissonrate;
   bool S1g1MfieldEnabled;
-  string RAWConfigFile;
+  string RAWConfigFile;*/
     
+  config = Configuration(argc, argv);
 
-  CommandLine cmd;
+  /*CommandLine cmd;
   cmd.AddValue ("seed", "random seed", seed);
   cmd.AddValue ("simulationTime", "Simulation time in seconds", simulationTime);
   cmd.AddValue ("payloadSize", "Size of payload", payloadSize);
@@ -336,12 +338,12 @@ int main (int argc, char *argv[])
   cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
 
 
-  cmd.Parse (argc,argv);
+  cmd.Parse (argc,argv);*/
 
-  RngSeedManager::SetSeed (seed);
+  RngSeedManager::SetSeed (config.seed);
 
   NodeContainer wifiStaNode;
-  wifiStaNode.Create (Nsta);
+  wifiStaNode.Create (config.Nsta);
   NodeContainer wifiApNode;
   wifiApNode.Create (1);
 
@@ -353,7 +355,7 @@ int main (int argc, char *argv[])
   phy.SetErrorRateModel ("ns3::YansErrorRateModel");
   phy.SetChannel (channel.Create ());
   phy.Set ("ShortGuardEnabled", BooleanValue (false));
-  phy.Set ("ChannelWidth", UintegerValue (bandWidth));
+  phy.Set ("ChannelWidth", UintegerValue (config.bandWidth));
   phy.Set ("EnergyDetectionThreshold", DoubleValue (-110.0));
   phy.Set ("CcaMode1Threshold", DoubleValue (-113.0));
   phy.Set ("TxGain", DoubleValue (0.0));
@@ -363,7 +365,7 @@ int main (int argc, char *argv[])
   phy.Set ("TxPowerStart", DoubleValue (0.0));
   phy.Set ("RxNoiseFigure", DoubleValue (6.8));
   phy.Set ("LdpcEnabled", BooleanValue (true));
-  phy.Set ("S1g1MfieldEnabled", BooleanValue (S1g1MfieldEnabled));
+  phy.Set ("S1g1MfieldEnabled", BooleanValue (config.S1g1MfieldEnabled));
 
   WifiHelper wifi = WifiHelper::Default ();
   wifi.SetStandard (WIFI_PHY_STANDARD_80211ah);
@@ -373,7 +375,7 @@ int main (int argc, char *argv[])
 
   Ssid ssid = Ssid ("ns380211ah");
   StringValue DataRate;
-  DataRate = StringValue (DataMode);
+  DataRate = StringValue (config.DataMode);
 
     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate, "ControlMode", DataRate);
 
@@ -385,12 +387,12 @@ int main (int argc, char *argv[])
   staDevice = wifi.Install (phy, mac, wifiStaNode);
 
   RPSVector rps;
-  rps = configureRAW (rps, RAWConfigFile);
+  rps = configureRAW (rps, config.RAWConfigFile);
     
   mac.SetType ("ns3::ApWifiMac",
                  "Ssid", SsidValue (ssid),
-                 "BeaconInterval", TimeValue (MicroSeconds(BeaconInterval)),
-                 "NRawStations", UintegerValue (NRawSta),
+                 "BeaconInterval", TimeValue (MicroSeconds(config.BeaconInterval)),
+                 "NRawStations", UintegerValue (config.NRawSta),
                  "RPSsetup", RPSVectorValue (rps));
 
   NetDeviceContainer apDevice;
@@ -411,7 +413,7 @@ int main (int argc, char *argv[])
   mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
                                        "X", StringValue ("1000.0"),
                                        "Y", StringValue ("1000.0"),
-                                       "rho", StringValue (rho));
+                                       "rho", StringValue (config.rho));
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(wifiStaNode);
 
@@ -439,7 +441,7 @@ int main (int argc, char *argv[])
   apNodeInterface = address.Assign (apDevice);
 
   //trace association
-  for (uint16_t kk=0; kk< Nsta; kk++)
+  for (uint16_t kk=0; kk< config.Nsta; kk++)
     {
       std::ostringstream STA;
       STA << kk;
@@ -454,18 +456,18 @@ int main (int argc, char *argv[])
 
 
 
-    Simulator::ScheduleNow(&UdpTraffic, Nsta,payloadSize, TrafficPath, staDevice);
+    Simulator::ScheduleNow(&UdpTraffic, config.Nsta, config.payloadSize, config.TrafficPath, staDevice);
 
-    Simulator::Schedule(Seconds(1), &CheckAssoc, Nsta, simulationTime, wifiApNode, wifiStaNode,apNodeInterface);
+    Simulator::Schedule(Seconds(1), &CheckAssoc, config.Nsta, config.simulationTime, wifiApNode, wifiStaNode,apNodeInterface);
 
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
     PopulateArpCache ();
 
-      if  (OutputPosition)
+      if  (config.OutputPosition)
         {
           int i =0;
-          while (i < Nsta)
+          while (i < config.Nsta)
             {
                Ptr<MobilityModel> mobility = wifiStaNode.Get (i)->GetObject<MobilityModel>();
                Vector position = mobility->GetPosition();
@@ -483,9 +485,9 @@ int main (int argc, char *argv[])
       double throughput = 0;
       //UDP
       uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * payloadSize * 8 / (simulationTime * 1000000.0);
+      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
       std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << datarate << "\t" << throughput << " Mbit/s" << std::endl;
+      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
     
 return 0;
 }

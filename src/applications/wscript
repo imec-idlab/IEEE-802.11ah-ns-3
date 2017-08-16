@@ -19,6 +19,10 @@ def build(bld):
         'model/udp-echo-server.cc',
         'model/v4ping.cc',
         'model/application-packet-probe.cc',
+        'model/tcp-echo-client.cc',
+        'model/tcp-echo-server.cc',
+        'model/tcp-client.cc',
+        'model/tcp-server.cc',
         'helper/bulk-send-helper.cc',
         'helper/on-off-helper.cc',
         'helper/packet-sink-helper.cc',
@@ -27,6 +31,7 @@ def build(bld):
         'helper/udp-echo-helper.cc',
         'helper/v4ping-helper.cc',
         'helper/radvd-helper.cc',
+        'helper/tcp-echo-helper.cc'
         ]
 
     applications_test = bld.create_ns3_module_test_library('applications')
@@ -53,6 +58,11 @@ def build(bld):
         'model/udp-echo-server.h',
         'model/v4ping.h',
         'model/application-packet-probe.h',
+        'model/udp-echo-server.h',
+        'model/tcp-echo-client.h',
+        'model/tcp-echo-server.h',
+        'model/tcp-client.h',
+        'model/tcp-server.h',
         'helper/bulk-send-helper.h',
         'helper/on-off-helper.h',
         'helper/packet-sink-helper.h',
@@ -61,6 +71,7 @@ def build(bld):
         'helper/udp-echo-helper.h',
         'helper/v4ping-helper.h',
         'helper/radvd-helper.h',
+        'helper/tcp-echo-helper.h'
         ]
 
     bld.ns3_python_bindings()

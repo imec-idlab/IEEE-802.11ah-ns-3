@@ -65,7 +65,7 @@ def configure(conf):
         conf.msg("Checking for NSC location", False)
         conf.report_optional_feature("nsc", "Network Simulation Cradle", False,
                                      "NSC not found (see option --with-nsc)")
-	return
+        return
     
     if Options.platform in ['linux', 'freebsd']:
         arch = os.uname()[4]
@@ -148,7 +148,7 @@ def build(bld):
         'model/tcp-rfc793.cc',
         'model/tcp-tahoe.cc',
         'model/tcp-reno.cc',
-        'model/tcp-newreno.cc',
+        'model/tcp-congestion-ops.cc',
         'model/tcp-westwood.cc',
         'model/tcp-rx-buffer.cc',
         'model/tcp-tx-buffer.cc',
@@ -206,7 +206,7 @@ def build(bld):
         'model/ipv6-pmtu-cache.cc',
         'model/ripng.cc',
         'model/ripng-header.cc',
-        'helper/ripng-helper.cc',
+        'helper/ripng-helper.cc'
         ]
 
     internet_test = bld.create_ns3_module_test_library('internet')
@@ -240,9 +240,9 @@ def build(bld):
         'test/ipv6-fragmentation-test.cc',
         'test/ipv6-forwarding-test.cc',
         'test/ipv6-ripng-test.cc',
-     	'test/ipv6-address-helper-test-suite.cc',
+        'test/ipv6-address-helper-test-suite.cc',
         'test/rtt-test.cc',
-        'test/codel-queue-test-suite.cc',
+        'test/codel-queue-test-suite.cc'        
         ]
     privateheaders = bld(features='ns3privateheader')
     privateheaders.module = 'internet'
@@ -324,10 +324,7 @@ def build(bld):
         'helper/ipv6-interface-container.h',
         'helper/ipv6-routing-helper.h',
         'model/ipv6-address-generator.h',
-        'model/tcp-rfc793.h',        
-        'model/tcp-tahoe.h',
-        'model/tcp-reno.h',
-        'model/tcp-newreno.h',
+        'model/tcp-congestion-ops.h',
         'model/tcp-westwood.h',
         'model/tcp-socket-base.h',
         'model/tcp-tx-buffer.h',
@@ -338,7 +335,7 @@ def build(bld):
         'model/ipv6-pmtu-cache.h',
         'model/ripng.h',
         'model/ripng-header.h',
-        'helper/ripng-helper.h',
+        'helper/ripng-helper.h'
        ]
 
     if bld.env['NSC_ENABLED']:

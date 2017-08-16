@@ -87,6 +87,22 @@ RPS::RawAssignment::SetRawGroup (uint32_t group)
     //NS_LOG_UNCOND (" set m_rawgroup address=" << &m_rawgroup);
 }
 
+uint8_t
+RPS::RawAssignment::GetRawGroupPage() const {
+	return m_rawgroup & 0x03;
+}
+
+uint16_t
+RPS::RawAssignment::GetRawGroupAIDStart()  const {
+	return (m_rawgroup >> 2) & 0x07FF;
+}
+
+uint16_t
+RPS::RawAssignment::GetRawGroupAIDEnd()  const {
+	return (m_rawgroup >> 13) & 0x07FF;
+}
+
+
 void
 RPS::RawAssignment::SetChannelInd (uint16_t channel)
 {
@@ -145,6 +161,29 @@ RPS::RawAssignment::GetRawSlot (void)
       m_rawslot = 0x8000 | (uint16_t(m_slotCrossBoundary) << 14) | (m_slotDurationCount << 3) | m_slotNum;
    }
   return m_rawslot;
+}
+
+void
+RPS::RawAssignment::SetSlot(uint16_t value) {
+    uint8_t slotFormat = (value & 0x8000) == 0x8000;
+
+    uint8_t slotCrossBoundary = ((value >> 14) & 0x01);
+
+    this->SetSlotFormat(slotFormat);
+    this->SetSlotCrossBoundary(slotCrossBoundary);
+
+    uint16_t slotDuration;
+    uint8_t slotNum;
+    if (slotFormat == 0) {
+        // slot duration is
+        slotDuration = (value >> 6) & 0xFF;
+        slotNum = (value) & 0x003F;
+    } else {
+        slotDuration = (value >> 3) & 0x07FF;
+        slotNum = (value) & 0x0007;
+    }
+    this->SetSlotDurationCount(slotDuration);
+    this->SetSlotNum(slotNum);
 }
 
 uint8_t
@@ -240,6 +279,25 @@ RPS::GetRawAssignment (void) const
     //printf (" get m_rps %x\n" , m_rps[6]);
     return m_rps;
 }
+
+RPS::RawAssignment
+RPS::GetRawAssigmentObj() const {
+        auto m_raw = this->GetRawAssignment();
+
+        RPS::RawAssignment ass;
+        ass.SetRawControl(m_raw[0]);
+
+        uint16_t slot =(uint16_t(m_raw[2]) << 8) | (uint16_t(m_raw[1]));
+        ass.SetSlot(slot);
+
+        ass.SetRawStart(m_raw[3]);
+        ass.SetRawGroup((uint32_t(m_raw[6]) << 16) + (uint32_t(m_raw[5]) << 8) + uint32_t(m_raw[4]));
+        ass.SetChannelInd((uint16_t(m_raw[8]) << 16) + uint16_t(m_raw[7]));
+        ass.SetPRAW((uint32_t(m_raw[11]) << 16) + (uint32_t(m_raw[10]) << 8) + uint32_t(m_raw[9]));
+
+        return ass;
+    }
+
 
 WifiInformationElementId
 RPS::ElementId () const

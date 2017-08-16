@@ -24,7 +24,7 @@
 
 namespace ns3 {
     
-    
+/*
 TIM::EncodedBlock::EncodedBlock ()
 {
 }
@@ -130,7 +130,7 @@ TIM::EncodedBlock::Deserialize (Buffer::Iterator start)
   start.Read (m_subblock, subb_length);
   return (subb_length + 2);
 }
-*/
+
 
 bool
 TIM::EncodedBlock::Is (uint8_t info, uint8_t n)
@@ -138,10 +138,10 @@ TIM::EncodedBlock::Is (uint8_t info, uint8_t n)
   uint8_t mask = 1 << n;
   return (info & mask) == mask;
 }
+*/
 
 TIM::TIM ()
 {
-  m_length = 0;
 }
 
 TIM::~TIM ()
@@ -169,8 +169,10 @@ TIM::SetBitmapControl (uint8_t control)
 }
     
 void
-TIM::SetPartialVBitmap (TIM::EncodedBlock block)
+TIM::SetPartialVBitmap (uint32_t val)
 {
+	this->m_partialVBitmap = val;
+	/*
   m_encodeblock = block;
   m_length = 0;
   uint8_t offset = m_encodeblock.GetBlockOffset ();
@@ -192,6 +194,8 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
     i++;
   }
   //NS_ASSERT ( 1 <= m_length <= 251);
+
+   */
 }
     
 uint8_t
@@ -212,8 +216,8 @@ TIM::GetBitmapControl (void) const
   return m_BitmapControl;
 }
 
-unsigned char *
-TIM::GetPartialVBitmap (void) const
+uint32_t
+TIM::GetPartialVBitmap(void) const
 {
   return m_partialVBitmap;
 }
@@ -227,7 +231,7 @@ TIM::ElementId () const
 uint8_t
 TIM::GetInformationFieldSize () const
 {
-  return (m_length + 3);
+  return (4 + 3);
 }
 
 void
@@ -236,7 +240,7 @@ TIM::SerializeInformationField (Buffer::Iterator start) const
  start.WriteU8 (m_DTIMCount);
  start.WriteU8 (m_DTIMPeriod);
  start.WriteU8 (m_BitmapControl);
- start.Write (m_partialVBitmap, m_length);
+ start.WriteU32(m_partialVBitmap);
 }
 
 uint8_t
@@ -245,9 +249,22 @@ TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
   m_DTIMCount = start.ReadU8 ();
   m_DTIMPeriod = start.ReadU8 ();
   m_BitmapControl = start.ReadU8 ();
-  start.Read (m_partialVBitmap, (length-3));
-    m_length = length-3;
+  m_partialVBitmap = start.ReadU32();
+  //start.Read (m_partialVBitmap, (length-3));
+//    m_length = length-3;
   return length;
+}
+
+void 
+TIM::Print(std::ostream& os) const {
+    os << "DTIM Count: " << std::to_string(m_DTIMCount) << std::endl;
+    os << "DTIM Period: " << std::to_string(m_DTIMPeriod) << std::endl;
+    os << "Bitmap Control: " << std::to_string(m_BitmapControl) << std::endl;
+    
+    
+    os << "Partial VBitmap" << "):";
+
+    os << std::endl;
 }
 
 //ATTRIBUTE_HELPER_CPP (TIM);
