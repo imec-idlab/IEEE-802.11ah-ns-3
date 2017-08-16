@@ -72,7 +72,7 @@ public:
   /**
    * Get a specific Object.
    *
-   * \param i The index of the requested object.
+   * \param [in] i The index of the requested object.
    * \returns The requested object
    */
   Ptr<Object> Get (uint32_t i) const;
@@ -88,15 +88,15 @@ public:
    *
    * Note this serializes the Ptr values, not the Objects themselves.
    *
-   * \param checker The checker to use (currently not used.)
+   * \param [in] checker The checker to use (currently not used.)
    * \returns The string form of the Objects.
    */
   virtual std::string SerializeToString (Ptr<const AttributeChecker> checker) const;
   /**
    * Deserialize from a string. (Not implemented; raises a fatal error.)
    *
-   * \param value The serialized string form.
-   * \param checker The checker to use.
+   * \param [in] value The serialized string form.
+   * \param [in] checker The checker to use.
    * \returns \c true.
    */
   virtual bool DeserializeFromString (std::string value, Ptr<const AttributeChecker> checker);
@@ -113,9 +113,9 @@ private:
  *
  * The two versions of this function differ only in argument order.
  *
- * \tparam T The container class type.
- * \tparam U The type of object the get method returns.
- * \tparam INDEX The type of the index variable.
+ * \tparam T \deduced The container class type.
+ * \tparam U \deduced The type of object the get method returns.
+ * \tparam INDEX \deduced The type of the index variable.
  * \param [in] get The class method to get a specific instance
  *             from the container.
  * \param [in] getN The class method to return the number of objects
@@ -133,9 +133,9 @@ MakeObjectPtrContainerAccessor (Ptr<U> (T::*get)(INDEX) const,
  *
  * The two versions of this function differ only in argument order.
  *
- * \tparam T The container class type.
- * \tparam U The type of object the get method returns.
- * \tparam INDEX The type of the index variable.
+ * \tparam T \deduced The container class type.
+ * \tparam U \deduced The type of object the get method returns.
+ * \tparam INDEX \deduced The type of the index variable.
  * \param [in] get The class method to get a specific instance
  *             from the container.
  * \param [in] getN The class method to return the number of objects

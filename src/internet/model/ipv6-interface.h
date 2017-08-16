@@ -23,7 +23,7 @@
 
 #include <list>
 
-#include "ns3/ipv6-address.h"
+#include "ns3/ipv6-header.h"
 #include "ns3/ipv6-interface-address.h"
 #include "ns3/ptr.h"
 #include "ns3/object.h"
@@ -35,6 +35,7 @@ namespace ns3
 class NetDevice;
 class Packet;
 class Node;
+class TrafficControlLayer;
 class NdiscCache;
 
 /**
@@ -76,6 +77,17 @@ public:
    * \param device NetDevice
    */
   void SetDevice (Ptr<NetDevice> device);
+
+  /**
+   * \brief Set the TrafficControlLayer.
+   * \param tc TrafficControlLayer object
+   */
+  void SetTrafficControl (Ptr<TrafficControlLayer> tc);
+  /**
+    * \brief Set NDISC cache used by this interface
+    * \param ndiscCache the NDISC cache
+    */
+   void SetNdiscCache (Ptr<NdiscCache> ndiscCache); ///ami
 
   /**
    * \brief Get the NetDevice.
@@ -180,12 +192,13 @@ public:
   /**
    * \brief Send a packet through this interface.
    * \param p packet to send
+   * \param hdr IPv6 header
    * \param dest next hop address of packet.
    *
    * \note This method will eventually call the private SendTo
    * method which must be implemented by subclasses.
    */
-  void Send (Ptr<Packet> p, Ipv6Address dest);
+  void Send (Ptr<Packet> p, const Ipv6Header & hdr, Ipv6Address dest);
 
   /**
    * \brief Add an IPv6 address.
@@ -199,6 +212,13 @@ public:
    * \return link-local Ipv6InterfaceAddress, assert if not found
    */
   Ipv6InterfaceAddress GetLinkLocalAddress () const;
+
+  /**
+   * \brief Checks if the address is a Solicited Multicast address for this interface.
+   * \param address the address to check.
+   * \return true if it is a solicited multicast address.
+   */
+  bool IsSolicitedMulticastAddress (Ipv6Address address) const;
 
   /**
    * \brief Get an address from IPv6 interface.
@@ -266,17 +286,17 @@ private:
   /**
    * \brief Container for the Ipv6InterfaceAddresses.
    */
-  typedef std::list<Ipv6InterfaceAddress> Ipv6InterfaceAddressList;
+  typedef std::list<std::pair<Ipv6InterfaceAddress, Ipv6Address> > Ipv6InterfaceAddressList;
 
   /**
    * \brief Container Iterator for the Ipv6InterfaceAddresses.
    */
-  typedef std::list<Ipv6InterfaceAddress>::iterator Ipv6InterfaceAddressListI;
+  typedef std::list<std::pair<Ipv6InterfaceAddress, Ipv6Address> >::iterator Ipv6InterfaceAddressListI;
 
   /**
    * \brief Const Container Iterator for the Ipv6InterfaceAddresses.
    */
-  typedef std::list<Ipv6InterfaceAddress>::const_iterator Ipv6InterfaceAddressListCI;
+  typedef std::list<std::pair<Ipv6InterfaceAddress, Ipv6Address> >::const_iterator Ipv6InterfaceAddressListCI;
 
   /**
    * \brief Initialize interface.
@@ -287,6 +307,11 @@ private:
    * \brief The addresses assigned to this interface.
    */
   Ipv6InterfaceAddressList m_addresses;
+
+  /**
+   * \brief The link-local addresses assigned to this interface.
+   */
+  Ipv6InterfaceAddress m_linkLocalAddress;
 
   /**
    * \brief The state of this interface.
@@ -312,6 +337,11 @@ private:
    * \brief NetDevice associated with this interface.
    */
   Ptr<NetDevice> m_device;
+
+  /**
+   * \brief TrafficControlLayer associated with this interface.
+   */
+  Ptr<TrafficControlLayer> m_tc;
 
   /**
    * \brief Neighbor cache.

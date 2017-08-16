@@ -26,6 +26,7 @@
 #include "ns3/ipv6-route.h"
 #include "ns3/ipv4.h"
 #include "ns3/ipv6.h"
+#include "ns3/ipv6-l3-protocol.h"
 #include "ns3/ipv4-header.h"
 #include "ns3/ipv4-routing-protocol.h"
 #include "ns3/ipv6-routing-protocol.h"
@@ -305,6 +306,14 @@ UdpSocketImpl::Bind (const Address &address)
           m_errno = port ? ERROR_ADDRINUSE : ERROR_ADDRNOTAVAIL;
           return -1;
         }
+      if (ipv6.IsMulticast ())
+        {
+          Ptr<Ipv6L3Protocol> ipv6l3 = m_node->GetObject <Ipv6L3Protocol> ();
+          if (ipv6l3)
+            {
+              ipv6l3->AddMulticastAddress (ipv6);
+            }
+        }
     }
   else
     {
@@ -349,6 +358,7 @@ UdpSocketImpl::Close (void)
       m_errno = Socket::ERROR_BADF;
       return -1;
     }
+  Ipv6LeaveGroup ();
   m_shutdownRecv = true;
   m_shutdownSend = true;
   DeallocateEndPoint ();
@@ -900,6 +910,35 @@ UdpSocketImpl::GetSockName (Address &address) const
   return 0;
 }
 
+int
+UdpSocketImpl::GetPeerName (Address &address) const
+{
+  NS_LOG_FUNCTION (this << address);
+
+  if (!m_connected)
+    {
+      m_errno = ERROR_NOTCONN;
+      return -1;
+    }
+
+  if (Ipv4Address::IsMatchingType (m_defaultAddress))
+    {
+      Ipv4Address addr = Ipv4Address::ConvertFrom (m_defaultAddress);
+      address = InetSocketAddress (addr, m_defaultPort);
+    }
+  else if (Ipv6Address::IsMatchingType (m_defaultAddress))
+    {
+      Ipv6Address addr = Ipv6Address::ConvertFrom (m_defaultAddress);
+      address = Inet6SocketAddress (addr, m_defaultPort);
+    }
+  else
+    {
+      NS_ASSERT_MSG (false, "unexpected address type");
+    }
+
+  return 0;
+}
+
 int 
 UdpSocketImpl::MulticastJoinGroup (uint32_t interface, const Address &groupAddress)
 {
@@ -955,6 +994,18 @@ UdpSocketImpl::BindToNetDevice (Ptr<NetDevice> netdevice)
       NS_ASSERT (m_endPoint6 != 0);
     }
   m_endPoint6->BindToNetDevice (netdevice);
+
+  if (m_endPoint6->GetLocalAddress ().IsMulticast ())
+    {
+      Ptr<Ipv6L3Protocol> ipv6l3 = m_node->GetObject <Ipv6L3Protocol> ();
+      if (ipv6l3)
+        {
+          uint32_t index = ipv6l3->GetInterfaceForDevice (netdevice);
+          ipv6l3->RemoveMulticastAddress (m_endPoint6->GetLocalAddress ());
+          ipv6l3->AddMulticastAddress (m_endPoint6->GetLocalAddress (), index);
+        }
+    }
+
   return;
 }
 
@@ -1169,5 +1220,48 @@ UdpSocketImpl::GetAllowBroadcast () const
   return m_allowBroadcast;
 }
 
+void
+UdpSocketImpl::Ipv6JoinGroup (Ipv6Address address, Socket::Ipv6MulticastFilterMode filterMode, std::vector<Ipv6Address> sourceAddresses)
+{
+  NS_LOG_FUNCTION (this << address << &filterMode << &sourceAddresses);
+
+  // We can join only one multicast group (or change its params)
+  NS_ASSERT_MSG ((m_ipv6MulticastGroupAddress == address || m_ipv6MulticastGroupAddress.IsAny ()), "Can join only one IPv6 multicast group.");
+
+  m_ipv6MulticastGroupAddress = address;
+
+  Ptr<Ipv6L3Protocol> ipv6l3 = m_node->GetObject <Ipv6L3Protocol> ();
+  if (ipv6l3)
+    {
+      if (filterMode == INCLUDE && sourceAddresses.empty ())
+        {
+          // it is a leave
+          if (m_boundnetdevice)
+            {
+              int32_t index = ipv6l3->GetInterfaceForDevice (m_boundnetdevice);
+              NS_ASSERT_MSG (index >= 0, "Interface without a valid index");
+              ipv6l3->RemoveMulticastAddress (address, index);
+            }
+          else
+            {
+              ipv6l3->RemoveMulticastAddress (address);
+            }
+        }
+      else
+        {
+          // it is a join or a modification
+          if (m_boundnetdevice)
+            {
+              int32_t index = ipv6l3->GetInterfaceForDevice (m_boundnetdevice);
+              NS_ASSERT_MSG (index >= 0, "Interface without a valid index");
+              ipv6l3->AddMulticastAddress (address, index);
+            }
+          else
+            {
+              ipv6l3->AddMulticastAddress (address);
+            }
+        }
+    }
+}
 
 } // namespace ns3

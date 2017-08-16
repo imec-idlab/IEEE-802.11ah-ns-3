@@ -164,11 +164,6 @@ public:
 
   virtual bool IsLinkUp (void) const;
 
-  /**
-   * TracedCallback signature for link changed event.
-   */
-  typedef void (* LinkChangeTracedCallback) (void);
-  
   virtual void AddLinkChangeCallback (Callback<void> callback);
 
   virtual bool IsBroadcast (void) const;
@@ -202,6 +197,8 @@ protected:
    * \param p Packet received
    */
   void DoMpiReceive (Ptr<Packet> p);
+
+  virtual void DoInitialize (void);
 
 private:
 
@@ -440,6 +437,7 @@ private:
   TracedCallback<Ptr<const Packet> > m_promiscSnifferTrace;
 
   Ptr<Node> m_node;         //!< Node owning this NetDevice
+  Ptr<NetDeviceQueueInterface> m_queueInterface;   //!< NetDevice queue interface
   Mac48Address m_address;   //!< Mac48Address of this NetDevice
   NetDevice::ReceiveCallback m_rxCallback;   //!< Receive callback
   NetDevice::PromiscReceiveCallback m_promiscCallback;  //!< Receive callback

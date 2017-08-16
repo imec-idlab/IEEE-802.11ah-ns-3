@@ -47,11 +47,15 @@ class SpectrumChannel : public Channel
 {
 public:
   virtual ~SpectrumChannel ();
-  static TypeId GetTypeId (void);
-
 
   /**
-   * set the single-frequency propagation loss model to be used
+   * \brief Get the type ID.
+   * \return the object TypeId
+   */
+  static TypeId GetTypeId (void);
+
+  /**
+   * Set the single-frequency propagation loss model to be used
    * \warning only models that do not depend on the TX power should be used.
    *
    * \param loss a pointer to the propagation loss model to be used.
@@ -59,13 +63,13 @@ public:
   virtual void AddPropagationLossModel (Ptr<PropagationLossModel> loss) = 0;
 
   /**
-   * set the frequency-dependent propagation loss model to be used
+   * Set the frequency-dependent propagation loss model to be used
    * \param loss a pointer to the propagation loss model to be used.
    */
   virtual void AddSpectrumPropagationLossModel (Ptr<SpectrumPropagationLossModel> loss) = 0;
 
   /**
-   * set the  propagation delay model to be used
+   * Set the  propagation delay model to be used
    * \param delay Ptr to the propagation delay model to be used.
    */
   virtual void SetPropagationDelayModel (Ptr<PropagationDelayModel> delay) = 0;
@@ -79,7 +83,7 @@ public:
   virtual void StartTx (Ptr<SpectrumSignalParameters> params) = 0;
 
   /**
-   * @brief add a SpectrumPhy to a channel, so it can receive packets
+   * @brief Add a SpectrumPhy to a channel, so it can receive packets
    *
    * This method is used to attach a SpectrumPhy instance to a
    * SpectrumChannel instance, so that the SpectrumPhy can receive
@@ -101,10 +105,13 @@ public:
    * \param [in] txPhy The TX SpectrumPhy instance.
    * \param [in] rxPhy The RX SpectrumPhy instance.
    * \param [in] lossDb The loss value, in dB.
+   * \deprecated The non-const `Ptr<SpectrumValue>` is
+   * deprecated and will be changed to Ptr<const SpectrumValue>`
+   * in a future release.
    */
   typedef void (* LossTracedCallback)
-    (const Ptr<const SpectrumPhy> txPhy, const Ptr<const SpectrumPhy> rxPhy,
-     const double lossDb);
+    (Ptr<SpectrumPhy> txPhy, Ptr<SpectrumPhy> rxPhy,
+     double lossDb);
   
 };
 

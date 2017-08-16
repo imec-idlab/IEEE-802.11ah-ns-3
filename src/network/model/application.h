@@ -99,6 +99,9 @@ public:
    */
   Ptr<Node> GetNode () const;
 
+  /*std::string GetNodeIpv6 () const; ///ami
+  std::string GetNodeIpv4 () const;*/
+
   /**
    * \param node the node to which this Application object is attached.
    */

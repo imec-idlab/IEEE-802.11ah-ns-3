@@ -16,19 +16,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-// The queue base class does not have any limit based on the number
-// of packets or number of bytes. It is, conceptually, infinite 
-// by default. Only subclasses define limitations.
+// The queue base class has a limit on its size, in terms of number of
+// packets or number of bytes depending on the operating mode.
 // The base class implements tracing and basic statistics calculations.
 
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include <string>
-#include <list>
 #include "ns3/packet.h"
 #include "ns3/object.h"
 #include "ns3/traced-callback.h"
+#include "ns3/net-device.h"
+#include "ns3/traced-value.h"
 
 namespace ns3 {
 
@@ -59,21 +58,21 @@ public:
    */
   bool IsEmpty (void) const;
   /**
-   * Place a packet into the rear of the Queue
-   * \param p packet to enqueue
+   * Place a queue item into the rear of the Queue
+   * \param item item to enqueue
    * \return True if the operation was successful; false otherwise
    */
-  bool Enqueue (Ptr<Packet> p);
+  bool Enqueue (Ptr<QueueItem> item);
   /**
-   * Remove a packet from the front of the Queue
-   * \return 0 if the operation was not successful; the packet otherwise.
+   * Remove an item from the front of the Queue
+   * \return 0 if the operation was not successful; the item otherwise.
    */
-  Ptr<Packet> Dequeue (void);
+  Ptr<QueueItem> Dequeue (void);
   /**
    * Get a copy of the item at the front of the queue without removing it
-   * \return 0 if the operation was not successful; the packet otherwise.
+   * \return 0 if the operation was not successful; the item otherwise.
    */
-  Ptr<const Packet> Peek (void) const;
+  Ptr<const QueueItem> Peek (void) const;
 
   /**
    * Flush the queue.
@@ -129,6 +128,44 @@ public:
     QUEUE_MODE_BYTES,       /**< Use number of bytes for maximum queue size */
   };
 
+  /**
+   * Set the operating mode of this device.
+   *
+   * \param mode The operating mode of this device.
+   */
+  void SetMode (Queue::QueueMode mode);
+
+  /**
+   * Get the encapsulation mode of this device.
+   *
+   * \returns The encapsulation mode of this device.
+   */
+  Queue::QueueMode GetMode (void) const;
+
+  /**
+   * \brief Set the maximum amount of packets that can be stored in this queue
+   *
+   * \param maxPackets amount of packets
+   */
+  void SetMaxPackets (uint32_t maxPackets);
+
+  /**
+   * \return the maximum amount of packets that can be stored in this queue
+   */
+  uint32_t GetMaxPackets (void) const;
+
+  /**
+   * \brief Set the maximum amount of bytes that can be stored in this queue
+   *
+   * \param maxBytes amount of bytes
+   */
+  void SetMaxBytes (uint32_t maxBytes);
+
+  /**
+   * \return the maximum amount of bytes that can be stored in this queue
+   */
+  uint32_t GetMaxBytes (void) const;
+
 #if 0
   // average calculation requires keeping around
   // a buffer with the date of arrival of past received packets
@@ -153,32 +190,34 @@ public:
   double GetDroppedPacketsPerSecondVariance (void);
 #endif
 
-private:
-
-  /**
-   * Push a packet in the queue
-   * \param p the packet to enqueue
-   * \return true if success, false if the packet has been dropped.
-   */
-  virtual bool DoEnqueue (Ptr<Packet> p) = 0;
-  /**
-   * Pull a packet from the queue
-   * \return the packet.
-   */
-  virtual Ptr<Packet> DoDequeue (void) = 0;
-  /**
-   * Peek the front packet in the queue
-   * \return the packet.
-   */
-  virtual Ptr<const Packet> DoPeek (void) const = 0;
-
 protected:
   /**
-   *  \brief Drop a packet 
-   *  \param packet packet that was dropped
-   *  This method is called by subclasses to notify parent (this class) of packet drops.
+   * \brief Drop a packet
+   * \param p packet that was dropped
+   *
+   * This method is called by the base class when a packet is dropped because
+   * the queue is full and by the subclasses to notify parent (this class) that
+   * a packet has been dropped for other reasons.
    */
-  void Drop (Ptr<Packet> packet);
+  void Drop (Ptr<Packet> p);
+
+private:
+  /**
+   * Push an item in the queue
+   * \param item the item to enqueue
+   * \return true if success, false if the packet has been dropped.
+   */
+  virtual bool DoEnqueue (Ptr<QueueItem> item) = 0;
+  /**
+   * Pull an item from the queue
+   * \return the item.
+   */
+  virtual Ptr<QueueItem> DoDequeue (void) = 0;
+  /**
+   * Peek the front item in the queue
+   * \return the item.
+   */
+  virtual Ptr<const QueueItem> DoPeek (void) const = 0;
 
   /// Traced callback: fired when a packet is enqueued
   TracedCallback<Ptr<const Packet> > m_traceEnqueue;
@@ -187,12 +226,16 @@ protected:
   /// Traced callback: fired when a packet is dropped
   TracedCallback<Ptr<const Packet> > m_traceDrop;
 
-  uint32_t m_nBytes;                //!< Number of bytes in the queue
+  TracedValue<uint32_t> m_nBytes;   //!< Number of bytes in the queue
   uint32_t m_nTotalReceivedBytes;   //!< Total received bytes
-  uint32_t m_nPackets;              //!< Number of packets in the queue
+  TracedValue<uint32_t> m_nPackets; //!< Number of packets in the queue
   uint32_t m_nTotalReceivedPackets; //!< Total received packets
   uint32_t m_nTotalDroppedBytes;    //!< Total dropped bytes
   uint32_t m_nTotalDroppedPackets;  //!< Total dropped packets
+
+  uint32_t m_maxPackets;              //!< max packets in the queue
+  uint32_t m_maxBytes;                //!< max bytes in the queue
+  QueueMode m_mode;                   //!< queue mode (packets or bytes limited)
 };
 
 } // namespace ns3

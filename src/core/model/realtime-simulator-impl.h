@@ -92,9 +92,9 @@ public:
   virtual void Destroy ();
   virtual bool IsFinished (void) const;
   virtual void Stop (void);
-  virtual void Stop (Time const &time);
-  virtual EventId Schedule (Time const &time, EventImpl *event);
-  virtual void ScheduleWithContext (uint32_t context, Time const &time, EventImpl *event);
+  virtual void Stop (Time const &delay);
+  virtual EventId Schedule (Time const &delay, EventImpl *event);
+  virtual void ScheduleWithContext (uint32_t context, Time const &delay, EventImpl *event);
   virtual EventId ScheduleNow (EventImpl *event);
   virtual EventId ScheduleDestroy (EventImpl *event);
   virtual void Remove (const EventId &ev);
@@ -108,18 +108,18 @@ public:
   virtual uint32_t GetSystemId (void) const; 
   virtual uint32_t GetContext (void) const;
 
-  /** \copydoc ScheduleWithContext */
-  void ScheduleRealtimeWithContext (uint32_t context, Time const &time, EventImpl *event);
-  /** \copydoc Schedule */
-  void ScheduleRealtime (Time const &time, EventImpl *event);
+  /** \copydoc ScheduleWithContext(uint32_t,const Time&,EventImpl*) */
+  void ScheduleRealtimeWithContext (uint32_t context, Time const &delay, EventImpl *event);
+  /** \copydoc Schedule(const Time&,EventImpl*) */
+  void ScheduleRealtime (Time const &delay, EventImpl *event);
   /**
-   * \copybrief ScheduleNow
+   * \copybrief ScheduleNow(EventImpl*)
    *
-   * \param context Event context.
-   * \param event The event to schedule.
+   * \param [in] context Event context.
+   * \param [in] event The event to schedule.
    */
   void ScheduleRealtimeNowWithContext (uint32_t context, EventImpl *event);
-  /** \copydoc ScheduleNow */
+  /** \copydoc ScheduleNow(EventImpl*) */
   void ScheduleRealtimeNow (EventImpl *event);
   /**
    * Get the current real time from the synchronizer.
@@ -130,7 +130,7 @@ public:
   /**
    * Set the SynchronizationMode.
    *
-   * \param mode The new SynchronizationMode.
+   * \param [in] mode The new SynchronizationMode.
    */
   void SetSynchronizationMode (RealtimeSimulatorImpl::SynchronizationMode mode);
   /**
@@ -142,7 +142,7 @@ public:
   /**
    * Set the fatal error threshold for SynchronizationMode SYNC_HARD_LIMIT.
    *
-   * \param limit The maximum amount of real time we are allowed to fall
+   * \param [in] limit The maximum amount of real time we are allowed to fall
    *     behind before we trigger a fatal error.
    */
   void SetHardLimit (Time limit);

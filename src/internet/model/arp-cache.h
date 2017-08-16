@@ -39,6 +39,7 @@ namespace ns3 {
 
 class NetDevice;
 class Ipv4Interface;
+class Ipv4Header;
 
 /**
  * \ingroup arp
@@ -151,6 +152,11 @@ public:
    */
   ArpCache::Entry *Add (Ipv4Address to);
   /**
+   * \brief Remove an entry.
+   * \param entry pointer to delete it from the list
+   */
+  void Remove (ArpCache::Entry *entry);
+  /**
    * \brief Clear the ArpCache of all entries
    */
   void Flush (void);
@@ -161,6 +167,11 @@ public:
    * \param stream the ostream the ARP cache entries is printed to
    */
   void PrintArpCache (Ptr<OutputStreamWrapper> stream);
+
+  /**
+   * \brief Pair of a packet and an Ipv4 header.
+   */
+  typedef std::pair<Ptr<Packet>, Ipv4Header> Ipv4PayloadHeaderPair;
 
   /**
    * \brief A record that that holds information about an ArpCache entry
@@ -184,12 +195,21 @@ public:
     /**
      * \param waiting
      */
+    void MarkWaitReply (Ipv4PayloadHeaderPair waiting);
+
     void MarkWaitReply (Ptr<Packet> waiting);
+
+    /**
+     * \brief Changes the state of this entry to Permanent.
+     *
+     * The entry must have a valid MacAddress.
+     */
+    void MarkPermanent (void);
     /**
      * \param waiting
      * \return 
      */
-    bool UpdateWaitReply (Ptr<Packet> waiting);
+    bool UpdateWaitReply (Ipv4PayloadHeaderPair waiting);
     /**
      * \return True if the state of this entry is dead; false otherwise.
      */
@@ -202,7 +222,10 @@ public:
      * \return True if the state of this entry is wait_reply; false otherwise.
      */
     bool IsWaitReply (void);
-
+    /**
+     * \return True if the state of this entry is permanent; false otherwise.
+     */
+    bool IsPermanent (void); 
     /**
      * \return The MacAddress of this entry
      */
@@ -211,6 +234,10 @@ public:
      * \return The Ipv4Address for this entry
      */
     Ipv4Address GetIpv4Address (void) const;
+    /**
+     * \param macAddress The MacAddress for this entry
+     */
+    void SetMacAddresss (Address macAddress);
     /**
      * \param destination The Ipv4Address for this entry
      */
@@ -226,7 +253,11 @@ public:
      * \returns 0 is no packet is pending, the next packet to send if 
      *            packets are pending.
      */
-    Ptr<Packet> DequeuePending (void);
+    Ipv4PayloadHeaderPair DequeuePending (void);
+    /**
+     * \brief Clear the pending packet list
+     */
+    void ClearPendingPacket (void);
     /**
      * \returns number of retries that have been sent for an ArpRequest
      *  in WaitReply state.
@@ -248,7 +279,8 @@ private:
     enum ArpCacheEntryState_e {
       ALIVE,
       WAIT_REPLY,
-      DEAD
+      DEAD,
+      PERMANENT
     };
 
     /**
@@ -267,7 +299,7 @@ private:
     Time m_lastSeen; //!< last moment a packet from that address has been seen
     Address m_macAddress; //!< entry's MAC address
     Ipv4Address m_ipv4Address; //!< entry's IP address
-    std::list<Ptr<Packet> > m_pending; //!< list of pending packets for the entry's IP
+    std::list<Ipv4PayloadHeaderPair> m_pending; //!< list of pending packets for the entry's IP
     uint32_t m_retries; //!< rerty counter
   };
 

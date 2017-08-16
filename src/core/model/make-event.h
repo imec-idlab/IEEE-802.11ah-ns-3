@@ -45,10 +45,10 @@ class EventImpl;
  * Make an EventImpl from class method members which take
  * varying numbers of arguments.
  *
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ>
@@ -56,12 +56,12 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj);
 
 /**
  * \copybrief MakeEvent(MEM,OBJ)
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \tparam T1 Type of the argument to the underlying function.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
- * \param a1 Argument value to be bound to the underlying function.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \tparam T1 \deduced Type of the argument to the underlying function.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
+ * \param [in] a1 Argument value to be bound to the underlying function.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ,
@@ -70,14 +70,14 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj, T1 a1);
 
 /**
  * \copybrief MakeEvent(MEM,OBJ)
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \tparam T1 Type of the first argument to the underlying function.
- * \tparam T2 Type of the second argument to the underlying function.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
- * \param a1 First argument value to be bound to the underlying function.
- * \param a2 Second argument value to be bound to the underlying function.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \tparam T1 \deduced Type of the first argument to the underlying function.
+ * \tparam T2 \deduced Type of the second argument to the underlying function.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
+ * \param [in] a1 First argument value to be bound to the underlying function.
+ * \param [in] a2 Second argument value to be bound to the underlying function.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ,
@@ -86,16 +86,16 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj, T1 a1, T2 a2);
 
 /**
  * \copybrief MakeEvent(MEM,OBJ)
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \tparam T1 Type of the first argument to the underlying function.
- * \tparam T2 Type of the second argument to the underlying function.
- * \tparam T3 Type of the third argument to the underlying function.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
- * \param a1 First argument value to be bound to the underlying function.
- * \param a2 Second argument value to be bound to the underlying function.
- * \param a3 Third argument value to be bound to the underlying function.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \tparam T1 \deduced Type of the first argument to the underlying function.
+ * \tparam T2 \deduced Type of the second argument to the underlying function.
+ * \tparam T3 \deduced Type of the third argument to the underlying function.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
+ * \param [in] a1 First argument value to be bound to the underlying function.
+ * \param [in] a2 Second argument value to be bound to the underlying function.
+ * \param [in] a3 Third argument value to be bound to the underlying function.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ,
@@ -104,18 +104,18 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj, T1 a1, T2 a2, T3 a3);
 
 /**
  * \copybrief MakeEvent(MEM,OBJ)
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \tparam T1 Type of the first argument to the underlying function.
- * \tparam T2 Type of the second argument to the underlying function.
- * \tparam T3 Type of the third argument to the underlying function.
- * \tparam T4 Type of the fourth argument to the underlying function.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
- * \param a1 First argument value to be bound to the underlying function.
- * \param a2 Second argument value to be bound to the underlying function.
- * \param a3 Third argument value to be bound to the underlying function.
- * \param a4 Fourth argument value to be bound to the underlying function.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \tparam T1 \deduced Type of the first argument to the underlying function.
+ * \tparam T2 \deduced Type of the second argument to the underlying function.
+ * \tparam T3 \deduced Type of the third argument to the underlying function.
+ * \tparam T4 \deduced Type of the fourth argument to the underlying function.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
+ * \param [in] a1 First argument value to be bound to the underlying function.
+ * \param [in] a2 Second argument value to be bound to the underlying function.
+ * \param [in] a3 Third argument value to be bound to the underlying function.
+ * \param [in] a4 Fourth argument value to be bound to the underlying function.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ,
@@ -124,20 +124,20 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj, T1 a1, T2 a2, T3 a3, T4 a4);
 
 /**
  * \copybrief MakeEvent(MEM,OBJ)
- * \tparam MEM The class method function signature.
- * \tparam OBJ The class type holding the method.
- * \tparam T1 Type of the first argument to the underlying function.
- * \tparam T2 Type of the second argument to the underlying function.
- * \tparam T3 Type of the third argument to the underlying function.
- * \tparam T4 Type of the fourth argument to the underlying function.
- * \tparam T5 Type of the fifth argument to the underlying function.
- * \param mem_ptr Class method member function pointer
- * \param obj Class instance.
- * \param a1 First argument value to be bound to the underlying function.
- * \param a2 Second argument value to be bound to the underlying function.
- * \param a3 Third argument value to be bound to the underlying function.
- * \param a4 Fourth argument value to be bound to the underlying function.
- * \param a5 Fifh argument value to be bound to the underlying function.
+ * \tparam MEM \deduced The class method function signature.
+ * \tparam OBJ \deduced The class type holding the method.
+ * \tparam T1 \deduced Type of the first argument to the underlying function.
+ * \tparam T2 \deduced Type of the second argument to the underlying function.
+ * \tparam T3 \deduced Type of the third argument to the underlying function.
+ * \tparam T4 \deduced Type of the fourth argument to the underlying function.
+ * \tparam T5 \deduced Type of the fifth argument to the underlying function.
+ * \param [in] mem_ptr Class method member function pointer
+ * \param [in] obj Class instance.
+ * \param [in] a1 First argument value to be bound to the underlying function.
+ * \param [in] a2 Second argument value to be bound to the underlying function.
+ * \param [in] a3 Third argument value to be bound to the underlying function.
+ * \param [in] a4 Fourth argument value to be bound to the underlying function.
+ * \param [in] a5 Fifh argument value to be bound to the underlying function.
  * \returns The constructed EventImpl.
  */
 template <typename MEM, typename OBJ,
@@ -159,17 +159,17 @@ EventImpl * MakeEvent (MEM mem_ptr, OBJ obj,
  * Make an EventImpl from a function pointer taking varying numbers
  * of arguments.
  *
- * \param f The function pointer.
+ * \param [in] f The function pointer.
  * \returns The constructed EventImpl.
  */
 EventImpl * MakeEvent (void (*f)(void));
 
 /**
  * \copybrief MakeEvent(void(*f)(void))
- * \tparam U1 Formal type of the argument to the function.
- * \tparam T1 Actual type of the argument to the function.
- * \param f The function pointer.
- * \param a1 Argument to be bound to the function.
+ * \tparam U1 \deduced Formal type of the argument to the function.
+ * \tparam T1 \deduced Actual type of the argument to the function.
+ * \param [in] f The function pointer.
+ * \param [in] a1 Argument to be bound to the function.
  * \returns The constructed EventImpl.
  */
 template <typename U1,
@@ -178,13 +178,13 @@ EventImpl * MakeEvent (void (*f)(U1), T1 a1);
 
 /**
  * \copybrief MakeEvent(void(*f)(void))
- * \tparam U1 Formal type of the first argument to the function.
- * \tparam U2 Formal type of the second argument to the function.
- * \tparam T1 Actual type of the first argument to the function.
- * \tparam T2 Actual type of the second argument to the function.
- * \param f The function pointer.
- * \param a1 First argument to be bound to the function.
- * \param a2 Second argument to be bound to the function.
+ * \tparam U1 \deduced Formal type of the first argument to the function.
+ * \tparam U2 \deduced Formal type of the second argument to the function.
+ * \tparam T1 \deduced Actual type of the first argument to the function.
+ * \tparam T2 \deduced Actual type of the second argument to the function.
+ * \param [in] f The function pointer.
+ * \param [in] a1 First argument to be bound to the function.
+ * \param [in] a2 Second argument to be bound to the function.
  * \returns The constructed EventImpl.
  */
 template <typename U1, typename U2,
@@ -193,16 +193,16 @@ EventImpl * MakeEvent (void (*f)(U1,U2), T1 a1, T2 a2);
 
 /**
  * \copybrief MakeEvent(void(*f)(void))
- * \tparam U1 Formal type of the first argument to the function.
- * \tparam U2 Formal type of the second argument to the function.
- * \tparam U3 Formal type of the third argument to the function.
- * \tparam T1 Actual type of the first argument to the function.
- * \tparam T2 Actual type of the second argument to the function.
- * \tparam T3 Actual type of the third argument to the function.
- * \param f The function pointer.
- * \param a1 First argument to be bound to the function.
- * \param a2 Second argument to be bound to the function.
- * \param a3 Third argument to be bound to the function.
+ * \tparam U1 \deduced Formal type of the first argument to the function.
+ * \tparam U2 \deduced Formal type of the second argument to the function.
+ * \tparam U3 \deduced Formal type of the third argument to the function.
+ * \tparam T1 \deduced Actual type of the first argument to the function.
+ * \tparam T2 \deduced Actual type of the second argument to the function.
+ * \tparam T3 \deduced Actual type of the third argument to the function.
+ * \param [in] f The function pointer.
+ * \param [in] a1 First argument to be bound to the function.
+ * \param [in] a2 Second argument to be bound to the function.
+ * \param [in] a3 Third argument to be bound to the function.
  * \returns The constructed EventImpl.
  */
 template <typename U1, typename U2, typename U3,
@@ -211,19 +211,19 @@ EventImpl * MakeEvent (void (*f)(U1,U2,U3), T1 a1, T2 a2, T3 a3);
 
 /**
  * \copybrief MakeEvent(void(*f)(void))
- * \tparam U1 Formal type of the first argument to the function.
- * \tparam U2 Formal type of the second argument to the function.
- * \tparam U3 Formal type of the third argument to the function.
- * \tparam U4 Formal type of the fourth argument to the function.
- * \tparam T1 Actual type of the first argument to the function.
- * \tparam T2 Actual type of the second argument to the function.
- * \tparam T3 Actual type of the third argument to the function.
- * \tparam T4 Actual type of the fourth argument to the function.
- * \param f The function pointer.
- * \param a1 First argument to be bound to the function.
- * \param a2 Second argument to be bound to the function.
- * \param a3 Third argument to be bound to the function.
- * \param a4 Fourth argument to be bound to the function.
+ * \tparam U1 \deduced Formal type of the first argument to the function.
+ * \tparam U2 \deduced Formal type of the second argument to the function.
+ * \tparam U3 \deduced Formal type of the third argument to the function.
+ * \tparam U4 \deduced Formal type of the fourth argument to the function.
+ * \tparam T1 \deduced Actual type of the first argument to the function.
+ * \tparam T2 \deduced Actual type of the second argument to the function.
+ * \tparam T3 \deduced Actual type of the third argument to the function.
+ * \tparam T4 \deduced Actual type of the fourth argument to the function.
+ * \param [in] f The function pointer.
+ * \param [in] a1 First argument to be bound to the function.
+ * \param [in] a2 Second argument to be bound to the function.
+ * \param [in] a3 Third argument to be bound to the function.
+ * \param [in] a4 Fourth argument to be bound to the function.
  * \returns The constructed EventImpl.
  */
 template <typename U1, typename U2, typename U3, typename U4,
@@ -232,22 +232,22 @@ EventImpl * MakeEvent (void (*f)(U1,U2,U3,U4), T1 a1, T2 a2, T3 a3, T4 a4);
 
 /**
  * \copybrief MakeEvent(void(*f)(void))
- * \tparam U1 Formal type of the first argument to the function.
- * \tparam U2 Formal type of the second argument to the function.
- * \tparam U3 Formal type of the third argument to the function.
- * \tparam U4 Formal type of the fourth argument to the function.
- * \tparam U5 Formal type of the fifth argument to the function.
- * \tparam T1 Actual type of the first argument to the function.
- * \tparam T2 Actual type of the second argument to the function.
- * \tparam T3 Actual type of the third argument to the function.
- * \tparam T4 Actual type of the fourth argument to the function.
- * \tparam T5 Actual type of the fifth argument to the function.
- * \param f The function pointer.
- * \param a1 First argument to be bound to the function.
- * \param a2 Second argument to be bound to the function.
- * \param a3 Third argument to be bound to the function.
- * \param a4 Fourth argument to be bound to the function.
- * \param a5 Fifth argument to be bound to the function.
+ * \tparam U1 \deduced Formal type of the first argument to the function.
+ * \tparam U2 \deduced Formal type of the second argument to the function.
+ * \tparam U3 \deduced Formal type of the third argument to the function.
+ * \tparam U4 \deduced Formal type of the fourth argument to the function.
+ * \tparam U5 \deduced Formal type of the fifth argument to the function.
+ * \tparam T1 \deduced Actual type of the first argument to the function.
+ * \tparam T2 \deduced Actual type of the second argument to the function.
+ * \tparam T3 \deduced Actual type of the third argument to the function.
+ * \tparam T4 \deduced Actual type of the fourth argument to the function.
+ * \tparam T5 \deduced Actual type of the fifth argument to the function.
+ * \param [in] f The function pointer.
+ * \param [in] a1 First argument to be bound to the function.
+ * \param [in] a2 Second argument to be bound to the function.
+ * \param [in] a3 Third argument to be bound to the function.
+ * \param [in] a4 Fourth argument to be bound to the function.
+ * \param [in] a5 Fifth argument to be bound to the function.
  * \returns The constructed EventImpl.
  */
 template <typename U1, typename U2, typename U3, typename U4, typename U5,
@@ -274,7 +274,7 @@ namespace ns3 {
  *
  * This is the generic template declaration (with empty body).
  *
- * \tparam T The class type.
+ * \tparam T \explicit The class type.
  */
 template <typename T>
 struct EventMemberImplObjTraits;
@@ -287,13 +287,13 @@ struct EventMemberImplObjTraits;
  *
  * This is the specialization for pointer types.
  *
- * \tparam T The class type.
+ * \tparam T \explicit The class type.
  */
 template <typename T>
 struct EventMemberImplObjTraits<T *>
 {
   /**
-   * \param p Object pointer.
+   * \param [in] p Object pointer.
    * \return A reference to the object pointed to by p.
    */
   static T &GetReference (T *p)

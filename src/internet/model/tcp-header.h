@@ -48,6 +48,15 @@ public:
   virtual ~TcpHeader ();
 
   /**
+   * \brief Print a TCP header into an output stream
+   *
+   * \param os output stream
+   * \param tc TCP header to print
+   * \return The ostream passed as first argument
+   */
+  friend std::ostream& operator<< (std::ostream& os, TcpHeader const & tc);
+
+  /**
    * \brief Converts an integer into a human readable list of Tcp flags
    *
    * \param flags Bitfield of TCP flags to convert to a readable string
@@ -177,6 +186,18 @@ public:
   Ptr<TcpOption> GetOption (uint8_t kind) const;
 
   /**
+   * \brief Get the total length of appended options
+   * \return the total length of options appended to this TcpHeader
+   */
+  uint8_t GetOptionLength () const;
+
+  /**
+   * \brief Get maximum option length
+   * \return the maximum option length
+   */
+  uint8_t GetMaxOptionLength () const;
+
+  /**
    * \brief Check if the header has the option specified
    * \param kind Option to check for
    * \return true if the header has the option, false otherwise
@@ -204,8 +225,8 @@ public:
    *        IP packet.
    *
    */
-  void InitializeChecksum (Ipv4Address source, 
-                           Ipv4Address destination,
+  void InitializeChecksum (const Ipv4Address &source,
+                           const Ipv4Address &destination,
                            uint8_t protocol);
 
   /**
@@ -222,8 +243,8 @@ public:
    *        IP packet.
    *
    */
-  void InitializeChecksum (Ipv6Address source, 
-                           Ipv6Address destination,
+  void InitializeChecksum (const Ipv6Address &source,
+                           const Ipv6Address &destination,
                            uint8_t protocol);
 
   /**
@@ -240,8 +261,8 @@ public:
    *        IP packet.
    *
    */
-  void InitializeChecksum (Address source, 
-                           Address destination,
+  void InitializeChecksum (const Address &source,
+                           const Address &destination,
                            uint8_t protocol);
 
   /**
@@ -319,11 +340,10 @@ private:
   bool m_calcChecksum;    //!< Flag to calculate checksum
   bool m_goodChecksum;    //!< Flag to indicate that checksum is correct
 
-
+  static const uint8_t m_maxOptionsLen = 40;         //!< Maximum options length
   typedef std::list< Ptr<TcpOption> > TcpOptionList; //!< List of TcpOption
-  TcpOptionList m_options; //!< TcpOption present in the header
-  uint8_t m_optionsLen; //!< Tcp options length.
-  static const uint8_t m_maxOptionsLen = 40; //!< Maximum options length
+  TcpOptionList m_options;     //!< TcpOption present in the header
+  uint8_t m_optionsLen;        //!< Tcp options length.
 };
 
 } // namespace ns3

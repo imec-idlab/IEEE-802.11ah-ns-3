@@ -107,6 +107,26 @@ Ptr<Node> Application::GetNode () const
   return m_node;
 }
 
+/*std::string Application::GetNodeIpv6 () const
+{
+	NS_ASSERT(GetNode());
+	Ptr<Ipv6> ip = GetNode()->GetObject<Ipv6>();
+	Ipv6InterfaceAddress iAddr = ip->GetAddress(1,0);
+	std::stringstream addressStringStream;
+	addressStringStream << Ipv6Address::ConvertFrom (iAddr.GetAddress());
+	return addressStringStream.str();
+}
+
+std::string Application::GetNodeIpv4 () const
+{
+	NS_ASSERT(GetNode());
+	Ptr<Ipv4> ip = GetNode()->GetObject<Ipv4>();
+	Ipv4InterfaceAddress iAddr = ip->GetAddress(1,0);
+	std::stringstream addressStringStream;
+	addressStringStream << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+	return addressStringStream.str();
+}*/
+
 void 
 Application::SetNode (Ptr<Node> node)
 {

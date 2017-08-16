@@ -101,6 +101,11 @@ public:
   bool IsGroup (void) const;
 
   /**
+   * \returns true if this is a Solicited Node Multicast MAC address reserved by IPv6, false otherwise. AMI
+   */
+  bool IsMulticast6 (void) const;
+
+  /**
    * \returns the broadcast address
    */
   static Mac48Address GetBroadcast (void);
@@ -134,7 +139,7 @@ public:
    *
    * \param [in] value Current value of the Mac48Address
    */
-  typedef void (* TracedCallback)(const Mac48Address value);
+  typedef void (* TracedCallback)(Mac48Address value);
   
 private:
   /**

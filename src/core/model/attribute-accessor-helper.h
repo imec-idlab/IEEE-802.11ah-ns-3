@@ -56,12 +56,13 @@ namespace ns3 {
  * In the case of a \p setter returning \p bool, the return value
  * should be \c true if the value could be set successfully.
  *
- * \tparam V  (If present) The specific AttributeValue type to use to represent
- *            the Attribute.  (If not present, the type \p V is implicit
- *            in the name of this function as "Make<V>Accessor"
- * \tparam T1 The type of the class data member,
+ * \tparam V  \explicit (If present) The specific AttributeValue type
+ *            to use to represent the Attribute.  (If not present,
+ *            the type \p V is implicit in the name of this function,
+ *            as "Make<V>Accessor"
+ * \tparam T1 \deduced The type of the class data member,
  *            or the type of the class get functor or set method.
- * \param  a1 The address of the data member,
+ * \param [in] a1 The address of the data member,
  *            or the get or set method.
  * \returns   The AttributeAccessor
  */
@@ -99,15 +100,15 @@ MakeAccessorHelper (T1 a1);
  * In practice the setter and getter arguments can appear in either order,
  * but setter first is preferred.
  *
- * \tparam V  (If present) The specific AttributeValue type to use to represent
+ * \tparam V  \explicit (If present) The specific AttributeValue type to use to represent
  *            the Attribute.  (If not present, the type \p V is implicit
  *            in the name of this function as "Make<V>Accessor"
- * \tparam T1 The type of the class data member,
+ * \tparam T1 \deduced The type of the class data member,
  *            or the type of the class get functor or set method.
  *
- * \tparam T2 The type of the getter class functor method.
- * \param  a2 The address of the class method to set the attribute.
- * \param  a1 The address of the data member,
+ * \tparam T2 \deduced The type of the getter class functor method.
+ * \param [in] a2 The address of the class method to set the attribute.
+ * \param [in] a1 The address of the data member,
  *            or the get or set method.
  * \returns   The AttributeAccessor
  */
@@ -134,7 +135,7 @@ namespace ns3 {
  *
  * The non-const and non-reference type equivalent to \p T.
  *
- * \tparam T The original (possibly qualified) type.
+ * \tparam T \explicit The original (possibly qualified) type.
  */
 template <typename T>
 struct AccessorTrait
@@ -150,8 +151,8 @@ struct AccessorTrait
  * Basic functionality for accessing class attributes via
  * class data members, or get functor/set methods.
  *
- * \tparam T Class of object holding the attribute.
- * \tparam U AttributeValue type for the underlying class member
+ * \tparam T \explicit Class of object holding the attribute.
+ * \tparam U \explicit AttributeValue type for the underlying class member
  *           which is an attribute.
  */
 template <typename T, typename U>
@@ -169,8 +170,8 @@ public:
    *
    * Forwards to DoSet method.
    *
-   * \param object Generic object pointer, to upcast to \p T.
-   * \param val Generic AttributeValue, to upcast to \p U.
+   * \param [in] object Generic object pointer, to upcast to \p T.
+   * \param [in] val Generic AttributeValue, to upcast to \p U.
    * \returns true if the member was set successfully.
    */
   virtual bool Set (ObjectBase * object, const AttributeValue & val) const {
@@ -195,8 +196,8 @@ public:
    *
    * Forwards to DoGet method.
    *
-   * \param object Generic object pointer, to upcast to \p T.
-   * \param val Generic AttributeValue, to upcast to \p U.
+   * \param [out] object Generic object pointer, to upcast to \p T.
+   * \param [out] val Generic AttributeValue, to upcast to \p U.
    * \returns true if the member value could be retrieved successfully
    */
   virtual bool Get (const ObjectBase * object, AttributeValue &val) const {
@@ -218,8 +219,8 @@ private:
    * Setter implementation.
    *
    * \see Set()
-   * \param object The parent object holding the attribute.
-   * \param v The specific AttributeValue to set.
+   * \param [in] object The parent object holding the attribute.
+   * \param [in] v The specific AttributeValue to set.
    * \returns true if the member was set successfully.
    */
   virtual bool DoSet (T *object, const U *v) const = 0;
@@ -227,8 +228,8 @@ private:
    * Getter implementation.
    *
    * \see Get()
-   * \param object The parent object holding the attribute.
-   * \param v The specific AttributeValue to set.
+   * \param [out] object The parent object holding the attribute.
+   * \param [out] v The specific AttributeValue to set.
    * \returns true if the member value could be retrieved successfully
    */
   virtual bool DoGet (const T *object, U *v) const = 0;
@@ -241,11 +242,11 @@ private:
  *
  * MakeAccessorHelper implementation for a class data member.
  *
- * \tparam V  The specific AttributeValue type to use to represent
+ * \tparam V  \explicit The specific AttributeValue type to use to represent
  *            the Attribute.
- * \tparam T  The class holding the data member.
- * \tparam U  The type of the data member.
- * \param  memberVariable  The address of the data member.
+ * \tparam T  \deduced The class holding the data member.
+ * \tparam U  \deduced The type of the data member.
+ * \param [in]  memberVariable  The address of the data member.
  * \returns The AttributeAccessor.
  */
 template <typename V, typename T, typename U>
@@ -259,7 +260,7 @@ DoMakeAccessorHelperOne (U T::*memberVariable)
 public:
     /*
      * Construct from a class data member address.
-     * \param memberVariable The class data member address.
+     * \param [in] memberVariable The class data member address.
      */
     MemberVariable (U T::*memberVariable)
       : AccessorHelper<T,V> (),
@@ -298,11 +299,11 @@ private:
  *
  * MakeAccessorHelper implementation for a class get functor method.
  *
- * \tparam V  The specific AttributeValue type to use to represent
+ * \tparam V  \explicit The specific AttributeValue type to use to represent
  *            the Attribute.
- * \tparam T  The class holding the get functor method.
- * \tparam U  The return type of the get functor method.
- * \param  getter  The address of the class get functor method.
+ * \tparam T  \deduced The class holding the get functor method.
+ * \tparam U  \deduced The return type of the get functor method.
+ * \param [in] getter  The address of the class get functor method.
  * \returns The AttributeAccessor.
  */
 template <typename V, typename T, typename U>
@@ -316,7 +317,7 @@ DoMakeAccessorHelperOne (U (T::*getter)(void) const)
 public:
     /*
      * Construct from a class get functor method.
-     * \param getter The class get functor method pointer.
+     * \param [in] getter The class get functor method pointer.
      */
     MemberMethod (U (T::*getter)(void) const)
       : AccessorHelper<T,V> (),
@@ -348,11 +349,11 @@ private:
  * MakeAccessorHelper implementation for a class set method
  * returning void.
  *
- * \tparam V  The specific AttributeValue type to use to represent
+ * \tparam V  \explicit The specific AttributeValue type to use to represent
  *            the Attribute.
- * \tparam T  The class holding the set method.
- * \tparam U  The argument type of the set method.
- * \param  setter  The address of the class set method, returning void.
+ * \tparam T  \deduced The class holding the set method.
+ * \tparam U  \deduced The argument type of the set method.
+ * \param [in] setter  The address of the class set method, returning void.
  * \returns The AttributeAccessor.
  */
 template <typename V, typename T, typename U>
@@ -366,7 +367,7 @@ DoMakeAccessorHelperOne (void (T::*setter)(U))
 public:
     /*
      * Construct from a class set method.
-     * \param setter The class set method pointer.
+     * \param [in] setter The class set method pointer.
      */
     MemberMethod (void (T::*setter)(U))
       : AccessorHelper<T,V> (),
@@ -406,13 +407,13 @@ private:
  *
  * The two versions of this function differ only in argument order.
  *
- * \tparam W  The specific AttributeValue type to use to represent
+ * \tparam W  \explicit The specific AttributeValue type to use to represent
  *            the Attribute.
- * \tparam T  The class holding the functor methods.
- * \tparam U  The argument type of the set method.
- * \tparam V  The return type of the get functor method.
- * \param  setter  The address of the class set method, returning void.
- * \param  getter  The address of the class get functor method.
+ * \tparam T  \deduced The class holding the functor methods.
+ * \tparam U  \deduced The argument type of the set method.
+ * \tparam V  \deduced The return type of the get functor method.
+ * \param [in] setter The address of the class set method, returning void.
+ * \param [in] getter The address of the class get functor method.
  * \returns The AttributeAccessor.
  */
 template <typename W, typename T, typename U, typename V>
@@ -430,8 +431,8 @@ DoMakeAccessorHelperTwo (void (T::*setter)(U),
 public:
     /*
      * Construct from class get functor and set methods.
-     * \param setter The class set method pointer, returning void.
-     * \param getter The class get functor method pointer.
+     * \param [in] setter The class set method pointer, returning void.
+     * \param [in] getter The class get functor method pointer.
      */
     MemberMethod (void (T::*setter)(U),
                   V (T::*getter)(void) const)
@@ -489,13 +490,13 @@ DoMakeAccessorHelperTwo (V (T::*getter)(void) const,
  *
  * The two versions of this function differ only in argument order.
  *
- * \tparam W  The specific AttributeValue type to use to represent
+ * \tparam W  \explicit The specific AttributeValue type to use to represent
  *            the Attribute.
- * \tparam T  The class holding the functor methods.
- * \tparam U  The argument type of the set method.
- * \tparam V  The return type of the get functor method.
- * \param  setter  The address of the class set method, returning bool.
- * \param  getter  The address of the class get functor method.
+ * \tparam T  \deduced The class holding the functor methods.
+ * \tparam U  \deduced The argument type of the set method.
+ * \tparam V  \deduced The return type of the get functor method.
+ * \param [in] setter The address of the class set method, returning bool.
+ * \param [in] getter The address of the class get functor method.
  * \returns The AttributeAccessor.
  */
 template <typename W, typename T, typename U, typename V>
@@ -513,8 +514,8 @@ DoMakeAccessorHelperTwo (bool (T::*setter)(U),
 public:
     /*
      * Construct from class get functor and set method, returning bool.
-     * \param setter The class set method pointer, returning bool.
-     * \param getter The class get functor method pointer.
+     * \param [in] setter The class set method pointer, returning bool.
+     * \param [in] getter The class get functor method pointer.
      */
     MemberMethod (bool (T::*setter)(U),
                   V (T::*getter)(void) const)

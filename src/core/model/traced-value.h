@@ -56,10 +56,41 @@ namespace ns3 {
  *        values used by the various model components.
  *
  * Additional callback function signatures defined elsewhere:
- *   - Time::TracedValueCallback
- *   - ns3::SequenceNumber32TracedValueCallback
+ *   - TracedValueCallback::Time
+ *   - TracedValueCallback::SequenceNumber32
+ *   - TracedValueCallback::LrWpanMacState
+ *   - TracedValueCallback::LrWpanPhyEnumeration
  */
 
+/**
+ * \ingroup tracing
+ *
+ * \brief TracedValue Callback function types.
+ */
+namespace TracedValueCallback {
+
+  /**
+   * \name TracedValueCallback Signatures for POD.
+   * @{
+   */
+  /**
+   *  TracedValue Callback signature for POD.
+   *
+   * \param [in] oldValue original value of the traced variable
+   * \param [in] newValue new value of the traced variable
+   */
+  typedef void (* Bool)  (bool     oldValue, bool     newValue);
+  typedef void (* Int8)  (int8_t   oldValue, int8_t   newValue);
+  typedef void (* Uint8) (uint8_t  oldValue, uint8_t  newValue);
+  typedef void (* Int16) (int16_t  oldValue, int16_t  newValue);
+  typedef void (* Uint16)(uint16_t oldValue, uint16_t newValue);
+  typedef void (* Int32) (int32_t  oldValue, int32_t  newValue);
+  typedef void (* Uint32)(uint32_t oldValue, uint32_t newValue);
+  typedef void (* Double)(double   oldValue, double   newValue);
+  /**@}*/
+}  // namespace TracedValueCallback
+
+  
 /**
  * \ingroup tracing
  *
@@ -73,7 +104,7 @@ namespace ns3 {
  * and will define Connect/DisconnectWithoutContext methods to work
  * with MakeTraceSourceAccessor.
  *
- * \tparam T The type of the underlying value being traced.
+ * \tparam T \explicit The type of the underlying value being traced.
  */
 template <typename T>
 class TracedValue
@@ -84,13 +115,13 @@ public:
     : m_v () {}
   /**
    * Copy constructor.
-   * \param o The value to copy.
+   * \param [in] o The value to copy.
    */
   TracedValue (const TracedValue &o)
     : m_v (o.m_v) {}
   /**
    * Construct from an explicit variable.
-   * \param v The variable to trace.
+   * \param [in] v The variable to trace.
    */
   TracedValue (const T &v)
     : m_v (v) {}
@@ -103,7 +134,7 @@ public:
   }
   /**
    * Assignment.
-   * \param o The value to assign to this instance.
+   * \param [in] o The value to assign to this instance.
    * \return This TracedValue.
    */
   TracedValue &operator = (const TracedValue &o) {
@@ -113,8 +144,8 @@ public:
   }
   /**
    * Copy from a TracedValue of a compatable type.
-   * \tparam U The underlying type of the other TracedValue.
-   * \param other The other TracedValuet to copy.
+   * \tparam U \deduced The underlying type of the other TracedValue.
+   * \param [in] other The other TracedValuet to copy.
    */
   template <typename U>
   TracedValue (const TracedValue<U> &other)
@@ -122,8 +153,8 @@ public:
   {}
   /**
    * Copy from a variable type compatible with this underlying type.
-   * \tparam U Type of the other variable.
-   * \param other The other variable to copy.
+   * \tparam U \deduced Type of the other variable.
+   * \param [in] other The other variable to copy.
    */
   template <typename U>
   TracedValue (const U &other)
@@ -132,7 +163,7 @@ public:
   /**
    * Connect a Callback (without context.)
    *
-   * \param cb The callback to connect.
+   * \param [in] cb The callback to connect.
    */
   void ConnectWithoutContext (const CallbackBase &cb) {
     m_cb.ConnectWithoutContext (cb);
@@ -143,8 +174,8 @@ public:
    * The context string will be provided as the first argument to the
    * Callback function.
    *
-   * \param cb The Callback to connect to the target trace source.
-   * \param path The context to bind to the user callback.
+   * \param [in] cb The Callback to connect to the target trace source.
+   * \param [in] path The context to bind to the user callback.
    */
   void Connect (const CallbackBase &cb, std::string path) {
     m_cb.Connect (cb, path);
@@ -152,7 +183,7 @@ public:
   /**
    * Disconnect a Callback which was connected without context.
    *
-   * \param cb The Callback to disconnect.
+   * \param [in] cb The Callback to disconnect.
    */
   void DisconnectWithoutContext (const CallbackBase &cb) {
     m_cb.DisconnectWithoutContext (cb);
@@ -160,8 +191,8 @@ public:
   /**
    * Disconnect a Callback which was connected with context.
    *
-   * \param cb The Callback to disconnect.
-   * \param path The context to bind to the user callback.
+   * \param [in] cb The Callback to disconnect.
+   * \param [in] path The context to bind to the user callback.
    */
   void Disconnect (const CallbackBase &cb, std::string path) {
     m_cb.Disconnect (cb, path);
@@ -170,7 +201,7 @@ public:
    * Set the value of the underlying variable.
    *
    * If the new value differs from the old, the Callback will be invoked.
-   * \param v The new value.
+   * \param [in] v The new value.
    */
   void Set (const T &v) {
     if (m_v != v)
@@ -225,23 +256,6 @@ public:
   }
   /**@}*/
 
-  /**
-   *  TracedValue Callback signature for POD.
-   *
-   * \param [in] oldValue original value of the traced variable
-   * \param [in] newValue new value of the traced variable
-   * @{
-   */
-  typedef void (* BoolCallback)  (const bool     oldValue, const bool     newValue);
-  typedef void (* Int8Callback)  (const int8_t   oldValue, const int8_t   newValue);
-  typedef void (* Uint8Callback) (const uint8_t  oldValue, const uint8_t  newValue);
-  typedef void (* Int16Callback) (const int16_t  oldValue, const int16_t  newValue);
-  typedef void (* Uint16Callback)(const uint16_t oldValue, const uint16_t newValue);
-  typedef void (* Int32Callback) (const int32_t  oldValue, const int32_t  newValue);
-  typedef void (* Uint32Callback)(const uint32_t oldValue, const uint32_t newValue);
-  typedef void (* DoubleCallback)(const double   oldValue, const double   newValue);
-  /**@}*/
-
 private:
   /** The underlying value. */
   T m_v;
@@ -263,9 +277,9 @@ private:
  *
  * The underlying value will be written to the stream.
  *
- * \tparam T The underlying type of the TracedValue.
- * \param os The output stream.
- * \param rhs The TracedValue to stream.
+ * \tparam T \deduced The underlying type of the TracedValue.
+ * \param [in,out] os The output stream.
+ * \param [in] rhs The TracedValue to stream.
  * \returns The stream.
  */
 template <typename T>
@@ -276,10 +290,10 @@ std::ostream& operator << (std::ostream& os, const TracedValue<T>& rhs)
 
 /**
  * Boolean operator for TracedValue.
- * \tparam T The underlying type held by the left-hand argument.
- * \tparam U The underlying type held by the right-hand argument.
- * \param lhs The left-hand argument.
- * \param rhs The right-hand argument.
+ * \tparam T \deduced The underlying type held by the left-hand argument.
+ * \tparam U \deduced The underlying type held by the right-hand argument.
+ * \param [in] lhs The left-hand argument.
+ * \param [in] rhs The right-hand argument.
  * \returns The boolean result of comparing the underlying values.
  */
 template <typename T, typename U>
@@ -418,10 +432,10 @@ bool operator > (const U &lhs, const TracedValue<T> &rhs)
  * This returns the arithmetic result in a new TracedValue,
  * which has no Callback connected.
  *
- * \tparam T The underlying type held by the left-hand argument.
- * \tparam U The underlying type held by the right-hand argument.
- * \param lhs The left-hand argument.
- * \param rhs The right-hand argument.
+ * \tparam T \deduced The underlying type held by the left-hand argument.
+ * \tparam U \deduced The underlying type held by the right-hand argument.
+ * \param [in] lhs The left-hand argument.
+ * \param [in] rhs The right-hand argument.
  * \returns The result of doing the operator on
  *     the underlying values.
  */
@@ -621,10 +635,10 @@ TracedValue<T> operator >> (const U &lhs, const TracedValue<T> &rhs) {
  * is assigned to the \c lhs TracedValue.  If the new value 
  * is different, the Callback will be invoked.
  *
- * \tparam T The underlying type held by the left-hand argument.
- * \tparam U The underlying type held by the right-hand argument.
- * \param lhs The left-hand argument.
- * \param rhs The right-hand argument.
+ * \tparam T \deduced The underlying type held by the left-hand argument.
+ * \tparam U \deduced The underlying type held by the right-hand argument.
+ * \param [in] lhs The left-hand argument.
+ * \param [in] rhs The right-hand argument.
  * \returns The result of doing the operator on
  *     the underlying values.
  */
@@ -722,8 +736,8 @@ TracedValue<T> &operator ^= (TracedValue<T> &lhs, const U &rhs) {
 /**
  * Unary arithmetic operator for TracedValue.
  *
- * \tparam T The underlying type held by the TracedValue.
- * \param lhs The TracedValue.
+ * \tparam T \deduced The underlying type held by the TracedValue.
+ * \param [in] lhs The TracedValue.
  * \returns The result of doing the operator on
  *     the underlying values.
  */

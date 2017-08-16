@@ -58,11 +58,11 @@ NscTcpSocketImpl::GetTypeId ()
     .AddTraceSource ("CongestionWindow",
                      "The TCP connection's congestion window",
                      MakeTraceSourceAccessor (&NscTcpSocketImpl::m_cWnd),
-                     "ns3::TracedValue::Uint32Callback")
+                     "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("SlowStartThreshold",
                      "TCP slow start threshold (bytes)",
                      MakeTraceSourceAccessor (&NscTcpSocketImpl::m_ssThresh),
-                     "ns3::TracedValue::Uint32Callback")
+                     "ns3::TracedValueCallback::Uint32")
     .AddTraceSource ("State",
                      "TCP state",
                      MakeTraceSourceAccessor (&NscTcpSocketImpl::m_state),
@@ -119,7 +119,7 @@ NscTcpSocketImpl::NscTcpSocketImpl(const NscTcpSocketImpl& sock)
     m_initialSsThresh (sock.m_initialSsThresh),
     m_lastMeasuredRtt (Seconds (0.0)),
     m_cnTimeout (sock.m_cnTimeout),
-    m_cnCount (sock.m_cnCount),
+    m_synRetries (sock.m_synRetries),
     m_rxAvailable (0),
     m_nscTcpSocket (0),
     m_sndBufSize (sock.m_sndBufSize)
@@ -480,6 +480,21 @@ NscTcpSocketImpl::GetSockName (Address &address) const
   return 0;
 }
 
+int
+NscTcpSocketImpl::GetPeerName (Address &address) const
+{
+  NS_LOG_FUNCTION (this << address);
+
+  if (!m_endPoint)
+    {
+      m_errno = ERROR_NOTCONN;
+      return -1;
+    }
+  address = InetSocketAddress (m_endPoint->GetPeerAddress (),
+                               m_endPoint->GetPeerPort ());
+  return 0;
+}
+
 uint32_t
 NscTcpSocketImpl::GetRxAvailable (void) const
 {
@@ -778,21 +793,35 @@ NscTcpSocketImpl::GetConnTimeout (void) const
 }
 
 void 
-NscTcpSocketImpl::SetConnCount (uint32_t count)
+NscTcpSocketImpl::SetSynRetries (uint32_t count)
 {
-  m_cnCount = count;
+  m_synRetries = count;
 }
 
 uint32_t 
-NscTcpSocketImpl::GetConnCount (void) const
+NscTcpSocketImpl::GetSynRetries (void) const
 {
-  return m_cnCount;
+  return m_synRetries;
 }
 
 void 
 NscTcpSocketImpl::SetDelAckTimeout (Time timeout)
 {
   m_delAckTimeout = timeout;
+}
+
+void
+NscTcpSocketImpl::SetDataRetries (uint32_t retries)
+{
+  NS_LOG_FUNCTION (this << retries);
+  m_dataRetries = retries;
+}
+
+uint32_t
+NscTcpSocketImpl::GetDataRetries (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_dataRetries;
 }
 
 Time

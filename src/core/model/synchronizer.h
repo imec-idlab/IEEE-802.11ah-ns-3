@@ -24,8 +24,8 @@
 #include "object.h"
 
 /**
- * \file
- * \ingroup realtime
+ * @file
+ * @ingroup realtime
  * ns3::Synchronizer declaration.
  */
 
@@ -53,7 +53,7 @@ class Synchronizer : public Object
 public:
   /**
    * Get the registered TypeId for this class.
-   * \returns The TypeId.
+   * @returns The TypeId.
    */
   static TypeId GetTypeId (void);
 
@@ -68,7 +68,7 @@ public:
    *
    * The simulator sometimes needs to know this.
    *
-   * @returns \c true if locked with realtime, \c false if not.
+   * @returns @c true if locked with realtime, @c false if not.
    */
   bool Realtime (void);
 
@@ -95,7 +95,7 @@ public:
    * virtual method to do the actual real-time-clock-specific work
    * of making the correspondence mentioned above.
    *
-   * @param ts The simulation time we should use as the origin (in
+   * @param [in] ts The simulation time we should use as the origin (in
    *     Time resolution units).
    * @see DoSetOrigin
    */
@@ -115,7 +115,7 @@ public:
    * synchronize the simulation and the simulation time (in
    * Time resolution units).
    *
-   * @param ts Simulation time in Time resolution units.
+   * @param [in] ts Simulation time in Time resolution units.
    * @returns Simulation Time (in Time resolution units)
    *     minus the origin time (stored internally in nanosecond units).
    * @see SetOrigin
@@ -127,7 +127,7 @@ public:
    * @brief Wait until the real time is in sync with the specified simulation
    * time or until the synchronizer is Sigalled.
    *
-   * This is where the real work of synchronization is done.  The \c tsCurrent
+   * This is where the real work of synchronization is done.  The @c tsCurrent
    * argument is the simulation time.  The job of Synchronize is to
    * translate from simulation time to synchronizer time (in a perfect world
    * this is the same time) and then figure out how long in real-time it needs
@@ -138,11 +138,11 @@ public:
    * (either busy-waiting or sleeping, or some combination thereof) until the
    * requested simulation time.
    *
-   * @param tsCurrent The current simulation time (in Time resolution units).
-   * @param tsDelay The simulation time we need to wait for (in Time
+   * @param [in] tsCurrent The current simulation time (in Time resolution units).
+   * @param [in] tsDelay The simulation time we need to wait for (in Time
    *     resolution units).
-   * @returns \c true if the function ran to completion,
-   *          \c false if it was interrupted by a Signal.
+   * @returns @c true if the function ran to completion,
+   *          @c false if it was interrupted by a Signal.
    * @see DoSynchronize
    * @see Signal
    */
@@ -212,14 +212,14 @@ protected:
    * for example, this is where the differences between Time parameters and
    * parameters to clock_nanosleep would be dealt with. 
    *
-   * @param ns The simulation time we need to use as the origin (normalized to
+   * @param [in] ns The simulation time we need to use as the origin (normalized to
    *    nanosecond units).
    * @see SetOrigin
    */
   virtual void DoSetOrigin (uint64_t ns) = 0;
 
   /**
-   * @brief Return \c true if this synchronizer is actually synchronizing to a
+   * @brief Return @c true if this synchronizer is actually synchronizing to a
    * realtime clock.
    *
    * The simulator sometimes needs to know this.
@@ -227,7 +227,7 @@ protected:
    * Subclasses are expected to implement this method to tell the outside world
    * whether or not they are synchronizing to a realtime clock.
    *
-   * @returns \c true if locked with realtime, \c false if not.
+   * @returns @c true if locked with realtime, @c false if not.
    */
   virtual bool DoRealtime (void) = 0;
 
@@ -248,7 +248,7 @@ protected:
    * time.
    *
    * This is where the real work of synchronization is done.  The
-   * \c nsCurrent argument is the simulation time (in ns).  The job of
+   * @c nsCurrent argument is the simulation time (in ns).  The job of
    * DoSynchronize is to translate from simulation time to synchronizer time
    * (in a perfect world these are the same time) and then figure out
    * how long in real-time it needs to wait until that
@@ -258,11 +258,11 @@ protected:
    * real-time-clock-specific work of waiting (either busy-waiting or sleeping,
    * or some combination) until the requested simulation time.
    *
-   * @param nsCurrent The current simulation time (in nanosecond units).
-   * @param nsDelay The simulation time we need to wait for (normalized to 
+   * @param [in] nsCurrent The current simulation time (in nanosecond units).
+   * @param [in] nsDelay The simulation time we need to wait for (normalized to 
    * nanosecond units).
-   * @returns \c true if the function ran to completion,
-   *          \c false if it was interrupted by a Signal.
+   * @returns @c true if the function ran to completion,
+   *          @c false if it was interrupted by a Signal.
    * @see Synchronize
    * @see Signal
    */
@@ -290,7 +290,7 @@ protected:
    * @brief Get the drift between the real time clock used to synchronize
    * the simulation and the current simulation time.
    *
-   * @param ns Simulation time in ns.
+   * @param [in] ns Simulation time in ns.
    * @returns Drift in ns units.
    * @see SetOrigin
    * @see GetDrift
@@ -320,7 +320,7 @@ private:
    * @brief Convert a simulator time step (in Time resolution units)
    * to a normalized time step in nanosecond units.
    *
-   * @param ts The simulation time step to be normalized.
+   * @param [in] ts The simulation time step to be normalized.
    * @returns The simulation time step normalized to nanosecond units.
    */
   uint64_t TimeStepToNanosecond (uint64_t ts);
@@ -329,7 +329,7 @@ private:
    * @brief Convert a normalized nanosecond time step into a
    * simulator time step (in Time resolution units).
    *
-   * @param ns The nanosecond count step to be converted
+   * @param [in] ns The nanosecond count step to be converted
    * @returns The simulation time step to be interpreted in appropriate units.
    */
   uint64_t NanosecondToTimeStep (uint64_t ns);

@@ -19,6 +19,7 @@
  */
 #include "address-utils.h"
 #include "inet-socket-address.h"
+#include "inet6-socket-address.h"
 #include "ns3/log.h"
 
 namespace ns3 {
@@ -120,6 +121,12 @@ bool IsMulticast (const Address &ad)
       Ipv4Address ipv4 = inetAddr.GetIpv4 ();
       return ipv4.IsMulticast ();
     }
+  else if (Inet6SocketAddress::IsMatchingType(ad))
+  {
+	  Inet6SocketAddress inet6Addr = Inet6SocketAddress::ConvertFrom (ad);
+      Ipv6Address ipv6 = inet6Addr.GetIpv6 ();
+      return ipv6.IsMulticast ();
+  }
   // IPv6 case can go here, in future
   return false;
 }

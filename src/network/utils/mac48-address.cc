@@ -166,6 +166,14 @@ Mac48Address::IsGroup (void) const
   NS_LOG_FUNCTION (this);
   return (m_address[0] & 0x01) == 0x01;
 }
+bool
+Mac48Address::IsMulticast6 (void) const
+{
+  NS_LOG_FUNCTION (this);
+  if (m_address[0] == 0x33 && m_address[1] == 0x33)
+	  return true;
+  else return false;
+}
 Mac48Address
 Mac48Address::GetBroadcast (void)
 {

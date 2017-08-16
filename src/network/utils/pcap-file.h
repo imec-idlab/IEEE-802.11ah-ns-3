@@ -95,7 +95,7 @@ public:
    * PCAP_PPP, PCAP_80211, etc.  If you are storing different kinds of packet
    * data, such as naked TCP headers, you are at liberty to locally define your
    * own data link types.  According to the pcap-linktype man page, "well-known"
-   * pcap linktypes range from 0 to 177.  If you use a large random number for
+   * pcap linktypes range from 0 to 263.  If you use a large random number for
    * your type, chances are small for a collision.
    *
    * \param snapLen An optional maximum size for packets written to the file.
@@ -116,7 +116,8 @@ public:
   void Init (uint32_t dataLinkType, 
              uint32_t snapLen = SNAPLEN_DEFAULT, 
              int32_t timeZoneCorrection = ZONE_DEFAULT,
-             bool swapMode = false);
+             bool swapMode = false,
+             bool nanosecMode = false);
 
   /**
    * \brief Write next packet to file
@@ -147,7 +148,7 @@ public:
    * \param p           Packet to write
    * 
    */
-  void Write (uint32_t tsSec, uint32_t tsUsec, Header &header, Ptr<const Packet> p);
+  void Write (uint32_t tsSec, uint32_t tsUsec, const Header &header, Ptr<const Packet> p);
 
 
   /**
@@ -191,6 +192,14 @@ public:
    */
   bool GetSwapMode (void);
 
+  /**
+   * \brief Get the nanosecond mode of the file.
+   *
+   * IsNanoSecMode returns true if the packet timestamps in the PCAP 
+   * file have nanosecond resolution.
+   */
+   bool IsNanoSecMode (void);
+ 
   /**
    * \brief Returns the magic number of the pcap file as defined by the magic_number
    * field in the pcap global header.
@@ -337,6 +346,10 @@ private:
   void WriteFileHeader (void);
   /**
    * \brief Write a Pcap packet header
+   *
+   * The pcap header has a fixed length of 24 bytes. The last 4 bytes
+   * represent the link-layer type
+   *
    * \param tsSec Time stamp (seconds part)
    * \param tsUsec Time stamp (microseconds part)
    * \param totalLen total packet length
@@ -353,6 +366,7 @@ private:
   std::fstream   m_file;        //!< file stream
   PcapFileHeader m_fileHeader;  //!< file header
   bool m_swapMode;              //!< swap mode
+  bool m_nanosecMode;           //!< nanosecond timestamp mode
 };
 
 } // namespace ns3

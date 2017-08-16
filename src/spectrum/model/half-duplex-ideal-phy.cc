@@ -71,6 +71,12 @@ HalfDuplexIdealPhy::DoDispose ()
   SpectrumPhy::DoDispose ();
 }
 
+/**
+ * \brief Output stream operator
+ * \param os output stream
+ * \param s the state to print
+ * \return an output stream
+ */
 std::ostream& operator<< (std::ostream& os, HalfDuplexIdealPhy::State s)
 {
   switch (s)
@@ -135,7 +141,7 @@ HalfDuplexIdealPhy::GetTypeId (void)
 
 
 Ptr<NetDevice>
-HalfDuplexIdealPhy::GetDevice ()
+HalfDuplexIdealPhy::GetDevice () const
 {
   NS_LOG_FUNCTION (this);
   return m_netDevice;

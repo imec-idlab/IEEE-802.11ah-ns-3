@@ -469,12 +469,12 @@ int
 PacketSocket::GetSockName (Address &address) const
 {
   NS_LOG_FUNCTION (this << address);
-  PacketSocketAddress ad = PacketSocketAddress::ConvertFrom (address);
+  PacketSocketAddress ad;
 
   ad.SetProtocol (m_protocol);
   if (m_isSingleDevice)
     {
-      Ptr<NetDevice> device = m_node->GetDevice (ad.GetSingleDevice ());
+      Ptr<NetDevice> device = m_node->GetDevice (m_device);
       ad.SetPhysicalAddress (device->GetAddress ());
       ad.SetSingleDevice (m_device);
     }
@@ -484,6 +484,22 @@ PacketSocket::GetSockName (Address &address) const
       ad.SetAllDevices ();
     }
   address = ad;
+
+  return 0;
+}
+
+int
+PacketSocket::GetPeerName (Address &address) const
+{
+  NS_LOG_FUNCTION (this << address);
+
+  if (m_state != STATE_CONNECTED)
+    {
+      m_errno = ERROR_NOTCONN;
+      return -1;
+    }
+
+  address = m_destAddr;
 
   return 0;
 }

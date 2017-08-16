@@ -46,14 +46,14 @@ namespace ns3 {
  * calling one of the \c operator() forms with the appropriate
  * number of arguments.
  *
- * \tparam T1 Type of the first argument to the functor.
- * \tparam T2 Type of the second argument to the functor.
- * \tparam T3 Type of the third argument to the functor.
- * \tparam T4 Type of the fourth argument to the functor.
- * \tparam T5 Type of the fifth argument to the functor.
- * \tparam T6 Type of the sixth argument to the functor.
- * \tparam T7 Type of the seventh argument to the functor.
- * \tparam T8 Type of the eighth argument to the functor.
+ * \tparam T1 \explicit Type of the first argument to the functor.
+ * \tparam T2 \explicit Type of the second argument to the functor.
+ * \tparam T3 \explicit Type of the third argument to the functor.
+ * \tparam T4 \explicit Type of the fourth argument to the functor.
+ * \tparam T5 \explicit Type of the fifth argument to the functor.
+ * \tparam T6 \explicit Type of the sixth argument to the functor.
+ * \tparam T7 \explicit Type of the seventh argument to the functor.
+ * \tparam T8 \explicit Type of the eighth argument to the functor.
  */
 template<typename T1 = empty, typename T2 = empty, 
          typename T3 = empty, typename T4 = empty,
@@ -67,7 +67,7 @@ public:
   /**
    * Append a Callback to the chain (without a context).
    *
-   * \param callback Callback to add to chain.
+   * \param [in] callback Callback to add to chain.
    */
   void ConnectWithoutContext (const CallbackBase & callback);
   /**
@@ -76,21 +76,21 @@ public:
    * The context string will be provided as the first argument
    * to the Callback.
    *
-   * \param callback Callback to add to chain.
-   * \param path Context string to provide when invoking the Callback.
+   * \param [in] callback Callback to add to chain.
+   * \param [in] path Context string to provide when invoking the Callback.
    */
   void Connect (const CallbackBase & callback, std::string path);
   /**
    * Remove from the chain a Callback which was connected without a context.
    *
-   * \param callback Callback to remove from the chain.
+   * \param [in] callback Callback to remove from the chain.
    */
   void DisconnectWithoutContext (const CallbackBase & callback);
   /**
    * Remove from the chain a Callback which was connected with a context.
    *
-   * \param callback Callback to remove from the chain.
-   * \param path Context path which was used to connect the Callback.
+   * \param [in] callback Callback to remove from the chain.
+   * \param [in] path Context path which was used to connect the Callback.
    */
   void Disconnect (const CallbackBase & callback, std::string path);
   /**
@@ -105,106 +105,106 @@ public:
   void operator() (void) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \param a1 The first argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \param [in] a1 The first argument to the functor.
    */
   void operator() (T1 a1) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
    */
   void operator() (T1 a1, T2 a2) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
-   * \param a4 The fourth argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
+   * \param [in] a4 The fourth argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3, T4 a4) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \tparam T5 Type of the fifth argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
-   * \param a4 The fourth argument to the functor.
-   * \param a5 The fifth argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \tparam T5 \deduced Type of the fifth argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
+   * \param [in] a4 The fourth argument to the functor.
+   * \param [in] a5 The fifth argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3, T4 a4, T5 a5) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \tparam T5 Type of the fifth argument to the functor.
-   * \tparam T6 Type of the sixth argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
-   * \param a4 The fourth argument to the functor.
-   * \param a5 The fifth argument to the functor.
-   * \param a6 The sixth argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \tparam T5 \deduced Type of the fifth argument to the functor.
+   * \tparam T6 \deduced Type of the sixth argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
+   * \param [in] a4 The fourth argument to the functor.
+   * \param [in] a5 The fifth argument to the functor.
+   * \param [in] a6 The sixth argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \tparam T5 Type of the fifth argument to the functor.
-   * \tparam T6 Type of the sixth argument to the functor.
-   * \tparam T7 Type of the seventh argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
-   * \param a4 The fourth argument to the functor.
-   * \param a5 The fifth argument to the functor.
-   * \param a6 The sixth argument to the functor.
-   * \param a7 The seventh argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \tparam T5 \deduced Type of the fifth argument to the functor.
+   * \tparam T6 \deduced Type of the sixth argument to the functor.
+   * \tparam T7 \deduced Type of the seventh argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
+   * \param [in] a4 The fourth argument to the functor.
+   * \param [in] a5 The fifth argument to the functor.
+   * \param [in] a6 The sixth argument to the functor.
+   * \param [in] a7 The seventh argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7) const;
   /**
    * \copybrief operator()()
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \tparam T5 Type of the fifth argument to the functor.
-   * \tparam T6 Type of the sixth argument to the functor.
-   * \tparam T7 Type of the seventh argument to the functor.
-   * \tparam T8 Type of the eighth argument to the functor.
-   * \param a1 The first argument to the functor.
-   * \param a2 The second argument to the functor.
-   * \param a3 The third argument to the functor.
-   * \param a4 The fourth argument to the functor.
-   * \param a5 The fifth argument to the functor.
-   * \param a6 The sixth argument to the functor.
-   * \param a7 The seventh argument to the functor.
-   * \param a8 The eighth argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \tparam T5 \deduced Type of the fifth argument to the functor.
+   * \tparam T6 \deduced Type of the sixth argument to the functor.
+   * \tparam T7 \deduced Type of the seventh argument to the functor.
+   * \tparam T8 \deduced Type of the eighth argument to the functor.
+   * \param [in] a1 The first argument to the functor.
+   * \param [in] a2 The second argument to the functor.
+   * \param [in] a3 The third argument to the functor.
+   * \param [in] a4 The fourth argument to the functor.
+   * \param [in] a5 The fifth argument to the functor.
+   * \param [in] a6 The sixth argument to the functor.
+   * \param [in] a7 The seventh argument to the functor.
+   * \param [in] a8 The eighth argument to the functor.
    */
   void operator() (T1 a1, T2 a2, T3 a3, T4 a4, T5 a5, T6 a6, T7 a7, T8 a8) const;
   /**@}*/
@@ -225,14 +225,14 @@ private:
   /**
    * Container type for holding the chain of Callbacks.
    *
-   * \tparam T1 Type of the first argument to the functor.
-   * \tparam T2 Type of the second argument to the functor.
-   * \tparam T3 Type of the third argument to the functor.
-   * \tparam T4 Type of the fourth argument to the functor.
-   * \tparam T5 Type of the fifth argument to the functor.
-   * \tparam T6 Type of the sixth argument to the functor.
-   * \tparam T7 Type of the seventh argument to the functor.
-   * \tparam T8 Type of the eighth argument to the functor.
+   * \tparam T1 \deduced Type of the first argument to the functor.
+   * \tparam T2 \deduced Type of the second argument to the functor.
+   * \tparam T3 \deduced Type of the third argument to the functor.
+   * \tparam T4 \deduced Type of the fourth argument to the functor.
+   * \tparam T5 \deduced Type of the fifth argument to the functor.
+   * \tparam T6 \deduced Type of the sixth argument to the functor.
+   * \tparam T7 \deduced Type of the seventh argument to the functor.
+   * \tparam T8 \deduced Type of the eighth argument to the functor.
    */
   typedef std::list<Callback<void,T1,T2,T3,T4,T5,T6,T7,T8> > CallbackList;
   /** The chain of Callbacks. */
@@ -264,7 +264,8 @@ void
 TracedCallback<T1,T2,T3,T4,T5,T6,T7,T8>::ConnectWithoutContext (const CallbackBase & callback)
 {
   Callback<void,T1,T2,T3,T4,T5,T6,T7,T8> cb;
-  cb.Assign (callback);
+  if (!cb.Assign (callback))
+    NS_FATAL_ERROR_NO_MSG();
   m_callbackList.push_back (cb);
 }
 template<typename T1, typename T2,
@@ -275,7 +276,8 @@ void
 TracedCallback<T1,T2,T3,T4,T5,T6,T7,T8>::Connect (const CallbackBase & callback, std::string path)
 {
   Callback<void,std::string,T1,T2,T3,T4,T5,T6,T7,T8> cb;
-  cb.Assign (callback);
+  if (!cb.Assign (callback))
+    NS_FATAL_ERROR ("when connecting to " << path);
   Callback<void,T1,T2,T3,T4,T5,T6,T7,T8> realCb = cb.Bind (path);
   m_callbackList.push_back (realCb);
 }
@@ -307,7 +309,8 @@ void
 TracedCallback<T1,T2,T3,T4,T5,T6,T7,T8>::Disconnect (const CallbackBase & callback, std::string path)
 {
   Callback<void,std::string,T1,T2,T3,T4,T5,T6,T7,T8> cb;
-  cb.Assign (callback);
+  if (!cb.Assign (callback))
+    NS_FATAL_ERROR ("when disconnecting from " << path);
   Callback<void,T1,T2,T3,T4,T5,T6,T7,T8> realCb = cb.Bind (path);
   DisconnectWithoutContext (realCb);
 }
