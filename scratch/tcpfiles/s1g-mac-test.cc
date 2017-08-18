@@ -319,6 +319,18 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
     return rpslist;
 }
 
+// begin <
+void sendStatistics(bool schedule) {
+	eventManager.onUpdateStatistics(stats);
+	/*eventManager.onUpdateSlotStatistics(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval, transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval);
+	// reset
+	transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.NGroup * config.NRawSlotNum, 0);
+	transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.NGroup * config.NRawSlotNum, 0);
+	*/
+	if(schedule)
+		Simulator::Schedule(Seconds(config.visualizerSamplingInterval), &sendStatistics, true);
+}
+// end >
 
 
 int main (int argc, char *argv[])
@@ -510,6 +522,14 @@ int main (int argc, char *argv[])
           Vector position = mobility1->GetPosition();
           std::cout << "AP node, position = " << position << std::endl;
         }
+      // begin <
+      // configure tracing for associations & other metrics
+      //configureNodes();
+
+      eventManager.onStartHeader();
+      eventManager.onStart(config);
+      sendStatistics(true);
+      // end >
 
       Simulator::Run ();
       Simulator::Destroy ();
