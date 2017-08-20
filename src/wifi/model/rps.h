@@ -49,7 +49,6 @@ public:
           ~RawAssignment ();
           
           void SetRawControl (uint8_t control);
-          //void SetRawSlot (uint16_t slot); repalce by following
           void SetSlotFormat (uint8_t format);
           void SetSlotCrossBoundary (uint8_t cross);
           void SetSlotDurationCount (uint16_t count);
@@ -61,6 +60,7 @@ public:
           void SetRawGroup (uint32_t group);
           void SetChannelInd (uint16_t channel);
           void SetPRAW (uint32_t praw);
+          void SetRawTypeIndex(uint8_t val);
           
           uint8_t GetRawControl (void) const;
           uint16_t GetRawSlot (void) ;
@@ -68,7 +68,6 @@ public:
           uint8_t GetSlotCrossBoundary (void) const;
           uint16_t GetSlotDurationCount (void) const;
           uint16_t GetSlotNum (void) const;
-           
            
           uint8_t GetRawStart (void) const;
           uint32_t GetRawGroup (void) const;
@@ -80,6 +79,7 @@ public:
           uint8_t GetRawGroupPage() const;
           uint16_t GetRawGroupAIDStart() const;
           uint16_t GetRawGroupAIDEnd() const;
+          uint8_t GetRawTypeIndex() const;
           //void Serialize (Buffer::Iterator start) const;
           //uint8_t Deserialize (Buffer::Iterator start);
           
@@ -90,7 +90,8 @@ public:
           uint8_t m_slotCrossBoundary;
           uint16_t m_slotDurationCount;
           uint16_t m_slotNum;
-           
+          uint8_t m_rawTypeIndex;
+
           uint8_t m_rawstart;
           uint32_t m_rawgroup;
           uint16_t m_channelind;
@@ -122,7 +123,7 @@ public:
   void SerializeInformationField (Buffer::Iterator start) const;
   uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
 
-  RPS::RawAssignment GetRawAssigmentObj() const;
+  RPS::RawAssignment GetRawAssigmentObj(uint32_t index = 0) const;
 
   uint8_t m_length;
 private:

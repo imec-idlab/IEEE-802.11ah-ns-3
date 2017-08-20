@@ -277,7 +277,7 @@ void
 DcaTxop::Queue (Ptr<const Packet> packet, const WifiMacHeader &hdr)
 {
   NS_LOG_FUNCTION (this << packet << &hdr);
-  NS_LOG_UNCOND("DcaTxop::Queue " << Simulator::Now () << "\t" << m_low->GetAddress () << "\t" << packet->GetSize ());
+  //NS_LOG_UNCOND("DcaTxop::Queue " << Simulator::Now () << "\t" << m_low->GetAddress () << "\t" << packet->GetSize ());
   WifiMacTrailer fcs;
   uint32_t fullPacketSize = hdr.GetSerializedSize () + packet->GetSize () + fcs.GetSerializedSize ();
   m_stationManager->PrepareForQueue (hdr.GetAddr1 (), &hdr,
@@ -322,7 +322,7 @@ DcaTxop::StartAccessIfNeeded (void)
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)      // always TRUE outside RAW
     {
-      NS_LOG_UNCOND("DcaTxop::StartAccessIfNeeded " << Simulator::Now () << "\t" << m_low->GetAddress ());  
+      //NS_LOG_UNCOND("DcaTxop::StartAccessIfNeeded " << Simulator::Now () << "\t" << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
     }
 }
@@ -478,12 +478,12 @@ void
 DcaTxop::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
-  NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted " << Simulator::Now () << "\t" << m_low->GetAddress ());
+  //NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted " << Simulator::Now () << "\t" << m_low->GetAddress ());
   if (!AccessIfRaw) 
     {
         return;
     }
-  NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted--- " << Simulator::Now () << "\t" << m_low->GetAddress ());
+  //NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted--- " << Simulator::Now () << "\t" << m_low->GetAddress ());
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty ())

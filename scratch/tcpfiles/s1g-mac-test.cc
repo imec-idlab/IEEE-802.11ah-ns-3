@@ -167,7 +167,6 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
         //UDP flow
         UdpServerHelper myServer (9);
-        //ApplicationContainer serverApp;
         serverApp = myServer.Install (wifiApNode);
         serverApp.Start (Seconds (0));
 
@@ -270,7 +269,7 @@ PopulateArpCache ()
 }
 
 
-RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
+/*RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
     uint16_t NRPS = 0;
     uint16_t Value = 0;
@@ -317,6 +316,65 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
     else cout << "Unable to open file \n";
     
     return rpslist;
+}*/
+
+uint16_t ngroup;
+uint16_t nslot;
+RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
+{
+    uint16_t NRPS = 0;
+    uint16_t NRAWPERBEACON = 0;
+    uint16_t Value = 0;
+    uint32_t page = 0;
+    uint32_t aid_start = 0;
+    uint32_t aid_end = 0;
+    uint32_t rawinfo = 0;
+
+    ifstream myfile (RAWConfigFile);
+    //1. get info from config file
+
+    //2. define RPS
+    if (myfile.is_open())
+    {
+        myfile >> NRPS;
+
+        for (uint16_t kk=0; kk< NRPS; kk++)   // number of beacons covering all raw groups
+        {
+            RPS *m_rps = new RPS;
+            myfile >> NRAWPERBEACON;
+            ngroup = NRAWPERBEACON;
+            for (uint16_t i=0; i< NRAWPERBEACON; i++)  // raw groups in one beacon
+            {
+                //RPS *m_rps = new RPS;
+                RPS::RawAssignment *m_raw = new RPS::RawAssignment;
+
+                myfile >> Value;
+                m_raw->SetRawControl (Value);//support paged STA or not
+                myfile >> Value;
+                m_raw->SetSlotCrossBoundary (Value);
+                myfile >> Value;
+                m_raw->SetSlotFormat (Value);
+                myfile >> Value;
+                m_raw->SetSlotDurationCount (Value);
+                myfile >> Value;
+                nslot = Value;
+                m_raw->SetSlotNum (Value);
+                myfile >> page;
+                myfile >> aid_start;
+                myfile >> aid_end;
+                rawinfo = (aid_end << 13) | (aid_start << 2) | page;
+                m_raw->SetRawGroup (rawinfo);
+
+                m_rps->SetRawAssignment(*m_raw);
+                delete m_raw;
+            }
+            rpslist.rpsset.push_back (m_rps);
+        }
+        myfile.close();
+    }
+    else cout << "Unable to open file \n";
+
+    return rpslist;
 }
 
 // begin <
@@ -330,12 +388,61 @@ void sendStatistics(bool schedule) {
 	if(schedule)
 		Simulator::Schedule(Seconds(config.visualizerSamplingInterval), &sendStatistics, true);
 }
+
+/*TODO:
+ * void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
+	cout << "Configuring STA Node trace sources" << endl;
+
+    for (uint32_t i = 0; i < config.Nsta; i++) {
+
+    	cout << "Hooking up trace sources for STA " << i << endl;
+
+        NodeEntry* n = new NodeEntry(i, &stats, wifiStaNode.Get(i), staDevice.Get(i));
+
+        n->SetAssociatedCallback([ = ]{onSTAAssociated(i);});
+        n->SetDeassociatedCallback([ = ]{onSTADeassociated(i);});
+
+        nodes.push_back(n);
+        // hook up Associated and Deassociated events
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback(&NodeEntry::UnsetAssociation, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/NrOfTransmissionsDuringRAWSlot", MakeCallback(&NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged, n));
+
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/S1gBeaconMissed", MakeCallback(&NodeEntry::OnS1gBeaconMissed, n));
+
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/PacketDropped", MakeCallback(&NodeEntry::OnMacPacketDropped, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Collision", MakeCallback(&NodeEntry::OnCollision, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/TransmissionWillCrossRAWBoundary", MakeCallback(&NodeEntry::OnTransmissionWillCrossRAWBoundary, n));
+
+
+        // hook up TX
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxBegin", MakeCallback(&NodeEntry::OnPhyTxBegin, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxEnd", MakeCallback(&NodeEntry::OnPhyTxEnd, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxDropWithReason", MakeCallback(&NodeEntry::OnPhyTxDrop, n));
+
+        // hook up RX
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxBegin", MakeCallback(&NodeEntry::OnPhyRxBegin, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxEnd", MakeCallback(&NodeEntry::OnPhyRxEnd, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxDropWithReason", MakeCallback(&NodeEntry::OnPhyRxDrop, n));
+
+
+        // hook up MAC traces
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxRtsFailed", MakeCallback(&NodeEntry::OnMacTxRtsFailed, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxDataFailed", MakeCallback(&NodeEntry::OnMacTxDataFailed, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalRtsFailed", MakeCallback(&NodeEntry::OnMacTxFinalRtsFailed, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalDataFailed", MakeCallback(&NodeEntry::OnMacTxFinalDataFailed, n));
+
+        // hook up PHY State change
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/State/State", MakeCallback(&NodeEntry::OnPhyStateChange, n));
+
+    }
+}*/
 // end >
 
 
 int main (int argc, char *argv[])
 {
-  LogComponentEnable ("UdpServer", LOG_INFO);
+  //LogComponentEnable ("UdpServer", LOG_INFO);
 
 
   /*double simulationTime = 10;
@@ -524,7 +631,7 @@ int main (int argc, char *argv[])
         }
       // begin <
       // configure tracing for associations & other metrics
-      //configureNodes();
+      //TODO:configureNodes(wifiStaNode, staDevice);
 
       eventManager.onStartHeader();
       eventManager.onStart(config);

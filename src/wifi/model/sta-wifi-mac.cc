@@ -938,6 +938,10 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
              NS_ASSERT ("RAW configuration incorrect!");
           }
         uint8_t RAW_number = raw_len/rawAssignment_len;
+        std::cout<<"====================================================== "<<std::endl;
+        std::cout<<"RAW_number = "<<(int)RAW_number<<std::endl<<std::endl;
+        std::cout<<"GetInformationFieldSize = "<<(int)raw_len<<std::endl<<std::endl;
+
 
          uint16_t m_slotDurationCount=0;
          uint16_t m_slotNum=0;
@@ -945,6 +949,8 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
          m_lastRawDurationus = MicroSeconds(0);
     for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
       {
+        auto ass = beacon.GetRPS().GetRawAssigmentObj(raw_index);
+
         uint8_t rawtypeindex = rawassign[raw_index*rawAssignment_len+0] & 0x07;
         if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
           {
@@ -955,12 +961,15 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             m_pagedStaRaw = false;
           }
         uint8_t pageindex = rawassign[raw_index*rawAssignment_len+3] & 0x03;
+        std::cout<<"pageindex = "<<(int)pageindex<<std::endl;
+        std::cout<<"ass.GetRawGroupPage() = "<<(int)ass.GetRawGroupPage()<<std::endl<<std::endl;
 
          uint16_t m_rawslot;
          m_rawslot = (uint16_t(rawassign[raw_index*rawAssignment_len+2]) << 8) | (uint16_t(rawassign[raw_index*rawAssignment_len+1]));
          uint8_t m_SlotFormat = uint8_t (m_rawslot >> 15) & 0x0001;
          uint8_t m_slotCrossBoundary = uint8_t (m_rawslot >> 14) & 0x0002;
-
+         std::cout<<"m_rawslot = "<<m_rawslot<<std::endl;
+         std::cout<<"GetRawSlot() = "<<(int)ass.GetRawSlot()<<std::endl<<std::endl;
           m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;
 
          NS_ASSERT (m_SlotFormat <= 1);
@@ -979,6 +988,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);
         m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;
 
+
          if (pageindex == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
            {
 
@@ -988,6 +998,16 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
              uint32_t rawgroup = (uint32_t(rawassign[raw_index*rawAssignment_len+5]) << 16) | (uint32_t(rawassign[raw_index*rawAssignment_len+4]) << 8) | uint32_t(rawassign[raw_index*rawAssignment_len+3]);
              uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
              uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
+
+             std::cout<<"raw_start = "<<raw_start<<std::endl;
+             std::cout<<"GetRawGroupAIDStart() = "<<(int)ass.GetRawGroupAIDStart()<<std::endl<<std::endl;
+
+             std::cout<<"rawgroup = "<<rawgroup<<std::endl;
+             std::cout<<"GetRawGroup() = "<<(int)ass.GetRawGroup()<<std::endl<<std::endl;
+
+
+             std::cout<<"raw_end = "<<raw_end<<std::endl;
+              std::cout<<"GetRawEnd() = "<<(int)ass.GetRawGroupAIDEnd()<<std::endl<<std::endl;
 
                uint16_t statsPerSlot = 0;
                uint16_t statRawSlot = 0;
