@@ -938,10 +938,6 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
              NS_ASSERT ("RAW configuration incorrect!");
           }
         uint8_t RAW_number = raw_len/rawAssignment_len;
-        std::cout<<"====================================================== "<<std::endl;
-        std::cout<<"RAW_number = "<<(int)RAW_number<<std::endl<<std::endl;
-        std::cout<<"GetInformationFieldSize = "<<(int)raw_len<<std::endl<<std::endl;
-
 
          uint16_t m_slotDurationCount=0;
          uint16_t m_slotNum=0;
@@ -951,8 +947,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
       {
         auto ass = beacon.GetRPS().GetRawAssigmentObj(raw_index);
 
-        uint8_t rawtypeindex = rawassign[raw_index*rawAssignment_len+0] & 0x07;
-        if (rawtypeindex == 4) // only support Generic Raw (paged STA RAW or not)
+        if (ass.GetRawTypeIndex() == 4) // only support Generic Raw (paged STA RAW or not)
           {
             m_pagedStaRaw = true;
           }
@@ -960,66 +955,27 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           {
             m_pagedStaRaw = false;
           }
-        uint8_t pageindex = rawassign[raw_index*rawAssignment_len+3] & 0x03;
-        std::cout<<"pageindex = "<<(int)pageindex<<std::endl;
-        std::cout<<"ass.GetRawGroupPage() = "<<(int)ass.GetRawGroupPage()<<std::endl<<std::endl;
-
-         uint16_t m_rawslot;
-         m_rawslot = (uint16_t(rawassign[raw_index*rawAssignment_len+2]) << 8) | (uint16_t(rawassign[raw_index*rawAssignment_len+1]));
-         uint8_t m_SlotFormat = uint8_t (m_rawslot >> 15) & 0x0001;
-         uint8_t m_slotCrossBoundary = uint8_t (m_rawslot >> 14) & 0x0002;
-         std::cout<<"m_rawslot = "<<m_rawslot<<std::endl;
-         std::cout<<"GetRawSlot() = "<<(int)ass.GetRawSlot()<<std::endl<<std::endl;
-          m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;
-
-         NS_ASSERT (m_SlotFormat <= 1);
-
-         if (m_SlotFormat == 0)
-           {
-             m_slotDurationCount = (m_rawslot >> 6) & 0x00ff;
-             m_slotNum = m_rawslot & 0x003f;
-           }
-         else if (m_SlotFormat == 1)
-           {
-             m_slotDurationCount = (m_rawslot >> 3) & 0x07ff;
-             m_slotNum = m_rawslot & 0x0007;
-           }
+         m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;
+         m_slotDurationCount = ass.GetSlotDurationCount();
+         m_slotNum = ass.GetSlotNum();
 
         m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);
         m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;
 
 
-         if (pageindex == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
+         if (ass.GetRawGroupPage() == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
            {
-
-             uint8_t rawgroup_l = rawassign[raw_index*rawAssignment_len+3];
-             uint8_t rawgroup_m = rawassign[raw_index*rawAssignment_len+4];
-             uint8_t rawgroup_h = rawassign[raw_index*rawAssignment_len+5];
-             uint32_t rawgroup = (uint32_t(rawassign[raw_index*rawAssignment_len+5]) << 16) | (uint32_t(rawassign[raw_index*rawAssignment_len+4]) << 8) | uint32_t(rawassign[raw_index*rawAssignment_len+3]);
-             uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
-             uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
-
-             std::cout<<"raw_start = "<<raw_start<<std::endl;
-             std::cout<<"GetRawGroupAIDStart() = "<<(int)ass.GetRawGroupAIDStart()<<std::endl<<std::endl;
-
-             std::cout<<"rawgroup = "<<rawgroup<<std::endl;
-             std::cout<<"GetRawGroup() = "<<(int)ass.GetRawGroup()<<std::endl<<std::endl;
-
-
-             std::cout<<"raw_end = "<<raw_end<<std::endl;
-              std::cout<<"GetRawEnd() = "<<(int)ass.GetRawGroupAIDEnd()<<std::endl<<std::endl;
-
                uint16_t statsPerSlot = 0;
                uint16_t statRawSlot = 0;
 
                Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
                uint16_t offset = m_rv->GetValue (0, 1023);
                offset =0; // for test
-               statsPerSlot = (raw_end - raw_start + 1)/m_slotNum;
+               statsPerSlot = (ass.GetRawGroupAIDEnd() - ass.GetRawGroupAIDStart() + 1)/m_slotNum;
                //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
                statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
 
-             if ((raw_start <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= raw_end))
+             if ((ass.GetRawGroupAIDStart() <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= ass.GetRawGroupAIDEnd()))
                {
                  m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);
                  SetInRAWgroup ();
@@ -1028,7 +984,6 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                   //break; //break should not used if multiple RAW is supported
                }
                //NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
-
            }
       }
          m_rawStart = true; //?

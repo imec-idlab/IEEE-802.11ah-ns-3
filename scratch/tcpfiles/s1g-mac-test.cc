@@ -269,7 +269,7 @@ PopulateArpCache ()
 }
 
 
-/*RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
+RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
     uint16_t NRPS = 0;
     uint16_t Value = 0;
@@ -316,9 +316,9 @@ PopulateArpCache ()
     else cout << "Unable to open file \n";
     
     return rpslist;
-}*/
+}
 
-uint16_t ngroup;
+/*uint16_t ngroup;
 uint16_t nslot;
 RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
@@ -375,7 +375,7 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
     else cout << "Unable to open file \n";
 
     return rpslist;
-}
+}*/
 
 // begin <
 void sendStatistics(bool schedule) {
