@@ -5,15 +5,21 @@
 using namespace ns3;
 using namespace std;
 
-
+NS_LOG_COMPONENT_DEFINE ("NodeEntry");
 bool showLog = false;
+Time NodeEntry::maxLatency = Time::Min();
+Time NodeEntry::minLatency = Time::Max();
+Time NodeEntry::minJitter = Time::Max();
+Time NodeEntry::maxJitter = Time::Min();
 
-NodeEntry::NodeEntry(int id, Statistics* stats, Ptr<Node> node,
-		Ptr<NetDevice> device) :
+NodeEntry::NodeEntry(int id, Statistics* stats, Ptr<Node> node, Ptr<NetDevice> device) :
 		id(id), stats(stats), node(node), device(device) {
 }
 
 void NodeEntry::SetAssociation(std::string context, Mac48Address address) {
+	unused(context);
+	unused(address);
+
 	this->isAssociated = true;
 
 	// determine AID
@@ -29,6 +35,8 @@ void NodeEntry::SetAssociation(std::string context, Mac48Address address) {
 }
 
 void NodeEntry::UnsetAssociation(std::string context, Mac48Address address) {
+	unused(context);
+	unused(address);
 	this->isAssociated = false;
 
 	cout << "[" << this->id << "] " << Simulator::Now().GetMicroSeconds() << " "
@@ -39,14 +47,19 @@ void NodeEntry::UnsetAssociation(std::string context, Mac48Address address) {
 
 
 void NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged(std::string context, uint16_t oldValue, uint16_t newValue) {
+	unused(context);
+	unused(oldValue);
 	stats->get(this->id).NumberOfTransmissionsDuringRAWSlot = newValue;
 }
 
 void NodeEntry::OnS1gBeaconMissed(std::string context, bool nextBeaconIsDTIM) {
+	unused(context);
+	unused(nextBeaconIsDTIM);
 	stats->get(this->id).NumberOfBeaconsMissed++;
 }
 
 void NodeEntry::OnPhyTxBegin(std::string context, Ptr<const Packet> packet) {
+	unused(context);
 	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 			<< "Begin Tx " << packet->GetUid() << endl;
 	txMap.emplace(packet->GetUid(), Simulator::Now());
@@ -64,6 +77,7 @@ void NodeEntry::OnPhyTxBegin(std::string context, Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
+	unused(context);
 	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 			<< "End Tx " << packet->GetUid() << endl;
 
@@ -77,8 +91,8 @@ void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
 				<< " without a begin tx" << endl;
 }
 
-void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet,
-		DropReason reason) {
+void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
+	unused(context);
 	if(showLog) cout << "[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
 			<< endl;
 
@@ -100,7 +114,7 @@ void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet,
 void NodeEntry::OnPhyRxBegin(std::string context, Ptr<const Packet> packet) {
 	//cout << "[" << this->aId << "] " << Simulator::Now().GetMicroSeconds()
 	//<< " Begin Rx " << packet->GetUid() << endl;
-
+	unused(context);
 	rxMap.emplace(packet->GetUid(), Simulator::Now());
 
 	if (rxMap.size() > 1)
@@ -111,7 +125,7 @@ void NodeEntry::OnPhyRxBegin(std::string context, Ptr<const Packet> packet) {
 void NodeEntry::OnPhyRxEnd(std::string context, Ptr<const Packet> packet) {
 	//cout  << Simulator::Now().GetMicroSeconds() << "[" << this->aId << "] "
 	//<< " End Rx " << packet->GetUid() << endl;
-
+	unused(context);
 	this->OnEndOfReceive(packet);
 }
 
@@ -157,7 +171,7 @@ void NodeEntry::OnEndOfReceive(Ptr<const Packet> packet) {
 				 cout << endl;
 				 */
 
-				if ((vmap >> this->rawGroupNumber) & 0x01 == 0x01) {
+				if (((vmap >> this->rawGroupNumber) & 0x01) == 0x01) {
 					// there is pending data at the AP
 					rawTIMGroupFlaggedAsDataAvailableInDTIM = true;
 				} else {
@@ -183,7 +197,7 @@ void NodeEntry::OnEndOfReceive(Ptr<const Packet> packet) {
 
 void NodeEntry::OnPhyRxDrop(std::string context, Ptr<const Packet> packet,
 		DropReason reason) {
-
+	unused(context);
 	this->OnEndOfReceive(packet);
 
 	// THIS REQUIRES PACKET METADATA ENABLE!
@@ -220,9 +234,9 @@ void NodeEntry::OnPhyRxDrop(std::string context, Ptr<const Packet> packet,
 	stats->get(this->id).NumberOfReceivesDropped++;
 }
 
-void NodeEntry::OnPhyStateChange(std::string context, const Time start,
-		const Time duration, const WifiPhy::State state) {
-
+void NodeEntry::OnPhyStateChange(std::string context, const Time start,	const Time duration, const WifiPhy::State state) {
+	unused(context);
+	unused(start);
 	switch (state) {
 
 	case WifiPhy::State::SLEEP:
@@ -316,9 +330,8 @@ SeqTsHeader GetSeqTSFromPacket(Ptr<const Packet> packet) {
 void NodeEntry::OnTcpPacketSent(Ptr<const Packet> packet) {
 
 	//SeqTsHeader seqTs = GetSeqTSFromPacket(packet);
-
-	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
-			<< "TCP packet sent " << endl;//with seq nr " << seqTs.GetSeq() << endl;
+	unused(packet);
+	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] " << "TCP packet sent " << endl;//with seq nr " << seqTs.GetSeq() << endl;
 
 /*
 	// the packet is just sent, so track if it's received by a list of booleans
@@ -339,9 +352,9 @@ void NodeEntry::OnTcpPacketSent(Ptr<const Packet> packet) {
 
 }
 
-void NodeEntry::OnTcpEchoPacketReceived(Ptr<const Packet> packet,
-		Address from) {
-
+void NodeEntry::OnTcpEchoPacketReceived(Ptr<const Packet> packet, Address from) {
+	unused(packet);
+	unused(from);
 	SeqTsHeader seqTs = GetSeqTSFromPacket(packet);
 	if(seqTs.GetSeq() > 0) {
 		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
@@ -350,6 +363,7 @@ void NodeEntry::OnTcpEchoPacketReceived(Ptr<const Packet> packet,
 	}
 
 	stats->get(this->id).NumberOfSuccessfulRoundtripPackets++;
+	this->UpdateJitter(Simulator::Now() - this->timeSent);
 
 	/*
 	try {
@@ -401,7 +415,7 @@ void NodeEntry::OnTcpPacketReceivedAtAP(Ptr<const Packet> packet) {
 		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 	}
 
-	std::cout << this->id <<" -------- "<< stats->get(this->id).NumberOfSuccessfulPackets++ << std::endl;
+	stats->get(this->id).NumberOfSuccessfulPackets++;
 
 
 
@@ -453,27 +467,28 @@ void NodeEntry::OnTcpPacketReceivedAtAP(Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnTcpCongestionWindowChanged(uint32_t oldval, uint32_t newval) {
-
+	unused(oldval);
 	stats->get(this->id).TCPCongestionWindow = newval;
 }
 
 void NodeEntry::OnTcpRTOChanged(Time oldval, Time newval) {
+	unused(oldval);
 	stats->get(this->id).TCPRTOValue = newval;
 }
 
 void NodeEntry::OnTcpRTTChanged(Time oldval, Time newval) {
+	unused(oldval);
 	stats->get(this->id).TCPRTTValue = newval;
 }
 
-void NodeEntry::OnTcpStateChanged(TcpSocket::TcpStates_t oldval,
-		TcpSocket::TcpStates_t newval) {
-
+void NodeEntry::OnTcpStateChanged(TcpSocket::TcpStates_t oldval, TcpSocket::TcpStates_t newval) {
+	unused(oldval);
 	tcpConnectedAtSTA = (newval == TcpSocket::TcpStates_t::ESTABLISHED);
 	stats->get(this->id).TCPConnected = tcpConnectedAtSTA && tcpConnectedAtAP;
 }
 
-void NodeEntry::OnTcpStateChangedAtAP(TcpSocket::TcpStates_t oldval,
-		TcpSocket::TcpStates_t newval) {
+void NodeEntry::OnTcpStateChangedAtAP(TcpSocket::TcpStates_t oldval, TcpSocket::TcpStates_t newval) {
+	unused(oldval);
 	tcpConnectedAtAP = (newval	== TcpSocket::TcpStates_t::ESTABLISHED);
 	if(showLog) cout << "TCP connected at ap " << tcpConnectedAtAP;
 
@@ -481,6 +496,7 @@ void NodeEntry::OnTcpStateChangedAtAP(TcpSocket::TcpStates_t oldval,
 }
 
 void NodeEntry::OnTcpRetransmission(Address to) {
+	unused(to);
 	stats->get(this->id).NumberOfTCPRetransmissions++;
 }
 
@@ -489,18 +505,19 @@ void NodeEntry::OnTcpRetransmissionAtAP() {
 	stats->get(this->id).NumberOfTCPRetransmissionsFromAP++;
 }
 
-void NodeEntry::OnTcpSlowStartThresholdChanged(uint32_t oldVal,
-		uint32_t newVal) {
+void NodeEntry::OnTcpSlowStartThresholdChanged(uint32_t oldVal, uint32_t newVal) {
+	unused(oldVal);
 	stats->get(this->id).TCPSlowStartThreshold = newVal;
 }
 
 void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
+	unused(oldVal);
 	stats->get(this->id).TCPEstimatedBandwidth = newVal;
 }
 
 void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) {
 //cout << "[" << this->id << "] " << "UDP packet sent " << endl;
-
+	unused(packet);
 	stats->get(this->id).NumberOfSentPackets++;
 
 	/*		cout << "[" << this->id << "] "  << Simulator::Now().GetMicroSeconds() <<
@@ -514,19 +531,94 @@ void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) {
 	 */
 }
 
-void NodeEntry::OnUdpEchoPacketReceived(Ptr<const Packet> packet,
-		Address from) {
+void NodeEntry::OnUdpEchoPacketReceived(Ptr<const Packet> packet, Address from) {
 	//cout << "Echo packet received back from AP ("
 	//	<< InetSocketAddress::ConvertFrom(from).GetIpv4() << ")" << endl;
-
+	unused(from);
 	auto pCopy = packet->Copy();
 	try {
 		SeqTsHeader seqTs;
 		pCopy->RemoveHeader(seqTs);
 		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
-
+		if (seqTs.GetSeq() > 0)
+			stats->get(this->id).NumberOfSuccessfulRoundtripPacketsWithSeqHeader++;
 		stats->get(this->id).NumberOfSuccessfulRoundtripPackets++;
 		stats->get(this->id).TotalPacketRoundtripTime += timeDiff;
+		// RT jitter calculation [server to client direction]
+		this->UpdateJitter(Simulator::Now() - this->timeSent);
+
+	} catch (std::runtime_error e) {
+		// packet fragmentation, unable to get the header from fragements
+	}
+}
+
+void NodeEntry::OnCoapPacketSent(Ptr<const Packet> packet) {
+	unused(packet);
+	stats->get(this->id).NumberOfSentPackets++;
+}
+/* Jitter is calculated only for packet delivered in order
+ * Dropped packets are ignored
+ * */
+void NodeEntry::UpdateJitter (Time timeDiff)
+{
+	if (stats->get(this->id).NumberOfSuccessfulRoundtripPackets == 1)
+	{
+		delayFirst = timeDiff;
+	}
+	else
+	{
+		delaySecond = timeDiff;
+		Time var = Abs(delayFirst - delaySecond);
+		stats->get (this->id).jitter = var;
+		stats->get (this->id).jitterAcc += pow (var.GetMilliSeconds (), 2);
+		if (NodeEntry::maxJitter < var)
+			NodeEntry::maxJitter = var;
+		if (NodeEntry::minJitter > var)
+			NodeEntry::minJitter = var;
+		delayFirst = delaySecond;
+
+	}
+}
+void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
+	unused(from);
+	auto pCopy = packet->Copy();
+	try {
+		SeqTsHeader seqTs;
+		pCopy->RemoveHeader(seqTs);
+		// time from the moment server sends a reply until the moment client receives it
+		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
+		//cout << "=========================CLIENT SEQ " << seqTs.GetSeq() << endl;
+		//if (seqTs.GetSeq() >= 0) //allways true
+		stats->get(this->id).NumberOfSuccessfulRoundtripPacketsWithSeqHeader++;
+
+		stats->get(this->id).NumberOfSuccessfulRoundtripPackets++;
+		stats->get(this->id).TotalPacketRoundtripTime += timeDiff; //time from S to C is accumulated here and later added to the time from C to S
+		this->UpdateJitter(Simulator::Now() - this->timeSent);
+		uint32_t currentSequenceNumber = seqTs.GetSeq();
+	    //cout << "============================================================================ Client " << this->id << " received seq" << currentSequenceNumber << endl;
+
+		Time newNow = Simulator::Now();
+		if (currentSequenceNumber == stats->get(this->id).m_prevPacketSeqClient + 1)
+		{
+			stats->get(this->id).m_interPacketDelayClient.push_back(newNow - stats->get(this->id).m_prevPacketTimeClient);
+			stats->get(this->id).interPacketDelayAtClient = newNow - stats->get(this->id).m_prevPacketTimeClient;
+		    //cout << "============================================================================ interPacketDelayAtClient " << this->id << " is" << newNow - stats->get(this->id).m_prevPacketTimeClient << endl;
+
+		}
+		else if (currentSequenceNumber > stats->get(this->id).m_prevPacketSeqClient + 1)
+		{
+			NS_LOG_INFO ("Packet(s) with seq number(s) ");
+			for (uint32_t i = stats->get(this->id).m_prevPacketSeqClient + 1; i < currentSequenceNumber; i++)
+				NS_LOG_INFO (std::to_string(i) << " ");
+			NS_LOG_INFO ("is(are) lost in path Server -> Client");
+
+			stats->get(this->id).m_interPacketDelayClient.push_back(newNow - stats->get(this->id).m_prevPacketTimeClient);
+			stats->get(this->id).interPacketDelayAtClient = newNow - stats->get(this->id).m_prevPacketTimeClient;
+
+		}
+		stats->get(this->id).m_prevPacketSeqClient = currentSequenceNumber;
+		stats->get(this->id).m_prevPacketTimeClient = newNow;
+
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get the header from fragements
 	}
@@ -545,27 +637,80 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 
 		stats->get(this->id).NumberOfSuccessfulPackets++;
 		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
-
-		/*cout << this->node->GetDevice(0)->GetAddress() << " ";
-		 cout << "[" << this->id << "] "  << Simulator::Now().GetMicroSeconds() << " Packet received in " << timeDiff.GetMicroSeconds() << "µs" << endl;
-		 */
-
 		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
+
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get header
 	}
 }
 
-void NodeEntry::OnMacPacketDropped(std::string context,
-		Ptr<const Packet> packet, DropReason reason) {
-	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
 
+void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
+	auto pCopy = packet->Copy();
+	try {
+
+		SeqTsHeader seqTs;
+		pCopy->RemoveHeader(seqTs);
+		// time from the moment client sends a packet to the moment server receives it - latency
+		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
+		this->timeSent = seqTs.GetTs();
+		if (NodeEntry::maxLatency < timeDiff)
+			NodeEntry::maxLatency = timeDiff;
+		if (NodeEntry::minLatency > timeDiff)
+			NodeEntry::minLatency = timeDiff;
+
+		//if (seqTs.GetSeq() >= 0) allways true
+		stats->get(this->id).NumberOfSuccessfulPacketsWithSeqHeader++;
+		stats->get(this->id).NumberOfSuccessfulPackets++;
+		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
+
+		uint32_t currentSequenceNumber = seqTs.GetSeq();
+		if (currentSequenceNumber == 0)
+		{
+			stats->get(this->id).m_prevPacketSeqServer = currentSequenceNumber;
+			stats->get(this->id).m_prevPacketTimeServer = Simulator::Now();
+		}
+		else if (currentSequenceNumber == stats->get(this->id).m_prevPacketSeqServer + 1)
+		{
+			Time newNow = Simulator::Now();
+			stats->get(this->id).m_interPacketDelayServer.push_back(newNow - stats->get(this->id).m_prevPacketTimeServer);
+			stats->get(this->id).interPacketDelayAtServer = newNow - stats->get(this->id).m_prevPacketTimeServer;
+			stats->get(this->id).m_time.push_back(newNow);
+			stats->get(this->id).m_prevPacketSeqServer = currentSequenceNumber;
+			stats->get(this->id).m_prevPacketTimeServer = newNow;
+		}
+		else if (currentSequenceNumber > stats->get(this->id).m_prevPacketSeqServer + 1)
+		{
+			NS_LOG_INFO ("Packet(s) with seq number(s) ");
+			for (uint32_t i = stats->get(this->id).m_prevPacketSeqServer + 1; i < currentSequenceNumber; i++)
+				NS_LOG_INFO (std::to_string(i) << " ");
+			NS_LOG_INFO ("is(are) lost in path Client->Server");
+
+			Time newNow = Simulator::Now();
+			stats->get(this->id).m_interPacketDelayServer.push_back(newNow - stats->get(this->id).m_prevPacketTimeServer);
+			stats->get(this->id).interPacketDelayAtServer = newNow - stats->get(this->id).m_prevPacketTimeServer;
+			stats->get(this->id).m_time.push_back(newNow);
+			stats->get(this->id).m_prevPacketSeqServer = currentSequenceNumber;
+			stats->get(this->id).m_prevPacketTimeServer = newNow;
+
+		}
+		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize() - 4 - 7; //deduct coap hdr & opts, only payload here
+		//std::cout << packet->GetSize() << std::endl;
+	} catch (std::runtime_error e) {
+		// packet fragmentation, unable to get header
+	}
+}
+
+void NodeEntry::OnMacPacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason) {
+	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
+	unused(context);
+	unused(packet);
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
 }
 
 void NodeEntry::OnTcpPacketDropped(Ptr<Packet> packet, DropReason reason) {
 	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
-
+	unused(packet);
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
 }
 
@@ -596,16 +741,15 @@ void NodeEntry::OnTcpIPCameraDataReceivedAtAP(uint16_t nrOfBytes) {
 	stats->get(this->id).IPCameraTotalDataReceivedAtAP += nrOfBytes;
 }
 
-
-
 void NodeEntry::OnCollision(std::string context, uint32_t nrOfBackoffSlots) {
 	if(showLog) cout << "Collision sensed" << endl;
-
+	unused(context);
 	stats->get(this->id).NumberOfCollisions++;
 	stats->get(this->id).TotalNumberOfBackedOffSlots += nrOfBackoffSlots;
 }
 
 void NodeEntry::OnTransmissionWillCrossRAWBoundary(std::string context, Time txDuration, Time remainingTimeInRawSlot) {
+	unused(context);
 	cout << "Transmission cancelled, tx duration " << txDuration << ", remaining time " << remainingTimeInRawSlot << endl;
 
 	stats->get(this->id).NumberOfTransmissionsCancelledDueToCrossingRAWBoundary++;
@@ -614,30 +758,32 @@ void NodeEntry::OnTransmissionWillCrossRAWBoundary(std::string context, Time txD
 void NodeEntry::OnMacTxRtsFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//	<< " MAC Tx Rts Failed" << endl;
-
+	unused(context);
+	unused(address);
 	stats->get(this->id).NumberOfMACTxRTSFailed++;
 }
 
 void NodeEntry::OnMacTxDataFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//		<< " MAC Tx Data Failed" << endl;
-
+	unused(context);
+	unused(address);
 	stats->get(this->id).NumberOfMACTxMissedACK++;
 }
 
-void NodeEntry::OnMacTxFinalRtsFailed(std::string context,
-		Mac48Address address) {
+void NodeEntry::OnMacTxFinalRtsFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//		<< " MAC Tx Rts Failed" << endl;
-
+	unused(context);
+	unused(address);
 	stats->get(this->id).NumberOfMACTxRTSFailed++;
 }
 
-void NodeEntry::OnMacTxFinalDataFailed(std::string context,
-		Mac48Address address) {
+void NodeEntry::OnMacTxFinalDataFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//		<< " MAC Tx Final data Failed" << endl;
-
+	unused(context);
+	unused(address);
 	stats->get(this->id).NumberOfMACTxMissedACKAndDroppedPacket++;
 }
 

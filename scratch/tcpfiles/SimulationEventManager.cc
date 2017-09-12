@@ -23,30 +23,32 @@ SimulationEventManager::SimulationEventManager(string hostname, int port, string
 
 
 void SimulationEventManager::onStart(Configuration& config) {
+	m_config = config;
 	send({"start",
-		  /*std::to_string(config.NRawSta),
+		  std::to_string(config.NRawSta),
 		  std::to_string(config.NGroup),
 		  std::to_string(config.SlotFormat),
 		  std::to_string(config.NRawSlotCount),
-		  std::to_string(config.NRawSlotNum),*/
+		  std::to_string(config.NRawSlotCount * 120 + 500),
+		  std::to_string(config.NRawSlotNum),
 
 		  config.DataMode,
 		  "",
 		  "",
 
-		  /*std::to_string(config.trafficInterval),
-		  std::to_string(config.trafficPacketSize),*/
+		  std::to_string(config.trafficInterval),
+		  std::to_string(config.trafficPacketSize),
 
 		  std::to_string(config.BeaconInterval),
 
 		  config.name,
 
-		  /*std::to_string(config.propagationLossExponent),
+		  std::to_string(config.propagationLossExponent),
 		  std::to_string(config.propagationLossReferenceLoss),
 		  std::to_string(config.APAlwaysSchedulesForNextSlot),
-		  std::to_string(config.MinRTO),*/
+		  std::to_string(config.MinRTO),
 		  std::to_string(config.simulationTime),
-		  /*config.trafficType,
+		  config.trafficType,
 		  std::to_string(config.trafficIntervalDeviation),
 		  std::to_string(config.TCPSegmentSize),
 		  std::to_string(config.TCPInitialSlowStartThreshold),
@@ -55,16 +57,16 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  std::to_string(config.MaxTimeOfPacketsInQueue),
 		  std::to_string(config.ipcameraMotionPercentage),
 		  std::to_string(config.ipcameraMotionDuration),
-		  std::to_string(config.ipcameraDataRate),*/
-		  std::to_string(config.Nsta)
-		  /*std::to_string(config.CoolDownPeriod),
+		  std::to_string(config.ipcameraDataRate),
+		  std::to_string(config.Nsta),
+		  std::to_string(config.CoolDownPeriod),
 		  std::to_string(config.firmwareSize),
 		  std::to_string(config.firmwareBlockSize),
 		  std::to_string(config.firmwareCorruptionProbability),
 		  std::to_string(config.firmwareNewUpdateProbability),
 		  std::to_string(config.sensorMeasurementSize),
 		  std::to_string(config.ContentionPerRAWSlot),
-		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup)*/
+		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup)
 	});
 }
 
@@ -78,7 +80,7 @@ void SimulationEventManager::onSTANodeCreated(NodeEntry& node) {
 }
 
 void SimulationEventManager::onNodeAssociated(NodeEntry& node) {
-	send({"stanodeassoc", std::to_string(node.id), std::to_string(node.aId), std::to_string(node.rawGroupNumber), std::to_string(node.rawSlotIndex)});
+	send({"stanodeassoc", std::to_string(node.id), std::to_string(node.aId), std::to_string(node.rawGroupNumber), std::to_string(node.rawSlotIndex)}); //TODO rawGroupNumber not known in assoc
 }
 
 void SimulationEventManager::onNodeDeassociated(NodeEntry& node) {
@@ -100,7 +102,7 @@ void SimulationEventManager::onUpdateSlotStatistics(vector<long>& transmissionsP
 	vector<string> values;
 
 	values.push_back("slotstatsAP");
-	for(int i = 0; i < transmissionsPerSlotFromAP.size(); i++) {
+	for(uint32_t i = 0; i < transmissionsPerSlotFromAP.size(); i++) {
 		values.push_back(std::to_string(transmissionsPerSlotFromAP[i]));
 	}
 	send(values);
@@ -108,7 +110,7 @@ void SimulationEventManager::onUpdateSlotStatistics(vector<long>& transmissionsP
 	values.clear();
 
 	values.push_back("slotstatsSTA");
-	for(int i = 0; i < transmissionsPerSlotFromSTA.size(); i++) {
+	for(uint32_t i = 0; i < transmissionsPerSlotFromSTA.size(); i++) {
 		values.push_back(std::to_string(transmissionsPerSlotFromSTA[i]));
 	}
 	send(values);
@@ -128,11 +130,11 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).NumberOfSentPackets),
 			std::to_string(stats.get(i).NumberOfSuccessfulPackets),
 			std::to_string(stats.get(i).getNumberOfDroppedPackets()),
-			std::to_string(stats.get(i).getAveragePacketSentReceiveTime().GetMilliSeconds()),
+			std::to_string(stats.get(i).getAveragePacketSentReceiveTime()),
 			std::to_string(stats.get(i).getGoodputKbit()),
 			std::to_string(stats.get(i).EDCAQueueLength),
 			std::to_string(stats.get(i).NumberOfSuccessfulRoundtripPackets),
-			std::to_string(stats.get(i).getAveragePacketRoundTripTime().GetMilliSeconds()),
+			std::to_string(stats.get(i).getAveragePacketRoundTripTime(m_config.trafficType)),
 			std::to_string(stats.get(i).TCPCongestionWindow),
 			std::to_string(stats.get(i).NumberOfTCPRetransmissions),
 			std::to_string(stats.get(i).NumberOfTCPRetransmissionsFromAP),
@@ -157,7 +159,13 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).FirmwareTransferTime.GetMicroSeconds()),
 			std::to_string(stats.get(i).getIPCameraSendingRate()),
 			std::to_string(stats.get(i).getIPCameraAPReceivingRate()),
-			std::to_string(stats.get(i).NumberOfTransmissionsCancelledDueToCrossingRAWBoundary)
+			std::to_string(stats.get(i).NumberOfTransmissionsCancelledDueToCrossingRAWBoundary),
+			std::to_string(stats.get(i).GetAverageJitter()), // I have jitter in micros abs delay between subsequent packets
+			std::to_string(stats.get(i).GetReliability()),
+			std::to_string(stats.get(i).GetInterPacketDelayAtServer()),
+			std::to_string(stats.get(i).GetInterPacketDelayAtClient()),
+			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer)),
+			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient))
 		});
 	}
 }
@@ -166,7 +174,7 @@ void SimulationEventManager::send(vector<string> str) {
 
 	std::stringstream s;
 	s << Simulator::Now().GetNanoSeconds() << ";";
-	for(int i = 0; i < str.size(); i++) {
+	for(uint32_t i = 0; i < str.size(); i++) {
 		s << str[i] << ((i != str.size()-1) ? ";" : "");
 	}
 	s << "\n";
@@ -202,24 +210,25 @@ void SimulationEventManager::send(vector<string> str) {
 
 void SimulationEventManager::onStartHeader() {
 	send({"startheader",
-		   /*"NRawSta",
+		   "NRawSta",
 		   "NGroup",
 		   "SlotFormat",
 		   "NRawSlotCount",
-		   "NRawSlotNum",*/
+		   "NRawSlotDuration",
+		   "NRawSlotNum",
 		   "DataMode",
 		   "",
 		   "",
-		   /*"TrafficInterval",
-		   "TrafficPacketSize",*/
+		   "TrafficInterval",
+		   "TrafficPacketSize",
 		   "BeaconInterval",
 		   "Name",
-		   /*"PropagationLossExponent",
+		   "PropagationLossExponent",
 		   "PropagationLossReferenceLoss",
 		   "APAlwaysSchedulesForNextSlot",
-		   "MinRTO",*/
+		   "MinRTO",
 		   "SimulationTime",
-		   /*"TrafficType",
+		   "TrafficType",
 		   "TrafficIntervalDeviation",
 		   "TCPSegmentSize",
 		   "TCPInitialSlowStartThreshold",
@@ -227,16 +236,16 @@ void SimulationEventManager::onStartHeader() {
 		   "MaxTimeOfPacketsInQueue",
 		   "IPCameraMotionPercentage",
 		   "IPCameraMotionDuration",
-		   "IPCameraDataRate",*/
-		   "NSta"
-		   /*"CoolDownPeriod",
+		   "IPCameraDataRate",
+		   "NSta",
+		   "CoolDownPeriod",
 		   "FirmwareSize",
 		   "FirmwareBlockSize",
 		   "FirmwareCorruptionProbability",
 		   "FirmwareNewUpdateProbability",
 		   "SensorMeasurementSize",
 		   "ContentionPerRAWSlot",
-		   "ContentionPerRAWSlotOnlyInFirstGroup"*/
+		   "ContentionPerRAWSlotOnlyInFirstGroup"
 		});
 }
 
@@ -282,7 +291,13 @@ void SimulationEventManager::onStatisticsHeader() {
 		"FirmwareTransferTime",
 		"IPCameraSendingRate",
 		"IPCameraReceivingRate",
-		"NumberOfTransmissionsCancelledDueToCrossingRAWBoundary"
+		"NumberOfTransmissionsCancelledDueToCrossingRAWBoundary",
+		"Jitter",
+		"Reliability",
+		"InterPacketDelayAtServer",
+		"InterPacketDelayAtClient",
+		"InterPacketDelayDeviationPercentageAtServer",
+		"InterPacketDelayDeviationPercentageAtClient"
 	});
 
 }

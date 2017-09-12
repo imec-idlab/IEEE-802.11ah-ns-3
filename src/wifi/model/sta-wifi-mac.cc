@@ -41,6 +41,9 @@
 
 #include "random-stream.h"
 
+#define LOG_SLEEP(msg)	if(true) NS_LOG_DEBUG("[" << (GetAID()) << "] " << msg << std::endl);
+
+
 /*
  * The state machine for this STA is:
  --------------                                          -----------
@@ -83,6 +86,10 @@ StaWifiMac::GetTypeId (void)
                    MakeTimeAccessor (&StaWifiMac::GetRawDuration,
                                      &StaWifiMac::SetRawDuration),
                    MakeTimeChecker ())
+	.AddAttribute ("MaxTimeInQueue", "The max. time a packet stays in the DCA queue before it's dropped",
+					TimeValue (MilliSeconds(10000)),
+					MakeTimeAccessor(&StaWifiMac::m_maxTimeInQueue),
+					MakeTimeChecker ())
     .AddAttribute ("MaxMissedBeacons",
                    "Number of beacons which much be consecutively missed before "
                    "we attempt to restart association.",
@@ -110,6 +117,14 @@ StaWifiMac::GetTypeId (void)
     .AddTraceSource ("DeAssoc", "Association with an access point lost.",
                      MakeTraceSourceAccessor (&StaWifiMac::m_deAssocLogger),
                      "ns3::Mac48Address::TracedCallback")
+	.AddTraceSource ("S1gBeaconMissed", "Fired when a beacon is missed.",
+					MakeTraceSourceAccessor (&StaWifiMac::m_beaconMissed),
+					"ns3::StaWifiMac::S1gBeaconMissedCallback")
+
+	.AddTraceSource ("NrOfTransmissionsDuringRAWSlot",
+					"Nr of transmissions during RAW slot",
+					MakeTraceSourceAccessor (&StaWifiMac::nrOfTransmissionsDuringRAWSlot),
+					"ns3::TracedValueCallback::Uint16")
   ;
   return tid;
 }
@@ -457,6 +472,57 @@ StaWifiMac::OutsideRawStartBackoff (void)
   */
 }
 
+void
+StaWifiMac::OnAssociated() {
+	m_assocLogger(GetBssid());
+	// start only allowing transmissions during specific slot periods
+	//DenyDCAAccess();
+}
+
+void
+StaWifiMac::OnDeassociated() {
+    m_deAssocLogger (GetBssid ());
+    // allow tranmissions until reassociated
+    //GrantDCAAccess();
+    TryToEnsureAssociated();
+}
+/*
+void
+StaWifiMac::GrantDCAAccess() {
+	m_pspollDca->AccessAllowedIfRaw (true);
+	m_dca->AccessAllowedIfRaw (true);
+	m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
+	m_edca.find (AC_VI)->second->AccessAllowedIfRaw (true);
+	m_edca.find (AC_BE)->second->AccessAllowedIfRaw (true);
+	m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
+	m_dca->RawStart(m_slotDuration);
+	m_edca.find (AC_VO)->second->RawStart(m_slotDuration);
+	m_edca.find (AC_VI)->second->RawStart(m_slotDuration);
+	m_edca.find (AC_BE)->second->RawStart(m_slotDuration);
+	m_edca.find (AC_BK)->second->RawStart(m_slotDuration);
+}
+
+void
+StaWifiMac::DenyDCAAccess() {
+	m_pspollDca->AccessAllowedIfRaw (false);
+	m_dca->AccessAllowedIfRaw (false);
+	m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
+	m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
+	m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
+	m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
+	m_dca->OutsideRawStart();
+	m_edca.find (AC_VO)->second->OutsideRawStart();
+	m_edca.find (AC_VI)->second->OutsideRawStart();
+	m_edca.find (AC_BE)->second->OutsideRawStart();
+	m_edca.find (AC_BK)->second->OutsideRawStart();
+
+	nrOfTransmissionsDuringRAWSlot = m_dca->GetNrOfTransmissionsDuringRaw() +
+			m_edca.find (AC_VO)->second->GetNrOfTransmissionsDuringRaw() +
+			m_edca.find (AC_VI)->second->GetNrOfTransmissionsDuringRaw() +
+			m_edca.find (AC_BE)->second->GetNrOfTransmissionsDuringRaw() +
+			m_edca.find (AC_BK)->second->GetNrOfTransmissionsDuringRaw();
+}
+*/
 void
 StaWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationManager)
 {
@@ -1043,9 +1109,9 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             }
           if (assocResp.GetStatusCode ().IsSuccess ())
             {
+        	  SetAID (assocResp.GetAID ());
               SetState (ASSOCIATED);
               NS_LOG_DEBUG ("assoc completed");
-              SetAID (assocResp.GetAID ());
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
                 {
@@ -1148,12 +1214,12 @@ StaWifiMac::SetState (MacState value)
   if (value == ASSOCIATED
       && m_state != ASSOCIATED)
     {
-      m_assocLogger (GetBssid ());
+      OnAssociated();
     }
   else if (value != ASSOCIATED
            && m_state == ASSOCIATED)
     {
-      m_deAssocLogger (GetBssid ());
+	  OnDeassociated();
     }
   m_state = value;
 }

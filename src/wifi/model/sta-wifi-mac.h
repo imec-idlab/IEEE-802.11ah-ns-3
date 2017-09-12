@@ -29,6 +29,7 @@
 #include "supported-rates.h"
 #include "amsdu-subframe-header.h"
 #include "s1g-capabilities.h"
+#include "ns3/traced-value.h"
 
 namespace ns3  {
 
@@ -112,6 +113,12 @@ private:
     REFUSED
   };
 
+  void OnAssociated();
+  void OnDeassociated();
+/*
+  void GrantDCAAccess();
+  void DenyDCAAccess();
+  */
   /**
    * Enable or disable active probing.
    *
@@ -248,6 +255,10 @@ private:
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons
   virtual void DoDispose (void);
+
+  Time m_maxTimeInQueue;
+  TracedCallback<bool> m_beaconMissed;
+  TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
 
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;

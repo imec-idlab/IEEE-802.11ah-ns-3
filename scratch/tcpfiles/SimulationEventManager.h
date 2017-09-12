@@ -23,6 +23,7 @@ private:
 	int port;
 	string filename;
 
+	Configuration m_config; ///ami
 	int socketDescriptor = -1;
 
 	void send(vector<string> str);

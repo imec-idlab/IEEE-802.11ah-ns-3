@@ -171,7 +171,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         serverApp.Start (Seconds (0));
 
         UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
-        myClient.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
+        myClient.SetAttribute ("MaxPackets", config.maxNumberOfPackets);
         myClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
 
           traffic_sta.clear ();
@@ -269,7 +269,7 @@ PopulateArpCache ()
 }
 
 
-RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
+/*RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
     uint16_t NRPS = 0;
     uint16_t Value = 0;
@@ -316,9 +316,9 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
     else cout << "Unable to open file \n";
     
     return rpslist;
-}
+}*/
 
-/*uint16_t ngroup;
+uint16_t ngroup;
 uint16_t nslot;
 RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
@@ -375,9 +375,9 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
     else cout << "Unable to open file \n";
 
     return rpslist;
-}*/
+}
 
-// begin <
+
 void sendStatistics(bool schedule) {
 	eventManager.onUpdateStatistics(stats);
 	/*eventManager.onUpdateSlotStatistics(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval, transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval);
@@ -389,8 +389,73 @@ void sendStatistics(bool schedule) {
 		Simulator::Schedule(Seconds(config.visualizerSamplingInterval), &sendStatistics, true);
 }
 
-/*TODO:
- * void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
+void onSTADeassociated(int i) {
+	eventManager.onNodeDeassociated(*nodes[i]);
+}
+
+void updateNodesQueueLength() {
+	for (uint32_t i = 0; i < config.Nsta; i++) {
+		nodes[i]->UpdateQueueLength();
+		stats.get(i).EDCAQueueLength = nodes[i]->queueLength;
+	}
+	Simulator::Schedule(Seconds(0.5), &updateNodesQueueLength);
+}
+
+void onSTAAssociated(int i) {
+    /*nodes[i]->rawGroupNumber = ((nodes[i]->aId - 1) / (config.NRawSta / config.NGroup));
+    nodes[i]->rawSlotIndex = nodes[i]->aId % config.NRawSlotNum;
+*/
+	cout << "Node " << std::to_string(i) << " is associated and has id " << nodes[i]->id << endl;
+    eventManager.onNodeAssociated(*nodes[i]);
+
+    uint32_t nrOfSTAAssociated (0);
+    for (uint32_t i = 0; i < config.Nsta; i++) {
+        if (nodes[i]->isAssociated)
+            nrOfSTAAssociated++;
+    }
+
+    if (nrOfSTAAssociated == config.Nsta) {
+    	cout << "All stations associated, configuring clients & server" << endl;
+        // association complete, start sending packets
+    	stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
+
+    	/*if(config.trafficType == "udp") {
+    		configureUDPServer();
+    		configureUDPClients();
+    	}
+    	else if(config.trafficType == "udpecho") {
+    		configureUDPEchoServer();
+    		configureUDPEchoClients();
+    	}
+    	else if(config.trafficType == "tcpecho") {
+			configureTCPEchoServer();
+			configureTCPEchoClients();
+    	}
+    	else if(config.trafficType == "tcppingpong") {
+    		configureTCPPingPongServer();
+			configureTCPPingPongClients();
+		}
+    	else if(config.trafficType == "tcpipcamera") {
+			configureTCPIPCameraServer();
+			configureTCPIPCameraClients();
+		}
+    	else if(config.trafficType == "tcpfirmware") {
+			configureTCPFirmwareServer();
+			configureTCPFirmwareClients();
+		}
+    	else if(config.trafficType == "tcpsensor") {
+			configureTCPSensorServer();
+			configureTCPSensorClients();
+    	}
+    	else if (config.trafficType == "coap") {
+			configureCoapServer();
+			configureCoapClients();
+		}*/
+        updateNodesQueueLength();
+    }
+}
+
+void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 	cout << "Configuring STA Node trace sources" << endl;
 
     for (uint32_t i = 0; i < config.Nsta; i++) {
@@ -406,7 +471,7 @@ void sendStatistics(bool schedule) {
         // hook up Associated and Deassociated events
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback(&NodeEntry::UnsetAssociation, n));
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/NrOfTransmissionsDuringRAWSlot", MakeCallback(&NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged, n));
+        /*Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/NrOfTransmissionsDuringRAWSlot", MakeCallback(&NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged, n));
 
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/S1gBeaconMissed", MakeCallback(&NodeEntry::OnS1gBeaconMissed, n));
 
@@ -434,11 +499,54 @@ void sendStatistics(bool schedule) {
 
         // hook up PHY State change
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/State/State", MakeCallback(&NodeEntry::OnPhyStateChange, n));
-
+*/
     }
-}*/
-// end >
+}
 
+int getBandwidth(string dataMode) {
+	if(dataMode == "MCS1_0" ||
+	   dataMode == "MCS1_1" || dataMode == "MCS1_2" ||
+		dataMode == "MCS1_3" || dataMode == "MCS1_4" ||
+		dataMode == "MCS1_5" || dataMode == "MCS1_6" ||
+		dataMode == "MCS1_7" || dataMode == "MCS1_8" ||
+		dataMode == "MCS1_9" || dataMode == "MCS1_10")
+			return 1;
+
+	else if(dataMode == "MCS2_0" ||
+	    dataMode == "MCS2_1" || dataMode == "MCS2_2" ||
+		dataMode == "MCS2_3" || dataMode == "MCS2_4" ||
+		dataMode == "MCS2_5" || dataMode == "MCS2_6" ||
+		dataMode == "MCS2_7" || dataMode == "MCS2_8")
+			return 2;
+
+	return 0;
+}
+
+string getWifiMode(string dataMode) {
+	if(dataMode == "MCS1_0") return "OfdmRate300KbpsBW1MHz";
+	else if(dataMode == "MCS1_1") return "OfdmRate600KbpsBW1MHz";
+	else if(dataMode == "MCS1_2") return "OfdmRate900KbpsBW1MHz";
+	else if(dataMode == "MCS1_3") return "OfdmRate1_2MbpsBW1MHz";
+	else if(dataMode == "MCS1_4") return "OfdmRate1_8MbpsBW1MHz";
+	else if(dataMode == "MCS1_5") return "OfdmRate2_4MbpsBW1MHz";
+	else if(dataMode == "MCS1_6") return "OfdmRate2_7MbpsBW1MHz";
+	else if(dataMode == "MCS1_7") return "OfdmRate3MbpsBW1MHz";
+	else if(dataMode == "MCS1_8") return "OfdmRate3_6MbpsBW1MHz";
+	else if(dataMode == "MCS1_9") return "OfdmRate4MbpsBW1MHz";
+	else if(dataMode == "MCS1_10") return "OfdmRate150KbpsBW1MHz";
+
+
+	else if(dataMode == "MCS2_0") return "OfdmRate650KbpsBW2MHz";
+	else if(dataMode == "MCS2_1") return "OfdmRate1_3MbpsBW2MHz";
+	else if(dataMode == "MCS2_2") return "OfdmRate1_95MbpsBW2MHz";
+	else if(dataMode == "MCS2_3") return "OfdmRate2_6MbpsBW2MHz";
+	else if(dataMode == "MCS2_4") return "OfdmRate3_9MbpsBW2MHz";
+	else if(dataMode == "MCS2_5") return "OfdmRate5_2MbpsBW2MHz";
+	else if(dataMode == "MCS2_6") return "OfdmRate5_85MbpsBW2MHz";
+	else if(dataMode == "MCS2_7") return "OfdmRate6_5MbpsBW2MHz";
+	else if(dataMode == "MCS2_8") return "OfdmRate7_8MbpsBW2MHz";
+	return "";
+}
 
 int main (int argc, char *argv[])
 {
@@ -506,7 +614,7 @@ int main (int argc, char *argv[])
   phy.SetErrorRateModel ("ns3::YansErrorRateModel");
   phy.SetChannel (channel.Create ());
   phy.Set ("ShortGuardEnabled", BooleanValue (false));
-  phy.Set ("ChannelWidth", UintegerValue (config.bandWidth));
+  phy.Set ("ChannelWidth", UintegerValue (getBandwidth(config.DataMode))); // changed
   phy.Set ("EnergyDetectionThreshold", DoubleValue (-110.0));
   phy.Set ("CcaMode1Threshold", DoubleValue (-113.0));
   phy.Set ("TxGain", DoubleValue (0.0));
@@ -526,7 +634,7 @@ int main (int argc, char *argv[])
 
   Ssid ssid = Ssid ("ns380211ah");
   StringValue DataRate;
-  DataRate = StringValue (config.DataMode);
+  DataRate = StringValue (getWifiMode(config.DataMode)); // changed
 
     wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager","DataMode", DataRate, "ControlMode", DataRate);
 
@@ -615,29 +723,37 @@ int main (int argc, char *argv[])
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
     PopulateArpCache ();
 
+    // configure tracing for associations & other metrics
+    configureNodes(wifiStaNode, staDevice);
+
+    Ptr<MobilityModel> mobility1 = wifiApNode.Get (0)->GetObject<MobilityModel>();
+    Vector apposition = mobility1->GetPosition();
       if  (OutputPosition)
         {
-          int i =0;
+          uint32_t i =0;
           while (i < config.Nsta)
             {
                Ptr<MobilityModel> mobility = wifiStaNode.Get (i)->GetObject<MobilityModel>();
                Vector position = mobility->GetPosition();
+               nodes[i]->x = position.x;
+               nodes[i]->y = position.y;
                std::cout << "Sta node#" << i << ", " << "position = " << position << std::endl;
                i++;
             }
-          Ptr<MobilityModel> mobility1 = wifiApNode.Get (0)->GetObject<MobilityModel>();
-          Vector position = mobility1->GetPosition();
-          std::cout << "AP node, position = " << position << std::endl;
+          std::cout << "AP node, position = " << apposition << std::endl;
         }
-      // begin <
-      // configure tracing for associations & other metrics
-      //TODO:configureNodes(wifiStaNode, staDevice);
 
       eventManager.onStartHeader();
       eventManager.onStart(config);
-      sendStatistics(true);
-      // end >
 
+      for (uint32_t i = 0; i < config.Nsta; i++)
+      	eventManager.onSTANodeCreated(*nodes[i]);
+
+      eventManager.onAPNodeCreated(apposition.x, apposition.y);
+
+      sendStatistics(true);
+
+      Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
       Simulator::Destroy ();
 

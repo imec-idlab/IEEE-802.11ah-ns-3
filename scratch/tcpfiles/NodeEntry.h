@@ -15,44 +15,16 @@
 #include "Statistics.h"
 #include "ns3/drop-reason.h"
 #include "ns3/tcp-socket.h"
+#include "cleaning-helper.h"
+#include "ns3/log.h"
+
 
 using namespace ns3;
 
-
 class NodeEntry {
-private:
-
-	Ptr<Node> node;
-	Ptr<NetDevice> device;
-
-    std::function<void()> associatedCallback;
-    std::function<void()> deAssociatedCallback;
-    std::map<uint64_t, Time> txMap;
-    std::map<uint64_t, Time> rxMap;
-
-    //std::vector<bool> seqNrReceivedAtAP;
-    //std::vector<bool> seqNrReceived;
-
-    uint16_t lastBeaconAIDStart = 0;
-    uint16_t lastBeaconAIDEnd = 0;
-
-    bool rawTIMGroupFlaggedAsDataAvailableInDTIM = false;
-
-    Time lastBeaconReceivedOn = Time();
-
-    Statistics* stats;
-    
-    void OnEndOfReceive(Ptr<const Packet> packet);
-
-    bool tcpConnectedAtSTA = true;
-    bool tcpConnectedAtAP = true;
-
-
-    Time timeStreamStarted;
-
 public:
     int id;
-    
+
     uint32_t aId = 8192; // unassociated is 8192
     uint8_t rawGroupNumber = 0;
     uint8_t rawSlotIndex = 0;
@@ -61,12 +33,20 @@ public:
     double y = 0;
     bool isAssociated = false;
     uint32_t queueLength = 0;
-    
 
+    static Time maxLatency;
+    static Time minLatency;
+    static Time minJitter;
+    static Time maxJitter;
     NodeEntry(int id, Statistics* stats,Ptr<Node> node, Ptr<NetDevice> device);
 
     virtual ~NodeEntry();
 
+    enum NodeType {
+    	CLIENT,
+		SERVER,
+		DUMMY
+    } m_nodeType;
     
     void SetAssociation(std::string context, Mac48Address address);
     void UnsetAssociation(std::string context, Mac48Address address);
@@ -124,12 +104,44 @@ public:
     void OnUdpPacketSent(Ptr<const Packet> packet);
     void OnUdpEchoPacketReceived(Ptr<const Packet> packet, Address from);
     void OnUdpPacketReceivedAtAP(Ptr<const Packet> packet);
-
+    void OnCoapPacketReceivedAtServer(Ptr<const Packet> packet);
+    void OnCoapPacketSent(Ptr<const Packet> packet); ///ami
+    void OnCoapPacketReceived(Ptr<const Packet> packet, Address from);
 
     void UpdateQueueLength();
     
     void SetAssociatedCallback(std::function<void()> assocCallback);
     void SetDeassociatedCallback(std::function<void()> assocCallback);
+
+private:
+    Statistics* stats;
+	Ptr<Node> node;
+	Ptr<NetDevice> device;
+
+    std::function<void()> associatedCallback;
+    std::function<void()> deAssociatedCallback;
+    std::map<uint64_t, Time> txMap;
+    std::map<uint64_t, Time> rxMap;
+
+    uint16_t lastBeaconAIDStart = 0;
+    uint16_t lastBeaconAIDEnd = 0;
+
+    bool rawTIMGroupFlaggedAsDataAvailableInDTIM = false;
+
+    Time lastBeaconReceivedOn = Time();
+
+
+    void OnEndOfReceive(Ptr<const Packet> packet);
+    void UpdateJitter (Time timeDiff);
+
+    bool tcpConnectedAtSTA = true;
+    bool tcpConnectedAtAP = true;
+
+    Time timeStreamStarted;
+
+    Time delayFirst = Time();
+    Time delaySecond = Time();
+    Time timeSent = Time();
 };
 
 #endif /* NODEENTRY_H */
