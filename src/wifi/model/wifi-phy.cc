@@ -74,6 +74,11 @@ WifiPhy::GetTypeId (void)
                      "has been dropped by the device during transmission",
                      MakeTraceSourceAccessor (&WifiPhy::m_phyTxDropTrace),
                      "ns3::Packet::TracedCallback")
+	.AddTraceSource ("PhyTxDropWithReason",
+					 "Trace source indicating a packet "
+					 "has been dropped by the device during transmission",
+					 MakeTraceSourceAccessor (&WifiPhy::m_phyTxDropWithDropReasonTrace),
+					 "ns3::WifiPhy::PhyTxDropWithReasonCallback")
     .AddTraceSource ("PhyRxBegin",
                      "Trace source indicating a packet "
                      "has begun being received from the channel medium "
@@ -91,6 +96,11 @@ WifiPhy::GetTypeId (void)
                      "has been dropped by the device during reception",
                      MakeTraceSourceAccessor (&WifiPhy::m_phyRxDropTrace),
                      "ns3::Packet::TracedCallback")
+	.AddTraceSource ("PhyRxDropWithReason",
+					 "Trace source indicating a packet "
+					 "has been dropped by the device during reception along with a reason why",
+					 MakeTraceSourceAccessor (&WifiPhy::m_phyRxDropWithDropReasonTrace),
+					 "ns3::WifiPhy::PhyRxDropWithReasonCallback")
     .AddTraceSource ("MonitorSnifferRx",
                      "Trace source simulating a wifi device in monitor mode "
                      "sniffing all received frames",
@@ -827,9 +837,10 @@ WifiPhy::NotifyTxEnd (Ptr<const Packet> packet)
 }
 
 void
-WifiPhy::NotifyTxDrop (Ptr<const Packet> packet)
+WifiPhy::NotifyTxDrop (Ptr<const Packet> packet, DropReason reason)
 {
   m_phyTxDropTrace (packet);
+  m_phyTxDropWithDropReasonTrace (packet, reason);
 }
 
 void
@@ -845,9 +856,10 @@ WifiPhy::NotifyRxEnd (Ptr<const Packet> packet)
 }
 
 void
-WifiPhy::NotifyRxDrop (Ptr<const Packet> packet)
+WifiPhy::NotifyRxDrop (Ptr<const Packet> packet, DropReason reason)
 {
   m_phyRxDropTrace (packet);
+  m_phyRxDropWithDropReasonTrace(packet, reason);
 }
 
 void

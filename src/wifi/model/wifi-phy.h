@@ -32,6 +32,7 @@
 #include "wifi-phy-standard.h"
 #include "ns3/traced-callback.h"
 #include "wifi-tx-vector.h"
+#include "drop-reason.h"
 
 namespace ns3 {
 
@@ -169,6 +170,11 @@ public:
    */
   typedef Callback<void, Ptr<const Packet>, double> RxErrorCallback;
 
+  typedef void (* PhyRxDropWithReasonCallback)
+                (Ptr<const Packet> packet, DropReason reason);
+
+  typedef void (* PhyTxDropWithReasonCallback)
+                  (Ptr<const Packet> packet, DropReason reason);
   static TypeId GetTypeId (void);
 
   WifiPhy ();
@@ -1595,7 +1601,7 @@ static WifiMode GetOfdmRate86_666_7MbpsBW16MHz ();
    *
    * \param packet the packet that was failed to transmitted
    */
-  void NotifyTxDrop (Ptr<const Packet> packet);
+  void NotifyTxDrop (Ptr<const Packet> packet, DropReason reason = DropReason::Unknown);
   /**
    * Public method used to fire a PhyRxBegin trace.
    * Implemented for encapsulation purposes.
@@ -1616,7 +1622,7 @@ static WifiMode GetOfdmRate86_666_7MbpsBW16MHz ();
    *
    * \param packet the packet that was not successfully received
    */
-  void NotifyRxDrop (Ptr<const Packet> packet);
+  void NotifyRxDrop (Ptr<const Packet> packet, DropReason reason = DropReason::Unknown);
 
   /**
    * Public method used to fire a MonitorSniffer trace for a wifi packet being received.
@@ -1825,6 +1831,8 @@ private:
    */
   TracedCallback<Ptr<const Packet> > m_phyTxDropTrace;
 
+  TracedCallback<Ptr<const Packet>, DropReason> m_phyTxDropWithDropReasonTrace;
+
   /**
    * The trace source fired when a packet begins the reception process from
    * the medium.
@@ -1847,6 +1855,8 @@ private:
    * \see class CallBackTraceSource
    */
   TracedCallback<Ptr<const Packet> > m_phyRxDropTrace;
+
+  TracedCallback<Ptr<const Packet>, DropReason> m_phyRxDropWithDropReasonTrace;
 
   /**
    * A trace source that emulates a wifi device in monitor mode
