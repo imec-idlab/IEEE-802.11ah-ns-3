@@ -69,6 +69,12 @@ class DcaTxop : public Dcf
 public:
   static TypeId GetTypeId (void);
 
+  typedef void (* CollisionCallback)(uint32_t nrOfSlotsToBackOff);
+  typedef void (* TransmissionWillCrossRAWBoundaryCallback)(Time txDuration, Time remainingRawTime);
+
+  uint16_t GetNrOfTransmissionsDuringRaw() { return nrOfTransmissionsDuringRaw; }
+  bool DEBUG_TRACK_PACKETS = false;
+
   /**
    * typedef for a callback to invoke when a
    * packet transmission was completed successfully.
@@ -84,7 +90,9 @@ public:
   ~DcaTxop ();
     
   bool AccessIfRaw;
-
+  Time rawDuration;
+  Time rawStartedAt;
+  uint16_t nrOfTransmissionsDuringRaw = 0;
   /**
    * Set MacLow associated with this DcaTxop.
    *
@@ -159,6 +167,14 @@ public:
   void RawStart (void);
   void OutsideRawStart (void);
 
+  /**
+   * Check if the DCF requires access.
+   *
+   * \return true if the DCF requires access,
+   *         false otherwise
+   */
+  bool NeedsAccess (void) const;
+
 private:
   class TransmissionListener;
   class NavListener;
@@ -179,13 +195,6 @@ private:
   Ptr<MacLow> Low (void);
   void DoInitialize ();
   /* dcf notifications forwarded here */
-  /**
-   * Check if the DCF requires access.
-   *
-   * \return true if the DCF requires access,
-   *         false otherwise
-   */
-  bool NeedsAccess (void) const;
 
   /**
    * Notify the DCF that access has been granted.
@@ -346,6 +355,9 @@ private:
   TransmissionListener *m_transmissionListener;
   RandomStream *m_rng;
 
+  TracedCallback<uint32_t> m_collisionTrace;
+
+  TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
   bool m_accessOngoing;
   Ptr<const Packet> m_currentPacket;
   WifiMacHeader m_currentHdr;

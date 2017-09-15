@@ -45,6 +45,9 @@ class StaWifiMac : public RegularWifiMac
 public:
   static TypeId GetTypeId (void);
 
+  typedef void (* S1gBeaconMissedCallback)
+		  (bool nextBeaconIsDTIM);
+
   StaWifiMac ();
   virtual ~StaWifiMac ();
 
@@ -227,6 +230,8 @@ private:
   void SetInRAWgroup(void);
   void UnsetInRAWgroup(void);
 
+  TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
+
   Time m_lastRawDurationus;
   Time m_lastRawStart;
   Time m_rawDuration;
@@ -257,8 +262,8 @@ private:
   virtual void DoDispose (void);
 
   Time m_maxTimeInQueue;
+
   TracedCallback<bool> m_beaconMissed;
-  TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
 
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;
