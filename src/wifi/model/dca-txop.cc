@@ -167,6 +167,7 @@ DcaTxop::DcaTxop ()
   NS_LOG_FUNCTION (this);
   AccessAllowedIfRaw (true);
   rawDuration = Time::Max(); // no limit on raw - not true
+  m_crossSlotBoundaryAllowed = true;
   m_transmissionListener = new DcaTxop::TransmissionListener (this);
   m_dcf = new DcaTxop::Dcf (this);
   m_queue = CreateObject<WifiMacQueue> ();
@@ -351,28 +352,29 @@ DcaTxop::StartAccessIfNeededRaw (void) //possibilely necessary, start new backof
 }
     
 void
-DcaTxop::RawStart (Time duration)
+DcaTxop::RawStart (Time duration, bool crossSlotBoundaryAllowed)
 {
   NS_LOG_FUNCTION (this);
   this->rawDuration = duration;
+  this->m_crossSlotBoundaryAllowed = crossSlotBoundaryAllowed;
   rawStartedAt = Simulator::Now();
   nrOfTransmissionsDuringRaw = 0;
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
 
   // restart the access like done in notifywakeup
-  RestartAccessIfNeeded();
-/*
+  //RestartAccessIfNeeded(); //instead of the 2 lines below
+
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
   StartAccessIfNeededRaw (); //how about remove it?
-  */
+
 }
 
 void
 DcaTxop::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
-  AccessAllowedIfRaw (true); // TODO make cross slot boundary configurable
+  AccessAllowedIfRaw (true); // TODO this is different between versions - check cross slot boundary
   m_dcf->OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
@@ -536,7 +538,7 @@ DcaTxop::NotifyAccessGranted (void)
 
       Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
 
-	  if(txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+	  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
 		  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 		  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 		  return;
@@ -577,7 +579,7 @@ DcaTxop::NotifyAccessGranted (void)
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
 
           Time txDuration = Low()->CalculateTransmissionTime(fragment, &hdr, params);
-		  if(txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+		  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
 			  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 			  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 			  return;
@@ -602,7 +604,7 @@ DcaTxop::NotifyAccessGranted (void)
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
 
           Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
-          if(txDuration > remainingRawTime) {
+          if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {
         	  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
         	  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
         	  return;

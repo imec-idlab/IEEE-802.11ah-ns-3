@@ -262,7 +262,7 @@ private:
   virtual void DoDispose (void);
 
   Time m_maxTimeInQueue;
-
+  bool m_crossSlotBoundaryAllowed;
   TracedCallback<bool> m_beaconMissed;
 
   TracedCallback<Mac48Address> m_assocLogger;

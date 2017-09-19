@@ -412,12 +412,12 @@ StaWifiMac::InsideBackoff (void)
 void
 StaWifiMac::StartRawbackoff (void)
 {
-  m_pspollDca->RawStart (m_slotDuration); //not really start raw useless allowedAccessRaw is true;
-  m_dca->RawStart (m_slotDuration);
-  m_edca.find (AC_VO)->second->RawStart ();
-  m_edca.find (AC_VI)->second->RawStart ();
-  m_edca.find (AC_BE)->second->RawStart ();
-  m_edca.find (AC_BK)->second->RawStart ();
+  m_pspollDca->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed); //not really start raw useless allowedAccessRaw is true;
+  m_dca->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_VO)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_VI)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_BE)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_BK)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
 
 }
 
@@ -436,11 +436,11 @@ StaWifiMac::OutsideRawStartBackoff (void)
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BE)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BK)->second);*/
   StaWifiMac::m_pspollDca->OutsideRawStart ();
-  m_dca->OutsideRawStart();
-  m_edca.find (AC_VO)->second->OutsideRawStart();
-  m_edca.find (AC_VI)->second->OutsideRawStart();
-  m_edca.find (AC_BE)->second->OutsideRawStart();
-  m_edca.find (AC_BK)->second->OutsideRawStart();
+  m_dca->OutsideRawStart ();
+  m_edca.find (AC_VO)->second->OutsideRawStart ();
+  m_edca.find (AC_VI)->second->OutsideRawStart ();
+  m_edca.find (AC_BE)->second->OutsideRawStart ();
+  m_edca.find (AC_BK)->second->OutsideRawStart ();
   /*
   It seems Simulator::ScheduleNow take longer time to execuate than without schedule.
 
@@ -1027,7 +1027,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 
         m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);
         m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;
-
+        m_crossSlotBoundaryAllowed = ass.GetSlotCrossBoundary() == 0x0001;
 
          if (ass.GetRawGroupPage() == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
            {

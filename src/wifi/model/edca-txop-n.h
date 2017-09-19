@@ -93,6 +93,11 @@ public:
    * packet transmission was failed.
    */
   typedef Callback <void, const WifiMacHeader&> TxFailed;
+  typedef void (* CollisionCallback)(uint32_t nrOfSlotsToBackOff);
+
+  typedef void (* TransmissionWillCrossRAWBoundaryCallback)(Time txDuration, Time remainingRawTime);
+
+  uint16_t GetNrOfTransmissionsDuringRaw() { return nrOfTransmissionsDuringRaw; }
 
   static TypeId GetTypeId (void);
   EdcaTxopN ();
@@ -100,6 +105,10 @@ public:
   void DoDispose ();
     
     bool AccessIfRaw;
+    Time rawDuration;
+    Time rawStartedAt;
+    uint16_t nrOfTransmissionsDuringRaw = 0;
+    bool m_crossSlotBoundaryAllowed;
   /**
    * Set MacLow associated with this EdcaTxopN.
    *
@@ -465,7 +474,7 @@ public:
   int64_t AssignStreams (int64_t stream);
     
   void AccessAllowedIfRaw (bool allowed);
-  void RawStart (void);
+  void RawStart (Time duration, bool crossSlotBoundaryAllowed);
   void OutsideRawStart (void);
 
 
@@ -565,8 +574,10 @@ private:
   uint16_t m_blockAckInactivityTimeout;
   struct Bar m_currentBar;
   bool m_ampduExist;
-    
   
+  TracedCallback<uint32_t> m_collisionTrace;
+  TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
+
 };
 
 } //namespace ns3

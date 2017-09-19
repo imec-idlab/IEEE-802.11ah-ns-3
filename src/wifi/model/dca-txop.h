@@ -165,7 +165,7 @@ public:
   int64_t AssignStreams (int64_t stream);
 
   void AccessAllowedIfRaw (bool allowed);
-  void RawStart (Time duration);
+  void RawStart (Time duration, bool crossSlotBoundaryAllowed);
   void OutsideRawStart (void);
 
   /**
@@ -359,6 +359,7 @@ private:
   TracedCallback<uint32_t> m_collisionTrace;
 
   TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
+  bool m_crossSlotBoundaryAllowed;
   bool m_accessOngoing;
   Ptr<const Packet> m_currentPacket;
   WifiMacHeader m_currentHdr;

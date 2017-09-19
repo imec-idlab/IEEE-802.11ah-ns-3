@@ -249,10 +249,19 @@ EdcaTxopN::GetTypeId (void)
                    MakePointerAccessor (&EdcaTxopN::GetEdcaQueue),
                    MakePointerChecker<WifiMacQueue> ())
     .AddTraceSource ("AccessQuest_record",
-                     "The header of successfully transmitted packet"
-                     "The header of successfully transmitted packet",
-                     MakeTraceSourceAccessor (&EdcaTxopN::m_AccessQuest_record),
-                     "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+                   "The header of successfully transmitted packet"
+                   "The header of successfully transmitted packet",
+                   MakeTraceSourceAccessor (&EdcaTxopN::m_AccessQuest_record),
+                   "ns3::TimeSeriesAdaptor::OutputTracedCallback")
+    .AddAttribute ("NrOfTransmissionsDuringRAW", "Number of transmissions done during RAW period",
+					UintegerValue(),
+				    MakeUintegerAccessor(&EdcaTxopN::nrOfTransmissionsDuringRaw),
+					MakeUintegerChecker<uint16_t> ())
+	.AddTraceSource("Collision", "Fired when a collision occurred",
+					MakeTraceSourceAccessor(&EdcaTxopN::m_collisionTrace), "ns3::EdcaTxopN::CollisionCallback")
+
+	.AddTraceSource("TransmissionWillCrossRAWBoundary", "Fired when a transmission is held off because it won't fit inside the RAW slot",
+					MakeTraceSourceAccessor(&EdcaTxopN::m_transmissionWillCrossRAWBoundary), "ns3::EdcaTxopN::TransmissionWillCrossRAWBoundaryCallback")
   ;
   return tid;
 }
@@ -267,6 +276,8 @@ EdcaTxopN::EdcaTxopN ()
 {
   NS_LOG_FUNCTION (this);
   AccessAllowedIfRaw (true);
+  rawDuration = Time::Max(); // no limit on raw
+  m_crossSlotBoundaryAllowed = true;
   m_transmissionListener = new EdcaTxopN::TransmissionListener (this);
   m_blockAckListener = new EdcaTxopN::AggregationCapableTransmissionListener (this);
   m_dcf = new EdcaTxopN::Dcf (this);
@@ -482,6 +493,7 @@ void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+  Time remainingRawTime = rawDuration - (Simulator::Now() - rawStartedAt);
   if (!AccessIfRaw)
     {
         return;
@@ -542,11 +554,23 @@ EdcaTxopN::NotifyAccessGranted (void)
       params.DisableRts ();
       params.DisableAck ();
       params.DisableNextData ();
+
+      Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
+     			&m_currentHdr, params);
+     	if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+     		NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+     		m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);
+     		return;
+     	}
+     	else {
+     		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
+     	}
+
       m_low->StartTransmission (m_currentPacket,
                                 &m_currentHdr,
                                 params,
                                 m_transmissionListener);
-
+      nrOfTransmissionsDuringRaw++;
       NS_LOG_DEBUG ("tx broadcast");
     }
   else if (m_currentHdr.GetType () == WIFI_MAC_CTL_BACKREQ)
@@ -585,8 +609,18 @@ EdcaTxopN::NotifyAccessGranted (void)
               NS_LOG_DEBUG ("fragmenting size=" << fragment->GetSize ());
               params.EnableNextData (GetNextFragmentSize ());
             }
+          Time txDuration = m_low->CalculateTransmissionTime(fragment,
+                			&hdr, params);
+			if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+				NS_LOG_DEBUG("TX will take longer than the remaining RAW time, not transmitting");
+				m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);
+				return;
+			}
+			else
+	      		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
           m_low->StartTransmission (fragment, &hdr, params,
                                     m_transmissionListener);
+          nrOfTransmissionsDuringRaw++;
         }
       else
         {
@@ -645,8 +679,19 @@ EdcaTxopN::NotifyAccessGranted (void)
               NS_LOG_DEBUG ("tx unicast");
             }
           params.DisableNextData ();
+          Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
+                         			&m_currentHdr, params);
+	      if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+			NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+			m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);
+			return;
+		  }
+	      else
+	      	NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
+
           m_low->StartTransmission (m_currentPacket, &m_currentHdr,
                                     params, m_transmissionListener);
+          nrOfTransmissionsDuringRaw++;
           if (!GetAmpduExist ())
             {
               CompleteTx ();
@@ -665,7 +710,10 @@ void
 EdcaTxopN::NotifyCollision (void)
 {
   NS_LOG_FUNCTION (this);
-  m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
+  auto cw = m_rng->GetNext (0, m_dcf->GetCw ());
+  m_collisionTrace(cw);
+
+  m_dcf->StartBackoffNow (cw);
   RestartAccessIfNeeded ();
 }
 
@@ -1003,9 +1051,15 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
 }
 
 void
-EdcaTxopN::RawStart (void)
+EdcaTxopN::RawStart (Time duration, bool crossSlotBoundaryAllowed)
 {
   NS_LOG_FUNCTION (this);
+  this->rawDuration = duration;
+  this->m_crossSlotBoundaryAllowed = crossSlotBoundaryAllowed;
+  nrOfTransmissionsDuringRaw = 0;
+  rawStartedAt = Simulator::Now();
+
+  NS_LOG_DEBUG("RAW START, duration is " << duration);
 
   int newdata=66;
   m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
@@ -1013,12 +1067,13 @@ EdcaTxopN::RawStart (void)
   m_dcf->RawStart ();
   m_stationManager->RawStart ();
   m_dcf->StartBackoffNow (m_rng->GetNext (0, m_dcf->GetCw ()));
-    if ((!m_queue->IsEmpty () || m_baManager->HasPackets ()) && AccessIfRaw)
-      {
-        int newdata=30;
-        m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
-      }
-  StartAccessIfNeededRaw (); //access could start even no packet (this comment seems incorrect)
+	if ((!m_queue->IsEmpty () || m_baManager->HasPackets ()) && AccessIfRaw)
+	  {
+		int newdata=30;
+		m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
+	  }
+  StartAccessIfNeededRaw (); //access could start even no packet
+  //RestartAccessIfNeeded();
 
 }
 
@@ -1027,7 +1082,7 @@ EdcaTxopN::OutsideRawStart ()
 {
   NS_LOG_FUNCTION (this);
 
-  AccessAllowedIfRaw (true);
+  AccessAllowedIfRaw (true); // TODO this is different accross versions
   m_dcf-> OutsideRawStart ();
   m_stationManager->OutsideRawStart ();
   m_dcf->StartBackoffNow (m_dcf->GetBackoffSlots());
@@ -1097,6 +1152,8 @@ void
 EdcaTxopN::StartNext (void)
 {
   NS_LOG_FUNCTION (this);
+  if(!AccessIfRaw)
+	return;
   NS_LOG_DEBUG ("start next packet fragment");
   /* this callback is used only for fragments. */
   NextFragment ();
@@ -1115,6 +1172,7 @@ EdcaTxopN::StartNext (void)
       params.EnableNextData (GetNextFragmentSize ());
     }
   Low ()->StartTransmission (fragment, &hdr, params, m_transmissionListener);
+  nrOfTransmissionsDuringRaw++;
 }
 
 void
@@ -1413,7 +1471,17 @@ EdcaTxopN::SendBlockAckRequest (const struct Bar &bar)
       //Delayed block ack
       params.EnableAck ();
     }
+  Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
+  Time remainingRawTime =  rawDuration -  (Simulator::Now() - rawStartedAt);
+  // Non-cross-slot boundary should be used with bidirectional
+  // Don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {
+      NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+      m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);
+	  return;
+  }
   m_low->StartTransmission (m_currentPacket, &m_currentHdr, params, m_transmissionListener);
+  nrOfTransmissionsDuringRaw++;
 }
 
 void
@@ -1506,8 +1574,19 @@ EdcaTxopN::SendAddBaRequest (Mac48Address dest, uint8_t tid, uint16_t startSeq,
   params.DisableNextData ();
   params.DisableOverrideDurationId ();
 
+	Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
+			&m_currentHdr, params);
+	Time remainingRawTime = rawDuration - (Simulator::Now() - rawStartedAt);
+	if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
+		NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+		m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);
+		return;
+	}
+	else
+		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
   m_low->StartTransmission (m_currentPacket, &m_currentHdr, params,
                             m_transmissionListener);
+  nrOfTransmissionsDuringRaw++;
 }
 
 void
