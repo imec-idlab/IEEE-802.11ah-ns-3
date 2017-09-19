@@ -59,6 +59,12 @@ RegularWifiMac::RegularWifiMac ()
   m_dca->SetTxOkCallback (MakeCallback (&RegularWifiMac::TxOk, this));
   m_dca->SetTxFailedCallback (MakeCallback (&RegularWifiMac::TxFailed, this));
 
+  m_dca->GetQueue()->TraceConnect("PacketDropped", "", MakeCallback(&RegularWifiMac::OnQueuePacketDropped, this));
+
+  m_dca->TraceConnect("Collision", "", MakeCallback(&RegularWifiMac::OnCollision, this));
+
+  m_dca->TraceConnect("TransmissionWillCrossRAWBoundary", "", MakeCallback(&RegularWifiMac::OnTransmissionWillCrossRAWBoundary, this));
+
   //Construct the EDCAFs. The ordering is important - highest
   //priority (Table 9-1 UP-to-AC mapping; IEEE 802.11-2012) must be created
   //first.
@@ -66,6 +72,22 @@ RegularWifiMac::RegularWifiMac ()
   SetupEdcaQueue (AC_VI);
   SetupEdcaQueue (AC_BE);
   SetupEdcaQueue (AC_BK);
+}
+
+void
+RegularWifiMac::OnQueuePacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason) {
+	m_packetdropped(packet,reason);
+}
+
+void
+RegularWifiMac::OnCollision(std::string context, uint32_t nrOfBackOffSlots) {
+	m_collisionTrace(nrOfBackOffSlots);
+}
+
+void
+RegularWifiMac::OnTransmissionWillCrossRAWBoundary(std::string context, Time txDuration, Time remainingTimeInRAWSlot) {
+	//std::cout << "TRANSMISSION WILL CROSS RAW BOUNDARY" << std::endl;
+	m_transmissionWillCrossRAWBoundary(txDuration, remainingTimeInRAWSlot);
 }
 
 RegularWifiMac::~RegularWifiMac ()
@@ -154,6 +176,9 @@ RegularWifiMac::SetupEdcaQueue (enum AcIndex ac)
   edca->SetAccessCategory (ac);
   edca->CompleteConfig ();
   m_edca.insert (std::make_pair (ac, edca));
+  edca->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&RegularWifiMac::OnQueuePacketDropped, this));
+  edca->TraceConnect("Collision", "", MakeCallback(&RegularWifiMac::OnCollision, this));
+  edca->TraceConnect("TransmissionWillCrossRAWBoundary", "", MakeCallback(&RegularWifiMac::OnTransmissionWillCrossRAWBoundary, this));
 }
 
 void
@@ -740,6 +765,17 @@ RegularWifiMac::GetTypeId (void)
                      "The header of unsuccessfully transmitted packet",
                      MakeTraceSourceAccessor (&RegularWifiMac::m_txErrCallback),
                      "ns3::WifiMacHeader::TracedCallback")
+	.AddTraceSource ("PacketDropped",
+					 "Trace source indicating a packet "
+					 "has been dropped from one of the queues",
+					 MakeTraceSourceAccessor (&RegularWifiMac::m_packetdropped),
+					 "ns3::RegularWifiMac::PacketDroppedCallback")
+
+	.AddTraceSource("Collision", "Fired when a collision occurred",
+					 MakeTraceSourceAccessor(&RegularWifiMac::m_collisionTrace), "ns3::RegularWifiMac::CollisionCallback")
+
+	.AddTraceSource("TransmissionWillCrossRAWBoundary", "Fired when a transmission is held off because it won't fit inside the RAW slot",
+					 MakeTraceSourceAccessor(&RegularWifiMac::m_transmissionWillCrossRAWBoundary), "ns3::RegularWifiMac::TransmissionWillCrossRAWBoundaryCallback")
   ;
   return tid;
 }

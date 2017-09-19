@@ -28,6 +28,8 @@
 #include "ssid.h"
 #include "qos-utils.h"
 #include <map>
+#include "drop-reason.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -50,7 +52,10 @@ class RegularWifiMac : public WifiMac
 {
 public:
   static TypeId GetTypeId (void);
-
+  typedef void (* PacketDroppedCallback)
+                    (Ptr<const Packet> packet, DropReason reason);
+  typedef void (* CollisionCallback)(uint32_t nrOfSlotsToBackOff);
+  typedef void (* TransmissionWillCrossRAWBoundaryCallback)(Time txDuration, Time remainingRawTime);
   RegularWifiMac ();
   virtual ~RegularWifiMac ();
 
@@ -268,6 +273,12 @@ protected:
   channel access function */
   EdcaQueues m_edca;
 
+  virtual void OnQueuePacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason);
+
+  virtual void OnCollision(std::string context, uint32_t nrOfBackOffSlots);
+
+  virtual void OnTransmissionWillCrossRAWBoundary(std::string context, Time txDuration, Time remainingTimeInRAWSlot);
+
   /**
    * Accessor for the DCF object
    *
@@ -428,6 +439,11 @@ protected:
   bool m_s1gSupported;
  
   uint8_t m_s1gStaType;
+
+  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
+  TracedCallback<uint32_t> m_collisionTrace;
+  TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
+
   /**
    * Enable or disable HT support for the device.
    *

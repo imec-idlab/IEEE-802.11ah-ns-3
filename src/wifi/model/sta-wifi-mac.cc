@@ -412,8 +412,8 @@ StaWifiMac::InsideBackoff (void)
 void
 StaWifiMac::StartRawbackoff (void)
 {
-  m_pspollDca->RawStart (); //not really start raw useless allowedAccessRaw is true;
-  m_dca->RawStart ();
+  m_pspollDca->RawStart (m_slotDuration); //not really start raw useless allowedAccessRaw is true;
+  m_dca->RawStart (m_slotDuration);
   m_edca.find (AC_VO)->second->RawStart ();
   m_edca.find (AC_VI)->second->RawStart ();
   m_edca.find (AC_BE)->second->RawStart ();
