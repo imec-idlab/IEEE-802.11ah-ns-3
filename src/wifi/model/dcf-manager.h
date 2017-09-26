@@ -265,7 +265,9 @@ class DcfManager : public Object
 public:
   DcfManager ();
   ~DcfManager ();
-    
+
+  void RawStart(Time start, Time duration);
+
   static TypeId GetTypeId (void);
 
   /**
@@ -559,6 +561,9 @@ private:
   Time m_sifs;
   PhyListener* m_phyListener;
   LowDcfListener* m_lowListener;
+
+  Time m_rawSlotStart;
+  Time m_rawSlotDuration;
 };
 
 } //namespace ns3

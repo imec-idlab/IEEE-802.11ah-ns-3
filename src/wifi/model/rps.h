@@ -115,15 +115,13 @@ public:
    * \Return the Partial Virtual Bitmap
    */
   uint8_t * GetRawAssignment (void) const;  //to do, use std::vector
-    
+  RPS::RawAssignment GetRawAssigmentObj(uint32_t index = 0) const;
 
   WifiInformationElementId ElementId () const;
   uint8_t GetInformationFieldSize () const;
     
   void SerializeInformationField (Buffer::Iterator start) const;
   uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
-
-  RPS::RawAssignment GetRawAssigmentObj(uint32_t index = 0) const;
 
   uint8_t m_length;
 private:

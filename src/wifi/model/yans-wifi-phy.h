@@ -438,6 +438,8 @@ private:
   virtual void DoInitialize (void);
   virtual void DoDispose (void);
 
+  void NotifyTxBegin (Ptr<const Packet> packet, Time duration);
+
   /**
    * Configure YansWifiPhy with appropriate channel frequency and
    * supported rates for 802.11a standard.

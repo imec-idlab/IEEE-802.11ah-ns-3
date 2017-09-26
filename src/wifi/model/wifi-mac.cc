@@ -280,7 +280,7 @@ WifiMac::NotifyPromiscRx (Ptr<const Packet> packet)
 }
 
 void
-WifiMac::NotifyRxDrop (Ptr<const Packet> packet)
+WifiMac::NotifyRxDrop (Ptr<const Packet> packet, DropReason reason)
 {
   m_macRxDropTrace (packet);
 }

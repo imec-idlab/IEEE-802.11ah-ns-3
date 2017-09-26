@@ -29,6 +29,7 @@
 #include "wifi-preamble.h"
 #include "wifi-tx-vector.h"
 #include "ns3/nstime.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -53,6 +54,8 @@ class YansWifiChannel : public WifiChannel
 {
 public:
   static TypeId GetTypeId (void);
+
+  typedef void (* TransmissionCallback)(Ptr<NetDevice> senderDevice, Ptr<Packet> packet);
 
   YansWifiChannel ();
   virtual ~YansWifiChannel ();
@@ -129,6 +132,8 @@ private:
   PhyList m_phyList;                   //!< List of YansWifiPhys connected to this YansWifiChannel
   Ptr<PropagationLossModel> m_loss;    //!< Propagation loss model
   Ptr<PropagationDelayModel> m_delay;  //!< Propagation delay model
+
+  TracedCallback<Ptr<NetDevice>, Ptr<Packet>> m_channelTransmission;
 };
 
 } //namespace ns3

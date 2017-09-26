@@ -35,8 +35,6 @@
 #include <utility> // std::pair
 #include <map>
 
-// begin <
-
 #include "Configuration.h"
 #include "NodeEntry.h"
 #include "SimpleTCPClient.h"
@@ -51,7 +49,6 @@
 #include "TCPFirmwareServer.h"
 #include "TCPSensorClient.h"
 #include "TCPSensorServer.h"
-// end >
 
 using namespace std;
 using namespace ns3;
@@ -65,8 +62,6 @@ string traffic_filepath;
 uint32_t payloadLength;
 NetDeviceContainer staDeviceCont;
 
-// begin <
-
 Configuration config;
 Statistics stats;
 SimulationEventManager eventManager;
@@ -74,7 +69,6 @@ vector<NodeEntry*> nodes;
 
 vector<long> transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval;
 vector<long> transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval;
-// end >
 
 class assoc_record
 {
@@ -267,56 +261,6 @@ PopulateArpCache ()
         }
     }
 }
-
-
-/*RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
-{
-    uint16_t NRPS = 0;
-    uint16_t Value = 0;
-    uint32_t page = 0;
-    uint32_t aid_start = 0;
-    uint32_t aid_end = 0;
-    uint32_t rawinfo = 0;
-    
-    ifstream myfile (RAWConfigFile);
-    //1. get info from config file
-    
-    //2. define RPS
-    if (myfile.is_open())
-    {
-        myfile >> NRPS;
-        for (uint16_t kk=0; kk< NRPS; kk++)
-        {
-            RPS *m_rps = new RPS;
-            RPS::RawAssignment *m_raw = new RPS::RawAssignment;
-            
-            myfile >> Value;
-            m_raw->SetRawControl (Value);//support paged STA or not
-            myfile >> Value;
-            m_raw->SetSlotCrossBoundary (Value);
-            myfile >> Value;
-            m_raw->SetSlotFormat (Value);
-            myfile >> Value;
-            m_raw->SetSlotDurationCount (Value);
-            myfile >> Value;
-            m_raw->SetSlotNum (Value);
-            
-            myfile >> page;
-            myfile >> aid_start;
-            myfile >> aid_end;
-            rawinfo = (aid_end << 13) | (aid_start << 2) | page;
-            m_raw->SetRawGroup (rawinfo);
-            
-            m_rps->SetRawAssignment(*m_raw);
-            
-            rpslist.rpsset.push_back (m_rps);
-        }
-        myfile.close();
-    }
-    else cout << "Unable to open file \n";
-    
-    return rpslist;
-}*/
 
 uint16_t ngroup;
 uint16_t nslot;
@@ -569,12 +513,9 @@ int main (int argc, char *argv[])
   bool S1g1MfieldEnabled;
   string RAWConfigFile;*/
 
-  // begin <
-
   config = Configuration(argc, argv);
   stats = Statistics(config.Nsta);
   eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
-  // end >
 
   /*CommandLine cmd;
   cmd.AddValue ("seed", "random seed", config.seed);

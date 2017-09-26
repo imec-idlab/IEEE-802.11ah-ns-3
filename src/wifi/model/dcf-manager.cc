@@ -626,6 +626,12 @@ DcfManager::DoGrantAccess (void)
 }
 
 void
+DcfManager::RawStart(Time start, Time duration) {
+	m_rawSlotStart = start;
+	m_rawSlotDuration = duration;
+}
+
+void
 DcfManager::AccessTimeout (void)
 {
   NS_LOG_FUNCTION (this);
@@ -686,7 +692,33 @@ DcfManager::GetBackoffStartFor (DcfState *state)
 Time
 DcfManager::GetBackoffEndFor (DcfState *state)
 {
-  return GetBackoffStartFor (state) + MicroSeconds (state->GetBackoffSlots () * m_slotTimeUs);
+  //return GetBackoffStartFor (state) + MicroSeconds (state->GetBackoffSlots () * m_slotTimeUs);
+	//std::cout << "Calculating backoff end, start is " << GetBackoffStartFor (state).GetMicroSeconds() << ", duration of backoff is (slots: " << state->GetBackoffSlots() << ", slot duration: " << m_slotTimeUs << "), total duration: " << state->GetBackoffSlots () * m_slotTimeUs << std::endl;
+    Time backOffEnd = GetBackoffStartFor (state) + MicroSeconds (state->GetBackoffSlots () * m_slotTimeUs);
+
+	if(m_rawSlotStart + m_rawSlotDuration == Time(0)) // if not set
+		return backOffEnd;
+
+	// don't schedule the backoff end beyond the raw slot period
+	if(backOffEnd > m_rawSlotStart + m_rawSlotDuration) {
+
+		//std::cout << "Backoff end was calculated beyond the slot duration, adjusting backoff end (backoffend: " << backOffEnd.GetMicroSeconds()
+		//		<< ", " << "Raw slot end: " << (m_rawSlotStart + m_rawSlotDuration).GetMicroSeconds() << ")" <<  std::endl;
+		Time adjusted = backOffEnd - (m_rawSlotStart + m_rawSlotDuration);
+
+		if(adjusted <= GetBackoffStartFor (state)) {
+			// eh can't adjust it, the start of the backoff is already later
+			// nothing to be done now, let it drop
+			//std::cout << "Unable to adjust the backoff end to prevent going out of the RAW period, the start is already later than the raw slot end" << std::endl;;
+			return backOffEnd;
+		}
+		else {
+			//std::cout << "Adjusted the backoff end to prevent going out of the RAW period to " << adjusted.GetMicroSeconds() << "µs" << std::endl;
+			return adjusted;
+		}
+	}
+	else
+		return backOffEnd;
 }
 
 void

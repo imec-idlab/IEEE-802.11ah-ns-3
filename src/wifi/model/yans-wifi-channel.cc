@@ -52,6 +52,8 @@ YansWifiChannel::GetTypeId (void)
                    PointerValue (),
                    MakePointerAccessor (&YansWifiChannel::m_delay),
                    MakePointerChecker<PropagationDelayModel> ())
+	.AddTraceSource("Transmission", "Fired when something is transmitted on the channel",
+				   MakeTraceSourceAccessor(&YansWifiChannel::m_channelTransmission), "ns3::YansWifiChannel::TransmissionCallback")
   ;
   return tid;
 }
@@ -85,6 +87,9 @@ YansWifiChannel::Send (Ptr<YansWifiPhy> sender, Ptr<const Packet> packet, double
   Ptr<MobilityModel> senderMobility = sender->GetMobility ()->GetObject<MobilityModel> ();
   NS_ASSERT (senderMobility != 0);
   uint32_t j = 0;
+
+  m_channelTransmission(sender->GetDevice(), packet->Copy());
+
   for (PhyList::const_iterator i = m_phyList.begin (); i != m_phyList.end (); i++, j++)
     {
       if (sender != (*i))

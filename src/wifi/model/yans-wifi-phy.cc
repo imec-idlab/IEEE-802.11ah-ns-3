@@ -805,7 +805,7 @@ YansWifiPhy::SendPacket (Ptr<const Packet> packet, WifiTxVector txVector, WifiPr
       m_endRxEvent.Cancel ();
       m_interference.NotifyRxEnd ();
     }
-  NotifyTxBegin (packet);
+  NotifyTxBegin(packet, txDuration);
   uint32_t dataRate500KbpsUnits;
   if (txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_HT || txVector.GetMode ().GetModulationClass () == WIFI_MOD_CLASS_S1G)
     {
@@ -819,6 +819,21 @@ YansWifiPhy::SendPacket (Ptr<const Packet> packet, WifiTxVector txVector, WifiPr
   NotifyMonitorSniffTx (packet, (uint16_t)GetChannelFrequencyMhz (), GetChannelNumber (), dataRate500KbpsUnits, isShortPreamble, txVector);
   m_state->SwitchToTx (txDuration, packet, GetPowerDbm (txVector.GetTxPowerLevel ()), txVector, preamble);
   m_channel->Send (this, packet, GetPowerDbm (txVector.GetTxPowerLevel ()) + m_txGainDb, txVector, preamble, packetType, txDuration);
+}
+
+void
+OnTxEnd (YansWifiPhy* obj, Ptr<const Packet> packet)
+{
+    obj->NotifyTxEnd (packet);
+}
+
+void
+YansWifiPhy::NotifyTxBegin (Ptr<const Packet> packet, Time duration)
+{
+    WifiPhy::NotifyTxBegin(packet);
+
+    //std::cout << this->m_device->GetAddress() << " " << Simulator::Now().GetMicroSeconds() << " Scheduling end tx " << time.GetMicroSeconds()  << std::endl;
+    Simulator::Schedule(duration, &OnTxEnd, this, packet);
 }
 
 uint32_t

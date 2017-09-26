@@ -33,7 +33,6 @@
 #include "mac-rx-middle.h"
 #include "mac-tx-middle.h"
 #include "mgt-headers.h"
-#include "extension-headers.h"
 #include "mac-low.h"
 #include "amsdu-subframe-header.h"
 #include "msdu-aggregator.h"
@@ -109,7 +108,11 @@ ApWifiMac::GetTypeId (void)
     .AddAttribute ("RPSsetup", "configuration of RAW",
                    RPSVectorValue (),
                    MakeRPSVectorAccessor (&ApWifiMac::m_rpsset),
-                   MakeRPSVectorChecker ());
+                   MakeRPSVectorChecker ())
+	.AddTraceSource ("S1gBeaconBroadcasted", "Fired when a beacon is transmitted",
+	                 MakeTraceSourceAccessor(&ApWifiMac::m_transmitBeaconTrace),
+	                 "ns3::ApWifiMac::S1gBeaconTracedCallback")
+				   ;
   return tid;
 }
 
@@ -652,6 +655,7 @@ ApWifiMac::SendOneBeacon (void)
       packet->AddHeader (beacon);
       m_beaconDca->Queue (packet, hdr);
 
+      m_transmitBeaconTrace(beacon, m_rps->GetRawAssigmentObj());
      }
     else
      {
