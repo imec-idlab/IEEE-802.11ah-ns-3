@@ -80,7 +80,7 @@ void SimulationEventManager::onSTANodeCreated(NodeEntry& node) {
 }
 
 void SimulationEventManager::onNodeAssociated(NodeEntry& node) {
-	send({"stanodeassoc", std::to_string(node.id), std::to_string(node.aId), std::to_string(node.rawGroupNumber), std::to_string(node.rawSlotIndex)}); //TODO rawGroupNumber not known in assoc
+	send({"stanodeassoc", std::to_string(node.id), std::to_string(node.aId), std::to_string(node.rpsIndex), std::to_string(node.rawGroupNumber), std::to_string(node.rawSlotIndex)}); //TODO rawGroupNumber not known in assoc
 }
 
 void SimulationEventManager::onNodeDeassociated(NodeEntry& node) {

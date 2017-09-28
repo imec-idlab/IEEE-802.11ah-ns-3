@@ -112,6 +112,9 @@ ApWifiMac::GetTypeId (void)
 	.AddTraceSource ("S1gBeaconBroadcasted", "Fired when a beacon is transmitted",
 	                 MakeTraceSourceAccessor(&ApWifiMac::m_transmitBeaconTrace),
 	                 "ns3::ApWifiMac::S1gBeaconTracedCallback")
+	.AddTraceSource ("RpsIndex", "Fired when RPS index changes",
+					 MakeTraceSourceAccessor(&ApWifiMac::m_rpsIndexTrace),
+					 "ns3::TracedValueCallback::Uint16")
 				   ;
   return tid;
 }
@@ -132,6 +135,7 @@ ApWifiMac::ApWifiMac ()
 
   m_enableBeaconGeneration = false;
   AuthenThreshold = 0;
+
   //m_SlotFormat = 0;
 }
 
@@ -622,6 +626,7 @@ ApWifiMac::SendOneBeacon (void)
             NS_LOG_DEBUG ("RpsIndex =" << RpsIndex);
             RpsIndex = 1;
           }
+      m_rpsIndexTrace = RpsIndex;
       beacon.SetRPS (*m_rps);
       /*
       RPS m_rps;

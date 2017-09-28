@@ -313,8 +313,10 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
                 delete m_raw;
             }
             rpslist.rpsset.push_back (m_rps);
+            config.nRawGroupsPerRpsList.push_back(NRAWPERBEACON);
         }
         myfile.close();
+        config.NRawSta = rpslist.rpsset[rpslist.rpsset.size()-1]->GetRawAssigmentObj(NRAWPERBEACON-1).GetRawGroupAIDEnd();
     }
     else cout << "Unable to open file \n";
 
@@ -346,20 +348,33 @@ void updateNodesQueueLength() {
 }
 
 void onSTAAssociated(int i) {
-    /*nodes[i]->rawGroupNumber = ((nodes[i]->aId - 1) / (config.NRawSta / config.NGroup));
-    nodes[i]->rawSlotIndex = nodes[i]->aId % config.NRawSlotNum;
-*/
-	cout << "Node " << std::to_string(i) << " is associated and has id " << nodes[i]->id << endl;
-    eventManager.onNodeAssociated(*nodes[i]);
+	cout << "Node " << std::to_string(i) << " is associated and has aid " << nodes[i]->aId << endl;
 
-    uint32_t nrOfSTAAssociated (0);
-    for (uint32_t i = 0; i < config.Nsta; i++) {
-        if (nodes[i]->isAssociated)
-            nrOfSTAAssociated++;
-    }
+	uint32_t nrOfSTAAssociated (0);
+	for (uint32_t i = 0; i < config.Nsta; i++) {
+		if (nodes[i]->isAssociated)
+			nrOfSTAAssociated++;
+	}
+	for (int k = 0; k < config.rps.rpsset.size(); k++)
+	{
+		for (int j=0; j < config.nRawGroupsPerRpsList[k]; j++)
+		{
+			if (config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDStart() <= i+1 && i+1 <= config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDEnd())
+			{
+				nodes[i]->rpsIndex = k + 1;
+				nodes[i]->rawGroupNumber = j + 1;
+				nodes[i]->rawSlotIndex = nodes[i]->aId % config.rps.rpsset[k]->GetRawAssigmentObj(j).GetSlotNum() + 1;
+				/*cout << "Node " << i << " with AID " << (int)nodes[i]->aId << " belongs to " << (int)nodes[i]->rawSlotIndex << " slot of RAW group "
+						<< (int)nodes[i]->rawGroupNumber << " within the " << (int)nodes[i]->rpsIndex << " RPS." << endl;
+			*/
+			}
+		}
+	}
+	eventManager.onNodeAssociated(*nodes[i]);
 
-    if (nrOfSTAAssociated == config.Nsta) {
-    	cout << "All stations associated, configuring clients & server" << endl;
+	// RPS, Raw group and RAW slot assignment
+	if (nrOfSTAAssociated == config.Nsta) {
+		cout << "All stations associated, configuring clients & server" << endl;
         // association complete, start sending packets
     	stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
@@ -397,6 +412,11 @@ void onSTAAssociated(int i) {
 		}*/
         updateNodesQueueLength();
     }
+}
+
+void RpsIndexTrace (uint16_t oldValue, uint16_t newValue)
+{
+	//cout << "-----------OLD " << oldValue << "+++++++++NEW " << newValue << endl;
 }
 
 void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
@@ -512,8 +532,11 @@ int main (int argc, char *argv[])
   double poissonrate;
   bool S1g1MfieldEnabled;
   string RAWConfigFile;*/
-
   config = Configuration(argc, argv);
+
+  config.rps = configureRAW (config.rps, config.RAWConfigFile);
+  config.Nsta = config.NRawSta;
+
   stats = Statistics(config.Nsta);
   eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
 
@@ -583,14 +606,11 @@ int main (int argc, char *argv[])
   NetDeviceContainer staDevice;
   staDevice = wifi.Install (phy, mac, wifiStaNode);
 
-  RPSVector rps;
-  rps = configureRAW (rps, config.RAWConfigFile);
-
   mac.SetType ("ns3::ApWifiMac",
                  "Ssid", SsidValue (ssid),
                  "BeaconInterval", TimeValue (MicroSeconds(config.BeaconInterval)),
                  "NRawStations", UintegerValue (config.NRawSta),
-                 "RPSsetup", RPSVectorValue (rps));
+                 "RPSsetup", RPSVectorValue (config.rps));
 
   NetDeviceContainer apDevice;
   phy.Set ("TxGain", DoubleValue (3.0));
@@ -604,7 +624,13 @@ int main (int argc, char *argv[])
 
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxPacketNumber", UintegerValue(10));
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxDelay", TimeValue (NanoSeconds (6000000000000)));
- 
+
+  std::ostringstream oss;
+  oss << "/NodeList/"
+		  << wifiApNode.Get(0)->GetId()
+		  << "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/RpsIndex";
+  Config::ConnectWithoutContext(oss.str (), MakeCallback (&RpsIndexTrace)); //never happens
+
   // mobility.
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
@@ -660,6 +686,7 @@ int main (int argc, char *argv[])
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
     PopulateArpCache ();
+
 
     // configure tracing for associations & other metrics
     configureNodes(wifiStaNode, staDevice);

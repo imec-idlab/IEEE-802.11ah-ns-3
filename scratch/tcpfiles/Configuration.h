@@ -22,12 +22,21 @@ using namespace std;
 
 struct Configuration {
 	/*
+	 * New configuration parameters
+	 *
+	 * */
+	  RPSVector rps;
+	  vector<uint16_t> nRawGroupsPerRpsList;
+	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
+	uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
+	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
+	/*
 	 * Common configuration parameters
 	 * */
 	  double simulationTime = 20; //60
 	  uint32_t seed = 1;
-	  int NRawSta = 32;
-	  uint32_t Nsta =32;
+	  int NRawSta = 1;
+	  uint32_t Nsta = 1;
 	  uint32_t BeaconInterval = 100000;
 
 	  double datarate = 7.8;

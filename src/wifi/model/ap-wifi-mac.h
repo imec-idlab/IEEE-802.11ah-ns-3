@@ -32,6 +32,8 @@
 #include "s1g-raw-control.h"
 #include "ns3/string.h"
 #include "extension-headers.h"
+#include "ns3/traced-value.h"
+#include "ns3/trace-source-accessor.h"
 
 
 namespace ns3 {
@@ -47,6 +49,8 @@ class ApWifiMac : public RegularWifiMac
 {
 public:
   static TypeId GetTypeId (void);
+
+  TracedValue<uint16_t> m_rpsIndexTrace;
 
   TracedCallback<S1gBeaconHeader, RPS::RawAssignment> m_transmitBeaconTrace;
 
@@ -118,7 +122,6 @@ public:
    * \return the number of stream indices assigned by this model
    */
   int64_t AssignStreams (int64_t stream);
-
 
 private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);

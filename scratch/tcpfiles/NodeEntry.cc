@@ -809,6 +809,7 @@ void NodeEntry::UpdateQueueLength() {
 	//cout << Simulator::Now().GetSeconds() << "s " << "Queue length of " << this->id << " is " << this->queueLength << endl;
 }
 
+
 NodeEntry::~NodeEntry() {
 }
 
