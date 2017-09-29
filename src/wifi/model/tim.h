@@ -24,6 +24,7 @@
 #include <stdint.h>
 #include "ns3/buffer.h"
 #include "ns3/attribute-helper.h"
+#include "ns3/attribute.h"
 #include "ns3/wifi-information-element.h"
 
 
@@ -58,6 +59,7 @@ public:
         void SetBlockControl (enum BlockCoding coding);
         void SetBlockOffset (uint8_t offset);
         void SetEncodedInfo (uint8_t * encodedInfo, uint8_t length);
+        void SetBlockBitmap (uint8_t offset);
       
         enum  TIM::BlockCoding GetBlockControl (void) const;
         uint8_t GetBlockOffset (void) const;
@@ -110,7 +112,7 @@ public:
    *
    * \Return the TIM Count
    */
-  uint8_t GetTIMCount (void) const;
+  uint8_t GetDTIMCount (void) const;
   /**
    * Return the DTIM Period.
    *
@@ -128,27 +130,42 @@ public:
    *
    * \Return the Partial Virtual Bitmap
    */
-  unsigned char * GetPartialVBitmap (void) const;
+  uint8_t * GetPartialVBitmap (void) const;
+  
+   void SetTafficIndicator (uint8_t control);
+   void SetPageSliceNum (uint8_t control);
+   void SetPageIndex (uint8_t control);
+   
+   uint8_t GetTrafficIndicator () const;
+   uint8_t GetPageSliceNum () const;
+   uint8_t GetPageIndex () const;
+
     
 
   WifiInformationElementId ElementId () const;
   uint8_t GetInformationFieldSize () const;
   void SerializeInformationField (Buffer::Iterator start) const;
   uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
-    
+  
+   uint8_t m_length; //!< length of partial Virtual Bitmap field
 
 private:
   uint8_t m_DTIMCount; //!< DTIM Count
   uint8_t m_DTIMPeriod; //!< DTIM Period
   uint8_t m_BitmapControl; //!< Bitmap Control
+  uint8_t m_TrafficIndicator;
+  uint8_t m_PageSliceNum;
+  uint8_t m_PageIndex;
   TIM::EncodedBlock m_encodeblock; //!< encoded block subfield of partial Virtual Bitmap field
+  uint8_t m_partialVBitmap_arrary[251];
   uint8_t * m_partialVBitmap;
-  uint8_t m_length; //!< length of partial Virtual Bitmap field
+
+  uint8_t * subblock; 
 };
 
-
-//ATTRIBUTE_HELPER_HEADER (TIM);
-
+std::ostream &operator << (std::ostream &os, const TIM &pageS);
+std::istream &operator >> (std::istream &is, TIM &pageS);
+ATTRIBUTE_HELPER_HEADER (TIM);
 } //namespace ns3
 
 #endif /* TIM_H */

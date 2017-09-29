@@ -479,6 +479,12 @@ EdcaTxopN::RemoveRetransmitPacket (uint8_t tid, Mac48Address recipient, uint16_t
 }
 
 void
+EdcaTxopN::SetsleepList (std::map<Mac48Address, bool> list)
+{
+    m_sleepList = list;
+}
+
+void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
@@ -517,6 +523,21 @@ EdcaTxopN::NotifyAccessGranted (void)
             {
               return;
             }
+          
+          //temporary, should be removed when ps-poll is suported
+          Ptr<const Packet> PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
+          
+          while (1)
+            {
+              PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);     
+              if (! m_sleepList.find(m_currentHdr.GetAddr1())->second || m_sleepList.size ()== 0) // "m_sleepList.size ()== 0" for non-ap stations
+              // no sleep 
+                {
+                    goto Transmission;
+                }
+             }
+          return;
+        Transmission:  
           m_currentPacket = m_queue->DequeueFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
           NS_ASSERT (m_currentPacket != 0);
 

@@ -109,7 +109,22 @@ ApWifiMac::GetTypeId (void)
     .AddAttribute ("RPSsetup", "configuration of RAW",
                    RPSVectorValue (),
                    MakeRPSVectorAccessor (&ApWifiMac::m_rpsset),
-                   MakeRPSVectorChecker ());
+                   MakeRPSVectorChecker ())
+    .AddAttribute ("PageSliceSet", "configuration of PageSlice",
+                   pageSliceValue (),
+                   MakepageSliceAccessor (&ApWifiMac::m_pageslice),
+                   MakepageSliceChecker ())
+     .AddAttribute ("TIMSet", "configuration of TIM",
+                   TIMValue (),
+                   MakeTIMAccessor (&ApWifiMac::m_TIM),
+                   MakeTIMChecker ());
+     /*
+       .AddAttribute ("DTIMPeriod", "TIM number in one of DTIM",
+                   UintegerValue (4),
+                   MakeUintegerAccessor (&ApWifiMac::GetDTIMPeriod,
+                                         &ApWifiMac::SetDTIMPeriod),
+                   MakeUintegerChecker<uint8_t> ()); 
+       */
   return tid;
 }
 
@@ -130,6 +145,10 @@ ApWifiMac::ApWifiMac ()
   m_enableBeaconGeneration = false;
   AuthenThreshold = 0;
   //m_SlotFormat = 0;
+  m_AidToMacAddr.clear ();
+  m_sleepList.clear ();
+  m_DTIMCount = 0;
+  m_DTIMOffset = 0;
 }
 
 ApWifiMac::~ApWifiMac ()
@@ -222,6 +241,20 @@ uint32_t
 ApWifiMac::GetSlotNum (void) const
 {
     return m_slotNum;
+}
+
+
+uint8_t 
+ApWifiMac::GetDTIMPeriod (void) const
+{
+    return m_DTIMPeriod;
+}
+
+void 
+ApWifiMac::SetDTIMPeriod (uint8_t period)
+{
+    m_DTIMPeriod = period;
+    //m_DTIMOffset = m_DTIMPeriod - 1;
 }
     
 
@@ -531,6 +564,8 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
   uint8_t aid_h = mac[4] & 0x1f;
   uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
   assoc.SetAID(aid); //
+  m_AidToMacAddr[aid]=to;
+
   StatusCode code;
   if (success)
     {
@@ -586,9 +621,99 @@ Addheader:
   m_dca->Queue (packet, hdr);
 }
 
+//For now, to avoid adjust pageslicecount and pageslicecount dynamicly,   page bitmap is always 4 bytes
+uint32_t
+ApWifiMac:: HasPacketsToPage (uint8_t blockstart , uint8_t Page)
+{
+   uint16_t sta_aid; 
+   uint8_t blockBitmap;
+   uint32_t PageBitmap;
+   PageBitmap = 0;
+   for (uint32_t i=blockstart; i<= 31; i++ ) 
+    {
+       blockBitmap = HasPacketsToBlock (i,  Page);
+       if (blockBitmap != 0)
+         {
+           PageBitmap = PageBitmap | (1 << i);
+         }
+    }
+   return PageBitmap;
+}
+
+uint8_t
+ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
+{
+    uint16_t sta_aid, subblock, block;
+    uint8_t blockBitmap;
+    
+    blockBitmap = 0;
+    block = (PageInd << 11) | (blockInd << 6);
+   
+    for (uint16_t i = 0; i <= 7; i++) //8 subblock in each block.
+     {
+       subblock = block | (i << 3);
+       for (uint16_t j = 0; j <= 7; j++) //8 stations in each subblock
+        {
+           sta_aid = subblock | j;
+           if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
+             {
+               blockBitmap = blockBitmap | (1 << i); 
+               break;
+             } 
+        }
+     }
+  
+    return blockBitmap;
+}
+
+uint8_t
+ApWifiMac::HasPacketsToSubBlock (uint16_t subblockInd, uint16_t blockInd , uint16_t PageInd)
+{
+    uint16_t sta_aid, subblock;
+    uint8_t subblockBitmap;
+    subblockBitmap = 0;
+  
+    subblock = (PageInd << 11) | (blockInd << 6) | (subblockInd << 3);
+    for (uint16_t j = 0; j <= 7; j++) //8 stations in each subblock
+        {
+           sta_aid = subblock | j;
+           if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
+             {
+               subblockBitmap = subblockBitmap | (1 << j); 
+               m_sleepList[m_AidToMacAddr.find(sta_aid)->second]=false;
+             } 
+        }
+    return subblockBitmap;
+}
+    
+
+bool 
+ApWifiMac::HasPacketsInQueueTo(Mac48Address dest) 
+{           
+    //check also if ack received
+    Ptr<const Packet> peekedPacket_VO, peekedPacket_VI, peekedPacket_BE, peekedPacket_BK;
+    WifiMacHeader peekedHdr;
+    Time tstamp;
+        
+    peekedPacket_VO = m_edca.find(AC_VO)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_VI = m_edca.find(AC_VI)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_BE = m_edca.find(AC_BE)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_BK = m_edca.find(AC_BK)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+        
+    if (peekedPacket_VO != 0 || peekedPacket_VI != 0 || peekedPacket_BE != 0 || peekedPacket_BK != 0 )
+       {
+         return true;
+       }
+    else
+      {
+         return false;
+      }
+}
+ 
+
 void
 ApWifiMac::SendOneBeacon (void)
-{
+{  
   NS_LOG_FUNCTION (this);
   WifiMacHeader hdr;
     
@@ -620,6 +745,31 @@ ApWifiMac::SendOneBeacon (void)
             RpsIndex = 1;
           }
       beacon.SetRPS (*m_rps);
+      
+    Mac48Address stasleepAddr;
+    for (uint16_t i=0; i< 8192;i++)
+       {  
+      // assume all station sleeps, then change some to awake state based on downlink data
+      //This implementation is temporary, should be removed if ps-poll is supported    
+        if (m_AidToMacAddr.find(i)->second != NULL)
+           {
+            stasleepAddr = m_AidToMacAddr.find(i)->second;
+            if (m_stationManager->IsAssociated (stasleepAddr))
+              {
+                m_sleepList[stasleepAddr]=true;
+              }
+           }
+       }
+      
+    if (m_DTIMCount == 0)
+      {
+        m_pagebitmap = HasPacketsToPage (m_pageslice.GetBlockOffset (), m_pageslice.GetPageindex());
+        //for now, only configure Page Bit map based on real-time traffic, other parameters configured beforehand. 
+        m_pageslice.SetPageBitmap (m_pagebitmap);
+        //For now, page bitmap is always 4 bytes
+        beacon.SetpageSlice (m_pageslice);
+      }
+    
       /*
       RPS m_rps;
       NS_LOG_UNCOND ("send beacon at" << Simulator::Now ());
@@ -628,7 +778,110 @@ ApWifiMac::SendOneBeacon (void)
       m_receivedAid.clear (); //release storage
       //m_rps = m_S1gRawCtr.GetRPS ();
       beacon.SetRPS (m_rps); */
+      
 
+    //NS_ASSERT (m_DTIMCount + m_DTIMOffset == m_DTIMPeriod -1);
+    m_DTIMPeriod = m_TIM.GetDTIMPeriod ();
+    m_TIM.SetDTIMCount (m_DTIMCount);
+    NS_ASSERT (m_pageslice.GetTIMOffset () +  m_pageslice.GetPageSliceCount() <= m_DTIMPeriod);
+    //m_TIM.SetDTIMPeriod (m_DTIMPeriod); //from users
+    m_TrafficIndicator = 0; //for group addressed MSDU/MMPDU, not supported.
+    m_TIM.SetTafficIndicator (m_TrafficIndicator); //from page slice
+
+
+    if (m_DTIMOffset == m_pageslice.GetTIMOffset ()) //first page slice start at TIM offset
+      {
+         m_PageSliceNum = 0;
+      }
+    else
+      {
+        m_PageSliceNum++;  
+      }
+        
+    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() ); //or do not use m_PageSliceNum when it's larger (equal) than slice count.
+    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() );
+    
+    m_TIM.SetPageSliceNum (m_PageSliceNum); //from page slice
+    m_PageIndex = m_pageslice.GetPageindex();
+    // m_TIM.SetPageIndex (m_PageIndex); 
+    
+    uint8_t NumEncodedBlock; 
+    if (m_PageSliceNum == m_pageslice.GetPageSliceCount() - 1)
+      {
+         NumEncodedBlock = m_pageslice.GetPageSliceLen();
+      }
+    else
+      {
+         NumEncodedBlock = (m_pageslice.GetInformationFieldSize ()  - 4 )* 8 - (m_pageslice.GetPageSliceCount() - 1) * m_pageslice.GetPageSliceLen();
+         //As page bitmap of page slice element is fixed to 4 bytes for now, "m_pageslice.GetInformationFieldSize ()" is alwawys 8.
+         //Section 9.4.2.193 oage slice element, Draft 802.11ah_D9.0
+      }
+    
+   if (m_PageSliceNum == 0)
+      {
+        m_blockoffset = m_pageslice.GetBlockOffset ();
+      }
+    
+    for (uint8_t i = 0; i< NumEncodedBlock; i++)
+      {
+        TIM::EncodedBlock * m_encodedBlock = new TIM::EncodedBlock;
+        m_encodedBlock->SetBlockOffset (m_blockoffset & 0x1f);
+        uint8_t m_blockbitmap = HasPacketsToBlock (m_blockoffset & 0x1f, m_PageIndex);
+        m_encodedBlock->SetBlockBitmap (m_blockbitmap);
+
+        uint8_t subblocklength = 0;
+        uint8_t *  m_subblock; 
+        m_subblock = new uint8_t [8]; //can be released after SetPartialVBitmap
+        for (uint16_t j = 0; j <= 7; j++ ) // at most 8 subblock
+          {
+             if (m_blockbitmap & (1 << j))
+             {
+                *m_subblock = HasPacketsToSubBlock (j, m_blockoffset & 0x1f, m_PageIndex);
+                subblocklength++; 
+                m_subblock++;
+             }
+          }
+        m_encodedBlock->SetEncodedInfo(m_subblock, subblocklength);
+             
+        m_blockoffset++; //actually block id
+        NS_ASSERT (m_blockoffset <= m_pageslice.GetBlockOffset () + m_pageslice.GetInformationFieldSize () * 8);
+        //block id cannot exceeds the max defined in the page slice  element
+        
+        m_TIM.SetPartialVBitmap (*m_encodedBlock);
+        delete m_encodedBlock;
+        delete m_subblock;
+      }
+    
+    beacon.SetTIM (m_TIM);
+    if (m_DTIMOffset == m_DTIMPeriod - 1)
+      {
+        m_DTIMOffset = 0;
+      }
+    else
+      {
+         m_DTIMOffset++;
+      }
+    
+    if (m_DTIMCount == 0)
+      {
+        m_DTIMCount = m_DTIMPeriod - 1;
+      }
+    else
+      {
+        m_DTIMCount--;
+      }
+    NS_ASSERT (m_DTIMCount+m_DTIMOffset-1==m_DTIMPeriod || (m_DTIMCount ==0 && m_DTIMOffset == 0));
+    
+    //set sleep list, temporary, removed if ps-poll supported 
+    m_edca.find (AC_VO)->second->SetsleepList (m_sleepList);
+    m_edca.find (AC_VI)->second->SetsleepList (m_sleepList);
+    m_edca.find (AC_BE)->second->SetsleepList (m_sleepList);
+    m_edca.find (AC_BK)->second->SetsleepList (m_sleepList);
+    
+    
+   
+      
+      
       AuthenticationCtrl  AuthenCtrl;
       AuthenCtrl.SetControlType (false); //centralized
       Ptr<WifiMacQueue> MgtQueue = m_dca->GetQueue ();

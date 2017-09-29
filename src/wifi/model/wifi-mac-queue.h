@@ -143,6 +143,7 @@ public:
    *
    * \return packet
    */
+  Ptr<const Packet> PeekByAddress (WifiMacHeader::AddressType type, Mac48Address dest);
   Ptr<const Packet> PeekByTidAndAddress (WifiMacHeader *hdr,
                                          uint8_t tid,
                                          WifiMacHeader::AddressType type,

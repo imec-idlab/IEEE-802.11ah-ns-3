@@ -211,6 +211,24 @@ WifiMacQueue::PeekByTidAndAddress (WifiMacHeader *hdr, uint8_t tid,
   return 0;
 }
 
+Ptr<const Packet>
+WifiMacQueue::PeekByAddress (WifiMacHeader::AddressType type, Mac48Address dest)
+{
+  Cleanup ();
+  if (!m_queue.empty ())
+    {
+      PacketQueueI it;
+      for (it = m_queue.begin (); it != m_queue.end (); ++it)
+        {
+              if (GetAddressForPacket (type, it) == dest)
+                {
+                  return it->packet;
+                }
+        }
+    }
+  return 0;
+}
+
 bool
 WifiMacQueue::IsEmpty (void)
 {

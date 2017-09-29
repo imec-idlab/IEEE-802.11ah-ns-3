@@ -309,9 +309,205 @@ StaWifiMac::SendPspollIfnecessary (void)
    }
 }
 
-void
-StaWifiMac::S1gBeaconReceived (void)
+void 
+StaWifiMac::S1gTIMReceived (S1gBeaconHeader beacon)
 {
+    uint8_t BeaconNumForTIM;
+    uint8_t m_selfBlockPos;
+    uint8_t blockind;
+    uint8_t subblockind;
+    
+    uint8_t m_blockbitmap;
+          
+    uint8_t * m_PartialVBitmap;
+    uint8_t length;
+       
+    m_selfAid = GetAID() & 0x07;
+    m_selfSubBlock = (GetAID() >> 3)& 0x07;
+    m_selfBlock = (GetAID() >> 6) & 0x1f;
+    m_selfPage = GetAID() >> 11;
+        //Encoded block subfield
+    m_TIM = beacon.GetTIM ();
+    m_DTIMCount = m_TIM.GetDTIMCount ();  
+    m_DTIMPeriod = m_TIM.GetDTIMPeriod ();
+    m_PageSliceNum = m_TIM.GetPageSliceNum ();
+    m_PageIndex = m_TIM.GetPageIndex ();
+      
+    if (m_DTIMCount == 0)
+       {
+          m_pageSlice = beacon.GetpageSlice ();
+          m_PagePeriod = m_pageSlice.GetPagePeriod ();
+          m_Pageindex_slice = m_pageSlice.GetPageindex ();
+          NS_ASSERT (m_Pageindex_slice == m_PageIndex);
+          m_PageSliceLen = m_pageSlice.GetPageSliceLen ()  ;
+          m_PageSliceCount = m_pageSlice.GetPageSliceCount () ;
+          m_BlockOffset = m_pageSlice.GetBlockOffset () ;
+          m_TIMOffset = m_pageSlice.GetTIMOffset ();
+          m_PageBitmapLen = m_pageSlice.GetInformationFieldSize () - 4;
+          uint8_t * map = m_pageSlice.GetPageBitmap ();
+          for (uint8_t i=0; i < m_PageBitmapLen ; i++)
+            {
+               m_PageBitmap[i] = *map;
+               map++;
+           }
+       }
+          
+    if ((m_DTIMCount == 0 && m_TIMOffset ==0) || (m_DTIMCount !=0 && (m_DTIMPeriod - m_DTIMCount) == m_TIMOffset) )
+      // page slice start from m_TIMOffset
+        {
+          if (m_selfBlock >= m_BlockOffset && m_selfPage == m_Pageindex_slice) 
+          //stations smaller m_BlockOffset are not involved
+            {
+              m_selfBlockPos = m_selfBlock - m_BlockOffset;
+              if (IsInPagebitmap (m_selfBlockPos)) //has packets for the block 
+                {
+                  BeaconNumForTIM = m_selfBlockPos/m_PageSliceLen;
+                  if (BeaconNumForTIM >= m_PageSliceCount)
+                    {
+                      BeaconNumForTIM--;
+                    }
+                }
+              else //has no packets for the block 
+                {
+                  BeaconNumForTIM = m_PageSliceCount;
+                  //wake up after the last page slice, this may happen before the next DTIM, depends on TIM offset and page slice count.
+                }
+             GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM)); 
+            }
+          return;
+        }
+       
+    //non first page slice, use info from TIM 
+    // m_PageSliceNum from TIM is not used, seems not necessary
+    if (m_selfPage != m_Pageindex ) 
+        {
+          return;
+          //not sure, how to handle when TIM and station are not in the same page
+    }
+          
+    m_PartialVBitmap = m_TIM.GetPartialVBitmap ();
+    length =  m_TIM.GetInformationFieldSize ();
+    NS_ASSERT (length >=5);
+    for (uint8_t i = 0; i <  length -3;) //exclude DTIM COUNT,DTIM period. bitmap control
+        {
+            blockind = ((*m_PartialVBitmap) >> 3) & 0x1f;
+            m_PartialVBitmap++;
+            m_blockbitmap = *m_PartialVBitmap;
+                
+            if (blockind == m_selfBlock) 
+             {
+                if ( (m_blockbitmap & (1 << m_selfSubBlock)) == 0) //no packets in subblock
+                  {
+                     //if not included in the page slice element, wake up for DTIM
+                    GoToSleepCurrentTIM (beacon);
+                    return;
+                  }
+                else
+                 {
+                    for (uint8_t j=0; j <= m_selfSubBlock; j++)
+                      {
+                        if ((m_blockbitmap & (1 << j)) == 1)
+                          {
+                            m_PartialVBitmap++;
+                          }   
+                      }
+                    subblockind = *m_PartialVBitmap; 
+                    if ((subblockind & (1 < m_selfAid) ) == 0) //no packet for me
+                     {
+                        GoToSleepCurrentTIM (beacon);
+                        return;
+                     }
+                    else // if has packet, set station to sleep after this beacon
+                     {
+                        GoToSleepNextTIM (beacon);
+                        return;
+                     }
+                 }
+             }
+            else 
+             {
+                for (uint8_t k=0; k <= 7; k++)
+                 {
+                    if ((m_blockbitmap & (1 << k)) == 1)
+                    {
+                        m_PartialVBitmap++;
+                    }
+                 }
+             } 
+        }  
+    GoToSleepCurrentTIM (beacon);
+}
+
+void
+StaWifiMac::GoToSleepNextTIM (S1gBeaconHeader beacon) //to do, merge with GoToSleepCurrentTIM
+{
+   uint8_t BeaconNumForTIM;
+   if (m_selfBlock < m_BlockOffset) //not included in the page slice element
+     {
+        BeaconNumForTIM = m_DTIMPeriod - m_DTIMCount - 1;
+     }
+   else
+    //if included in the page slice element, wake up for after last page slice, not sure that's the correct way.    
+    {
+       BeaconNumForTIM = m_PagePeriod - m_PageSliceNum -1 ;
+    }
+  GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM)); 
+}
+
+void
+StaWifiMac::GoToSleepCurrentTIM (S1gBeaconHeader beacon)
+{
+    uint8_t BeaconNumForTIM;
+   if (m_selfBlock < m_BlockOffset) //not included in the page slice element
+     {
+        BeaconNumForTIM = m_DTIMPeriod - m_DTIMCount;
+     }
+   else
+    //if included in the page slice element, wake up for after last page slice, not sure that's the correct way.    
+    {
+       BeaconNumForTIM = m_PagePeriod - m_PageSliceNum;
+    }
+  GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM)); 
+}
+
+    
+
+void
+StaWifiMac::GoToSleep(Time  sleeptime) 
+{
+    if (!m_low->GetPhy()->IsStateSleep() && (sleeptime.GetMicroSeconds() != 0))
+      {
+        m_low->GetPhy()->SetSleepMode();
+        Simulator::Schedule(sleeptime, &StaWifiMac::WakeUp, this);
+      }
+}
+
+void
+StaWifiMac::WakeUp (void)
+{ 
+    if (m_low->GetPhy()->IsStateSleep())
+      {
+        m_low->GetPhy()->ResumeFromSleep();
+      }
+}
+
+bool
+StaWifiMac::IsInPagebitmap (uint8_t block)
+{
+    uint8_t Ind, offset;
+    bool inPage;
+    Ind = block/8;
+    offset = block % 8;
+    inPage = m_PageBitmap[Ind] & (1 < offset);
+    return inPage;
+}
+
+
+
+void
+StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
+{
+    S1gTIMReceived (beacon);
     if (m_outsideRawEvent.IsRunning ())
      {
         m_outsideRawEvent.Cancel ();          //avoid error when actual beacon interval become shorter, otherwise, AccessAllowedIfRaw will set again after raw starting
@@ -1012,6 +1208,157 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
            }
       }
          m_rawStart = true; //?
+       
+      static uint8_t PagePeriod = 0;
+
+      static uint8_t Pageindex = 0;
+      static uint8_t PageSliceLen = 0;
+      static uint8_t PageSliceCount = 0;
+      static uint8_t BlockOffset = 0;
+      static uint8_t TIMOffset = 0;
+      
+      static uint32_t PageBitmap = 0;
+     
+      uint8_t PagePeriod_read = 0;
+      uint8_t Pageindex_read = 0;
+      uint8_t PageSliceLen_read = 0;
+      uint8_t PageSliceCount_read = 0;
+      uint8_t BlockOffset_read = 0;
+      uint8_t TIMOffset_read = 0;
+      uint32_t PageBitmap_read = 0;
+
+     
+      pageSlice pageSli; 
+      pageSli = beacon.GetpageSlice ();
+         
+      
+      PagePeriod_read = pageSli.GetPagePeriod ();
+      
+      Pageindex_read = pageSli.GetPageindex () ;
+      PageSliceLen_read = pageSli.GetPageSliceLen ()  ;
+      PageSliceCount_read = pageSli.GetPageSliceCount () ;
+      BlockOffset_read = pageSli.GetBlockOffset () ;
+      TIMOffset_read = pageSli.GetTIMOffset ();
+      
+      //PageBitmap_read = pageSli.GetPageBitmap ();
+               //printf ("sta Pageindex_read =%d \n" ,Pageindex_read);
+               //printf ("sta Pageindex =%d \n", Pageindex);
+
+      NS_ASSERT (PagePeriod_read == PagePeriod );
+      NS_ASSERT (Pageindex_read == (Pageindex & 0x03) );
+      NS_ASSERT (PageSliceLen_read == (PageSliceLen & 0x1f));
+      NS_ASSERT (PageSliceCount_read == (PageSliceCount & 0x1f));
+      NS_ASSERT (BlockOffset_read == (BlockOffset & 0x1f));
+      NS_ASSERT (TIMOffset_read == (TIMOffset & 0x0f));
+      //NS_ASSERT (PageBitmap_read == PageBitmap);
+      
+      
+    PagePeriod++;      
+    Pageindex++;
+    PageSliceLen++;
+    PageSliceCount++;
+    BlockOffset++;
+    TIMOffset++;
+    PageBitmap++;
+
+    
+    
+         printf ("pageSli.TIMOffset_read =%d \n", TIMOffset_read);
+         
+         
+         
+         
+      static  uint8_t m_DTIMCount = 0 ; //!< DTIM Count
+      static  uint8_t m_DTIMPeriod = 0 ; //!< DTIM Period
+      static   uint8_t m_TrafficIndicator = 0 ;
+      static  uint8_t m_PageSliceNum = 0 ;
+      static  uint8_t m_PageIndex = 0 ;
+        
+        //Encoded block subfield
+      static  uint8_t m_blockcontrol = 0 ;
+      static  uint8_t m_blockoffset = 0 ;
+      static  uint8_t m_blockbitmap = 1 ;
+      static  uint8_t m_subblock = 0 ;
+      static  uint8_t subblocklength = 0 ;
+      static  uint8_t m_blockbitmap_trail = 0 ;
+      
+      
+      uint8_t m_DTIMCount_read = 0 ; //!< DTIM Count
+      uint8_t m_DTIMPeriod_read = 0 ; //!< DTIM Period
+      uint8_t m_TrafficIndicator_read = 0 ;
+      uint8_t m_PageSliceNum_read = 0 ;
+      uint8_t m_PageIndex_read = 0 ;
+        
+        //Encoded block subfield
+      uint8_t m_blockcontrol_read = 0 ;
+      uint8_t m_blockoffset_read = 0 ;
+      uint8_t m_blockbitmap_read = 1 ;
+      uint8_t m_subblock_read = 0 ;
+      uint8_t subblocklength_read = 0 ;
+      uint8_t m_blockbitmap_trail_read = 0 ;
+      
+      TIM m_TIM;
+           // NS_LOG_UNCOND  ("===\n");
+
+      m_TIM = beacon.GetTIM ();
+      //NS_LOG_UNCOND ("---\n");
+
+      m_DTIMCount_read = m_TIM.GetDTIMCount ();  
+      m_DTIMPeriod_read = m_TIM.GetDTIMPeriod ();
+      m_TrafficIndicator_read = m_TIM.GetTrafficIndicator ();
+      m_PageSliceNum_read = m_TIM.GetPageSliceNum ();
+      m_PageIndex_read = m_TIM.GetPageIndex ();
+      
+      
+      uint8_t * m_PartialVBitmap = m_TIM.GetPartialVBitmap ();
+      uint8_t length =  m_TIM.GetInformationFieldSize ();
+      m_blockoffset_read = ((*m_PartialVBitmap) >> 3) & 0x1f;
+      m_PartialVBitmap++;
+      m_blockbitmap_read = *m_PartialVBitmap;
+      m_PartialVBitmap++;
+      m_subblock_read = *m_PartialVBitmap;
+      
+      
+      printf ("---stawifimac, m_subblock_read %d \n", m_subblock_read);
+      //printf ("---stawifimac, m_subblock %d \n", m_subblock);
+      //printf ("---stawifimac, length %d \n", length);
+
+      
+    
+    //TIM::EncodedBlock m_encodedBlock;
+    //m_blockoffset_read  = m_encodedBlock.GetBlockOffset ();
+    //m_blockbitmap_read = m_encodedBlock.GetBlockBitmap ();
+    //m_subblock_read = *m_encodedBlock.GetSubblock ();
+    
+    
+      NS_ASSERT (m_DTIMCount_read == m_DTIMCount);
+      NS_ASSERT (m_DTIMPeriod_read == m_DTIMPeriod);
+      NS_ASSERT (m_TrafficIndicator_read == (m_TrafficIndicator & 0x01));
+      NS_ASSERT (m_PageSliceNum_read == (m_PageSliceNum & 0x1f));
+      NS_ASSERT (m_PageIndex_read == (m_PageIndex & 0x03));
+      
+      NS_ASSERT (m_blockoffset_read == (m_blockoffset & 0x1f));
+      NS_ASSERT (m_blockbitmap_read == m_blockbitmap);
+      NS_ASSERT (m_subblock_read == m_subblock);
+
+    
+    
+    m_DTIMCount++; //!< DTIM Count
+    m_DTIMPeriod++; //!< DTIM Period
+    m_TrafficIndicator++;
+    m_PageSliceNum++;
+    m_PageIndex++;   
+        
+        //Encoded block subfield
+    m_blockcontrol++ ;
+    m_blockoffset++;
+    m_blockbitmap++;
+    m_blockbitmap_trail++;
+    m_subblock++ ;
+    m_blockbitmap = pow (2, m_blockbitmap_trail & 0x07);
+    
+      
+      
 
          AuthenticationCtrl AuthenCtrl;
          AuthenCtrl = beacon.GetAuthCtrl ();
@@ -1021,7 +1368,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
              fastAssocThreshold = AuthenCtrl.GetThreshold();
            }
      }
-    S1gBeaconReceived ();
+    S1gBeaconReceived (beacon); //to do, include RPS element processing
     return;
    }
   else if (hdr->IsProbeResp ())

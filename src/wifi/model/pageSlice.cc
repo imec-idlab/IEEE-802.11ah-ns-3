@@ -21,125 +21,14 @@
 #include "tim.h"
 #include "ns3/assert.h"
 #include "ns3/log.h" //for test
+#include "ns3/attribute.h"
+#include "pageSlice.h" 
+
 
 namespace ns3 {
     
-/*
-TIM::EncodedBlock::EncodedBlock ()
-{
-}
-
-TIM::EncodedBlock::~EncodedBlock ()
-{
-}
-
-void
-TIM::EncodedBlock::SetBlockControl (enum BlockCoding coding)
-{
-  m_blockcontrol = 0; // only support Block Bitmap
-}
-
-void
-TIM::EncodedBlock::SetBlockOffset (uint8_t offset)
-{
-  NS_ASSERT (offset <= 31);
-  m_blockoffset = offset;
-}
-
-void
-TIM::EncodedBlock::SetEncodedInfo (uint8_t * encodedInfo, uint8_t subblocklength)
-{
-  //NS_ASSERT (1 <= subblocklength <= 8);
-  uint8_t * blockbitmap = encodedInfo;
-  uint8_t i = 0;
-  uint8_t len = 0;
-  uint8_t info = *blockbitmap;
-  while (i <= 7)
-  {
-    if (Is (info, i))
-      {
-       len++;
-      }
-    i++;
-  }
-  NS_ASSERT (len == subblocklength);
-  blockbitmap++;
-  m_subblock = blockbitmap;
-  subb_length = subblocklength;
-}
-
-enum TIM::BlockCoding
-TIM::EncodedBlock::GetBlockControl (void) const
-{
-switch (m_blockcontrol)
-  {
-  case 0:
-    return BLOCK_BITMAP;
-    break;
-  case 1:
-  default:
-    return BLOCK_BITMAP;
-    break;
-  }
-}
-
-uint8_t
-TIM::EncodedBlock::GetBlockOffset (void) const
-{
-  NS_ASSERT (m_blockoffset <= 31);
-  return m_blockoffset;
-}
-
-uint8_t
-TIM::EncodedBlock::GetBlockBitmap (void) const
-{
-  return m_blockbitmap;
-}
-
-uint8_t *
-TIM::EncodedBlock::GetSubblock (void) const
-{
-  return m_subblock;
-}
-
-uint8_t
-TIM::EncodedBlock::GetSize (void) const
-{
-  return (subb_length + 2);
-}
-
-/*
-void
-TIM::EncodedBlock::Serialize (Buffer::Iterator start) const
-{
-  NS_ASSERT ( 1 <= subb_length <= 8);
-  uint8_t m_block = ((m_blockoffset << 3) & 0xf8) | ((m_blockcontrol << 0) & 0x07);
-  start.WriteU8 (m_block);
-  start.WriteU8 (m_blockbitmap);
-  start.Write (subblock, subb_length);
-}
-
-uint8_t
-TIM::EncodedBlock::Deserialize (Buffer::Iterator start)
-{
-  NS_ASSERT ( 1 <= subb_length <= 8);
-  uint8_t m_block = start.ReadU8 ();
-  m_blockcontrol = (m_block >> 0) & 0x07
-  m_blockoffset = (m_block >> 3) & 0x1f;
-  m_blockbitmap = start.ReadU8 ();
-  start.Read (m_subblock, subb_length);
-  return (subb_length + 2);
-}
-
-
-bool
-TIM::EncodedBlock::Is (uint8_t info, uint8_t n)
-{
-  uint8_t mask = 1 << n;
-  return (info & mask) == mask;
-}
-*/
-
+NS_LOG_COMPONENT_DEFINE ("pageSlice");
+    
 pageSlice::pageSlice ()
 {
 }
@@ -153,19 +42,78 @@ pageSlice::SetPagePeriod (uint8_t count)
 {
   m_PagePeriod = count;
 }
-    
+
+/*
 void
 pageSlice::SetPageSliceControl (uint32_t count)
 {
   m_PageSliceControl = count;
+} */
+
+void
+pageSlice::SetPageindex (uint8_t count)
+{
+  m_Pageindex = count;
+}
+
+void
+pageSlice::SetPageSliceLen (uint8_t count)
+{
+  m_PageSliceLen = count;
+}
+
+void
+pageSlice::SetPageSliceCount (uint8_t count)
+{
+  m_PageSliceCount = count;
+}
+
+void
+pageSlice::SetBlockOffset (uint8_t count)
+{
+  m_BlockOffset = count;
+}
+
+void
+pageSlice::SetTIMOffset (uint8_t count)
+{
+  m_TIMOffset = count;
 }
 
 //to be implemented, should divided into traffic indicator, page slice and page index
 void
 pageSlice::SetPageBitmap (uint32_t control)
-{
-  //to be implemented
-  m_PageBitmap = control;
+{  
+ if ( (control & 0xff000000) > 0)
+  {
+     m_length = 4;
+  }
+ else if ( (control & 0x00ff0000) > 0)
+  {
+     m_length = 3;
+  }
+ else if ( (control & 0x0000ff00) > 0)
+  {
+     m_length = 2;
+  }
+ else if ((control & 0x000000ff) > 0)
+  {
+     m_length = 1;
+  }
+ else
+  {
+     m_length = 0; 
+  }    
+ 
+  for (uint8_t i=0; i < m_length; i++ )
+   {
+      m_PageBitmaparry[i] = (control >> i*8) & 0x000000ff ;
+   }
+ 
+  m_PageSliceControl = (m_Pageindex & 0x3)  | ((m_PageSliceLen & 0x1f ) << 2 )| ( (m_PageSliceCount & 0x1f) << 7 )
+         | ((m_BlockOffset & 0x1f )<< 12 ) | ( (m_TIMOffset & 0x0f) << 17 );
+  
+  m_PageBitmap = m_PageBitmaparry;
 }
 
 uint8_t
@@ -174,13 +122,44 @@ pageSlice::GetPagePeriod (void) const
   return m_PagePeriod;
 }
 
+/*
 uint32_t
 pageSlice::GetPageSliceControl (void) const
 {
   return m_PageSliceControl;
+} */
+
+uint8_t
+pageSlice::GetPageindex (void) const
+{
+  return m_Pageindex;
 }
 
-uint32_t
+uint8_t
+pageSlice::GetPageSliceLen (void) const
+{
+  return m_PageSliceLen;
+}
+
+uint8_t
+pageSlice::GetPageSliceCount (void) const
+{
+  return m_PageSliceCount;
+}
+
+uint8_t
+pageSlice::GetBlockOffset (void) const
+{
+  return m_BlockOffset;
+}
+
+uint8_t
+pageSlice::GetTIMOffset (void) const
+{
+  return m_TIMOffset;
+}
+
+uint8_t *
 pageSlice::GetPageBitmap (void) const
 {
   return m_PageBitmap;
@@ -190,50 +169,86 @@ pageSlice::GetPageBitmap (void) const
 WifiInformationElementId
 pageSlice::ElementId () const
 {
-  return IE_PAGESLICE;
+  return IE_PAGE_SLICE;
 }
 
 uint8_t
-TIM::GetInformationFieldSize () const
+pageSlice::GetInformationFieldSize () const
 {
-  return (4 + 3);
+  return (m_length + 4);
 }
 
 void
-TIM::SerializeInformationField (Buffer::Iterator start) const
+pageSlice::SerializeInformationField (Buffer::Iterator start) const
 {
- start.WriteU8 (m_DTIMCount);
- start.WriteU8 (m_DTIMPeriod);
- start.WriteU8 (m_BitmapControl);
- start.WriteU32(m_partialVBitmap);
-}
+ start.WriteU8 (m_PagePeriod);
+ start.WriteU8 ((uint8_t) m_PageSliceControl); //0-7
+ start.WriteU8 ((uint8_t) (m_PageSliceControl >> 8)); //8-15
+ start.WriteU8 ((uint8_t) (m_PageSliceControl >> 16)); // 16-23
+ //start.WriteU32 (m_PageBitmap);
+ //start.Write (m_PageBitmapP, m_length);
+ for (uint8_t i=0; i < m_length; i++ )
+   {
+      start.Write (&m_PageBitmaparry[i], m_length);
+   }
+ }
 
 uint8_t
-TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
+pageSlice::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 {
-  m_DTIMCount = start.ReadU8 ();
-  m_DTIMPeriod = start.ReadU8 ();
-  m_BitmapControl = start.ReadU8 ();
-  m_partialVBitmap = start.ReadU32();
-  //start.Read (m_partialVBitmap, (length-3));
-//    m_length = length-3;
+  uint8_t  m_PageSliceControl_l;
+  uint8_t  m_PageSliceControl_m;
+  uint8_t  m_PageSliceControl_h;
+  
+ // NS_LOG_UNCOND ("DeserializeInformationField length = " << length);
+  
+  m_PagePeriod = start.ReadU8 ();
+  m_PageSliceControl_l = start.ReadU8 ();
+  m_PageSliceControl_m = start.ReadU8 ();
+  m_PageSliceControl_h = start.ReadU8 ();
+  start.Read (m_PageBitmaparry, length - 4);
+  m_PageBitmap = m_PageBitmaparry;
+  
+  m_PageSliceControl = (uint32_t)m_PageSliceControl_l | (uint32_t)m_PageSliceControl_m << 8 | (uint32_t) m_PageSliceControl_h << 16;
+
+   m_Pageindex = m_PageSliceControl & 0x00000003;
+   m_PageSliceLen = (m_PageSliceControl >> 2) & 0x0000001f;
+   m_PageSliceCount = (m_PageSliceControl >> 7) & 0x0000001f;
+   m_BlockOffset = (m_PageSliceControl >> 12) & 0x0000001f;
+   m_TIMOffset = (m_PageSliceControl >> 17) & 0x0000000f;
+   m_length = length - 4;
+  
   return length;
 }
 
+/*
 void 
-TIM::Print(std::ostream& os) const {
-    os << "DTIM Count: " << std::to_string(m_DTIMCount) << std::endl;
-    os << "DTIM Period: " << std::to_string(m_DTIMPeriod) << std::endl;
-    os << "Bitmap Control: " << std::to_string(m_BitmapControl) << std::endl;
+pageSlice::Print(std::ostream& os) const {
+    os << "DTIM Count: " << std::to_string(m_PagePeriod) << std::endl;
+    os << "DTIM Period: " << std::to_string(m_PageSliceControl) << std::endl;
+    os << "Bitmap Control: " << std::to_string(m_PageBitmap) << std::endl;
     
     
     os << "Partial VBitmap" << "):";
 
     os << std::endl;
-}
+} */
 
-//ATTRIBUTE_HELPER_CPP (TIM);
+   ATTRIBUTE_HELPER_CPP (pageSlice);
 
+std::ostream &
+operator << (std::ostream &os, const pageSlice &rpsv)
+  {
+        os <<  "|" ;
+        return os;
+  }
+
+std::istream &
+operator >> (std::istream &is, pageSlice &rpsv)
+  {
+        is >> rpsv.m_length;
+        return is;
+  }
 } //namespace ns3
 
 

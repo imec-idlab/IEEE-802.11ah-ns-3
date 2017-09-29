@@ -29,6 +29,8 @@
 #include "supported-rates.h"
 #include "amsdu-subframe-header.h"
 #include "s1g-capabilities.h"
+#include "extension-headers.h"
+
 
 namespace ns3  {
 
@@ -206,7 +208,9 @@ private:
 
   void SendPspoll (void);
   void SendPspollIfnecessary (void);
-  void S1gBeaconReceived (void);
+  void S1gBeaconReceived (S1gBeaconHeader beacon);
+  void S1gTIMReceived (S1gBeaconHeader beacon);
+
   void StartRawbackoff (void);
   void OutsideRawStartBackoff (void);
   bool Is(uint8_t blockbitmap, uint8_t j);
@@ -218,6 +222,13 @@ private:
   void ClearDataBuffered (void);
   void SetInRAWgroup(void);
   void UnsetInRAWgroup(void);
+  
+  bool IsInPagebitmap (uint8_t block);
+  
+  void GoToSleepNextTIM (S1gBeaconHeader beacon);
+  void GoToSleepCurrentTIM (S1gBeaconHeader beacon);
+  void GoToSleep(Time  sleeptime); 
+  void WakeUp (void);
 
   Time m_lastRawDurationus;
   Time m_lastRawStart;
@@ -247,6 +258,33 @@ private:
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons
   virtual void DoDispose (void);
+  
+  TIM m_TIM;
+  uint8_t m_DTIMCount; //!< DTIM Count
+  uint8_t m_DTIMPeriod; //!< DTIM Period
+  uint8_t m_TrafficIndicator;
+  uint8_t m_PageSliceNum;
+  uint8_t m_PageIndex;
+          
+  pageSlice m_pageSlice;   
+  uint8_t m_PagePeriod;
+  uint8_t m_Pageindex_slice; // page index from page slice element, different from page index in TIM element
+  uint8_t m_Pageindex;
+  uint8_t m_PageSliceLen;
+  uint8_t m_PageSliceCount;
+  uint8_t m_BlockOffset;
+  uint8_t m_TIMOffset;  
+  uint8_t m_PageBitmap[4];
+  uint8_t m_PageBitmapLen;
+  uint8_t m_TIMSeq;  // 0 for DTIM 
+
+
+  uint8_t m_selfBlock;
+  uint8_t m_selfPage;
+  uint8_t m_selfSubBlock;
+  uint8_t m_selfAid;
+  
+
 
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;

@@ -30,6 +30,7 @@
 #include "s1g-beacon-compatibility.h"
 #include "tim.h"
 #include "rps.h"
+#include "pageSlice.h"
 #include "authentication-control.h"
 
 namespace ns3 {
@@ -51,6 +52,7 @@ public:
   void SetAccessNetwork (uint8_t accessnetwork);
   void SetBeaconCompatibility (S1gBeaconCompatibility compatibility);
   void SetTIM (TIM tim);
+  void SetpageSlice (pageSlice page);
   void SetRPS (RPS rps);
   void SetAuthCtrl (AuthenticationCtrl auth);
 
@@ -62,6 +64,7 @@ public:
   uint8_t GetAccessNetwork (void) const;
   S1gBeaconCompatibility GetBeaconCompatibility (void) const;
   TIM GetTIM (void) const;
+  pageSlice GetpageSlice (void) const;
   RPS GetRPS (void) const;
   AuthenticationCtrl GetAuthCtrl (void) const;
     
@@ -82,7 +85,8 @@ private:
   S1gBeaconCompatibility m_beaconcompatibility;
   TIM m_tim;
   RPS m_rps;
-    AuthenticationCtrl  m_auth;
+  pageSlice m_pageSlice;
+  AuthenticationCtrl  m_auth;
 };
 
 

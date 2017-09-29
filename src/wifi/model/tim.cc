@@ -47,24 +47,27 @@ TIM::EncodedBlock::SetBlockOffset (uint8_t offset)
 }
 
 void
+TIM::EncodedBlock::SetBlockBitmap (uint8_t encodedInfo)
+{
+  m_blockbitmap = encodedInfo;
+}
+
+void
 TIM::EncodedBlock::SetEncodedInfo (uint8_t * encodedInfo, uint8_t subblocklength)
 {
   //NS_ASSERT (1 <= subblocklength <= 8);
-  uint8_t * blockbitmap = encodedInfo;
   uint8_t i = 0;
   uint8_t len = 0;
-  uint8_t info = *blockbitmap;
   while (i <= 7)
   {
-    if (Is (info, i))
+    if (Is (m_blockbitmap, i))
       {
        len++;
       }
     i++;
   }
   NS_ASSERT (len == subblocklength);
-  blockbitmap++;
-  m_subblock = blockbitmap;
+  m_subblock = encodedInfo;
   subb_length = subblocklength;
 }
 
@@ -161,41 +164,64 @@ TIM::SetDTIMPeriod (uint8_t count)
 }
 
 //to be implemented, should divided into traffic indicator, page slice and page index
+/*
 void
 TIM::SetBitmapControl (uint8_t control)
 {
   //to be implemented
   m_BitmapControl = control;
 }
-    
+*/
+
+void 
+TIM::SetTafficIndicator (uint8_t control)
+{
+   m_TrafficIndicator = control;
+}
+
+void
+TIM::SetPageSliceNum (uint8_t control)
+{
+   m_PageSliceNum = control; 
+}
+
+void 
+TIM::SetPageIndex (uint8_t control)
+{
+   m_PageIndex = control;
+}
+  
 void
 TIM::SetPartialVBitmap (TIM::EncodedBlock block)
 {
   m_encodeblock = block;
-  m_length = 0;
   uint8_t offset = m_encodeblock.GetBlockOffset ();
-  uint8_t control = m_encodeblock.GetBlockBitmap ();
-  uint8_t offcont = ((offset << 3) & 0xf8) | ((control << 0) & 0x07);
-  m_partialVBitmap[m_length] = offcont;
+  uint8_t control = m_encodeblock.GetBlockControl ();
+
+  uint8_t offcont = ((offset << 3) & 0xf8) | (control & 0x07);
+  m_partialVBitmap_arrary[m_length] = offcont;
   m_length++;
-  m_partialVBitmap[m_length] = m_encodeblock.GetBlockBitmap ();
+  
+  m_partialVBitmap_arrary[m_length] = m_encodeblock.GetBlockBitmap ();
   m_length++;
 
-  uint8_t * subblock = m_encodeblock.GetSubblock ();
+  subblock = m_encodeblock.GetSubblock ();
   uint8_t len = m_encodeblock.GetSize ();  //size of EncodedBlock
   uint8_t i=0;
   while (i < len-2) //blockcotrol, blockoffset has already been added into m_partialVBitmap
   {
-    m_partialVBitmap[m_length] = *subblock;
+    m_partialVBitmap_arrary[m_length] = *subblock;
     m_length++;
     subblock++;
     i++;
   }
-  //NS_ASSERT ( 1 <= m_length <= 251);
+  m_partialVBitmap = m_partialVBitmap_arrary;
+  NS_ASSERT ( m_length < 252);
+  NS_ASSERT ( m_length > 0);
 }
     
 uint8_t
-TIM::GetTIMCount (void) const
+TIM::GetDTIMCount (void) const
 {
   return m_DTIMCount;
 }
@@ -205,14 +231,31 @@ TIM::GetDTIMPeriod (void) const
 {
   return m_DTIMPeriod;
 }
-
+/*
 uint8_t
 TIM::GetBitmapControl (void) const
 {
   return m_BitmapControl;
+} */
+
+uint8_t
+TIM::GetTrafficIndicator  (void) const
+{
+    return m_TrafficIndicator; 
+}
+uint8_t
+TIM::GetPageSliceNum  (void) const
+{
+    return m_PageSliceNum; 
 }
 
-unsigned char *
+uint8_t
+TIM::GetPageIndex(void) const
+{
+    return m_PageIndex;
+}
+
+uint8_t *
 TIM::GetPartialVBitmap (void) const
 {
   return m_partialVBitmap;
@@ -235,7 +278,7 @@ TIM::SerializeInformationField (Buffer::Iterator start) const
 {
  start.WriteU8 (m_DTIMCount);
  start.WriteU8 (m_DTIMPeriod);
- start.WriteU8 (m_BitmapControl);
+ start.WriteU8 ((m_TrafficIndicator & 0x01) | ((m_PageSliceNum  & 0x1f) << 1) | ((m_PageSliceNum & 0x03) << 6));
  start.Write (m_partialVBitmap, m_length);
 }
 
@@ -245,12 +288,33 @@ TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
   m_DTIMCount = start.ReadU8 ();
   m_DTIMPeriod = start.ReadU8 ();
   m_BitmapControl = start.ReadU8 ();
-  start.Read (m_partialVBitmap, (length-3));
-    m_length = length-3;
+  start.Read (m_partialVBitmap_arrary, (length-3));
+  m_length = length-3;
+  
+  m_TrafficIndicator = m_BitmapControl & 0x01;
+  m_PageSliceNum = (m_BitmapControl  >> 1) & 0x1f;
+  m_PageIndex = (m_BitmapControl  >> 6) & 0x03;
+  m_partialVBitmap = m_partialVBitmap_arrary;
+
   return length;
 }
 
-//ATTRIBUTE_HELPER_CPP (TIM);
+ATTRIBUTE_HELPER_CPP (TIM);
+
+   std::ostream &
+    operator << (std::ostream &os, const TIM &rpsv)
+    {
+        os <<  "|" ;
+        return os;
+    }
+
+
+    std::istream &
+    operator >> (std::istream &is, TIM &rpsv)
+    {
+        is >> rpsv.m_length;
+        return is;
+    }
 
 } //namespace ns3
 

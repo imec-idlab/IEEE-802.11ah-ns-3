@@ -467,6 +467,8 @@ public:
   void AccessAllowedIfRaw (bool allowed);
   void RawStart (void);
   void OutsideRawStart (void);
+  
+  void SetsleepList (std::map<Mac48Address, bool> list);
 
 
 private:
@@ -565,8 +567,8 @@ private:
   uint16_t m_blockAckInactivityTimeout;
   struct Bar m_currentBar;
   bool m_ampduExist;
-    
   
+  std::map<Mac48Address, bool> m_sleepList;
 };
 
 } //namespace ns3
