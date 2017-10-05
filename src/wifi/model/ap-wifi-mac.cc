@@ -45,6 +45,8 @@ NS_LOG_COMPONENT_DEFINE ("ApWifiMac");
 
 NS_OBJECT_ENSURE_REGISTERED (ApWifiMac);
 
+#define LOG_TRAFFIC(msg)	if(true) NS_LOG_DEBUG(Simulator::Now().GetMicroSeconds() << " " << msg << std::endl);
+
 TypeId
 ApWifiMac::GetTypeId (void)
 {
@@ -115,6 +117,21 @@ ApWifiMac::GetTypeId (void)
 	.AddTraceSource ("RpsIndex", "Fired when RPS index changes",
 					 MakeTraceSourceAccessor(&ApWifiMac::m_rpsIndexTrace),
 					 "ns3::TracedValueCallback::Uint16")
+	.AddTraceSource ("RawGroup", "Fired when RAW group index changes",
+					 MakeTraceSourceAccessor(&ApWifiMac::m_rawGroupTrace),
+					 "ns3::TracedValueCallback::Uint8")
+	.AddTraceSource ("RawSlot", "Fired when RAW slot index changes",
+					 MakeTraceSourceAccessor(&ApWifiMac::m_rawSlotTrace),
+					 "ns3::TracedValueCallback::Uint8")
+	/*.AddTraceSource("RAWSlotStarted",
+					"Fired when a RAW slot has started",
+					MakeTraceSourceAccessor(&ApWifiMac::m_rawSlotStarted),
+					"ns3::S1gApWifiMac::RawSlotStartedCallback")*/
+	.AddTraceSource("PacketToTransmitReceivedFromUpperLayer",
+					"Fired when packet is received from the upper layer",
+					MakeTraceSourceAccessor(
+					&ApWifiMac::m_packetToTransmitReceivedFromUpperLayer),
+					"ns3::S1gApWifiMac::PacketToTransmitReceivedFromUpperLayerCallback")
 				   ;
   return tid;
 }
@@ -135,7 +152,7 @@ ApWifiMac::ApWifiMac ()
 
   m_enableBeaconGeneration = false;
   AuthenThreshold = 0;
-
+  currentRawGroup = 0;
   //m_SlotFormat = 0;
 }
 
@@ -555,7 +572,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
       assoc.SetHtCapabilities (GetHtCapabilities ());
       hdr.SetNoOrder ();
     }
-    NS_LOG_UNCOND ("ApWifiMac::SendAssocResp =" );
+    //NS_LOG_UNCOND ("ApWifiMac::SendAssocResp =" );
 
    
   if (m_s1gSupported && success)
@@ -569,7 +586,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                  goto Addheader;
             }
           m_sensorList.push_back (aid);
-          NS_LOG_UNCOND ("m_sensorList =" << m_sensorList.size ());
+          //NS_LOG_UNCOND ("m_sensorList =" << m_sensorList.size ());
   
         }
        else if (staType == 2)
@@ -580,7 +597,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                   goto Addheader;
             }
           m_OffloadList.push_back (aid);
-          NS_LOG_UNCOND ("m_OffloadList =" << m_OffloadList.size ());
+          //NS_LOG_UNCOND ("m_OffloadList =" << m_OffloadList.size ());
         }
     }
 Addheader:
@@ -661,6 +678,31 @@ ApWifiMac::SendOneBeacon (void)
       m_beaconDca->Queue (packet, hdr);
 
       m_transmitBeaconTrace(beacon, m_rps->GetRawAssigmentObj());
+
+  	  MacLowTransmissionParameters params;
+  	  params.DisableRts();
+  	  params.DisableAck();
+  	  params.DisableNextData();
+      Time txTime = m_low->CalculateOverallTxTime(packet, &hdr, params);
+      NS_LOG_DEBUG(
+      			"Transmission of beacon will take " << txTime << ", delaying RAW start for that amount");
+      Time bufferTimeToAllowBeaconToBeReceived = txTime;
+
+      auto nRaw = m_rps->GetNumberOfRawGroups();
+      currentRawGroup = (currentRawGroup + 1) % nRaw;
+      // schedule the slot start
+      Time timeToSlotStart = Time ();
+      for (uint32_t g = 0; g < nRaw; g++)
+        {
+		  for (uint32_t i = 0; i < m_rps->GetRawAssigmentObj(g).GetSlotNum(); i++)
+			{
+			Simulator::Schedule(
+						bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
+						&ApWifiMac::OnRAWSlotStart, this, g + 1, i + 1);
+			timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
+			}
+
+        }
      }
     else
      {
@@ -687,6 +729,17 @@ ApWifiMac::SendOneBeacon (void)
       }
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
 }
+
+void ApWifiMac::OnRAWSlotStart(uint8_t rawGroup, uint8_t slot)
+{
+	LOG_TRAFFIC(
+			"AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
+
+	m_rawGroupTrace = rawGroup;
+	m_rawSlotTrace = slot;
+}
+
+
 
 void
 ApWifiMac::TxOk (const WifiMacHeader &hdr)

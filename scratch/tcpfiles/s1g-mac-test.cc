@@ -16,42 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-
-#include "ns3/core-module.h"
-#include "ns3/network-module.h"
-#include "ns3/applications-module.h"
-#include "ns3/wifi-module.h"
-#include "ns3/mobility-module.h"
-#include "ns3/ipv4-global-routing-helper.h"
-#include "ns3/internet-module.h"
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctime>
-#include <fstream>
-#include <sys/stat.h>
-#include "ns3/rps.h"
-#include <utility> // std::pair
-#include <map>
-
-#include "Configuration.h"
-#include "NodeEntry.h"
-#include "SimpleTCPClient.h"
-#include "Statistics.h"
-#include "SimulationEventManager.h"
-
-#include "TCPPingPongClient.h"
-#include "TCPPingPongServer.h"
-#include "TCPIPCameraClient.h"
-#include "TCPIPCameraServer.h"
-#include "TCPFirmwareClient.h"
-#include "TCPFirmwareServer.h"
-#include "TCPSensorClient.h"
-#include "TCPSensorServer.h"
-
-using namespace std;
-using namespace ns3;
+#include "s1g-mac-test.h"
 
 NS_LOG_COMPONENT_DEFINE ("s1g-wifi-network-le");
 
@@ -65,10 +30,6 @@ NetDeviceContainer staDeviceCont;
 Configuration config;
 Statistics stats;
 SimulationEventManager eventManager;
-vector<NodeEntry*> nodes;
-
-vector<long> transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval;
-vector<long> transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval;
 
 class assoc_record
 {
@@ -313,7 +274,7 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
                 delete m_raw;
             }
             rpslist.rpsset.push_back (m_rps);
-            config.nRawGroupsPerRpsList.push_back(NRAWPERBEACON);
+            //config.nRawGroupsPerRpsList.push_back(NRAWPERBEACON);
         }
         myfile.close();
         config.NRawSta = rpslist.rpsset[rpslist.rpsset.size()-1]->GetRawAssigmentObj(NRAWPERBEACON-1).GetRawGroupAIDEnd();
@@ -326,11 +287,11 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 
 void sendStatistics(bool schedule) {
 	eventManager.onUpdateStatistics(stats);
-	/*eventManager.onUpdateSlotStatistics(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval, transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval);
+	eventManager.onUpdateSlotStatistics(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval, transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval);
 	// reset
-	transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.NGroup * config.NRawSlotNum, 0);
-	transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.NGroup * config.NRawSlotNum, 0);
-	*/
+	transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0);
+	transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.totalRawSlots, 0);
+
 	if(schedule)
 		Simulator::Schedule(Seconds(config.visualizerSamplingInterval), &sendStatistics, true);
 }
@@ -355,21 +316,21 @@ void onSTAAssociated(int i) {
 		if (nodes[i]->isAssociated)
 			nrOfSTAAssociated++;
 	}
-	for (int k = 0; k < config.rps.rpsset.size(); k++)
+	/*for (int k = 0; k < config.rps.rpsset.size(); k++)
 	{
-		for (int j=0; j < config.nRawGroupsPerRpsList[k]; j++)
+		for (int j=0; j < config.rps.rpsset[k]->GetNumberOfRawGroups(); j++)
 		{
 			if (config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDStart() <= i+1 && i+1 <= config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDEnd())
 			{
 				nodes[i]->rpsIndex = k + 1;
 				nodes[i]->rawGroupNumber = j + 1;
 				nodes[i]->rawSlotIndex = nodes[i]->aId % config.rps.rpsset[k]->GetRawAssigmentObj(j).GetSlotNum() + 1;
-				/*cout << "Node " << i << " with AID " << (int)nodes[i]->aId << " belongs to " << (int)nodes[i]->rawSlotIndex << " slot of RAW group "
-						<< (int)nodes[i]->rawGroupNumber << " within the " << (int)nodes[i]->rpsIndex << " RPS." << endl;
-			*/
+				//cout << "Node " << i << " with AID " << (int)nodes[i]->aId << " belongs to " << (int)nodes[i]->rawSlotIndex << " slot of RAW group "
+					//	<< (int)nodes[i]->rawGroupNumber << " within the " << (int)nodes[i]->rpsIndex << " RPS." << endl;
+
 			}
 		}
-	}
+	}*/
 	eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
@@ -416,7 +377,21 @@ void onSTAAssociated(int i) {
 
 void RpsIndexTrace (uint16_t oldValue, uint16_t newValue)
 {
-	//cout << "-----------OLD " << oldValue << "+++++++++NEW " << newValue << endl;
+	currentRps = newValue;
+	cout << "+++++OLD " << oldValue;
+	cout << "RPS: " << newValue << " at " << Simulator::Now().GetMicroSeconds() << endl;
+}
+
+void RawGroupTrace (uint8_t oldValue, uint8_t newValue)
+{
+	currentRawGroup = newValue;
+	cout << "	group " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
+}
+
+void RawSlotTrace (uint8_t oldValue, uint8_t newValue)
+{
+	currentRawSlot = newValue;
+	cout << "		slot " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
 }
 
 void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
@@ -461,6 +436,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 
         // hook up PHY State change
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/State/State", MakeCallback(&NodeEntry::OnPhyStateChange, n));
+
     }
 }
 
@@ -509,6 +485,102 @@ string getWifiMode(string dataMode) {
 	return "";
 }
 
+void OnAPPhyRxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
+	// THIS REQUIRES PACKET METADATA ENABLE!
+	unused (context);
+	auto pCopy = packet->Copy();
+	auto it = pCopy->BeginItem();
+	while(it.HasNext()) {
+
+		auto item = it.Next();
+		Callback<ObjectBase *> constructor = item.tid.GetConstructor ();
+
+		ObjectBase *instance = constructor ();
+		Chunk *chunk = dynamic_cast<Chunk *> (instance);
+		chunk->Deserialize (item.current);
+
+		if(dynamic_cast<WifiMacHeader*>(chunk)) {
+			WifiMacHeader* hdr = (WifiMacHeader*)chunk;
+
+			int staId = -1;
+			if (!config.useV6){
+				for (uint32_t i = 0; i < staNodeInterface.GetN(); i++) {
+					if(wifiStaNode.Get(i)->GetDevice(0)->GetAddress() == hdr->GetAddr2()) {
+						staId = i;
+						break;
+					}
+				}
+			}
+			else
+			{
+				for (uint32_t i = 0; i < staNodeInterface6.GetN(); i++) {
+					if(wifiStaNode.Get(i)->GetDevice(0)->GetAddress() == hdr->GetAddr2()) {
+						staId = i;
+						break;
+					}
+				}
+			}
+			if(staId != -1) {
+				stats.get(staId).NumberOfDropsByReasonAtAP[reason]++;
+			}
+			delete chunk;
+			break;
+		}
+		else
+			delete chunk;
+	}
+
+
+}
+
+void OnAPPacketToTransmitReceived(string context, Ptr<const Packet> packet, Mac48Address to, bool isScheduled, bool isDuringSlotOfSTA, Time timeLeftInSlot) {
+	unused(context);
+	unused(packet);
+	unused(isDuringSlotOfSTA);
+	int staId = -1;
+	if (!config.useV6){
+		for (uint32_t i = 0; i < staNodeInterface.GetN(); i++) {
+			if(wifiStaNode.Get(i)->GetDevice(0)->GetAddress() == to) {
+				staId = i;
+				break;
+			}
+		}
+	}
+	else
+	{
+		for (uint32_t i = 0; i < staNodeInterface6.GetN(); i++) {
+			if(wifiStaNode.Get(i)->GetDevice(0)->GetAddress() == to) {
+				staId = i;
+				break;
+			}
+		}
+	}
+	if(staId != -1) {
+		if(isScheduled)
+			stats.get(staId).NumberOfAPScheduledPacketForNodeInNextSlot++;
+		else {
+			stats.get(staId).NumberOfAPSentPacketForNodeImmediately++;
+			stats.get(staId).APTotalTimeRemainingWhenSendingPacketInSameSlot += timeLeftInSlot;
+		}
+	}
+}
+
+void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet) {
+	//cout << "+++++++++ON CHANNEL TRANSMISSION" << endl;
+	/*int timGroup = currentTIMGroup;
+	int slotIndex = currentRawSlot;
+
+	if(senderDevice->GetAddress() == apDevice.Get(0)->GetAddress()) {
+		// from AP
+		transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[timGroup * config.NRawSlotNum + slotIndex]+= packet->GetSerializedSize();
+	}
+	else {
+		// from STA
+		transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[timGroup * config.NRawSlotNum + slotIndex]+= packet->GetSerializedSize();
+
+	}*/
+}
+
 int main (int argc, char *argv[])
 {
   //LogComponentEnable ("UdpServer", LOG_INFO);
@@ -539,7 +611,20 @@ int main (int argc, char *argv[])
 
   stats = Statistics(config.Nsta);
   eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
+  uint32_t totalRawGroups (0);
+  for (int i = 0; i < config.rps.rpsset.size(); i++)
+  {
+	  int nRaw = config.rps.rpsset[i]->GetNumberOfRawGroups();
+	  totalRawGroups += nRaw;
+	  //cout << "Total raw groups after rps " << i << " is " << totalRawGroups << endl;
+	  for (int j = 0; j < nRaw; j++){
+		  config.totalRawSlots += config.rps.rpsset[i]->GetRawAssigmentObj(j).GetSlotNum();
+		  //cout << "Total slots after group " << j << " is " << totalRawSlots << endl;
+	  }
 
+  }
+  transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0); // TODO
+  transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.totalRawSlots, 0);
   /*CommandLine cmd;
   cmd.AddValue ("seed", "random seed", config.seed);
   cmd.AddValue ("simulationTime", "Simulation time in seconds", config.simulationTime);
@@ -562,18 +647,20 @@ int main (int argc, char *argv[])
 
   RngSeedManager::SetSeed (config.seed);
 
-  NodeContainer wifiStaNode;
+  //NodeContainer wifiStaNode;
   wifiStaNode.Create (config.Nsta);
   NodeContainer wifiApNode;
   wifiApNode.Create (1);
 
-  YansWifiChannelHelper channel = YansWifiChannelHelper ();
-  channel.AddPropagationLoss ("ns3::LogDistancePropagationLossModel","Exponent", DoubleValue(3.76) ,"ReferenceLoss", DoubleValue(8.0), "ReferenceDistance", DoubleValue(1.0));
-  channel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  YansWifiChannelHelper channelBuilder = YansWifiChannelHelper ();
+  channelBuilder.AddPropagationLoss ("ns3::LogDistancePropagationLossModel","Exponent", DoubleValue(3.76) ,"ReferenceLoss", DoubleValue(8.0), "ReferenceDistance", DoubleValue(1.0));
+  channelBuilder.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
+  Ptr<YansWifiChannel> channel = channelBuilder.Create();
+  channel->TraceConnectWithoutContext("Transmission", MakeCallback(&onChannelTransmission)); //TODO
 
   YansWifiPhyHelper phy = YansWifiPhyHelper::Default ();
   phy.SetErrorRateModel ("ns3::YansErrorRateModel");
-  phy.SetChannel (channel.Create ());
+  phy.SetChannel (channel);
   phy.Set ("ShortGuardEnabled", BooleanValue (false));
   phy.Set ("ChannelWidth", UintegerValue (getBandwidth(config.DataMode))); // changed
   phy.Set ("EnergyDetectionThreshold", DoubleValue (-110.0));
@@ -612,7 +699,6 @@ int main (int argc, char *argv[])
                  "NRawStations", UintegerValue (config.NRawSta),
                  "RPSsetup", RPSVectorValue (config.rps));
 
-  NetDeviceContainer apDevice;
   phy.Set ("TxGain", DoubleValue (3.0));
   phy.Set ("RxGain", DoubleValue (3.0));
   phy.Set ("TxPowerLevels", UintegerValue (1));
@@ -628,8 +714,11 @@ int main (int argc, char *argv[])
   std::ostringstream oss;
   oss << "/NodeList/"
 		  << wifiApNode.Get(0)->GetId()
-		  << "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/RpsIndex";
-  Config::ConnectWithoutContext(oss.str (), MakeCallback (&RpsIndexTrace)); //never happens
+		  << "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/";
+  Config::ConnectWithoutContext(oss.str () + "RpsIndex", MakeCallback (&RpsIndexTrace));
+  Config::ConnectWithoutContext(oss.str () + "RawGroup", MakeCallback (&RawGroupTrace));
+  Config::ConnectWithoutContext(oss.str () + "RawSlot", MakeCallback(&RawSlotTrace));
+
 
   // mobility.
   MobilityHelper mobility;
@@ -657,7 +746,7 @@ int main (int argc, char *argv[])
   Ipv4AddressHelper address;
 
   address.SetBase ("192.168.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer staNodeInterface;
+  //Ipv4InterfaceContainer staNodeInterface;
   Ipv4InterfaceContainer apNodeInterface;
 
   staNodeInterface = address.Assign (staDevice);
@@ -691,6 +780,9 @@ int main (int argc, char *argv[])
     // configure tracing for associations & other metrics
     configureNodes(wifiStaNode, staDevice);
 
+	Config::Connect("/NodeList/" + std::to_string(config.Nsta) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxDropWithReason", MakeCallback(&OnAPPhyRxDrop));
+	Config::Connect("/NodeList/" + std::to_string(config.Nsta) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::ApWifiMac/PacketToTransmitReceivedFromUpperLayer", MakeCallback(&OnAPPacketToTransmitReceived));
+
     Ptr<MobilityModel> mobility1 = wifiApNode.Get (0)->GetObject<MobilityModel>();
     Vector apposition = mobility1->GetPosition();
       if  (OutputPosition)
@@ -708,8 +800,12 @@ int main (int argc, char *argv[])
           std::cout << "AP node, position = " << apposition << std::endl;
         }
 
-      eventManager.onStartHeader();
+      //eventManager.onStartHeader();
       eventManager.onStart(config);
+      if (config.rps.rpsset.size() > 0)
+    	  for (uint32_t i = 0; i < config.rps.rpsset.size(); i++)
+    		  for (uint32_t j = 0; j < config.rps.rpsset[i]->GetNumberOfRawGroups(); j++)
+    			  eventManager.onRawConfig(i, j, config.rps.rpsset[i]->GetRawAssigmentObj(j));
 
       for (uint32_t i = 0; i < config.Nsta; i++)
       	eventManager.onSTANodeCreated(*nodes[i]);

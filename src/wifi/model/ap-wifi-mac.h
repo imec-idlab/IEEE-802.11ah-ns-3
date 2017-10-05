@@ -50,7 +50,11 @@ class ApWifiMac : public RegularWifiMac
 public:
   static TypeId GetTypeId (void);
 
-  TracedValue<uint16_t> m_rpsIndexTrace;
+  typedef void (* PacketToTransmitReceivedFromUpperLayerCallback)
+		  (Ptr<const Packet> packet, Mac48Address to, bool isScheduled, bool isDuringSlotOfSTA, Time timeLeftInSlot);
+
+  typedef void (* RawSlotStartedCallback)
+       (uint16_t timGroup, uint16_t rawSlot);
 
   TracedCallback<S1gBeaconHeader, RPS::RawAssignment> m_transmitBeaconTrace;
 
@@ -125,6 +129,9 @@ public:
 
 private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);
+
+  void OnRAWSlotStart(uint8_t rawGroup, uint8_t slot);
+
   /**
    * The packet we sent was successfully received by the receiver
    * (i.e. we received an ACK from the receiver).  If the packet
@@ -238,6 +245,13 @@ private:
   virtual void DoDispose (void);
   virtual void DoInitialize (void);
   
+  TracedCallback<Ptr<const Packet>, Mac48Address, bool, bool, Time> m_packetToTransmitReceivedFromUpperLayer;
+  TracedCallback<uint16_t,uint16_t> m_rawSlotStarted;
+  TracedValue<uint16_t> m_rpsIndexTrace;
+  TracedValue<uint8_t> m_rawGroupTrace;
+  TracedValue<uint8_t> m_rawSlotTrace;
+  uint8_t currentRawGroup = -1; //because 1st will have to be 0
+
   uint16_t  AuthenThreshold;
   uint32_t m_totalStaNum;
   uint32_t m_rawGroupInterval;

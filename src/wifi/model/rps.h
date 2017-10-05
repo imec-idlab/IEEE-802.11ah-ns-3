@@ -122,6 +122,7 @@ public:
     
   void SerializeInformationField (Buffer::Iterator start) const;
   uint8_t DeserializeInformationField (Buffer::Iterator start, uint8_t length);
+  uint8_t GetNumberOfRawGroups (void) const;
 
   uint8_t m_length;
 private:

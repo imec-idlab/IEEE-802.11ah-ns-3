@@ -26,10 +26,13 @@ struct Configuration {
 	 *
 	 * */
 	  RPSVector rps;
-	  vector<uint16_t> nRawGroupsPerRpsList;
+      uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
+      uint64_t totalRawSlots = 0;				// Total number of RAW slots in all RAW groups in all RPS elements
+
+	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
-	uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
 	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
+
 	/*
 	 * Common configuration parameters
 	 * */
@@ -84,10 +87,10 @@ struct Configuration {
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
 
 
-	int SlotFormat = -1; //0;
-	int NRawSlotCount = 166; //162;
-	uint32_t NRawSlotNum = 5; //broj slotova
-	uint32_t NGroup = 2; // mora biti djeljenik od nsta dodati u checks
+	int SlotFormat=0; //0;
+	int NRawSlotCount=0; //162;
+	uint32_t NRawSlotNum=0; //broj slotova
+	uint32_t NGroup=0; // mora biti djeljenik od nsta dodati u checks
 
 
 
@@ -97,8 +100,8 @@ struct Configuration {
 	uint32_t TCPInitialSlowStartThreshold = 0xffff;
 	uint32_t TCPInitialCwnd = 1;
 
-	int ContentionPerRAWSlot = -1; //-1
-	bool ContentionPerRAWSlotOnlyInFirstGroup = false; //false
+	int ContentionPerRAWSlot=0; //-1
+	bool ContentionPerRAWSlotOnlyInFirstGroup=false; //false
 
 	double propagationLossExponent = 3.67; //3.76
 	double propagationLossReferenceLoss = 8;

@@ -26,12 +26,6 @@ void SimulationEventManager::onStart(Configuration& config) {
 	m_config = config;
 	send({"start",
 		  std::to_string(config.NRawSta),
-		  std::to_string(config.NGroup),
-		  std::to_string(config.SlotFormat),
-		  std::to_string(config.NRawSlotCount),
-		  std::to_string(config.NRawSlotCount * 120 + 500),
-		  std::to_string(config.NRawSlotNum),
-
 		  config.DataMode,
 		  "",
 		  "",
@@ -65,8 +59,15 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  std::to_string(config.firmwareCorruptionProbability),
 		  std::to_string(config.firmwareNewUpdateProbability),
 		  std::to_string(config.sensorMeasurementSize),
+
+		  std::to_string(config.NGroup),
+		  std::to_string(config.SlotFormat),
+		  std::to_string(config.NRawSlotCount),
+		  //std::to_string(config.NRawSlotCount * 120 + 500),
+		  std::to_string(config.NRawSlotNum),
 		  std::to_string(config.ContentionPerRAWSlot),
-		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup)
+		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup),
+		  std::to_string(config.rps.rpsset.size())
 	});
 }
 
@@ -207,6 +208,18 @@ void SimulationEventManager::send(vector<string> str) {
 	}
 }
 
+void SimulationEventManager::onRawConfig (uint32_t rpsIndex, uint32_t rawIndex, RPS::RawAssignment raw)
+{
+
+	send({"rawconfig", std::to_string(rpsIndex), std::to_string(rawIndex),
+		std::to_string(raw.GetSlotFormat()),
+		std::to_string(raw.GetSlotDurationCount()),
+		std::to_string(raw.GetSlotNum()),
+		std::to_string(raw.GetSlotCrossBoundary()),
+		std::to_string(raw.GetRawGroupAIDStart()),
+		std::to_string(raw.GetRawGroupAIDEnd())
+	});
+}
 
 void SimulationEventManager::onStartHeader() {
 	send({"startheader",
@@ -301,7 +314,6 @@ void SimulationEventManager::onStatisticsHeader() {
 	});
 
 }
-
 
 SimulationEventManager::~SimulationEventManager() {
 

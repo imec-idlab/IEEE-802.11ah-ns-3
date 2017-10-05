@@ -664,7 +664,7 @@ if (assocVaule < fastAssocThreshold)
   if (m_s1gSupported)
     {
         assoc.SetS1gCapabilities (GetS1gCapabilities ());
-        NS_LOG_UNCOND ("StaWifiMac::SendAssociationRequest (void)");
+        //NS_LOG_UNCOND ("StaWifiMac::SendAssociationRequest (void)");
 
     }
 
@@ -1046,6 +1046,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                  m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);
                  SetInRAWgroup ();
                  m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
+
                   // NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
                   //break; //break should not used if multiple RAW is supported
                }

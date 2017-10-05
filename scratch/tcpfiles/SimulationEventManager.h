@@ -14,6 +14,7 @@
 #include "ns3/drop-reason.h"
 #include <fstream>
 #include <memory>
+#include "ns3/rps.h"
 
 class SimulationEventManager {
 
@@ -49,6 +50,8 @@ public:
 	void onStatisticsHeader();
 
 	void onUpdateStatistics(Statistics& stats);
+
+	void onRawConfig (uint32_t rpsIndex, uint32_t rawIndex, RPS::RawAssignment raw);
 
 	virtual ~SimulationEventManager();
 };

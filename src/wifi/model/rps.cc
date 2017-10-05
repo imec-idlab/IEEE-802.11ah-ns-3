@@ -360,6 +360,12 @@ RPS::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
   return length;
 }
 
+uint8_t
+RPS::GetNumberOfRawGroups () const
+{
+	return m_length / 6;
+}
+
 ATTRIBUTE_HELPER_CPP (RPS);
 
 std::ostream &

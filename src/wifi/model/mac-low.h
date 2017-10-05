@@ -818,6 +818,9 @@ public:
    */
   void FlushAggregateQueue (void);
 
+  Time CalculateOverallTxTime (Ptr<const Packet> packet,
+                               const WifiMacHeader* hdr,
+                               const MacLowTransmissionParameters &params) const;
 protected:
   /**
    * Return a TXVECTOR for the DATA frame given the destination.
@@ -1015,9 +1018,7 @@ private:
    */
   bool NeedCtsToSelf (void);
 
-  Time CalculateOverallTxTime (Ptr<const Packet> packet,
-                               const WifiMacHeader* hdr,
-                               const MacLowTransmissionParameters &params) const;
+
   void NotifyNav (Ptr<const Packet> packet,const WifiMacHeader &hdr, WifiPreamble preamble);
   /**
    * Reset NAV with the given duration.
