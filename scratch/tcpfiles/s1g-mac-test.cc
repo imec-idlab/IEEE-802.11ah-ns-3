@@ -289,8 +289,8 @@ void sendStatistics(bool schedule) {
 	eventManager.onUpdateStatistics(stats);
 	eventManager.onUpdateSlotStatistics(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval, transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval);
 	// reset
-	transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0);
-	transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.totalRawSlots, 0);
+	std::fill(transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval.begin(), transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval.end(), 0);
+	std::fill(transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval.begin(), transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval.end(), 0);
 
 	if(schedule)
 		Simulator::Schedule(Seconds(config.visualizerSamplingInterval), &sendStatistics, true);
@@ -316,21 +316,6 @@ void onSTAAssociated(int i) {
 		if (nodes[i]->isAssociated)
 			nrOfSTAAssociated++;
 	}
-	/*for (int k = 0; k < config.rps.rpsset.size(); k++)
-	{
-		for (int j=0; j < config.rps.rpsset[k]->GetNumberOfRawGroups(); j++)
-		{
-			if (config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDStart() <= i+1 && i+1 <= config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDEnd())
-			{
-				nodes[i]->rpsIndex = k + 1;
-				nodes[i]->rawGroupNumber = j + 1;
-				nodes[i]->rawSlotIndex = nodes[i]->aId % config.rps.rpsset[k]->GetRawAssigmentObj(j).GetSlotNum() + 1;
-				//cout << "Node " << i << " with AID " << (int)nodes[i]->aId << " belongs to " << (int)nodes[i]->rawSlotIndex << " slot of RAW group "
-					//	<< (int)nodes[i]->rawGroupNumber << " within the " << (int)nodes[i]->rpsIndex << " RPS." << endl;
-
-			}
-		}
-	}*/
 	eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
@@ -378,20 +363,19 @@ void onSTAAssociated(int i) {
 void RpsIndexTrace (uint16_t oldValue, uint16_t newValue)
 {
 	currentRps = newValue;
-	cout << "+++++OLD " << oldValue;
-	cout << "RPS: " << newValue << " at " << Simulator::Now().GetMicroSeconds() << endl;
+	//cout << "RPS: " << newValue << " at " << Simulator::Now().GetMicroSeconds() << endl;
 }
 
 void RawGroupTrace (uint8_t oldValue, uint8_t newValue)
 {
 	currentRawGroup = newValue;
-	cout << "	group " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
+	//cout << "	group " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
 }
 
 void RawSlotTrace (uint8_t oldValue, uint8_t newValue)
 {
 	currentRawSlot = newValue;
-	cout << "		slot " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
+	//cout << "		slot " << std::to_string(newValue) << " at " << Simulator::Now().GetMicroSeconds() << endl;
 }
 
 void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
@@ -566,19 +550,31 @@ void OnAPPacketToTransmitReceived(string context, Ptr<const Packet> packet, Mac4
 }
 
 void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet) {
-	//cout << "+++++++++ON CHANNEL TRANSMISSION" << endl;
-	/*int timGroup = currentTIMGroup;
-	int slotIndex = currentRawSlot;
+	int rpsIndex = currentRps - 1;
+	int rawGroup = currentRawGroup - 1;
+	int slotIndex = currentRawSlot - 1;
+	//cout << rpsIndex << "		" << rawGroup << "		" << slotIndex << "		" << endl;
 
-	if(senderDevice->GetAddress() == apDevice.Get(0)->GetAddress()) {
-		// from AP
-		transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[timGroup * config.NRawSlotNum + slotIndex]+= packet->GetSerializedSize();
-	}
-	else {
-		// from STA
-		transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[timGroup * config.NRawSlotNum + slotIndex]+= packet->GetSerializedSize();
+	uint64_t iSlot = slotIndex;
+	if (rpsIndex > 0)
+		for (int r = rpsIndex - 1; r >= 0; r--)
+			for (int g = 0; g < config.rps.rpsset[r]->GetNumberOfRawGroups(); g++)
+				iSlot += config.rps.rpsset[r]->GetRawAssigmentObj(g).GetSlotNum();
 
-	}*/
+	if (rawGroup > 0)
+		for (int i = rawGroup - 1; i >= 0; i--)
+			iSlot += config.rps.rpsset[rpsIndex]->GetRawAssigmentObj(i).GetSlotNum();
+
+	if (rpsIndex >= 0 && rawGroup >= 0 && slotIndex >= 0)
+		if(senderDevice->GetAddress() == apDevice.Get(0)->GetAddress()) {
+			// from AP
+			transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[iSlot]+= packet->GetSerializedSize();
+		}
+		else {
+			// from STA
+			transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[iSlot]+= packet->GetSerializedSize();
+
+		}
 }
 
 int main (int argc, char *argv[])
@@ -623,7 +619,7 @@ int main (int argc, char *argv[])
 	  }
 
   }
-  transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0); // TODO
+  transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0);
   transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.totalRawSlots, 0);
   /*CommandLine cmd;
   cmd.AddValue ("seed", "random seed", config.seed);
@@ -824,6 +820,5 @@ int main (int argc, char *argv[])
       throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
       std::cout << "datarate" << "\t" << "throughput" << std::endl;
       std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
-    
-return 0;
+      return 0;
 }

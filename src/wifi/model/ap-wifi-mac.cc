@@ -643,7 +643,6 @@ ApWifiMac::SendOneBeacon (void)
             NS_LOG_DEBUG ("RpsIndex =" << RpsIndex);
             RpsIndex = 1;
           }
-      m_rpsIndexTrace = RpsIndex;
       beacon.SetRPS (*m_rps);
       /*
       RPS m_rps;
@@ -698,7 +697,7 @@ ApWifiMac::SendOneBeacon (void)
 			{
 			Simulator::Schedule(
 						bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
-						&ApWifiMac::OnRAWSlotStart, this, g + 1, i + 1);
+						&ApWifiMac::OnRAWSlotStart, this, RpsIndex, g + 1, i + 1);
 			timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
 			}
 
@@ -730,11 +729,11 @@ ApWifiMac::SendOneBeacon (void)
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
 }
 
-void ApWifiMac::OnRAWSlotStart(uint8_t rawGroup, uint8_t slot)
+void ApWifiMac::OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
 	LOG_TRAFFIC(
 			"AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
-
+	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
 	m_rawSlotTrace = slot;
 }
