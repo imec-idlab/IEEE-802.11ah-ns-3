@@ -36,7 +36,7 @@ struct Configuration {
 	/*
 	 * Common configuration parameters
 	 * */
-	  double simulationTime = 60; //60
+	  double simulationTime = 20; //60
 	  uint32_t seed = 1;
 	  int NRawSta = 1;
 	  uint32_t Nsta = 1;
@@ -44,7 +44,7 @@ struct Configuration {
 
 	  double datarate = 7.8;
 	  double bandWidth = 2;
-	  string rho="50"; //50
+	  string rho="200"; //50
 
 	  string visualizerIP = "10.0.2.15"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
@@ -63,7 +63,7 @@ struct Configuration {
 	  string TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt";
 	  bool S1g1MfieldEnabled=false;
 	  string RAWConfigFile = "./OptimalRawGroup/RawConfig-32-2-2.txt";
-	  string DataMode = "MCS2_8"; //TODO copy this from Dwight, OfdmRate7_8MbpsBW2MHz MCS2
+	  string DataMode = "MCS2_0"; //TODO copy this from Dwight, OfdmRate7_8MbpsBW2MHz MCS2
 
 	/*
 	 * Amina's configuration parameters

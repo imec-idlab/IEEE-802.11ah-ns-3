@@ -416,54 +416,6 @@ void NodeEntry::OnTcpPacketReceivedAtAP(Ptr<const Packet> packet) {
 	}
 
 	stats->get(this->id).NumberOfSuccessfulPackets++;
-
-
-
-	/*auto pCopy = packet->Copy();
-
-	try {
-
-		SeqTsHeader seqTs = GetSeqTSFromPacket(packet);
-
-		// check if the packet wasn't already received to prevent counting them double
-		if (seqTs.GetSeq() < 0 || seqTs.GetSeq() >= seqNrReceivedAtAP.size()
-				|| seqNrReceivedAtAP[seqTs.GetSeq()]) {
-			// but the packet was already received ?
-			// probably a fragment?
-
-			if(showLog) cout << "Packet with seq nr " << seqTs.GetSeq() << " and time "
-					<< seqTs.GetTs().GetMicroSeconds()
-					<< "µs falls outside expected array or is already received and is "
-					<< pCopy->GetSerializedSize() << " size" << endl;
-
-
-			// well ns3 corruption sets in with packet fragmentation
-			// count it as succesfully received, but don't update the time
-			stats->get(this->id).NumberOfSuccessfulPackets++;
-			return;
-		} else {
-			if(showLog) cout << "Packet with seq nr " << seqTs.GetSeq() << " received at AP"
-					<< endl;
-
-			seqNrReceivedAtAP[seqTs.GetSeq()] = true;
-		}
-
-		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
-
-		cout << Simulator::Now().GetMicroSeconds() << "[" << this->id << "] "
-		 << "TCP packet received at AP after "
-		 << std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
-
-		stats->get(this->id).NumberOfSuccessfulPackets++;
-		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
-		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
-	} catch (std::runtime_error e) {
-		// packet fragmentation
-		cerr
-				<< "ERROR: unable to get the packet header at AP to determine the travel time"
-				<< endl;
-	}
-	*/
 }
 
 void NodeEntry::OnTcpCongestionWindowChanged(uint32_t oldval, uint32_t newval) {
@@ -515,8 +467,8 @@ void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
 	stats->get(this->id).TCPEstimatedBandwidth = newVal;
 }
 
-void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) {
-    cout << "[" << this->id << "] " << "UDP packet sent " << endl;
+void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) { //works
+    //cout << "[" << this->id << "] " << "UDP packet sent " << endl;
 	unused(packet);
 
 	stats->get(this->id).NumberOfSentPackets++;
@@ -637,7 +589,7 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 		//	<< std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
 
 		stats->get(this->id).NumberOfSuccessfulPackets++;
-		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
+		//stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
 		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 
 	} catch (std::runtime_error e) {

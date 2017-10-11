@@ -69,6 +69,9 @@ UdpClient::GetTypeId (void)
                    UintegerValue (1024),
                    MakeUintegerAccessor (&UdpClient::m_size),
                    MakeUintegerChecker<uint32_t> (12,1500))
+	.AddTraceSource ("Tx", "A new packet is created and is sent",
+				   MakeTraceSourceAccessor (&UdpClient::m_packetSent),
+				   "ns3::Packet::TracedCallback")
   ;
   return tid;
 }
@@ -172,6 +175,7 @@ UdpClient::Send (void)
   if ((m_socket->Send (p)) >= 0)
     {
       ++m_sent;
+      this->m_packetSent(p);
       NS_LOG_INFO ("TraceDelay TX " << m_size << " bytes to "
                                     << peerAddressStringStream.str () << " Uid: "
                                     << p->GetUid () << " Time: "

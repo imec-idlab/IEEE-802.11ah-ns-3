@@ -99,13 +99,10 @@ long double NodeStatistics::GetInterPacketDelayAtServer ()
 	else return -1;
 }
 
-double NodeStatistics::getGoodputKbit() {
-	if(TotalPacketSentReceiveTime.GetSeconds() > 0)
-	{
-			return (TotalPacketPayloadSize * 8. / (1024)) / TotalPacketSentReceiveTime.GetSeconds();
-	}
-	else
-		return -1;
+double NodeStatistics::getGoodputKbit(Time timeAllStationsAssociated) {
+	if (Simulator::Now () > 0)
+		return (TotalPacketPayloadSize * 8.) / ((Simulator::Now ().GetSeconds () - timeAllStationsAssociated.GetSeconds ()) * 1000);
+	else return -1;
 }
 
 

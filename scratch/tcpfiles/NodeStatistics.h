@@ -66,7 +66,7 @@ public:
     long double getAveragePacketSentReceiveTime();
     long double getAveragePacketRoundTripTime(std::string trafficType);
 
-    double getGoodputKbit(void);
+    double getGoodputKbit(Time timeAllStationsAssociated);
 
     int EDCAQueueLength = 0;
 

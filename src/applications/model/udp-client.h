@@ -27,6 +27,7 @@
 #include "ns3/event-id.h"
 #include "ns3/ptr.h"
 #include "ns3/ipv4-address.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
@@ -95,6 +96,7 @@ private:
   uint16_t m_peerPort; //!< Remote peer port
   EventId m_sendEvent; //!< Event to send the next packet
 
+  TracedCallback<Ptr<const Packet> > m_packetSent;
 };
 
 } // namespace ns3

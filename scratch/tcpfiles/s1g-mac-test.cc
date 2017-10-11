@@ -23,8 +23,8 @@ NS_LOG_COMPONENT_DEFINE ("s1g-wifi-network-le");
 uint32_t AssocNum = 0;
 int64_t AssocTime=0;
 uint32_t StaNum=0;
-string traffic_filepath;
-uint32_t payloadLength;
+//string traffic_filepath;
+//uint32_t payloadLength;
 NetDeviceContainer staDeviceCont;
 
 Configuration config;
@@ -92,7 +92,7 @@ GetAssocNum ( )
   return AssocNum;
 }
 
-
+/*
 void
 UdpTraffic ( uint16_t num, uint32_t Size, string path, NetDeviceContainer staDevice)
 {
@@ -100,7 +100,7 @@ UdpTraffic ( uint16_t num, uint32_t Size, string path, NetDeviceContainer staDev
   payloadLength = Size;
   traffic_filepath = path;
   staDeviceCont = staDevice;
-}
+}*/
 
 ApplicationContainer serverApp;
 uint32_t AppStartTime = 0;
@@ -907,7 +907,7 @@ void configureUDPClients() {
 	        myClient.SetAttribute ("MaxPackets", config.maxNumberOfPackets);
 	        myClient.SetAttribute ("PacketSize", UintegerValue (config.payloadSize));
 	          traffic_sta.clear ();
-	          ifstream trafficfile (traffic_filepath);
+	          ifstream trafficfile (config.TrafficPath);
 	           if (trafficfile.is_open())
 	                 {
 	                  uint16_t sta_id;
@@ -927,17 +927,17 @@ void configureUDPClients() {
 	          for (std::map<uint16_t,float>::iterator it=traffic_sta.begin(); it!=traffic_sta.end(); ++it)
 	              {
 	                  std::ostringstream intervalstr;
-	                  intervalstr << (payloadLength*8)/(it->second * 1000000);
+	                  intervalstr << (config.payloadSize*8)/(it->second * 1000000);
 	                  std::string intervalsta = intervalstr.str();
 
 	                  //config.trafficInterval = UintegerValue (Time (intervalsta));
 
 	                  myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); // TODO add to nodeEntry and visualize
-	                  randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
+	                  randomStart = m_rv->GetValue (0, (config.payloadSize*8)/(it->second * 1000000));
 	                  ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
 	                  clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
 	                  clientApp.Start (Seconds (1 + randomStart));
-	                  //clientApp.Stop (Seconds (config.simulationTime+1)); //
+	                  //clientApp.Stop (Seconds (config.simulationTime+1)); //with this throughput is smaller
 	               }
 	              AppStartTime=Simulator::Now ().GetSeconds () + 1;
 	              //Simulator::Stop (Seconds (config.simulationTime+1));
@@ -1150,7 +1150,7 @@ int main (int argc, char *argv[])
 
 
 
-    Simulator::ScheduleNow(&UdpTraffic, config.Nsta, config.payloadSize, config.TrafficPath, staDevice);
+    //Simulator::ScheduleNow(&UdpTraffic, config.Nsta, config.payloadSize, config.TrafficPath, staDevice);
 
     //Simulator::Schedule(Seconds(1), &CheckAssoc, config.Nsta, config.simulationTime, wifiApNode, wifiStaNode,apNodeInterface);
 
@@ -1204,6 +1204,15 @@ int main (int argc, char *argv[])
       //UDP
       uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
       throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+      /*
+      int paketi=0, pay=0;
+      for (int i=0; i < config.Nsta; i++){
+    	  paketi+= stats.get(i).NumberOfSuccessfulPackets;
+    	  pay+=stats.get(i).TotalPacketPayloadSize;
+      }
+      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << paketi << endl;
+      cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
+       */
       std::cout << "datarate" << "\t" << "throughput" << std::endl;
       std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
       return 0;

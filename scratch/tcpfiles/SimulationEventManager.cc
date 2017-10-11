@@ -132,7 +132,7 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).NumberOfSuccessfulPackets),
 			std::to_string(stats.get(i).getNumberOfDroppedPackets()),
 			std::to_string(stats.get(i).getAveragePacketSentReceiveTime()),
-			std::to_string(stats.get(i).getGoodputKbit()),
+			std::to_string(stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)),
 			std::to_string(stats.get(i).EDCAQueueLength),
 			std::to_string(stats.get(i).NumberOfSuccessfulRoundtripPackets),
 			std::to_string(stats.get(i).getAveragePacketRoundTripTime(m_config.trafficType)),
