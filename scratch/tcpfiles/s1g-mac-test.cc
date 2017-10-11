@@ -110,21 +110,14 @@ std::map<uint16_t, float> traffic_sta;
 
 
 
-
+/*
 void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode, NodeContainer  wifiStaNode, Ipv4InterfaceContainer apNodeInterface)
 {
-
-
     if  (GetAssocNum () == Nsta)
       {
         std::cout << "Assoc Finished, AssocNum=" << AssocNum << ", time = " << Simulator::Now ().GetMicroSeconds () << std::endl;
         //Application start time
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
-        //UDP flow
-        //UdpServerHelper myServer (9);
-        //serverApp = myServer.Install (wifiApNode);
-        //serverApp.Start (Seconds (0));
-        //configureUDPServer();
 
         UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
         myClient.SetAttribute ("MaxPackets", config.maxNumberOfPackets);
@@ -148,7 +141,6 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   trafficfile.close();
                 }
            else cout << "Unable to open file \n";
-
           
           double randomStart = 0.0;
           
@@ -167,7 +159,6 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   clientApp.Start (Seconds (1 + randomStart));
                   clientApp.Stop (Seconds (simulationTime+1)); //
                }
-          
               AppStartTime=Simulator::Now ().GetSeconds () + 1;
               Simulator::Stop (Seconds (simulationTime+1));
       }
@@ -175,8 +166,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
       {
         Simulator::Schedule(Seconds(1.0), &CheckAssoc, Nsta, simulationTime, wifiApNode, wifiStaNode, apNodeInterface);
       }
-
-}
+}*/
 
 
 
@@ -345,7 +335,7 @@ void onSTAAssociated(int i) {
 
     	if(config.trafficType == "udp") {
     		configureUDPServer();
-    		//configureUDPClients();
+    		configureUDPClients();
     	}
     	else if(config.trafficType == "udpecho") {
     		configureUDPEchoServer();
@@ -910,21 +900,47 @@ void configureTCPEchoClients() {
 }
 
 void configureUDPClients() {
-    UdpClientHelper clientHelper(apNodeInterface.GetAddress(0), 9); //address of remote node
-    clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
-    clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
-    clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
+	        //Application start time
+	        Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
-    Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+	        UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
+	        myClient.SetAttribute ("MaxPackets", config.maxNumberOfPackets);
+	        myClient.SetAttribute ("PacketSize", UintegerValue (config.payloadSize));
+	          traffic_sta.clear ();
+	          ifstream trafficfile (traffic_filepath);
+	           if (trafficfile.is_open())
+	                 {
+	                  uint16_t sta_id;
+	                  float  sta_traffic;
+	                  for (uint16_t kk=0; kk< config.Nsta; kk++)
+	                    {
+	                      trafficfile >> sta_id;
+	                      trafficfile >> sta_traffic;
+	                      traffic_sta.insert (std::make_pair(sta_id,sta_traffic)); //insert data
+	                      //cout << "sta_id = " << sta_id << " sta_traffic = " << sta_traffic << "\n";
+	                    }
+	                  trafficfile.close();
+	                }
+	           else cout << "Unable to open file \n";
 
-    for (uint16_t i = 0; i < config.Nsta; i++) {
-        ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(i));
-        clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
+	          double randomStart = 0.0;
+	          for (std::map<uint16_t,float>::iterator it=traffic_sta.begin(); it!=traffic_sta.end(); ++it)
+	              {
+	                  std::ostringstream intervalstr;
+	                  intervalstr << (payloadLength*8)/(it->second * 1000000);
+	                  std::string intervalsta = intervalstr.str();
 
-		double random = m_rv->GetValue(0, config.trafficInterval);
-		clientApp.Start(MilliSeconds(0+random));
-        //clientApp.Stop(Seconds(simulationTime + 1));
-    }
+	                  //config.trafficInterval = UintegerValue (Time (intervalsta));
+
+	                  myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); // TODO add to nodeEntry and visualize
+	                  randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
+	                  ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
+	                  clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
+	                  clientApp.Start (Seconds (1 + randomStart));
+	                  //clientApp.Stop (Seconds (config.simulationTime+1)); //
+	               }
+	              AppStartTime=Simulator::Now ().GetSeconds () + 1;
+	              //Simulator::Stop (Seconds (config.simulationTime+1));
 }
 
 void configureUDPEchoClients() {
@@ -1136,7 +1152,7 @@ int main (int argc, char *argv[])
 
     Simulator::ScheduleNow(&UdpTraffic, config.Nsta, config.payloadSize, config.TrafficPath, staDevice);
 
-    Simulator::Schedule(Seconds(1), &CheckAssoc, config.Nsta, config.simulationTime, wifiApNode, wifiStaNode,apNodeInterface);
+    //Simulator::Schedule(Seconds(1), &CheckAssoc, config.Nsta, config.simulationTime, wifiApNode, wifiStaNode,apNodeInterface);
 
 
     Ipv4GlobalRoutingHelper::PopulateRoutingTables ();

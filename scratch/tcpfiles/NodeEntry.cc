@@ -516,8 +516,9 @@ void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
 }
 
 void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) {
-//cout << "[" << this->id << "] " << "UDP packet sent " << endl;
+    cout << "[" << this->id << "] " << "UDP packet sent " << endl;
 	unused(packet);
+
 	stats->get(this->id).NumberOfSentPackets++;
 
 	/*		cout << "[" << this->id << "] "  << Simulator::Now().GetMicroSeconds() <<
