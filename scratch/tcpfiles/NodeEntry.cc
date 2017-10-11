@@ -17,9 +17,6 @@ NodeEntry::NodeEntry(int id, Statistics* stats, Ptr<Node> node, Ptr<NetDevice> d
 }
 
 void NodeEntry::SetAssociation(std::string context, Mac48Address address) {
-	unused(context);
-	unused(address);
-
 	this->isAssociated = true;
 
 	// determine AID
@@ -35,8 +32,6 @@ void NodeEntry::SetAssociation(std::string context, Mac48Address address) {
 }
 
 void NodeEntry::UnsetAssociation(std::string context, Mac48Address address) {
-	unused(context);
-	unused(address);
 	this->isAssociated = false;
 
 	cout << "[" << this->id << "] " << Simulator::Now().GetMicroSeconds() << " "
@@ -47,19 +42,14 @@ void NodeEntry::UnsetAssociation(std::string context, Mac48Address address) {
 
 
 void NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged(std::string context, uint16_t oldValue, uint16_t newValue) {
-	unused(context);
-	unused(oldValue);
 	stats->get(this->id).NumberOfTransmissionsDuringRAWSlot = newValue;
 }
 
 void NodeEntry::OnS1gBeaconMissed(std::string context, bool nextBeaconIsDTIM) {
-	unused(context);
-	unused(nextBeaconIsDTIM);
 	stats->get(this->id).NumberOfBeaconsMissed++;
 }
 
 void NodeEntry::OnPhyTxBegin(std::string context, Ptr<const Packet> packet) {
-	unused(context);
 	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 			<< "Begin Tx " << packet->GetUid() << endl;
 	txMap.emplace(packet->GetUid(), Simulator::Now());
@@ -77,7 +67,6 @@ void NodeEntry::OnPhyTxBegin(std::string context, Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
-	unused(context);
 	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 			<< "End Tx " << packet->GetUid() << endl;
 
@@ -92,7 +81,6 @@ void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
-	unused(context);
 	if(showLog) cout << "[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
 			<< endl;
 
@@ -114,7 +102,6 @@ void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet, DropR
 void NodeEntry::OnPhyRxBegin(std::string context, Ptr<const Packet> packet) {
 	//cout << "[" << this->aId << "] " << Simulator::Now().GetMicroSeconds()
 	//<< " Begin Rx " << packet->GetUid() << endl;
-	unused(context);
 	rxMap.emplace(packet->GetUid(), Simulator::Now());
 
 	if (rxMap.size() > 1)
@@ -125,7 +112,6 @@ void NodeEntry::OnPhyRxBegin(std::string context, Ptr<const Packet> packet) {
 void NodeEntry::OnPhyRxEnd(std::string context, Ptr<const Packet> packet) {
 	//cout  << Simulator::Now().GetMicroSeconds() << "[" << this->aId << "] "
 	//<< " End Rx " << packet->GetUid() << endl;
-	unused(context);
 	this->OnEndOfReceive(packet);
 }
 
@@ -197,7 +183,6 @@ void NodeEntry::OnEndOfReceive(Ptr<const Packet> packet) {
 
 void NodeEntry::OnPhyRxDrop(std::string context, Ptr<const Packet> packet,
 		DropReason reason) {
-	unused(context);
 	this->OnEndOfReceive(packet);
 
 	// THIS REQUIRES PACKET METADATA ENABLE!
@@ -235,8 +220,6 @@ void NodeEntry::OnPhyRxDrop(std::string context, Ptr<const Packet> packet,
 }
 
 void NodeEntry::OnPhyStateChange(std::string context, const Time start,	const Time duration, const WifiPhy::State state) {
-	unused(context);
-	unused(start);
 	switch (state) {
 
 	case WifiPhy::State::SLEEP:
@@ -330,7 +313,6 @@ SeqTsHeader GetSeqTSFromPacket(Ptr<const Packet> packet) {
 void NodeEntry::OnTcpPacketSent(Ptr<const Packet> packet) {
 
 	//SeqTsHeader seqTs = GetSeqTSFromPacket(packet);
-	unused(packet);
 	if(showLog) cout << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] " << "TCP packet sent " << endl;//with seq nr " << seqTs.GetSeq() << endl;
 
 /*
@@ -353,8 +335,6 @@ void NodeEntry::OnTcpPacketSent(Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnTcpEchoPacketReceived(Ptr<const Packet> packet, Address from) {
-	unused(packet);
-	unused(from);
 	SeqTsHeader seqTs = GetSeqTSFromPacket(packet);
 	if(seqTs.GetSeq() > 0) {
 		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
@@ -419,28 +399,23 @@ void NodeEntry::OnTcpPacketReceivedAtAP(Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnTcpCongestionWindowChanged(uint32_t oldval, uint32_t newval) {
-	unused(oldval);
 	stats->get(this->id).TCPCongestionWindow = newval;
 }
 
 void NodeEntry::OnTcpRTOChanged(Time oldval, Time newval) {
-	unused(oldval);
 	stats->get(this->id).TCPRTOValue = newval;
 }
 
 void NodeEntry::OnTcpRTTChanged(Time oldval, Time newval) {
-	unused(oldval);
 	stats->get(this->id).TCPRTTValue = newval;
 }
 
 void NodeEntry::OnTcpStateChanged(TcpSocket::TcpStates_t oldval, TcpSocket::TcpStates_t newval) {
-	unused(oldval);
 	tcpConnectedAtSTA = (newval == TcpSocket::TcpStates_t::ESTABLISHED);
 	stats->get(this->id).TCPConnected = tcpConnectedAtSTA && tcpConnectedAtAP;
 }
 
 void NodeEntry::OnTcpStateChangedAtAP(TcpSocket::TcpStates_t oldval, TcpSocket::TcpStates_t newval) {
-	unused(oldval);
 	tcpConnectedAtAP = (newval	== TcpSocket::TcpStates_t::ESTABLISHED);
 	if(showLog) cout << "TCP connected at ap " << tcpConnectedAtAP;
 
@@ -448,7 +423,6 @@ void NodeEntry::OnTcpStateChangedAtAP(TcpSocket::TcpStates_t oldval, TcpSocket::
 }
 
 void NodeEntry::OnTcpRetransmission(Address to) {
-	unused(to);
 	stats->get(this->id).NumberOfTCPRetransmissions++;
 }
 
@@ -458,18 +432,15 @@ void NodeEntry::OnTcpRetransmissionAtAP() {
 }
 
 void NodeEntry::OnTcpSlowStartThresholdChanged(uint32_t oldVal, uint32_t newVal) {
-	unused(oldVal);
 	stats->get(this->id).TCPSlowStartThreshold = newVal;
 }
 
 void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
-	unused(oldVal);
 	stats->get(this->id).TCPEstimatedBandwidth = newVal;
 }
 
 void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) { //works
     //cout << "[" << this->id << "] " << "UDP packet sent " << endl;
-	unused(packet);
 
 	stats->get(this->id).NumberOfSentPackets++;
 
@@ -487,7 +458,6 @@ void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) { //works
 void NodeEntry::OnUdpEchoPacketReceived(Ptr<const Packet> packet, Address from) {
 	//cout << "Echo packet received back from AP ("
 	//	<< InetSocketAddress::ConvertFrom(from).GetIpv4() << ")" << endl;
-	unused(from);
 	auto pCopy = packet->Copy();
 	try {
 		SeqTsHeader seqTs;
@@ -506,7 +476,6 @@ void NodeEntry::OnUdpEchoPacketReceived(Ptr<const Packet> packet, Address from) 
 }
 
 void NodeEntry::OnCoapPacketSent(Ptr<const Packet> packet) {
-	unused(packet);
 	stats->get(this->id).NumberOfSentPackets++;
 }
 /* Jitter is calculated only for packet delivered in order
@@ -533,7 +502,6 @@ void NodeEntry::UpdateJitter (Time timeDiff)
 	}
 }
 void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
-	unused(from);
 	auto pCopy = packet->Copy();
 	try {
 		SeqTsHeader seqTs;
@@ -656,14 +624,11 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 
 void NodeEntry::OnMacPacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason) {
 	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
-	unused(context);
-	unused(packet);
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
 }
 
 void NodeEntry::OnTcpPacketDropped(Ptr<Packet> packet, DropReason reason) {
 	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
-	unused(packet);
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
 }
 
@@ -696,13 +661,11 @@ void NodeEntry::OnTcpIPCameraDataReceivedAtAP(uint16_t nrOfBytes) {
 
 void NodeEntry::OnCollision(std::string context, uint32_t nrOfBackoffSlots) {
 	if(showLog) cout << "Collision sensed" << endl;
-	unused(context);
 	stats->get(this->id).NumberOfCollisions++;
 	stats->get(this->id).TotalNumberOfBackedOffSlots += nrOfBackoffSlots;
 }
 
 void NodeEntry::OnTransmissionWillCrossRAWBoundary(std::string context, Time txDuration, Time remainingTimeInRawSlot) {
-	unused(context);
 	cout << "Transmission cancelled, tx duration " << txDuration << ", remaining time " << remainingTimeInRawSlot << endl;
 
 	stats->get(this->id).NumberOfTransmissionsCancelledDueToCrossingRAWBoundary++;
@@ -711,32 +674,23 @@ void NodeEntry::OnTransmissionWillCrossRAWBoundary(std::string context, Time txD
 void NodeEntry::OnMacTxRtsFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//	<< " MAC Tx Rts Failed" << endl;
-	unused(context);
-	unused(address);
 	stats->get(this->id).NumberOfMACTxRTSFailed++;
 }
 
 void NodeEntry::OnMacTxDataFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//		<< " MAC Tx Data Failed" << endl;
-	unused(context);
-	unused(address);
 	stats->get(this->id).NumberOfMACTxMissedACK++;
 }
 
 void NodeEntry::OnMacTxFinalRtsFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
-	//		<< " MAC Tx Rts Failed" << endl;
-	unused(context);
-	unused(address);
 	stats->get(this->id).NumberOfMACTxRTSFailed++;
 }
 
 void NodeEntry::OnMacTxFinalDataFailed(std::string context, Mac48Address address) {
 	//cout  << Simulator::Now().GetMicroSeconds() << " [" << this->aId << "] "
 	//		<< " MAC Tx Final data Failed" << endl;
-	unused(context);
-	unused(address);
 	stats->get(this->id).NumberOfMACTxMissedACKAndDroppedPacket++;
 }
 

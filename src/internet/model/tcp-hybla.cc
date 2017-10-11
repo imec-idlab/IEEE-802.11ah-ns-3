@@ -20,7 +20,6 @@
 #include "tcp-hybla.h"
 #include "ns3/log.h"
 #include "ns3/tcp-socket-base.h"
-#include "cleaning-helper.h"
 
 namespace ns3 {
 
@@ -73,7 +72,6 @@ void
 TcpHybla::RecalcParam (Ptr<TcpSocketState> tcb, const Time &rtt)
 {
   NS_LOG_FUNCTION (this << rtt);
-  unused(tcb);
   m_rho = std::max ((double) rtt.GetMilliSeconds () / m_rRtt.GetMilliSeconds (), 1.0);
 
   NS_ASSERT (m_rho > 0.0);

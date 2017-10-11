@@ -11,7 +11,6 @@
 #include "tcp-client.h"
 #include "seq-ts-header.h"
 #include "ns3/tcp-socket-base.h"
-#include "cleaning-helper.h"
 
 namespace ns3 {
 
@@ -147,8 +146,6 @@ void TcpClient::OnRetransmission(Address a) {
 }
 
 void TcpClient::OnTCPDataPacketSent(Ptr<const Packet> packet, const TcpHeader& header, Ptr<const TcpSocketBase> tcpSocket, bool isRetransmission) {
-	unused (header);
-	unused (tcpSocket);
 	if(!isRetransmission)
 		m_txTrace(packet);
 }

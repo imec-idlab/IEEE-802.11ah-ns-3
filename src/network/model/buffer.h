@@ -24,7 +24,6 @@
 #include <vector>
 #include <ostream>
 #include "ns3/assert.h"
-#include "cleaning-helper.h"
 
 #define BUFFER_FREE_LIST 1
 
@@ -824,7 +823,6 @@ Buffer::Iterator::Iterator (Buffer const*buffer)
 }
 Buffer::Iterator::Iterator (Buffer const*buffer, bool dummy)
 {
-  unused(dummy);
   Construct (buffer);
   m_current = m_dataEnd;
 }

@@ -21,7 +21,6 @@
 
 #include "ns3/object.h"
 #include "ns3/timer.h"
-#include "cleaning-helper.h"
 
 namespace ns3 {
 
@@ -108,9 +107,6 @@ public:
    */
   virtual void PktsAcked (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked, const Time& rtt)
   {
-	  unused(tcb);
-	  unused(segmentsAcked);
-	  unused(rtt);
   }
 
   // Present in Linux but not in ns-3 yet:

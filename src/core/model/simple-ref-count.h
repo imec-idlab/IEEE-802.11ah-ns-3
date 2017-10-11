@@ -28,8 +28,6 @@
 #include <stdint.h>
 #include <limits>
 
-#include "cleaning-helper.h"
-
 /**
  * \file
  * \ingroup ptr
@@ -86,14 +84,12 @@ public:
   SimpleRefCount (const SimpleRefCount &o)
     : m_count (1)
   {
-	  unused(o);
   }
   /**
    * Assignment
    */
   SimpleRefCount &operator = (const SimpleRefCount &o)
   {
-	unused(o);
     return *this;
   }
   /**

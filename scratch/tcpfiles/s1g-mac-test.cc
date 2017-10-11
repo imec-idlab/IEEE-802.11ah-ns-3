@@ -480,7 +480,6 @@ string getWifiMode(string dataMode) {
 
 void OnAPPhyRxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
 	// THIS REQUIRES PACKET METADATA ENABLE!
-	unused (context);
 	auto pCopy = packet->Copy();
 	auto it = pCopy->BeginItem();
 	while(it.HasNext()) {
@@ -527,9 +526,6 @@ void OnAPPhyRxDrop(std::string context, Ptr<const Packet> packet, DropReason rea
 }
 
 void OnAPPacketToTransmitReceived(string context, Ptr<const Packet> packet, Mac48Address to, bool isScheduled, bool isDuringSlotOfSTA, Time timeLeftInSlot) {
-	unused(context);
-	unused(packet);
-	unused(isDuringSlotOfSTA);
 	int staId = -1;
 	if (!config.useV6){
 		for (uint32_t i = 0; i < staNodeInterface.GetN(); i++) {
