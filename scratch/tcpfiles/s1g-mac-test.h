@@ -37,8 +37,13 @@ using namespace std;
 using namespace ns3;
 
 NodeContainer wifiStaNode;
+NodeContainer wifiApNode;
+
 Ipv4InterfaceContainer staNodeInterface;
 Ipv6InterfaceContainer staNodeInterface6;
+
+Ipv4InterfaceContainer apNodeInterface;
+Ipv6InterfaceContainer apNodeInterface6;
 
 NetDeviceContainer apDevice;
 
@@ -50,3 +55,60 @@ vector<NodeEntry*> nodes;
 
 vector<long> transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval;
 vector<long> transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval;
+
+/*void configureChannel();
+
+void configureSTANodes(Ssid& ssid);
+
+void configureAPNode(Ssid& ssid);
+
+void configureIPStack();*/
+
+void configureNodes();
+
+void configureUDPServer();
+void configureUDPClients();
+
+void configureUDPEchoClients();
+void configureUDPEchoServer();
+void configureUdpEchoClientHelper(UdpEchoClientHelper& clientHelper);
+
+void configureTCPEchoClients();
+void configureTCPEchoServer();
+void configureTCPEchoClientHelper(TcpEchoClientHelper& clientHelper);
+
+void configureTCPPingPongServer();
+void configureTCPPingPongClients();
+
+void configureTCPIPCameraServer();
+void configureTCPIPCameraClients();
+
+void configureTCPFirmwareServer();
+void configureTCPFirmwareClients();
+
+void configureTCPSensorServer();
+void configureTCPSensorClients();
+
+/*void configureCoapServer();
+void configureCoapClients();
+void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n);*/
+
+void wireTCPServer(ApplicationContainer serverApp);
+void wireTCPClient(ApplicationContainer clientApp, int i);
+
+void onSTAAssociated(int i);
+void onSTADeassociated(int i);
+
+void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet);
+
+void updateNodesQueueLength();
+
+
+int getSTAIdFromAddress(Ipv4Address from);
+//int getSTAIdFromAddress(Ipv6Address from);
+
+int main(int argc, char** argv);
+
+//void printStatistics();
+
+void sendStatistics(bool schedule);

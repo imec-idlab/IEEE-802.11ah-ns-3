@@ -31,7 +31,7 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  "",
 
 		  std::to_string(config.trafficInterval),
-		  std::to_string(config.trafficPacketSize),
+		  std::to_string(config.payloadSize),
 
 		  std::to_string(config.BeaconInterval),
 

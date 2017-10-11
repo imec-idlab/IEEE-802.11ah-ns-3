@@ -121,19 +121,19 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         //Application start time
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
         //UDP flow
-        UdpServerHelper myServer (9);
-        serverApp = myServer.Install (wifiApNode);
-        serverApp.Start (Seconds (0));
+        //UdpServerHelper myServer (9);
+        //serverApp = myServer.Install (wifiApNode);
+        //serverApp.Start (Seconds (0));
+        //configureUDPServer();
 
         UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
         myClient.SetAttribute ("MaxPackets", config.maxNumberOfPackets);
-        myClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
+        myClient.SetAttribute ("PacketSize", UintegerValue (config.payloadSize));
 
           traffic_sta.clear ();
           
           ifstream trafficfile (traffic_filepath);
           
-         
            if (trafficfile.is_open())
                  {
                   uint16_t sta_id;
@@ -157,6 +157,8 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   std::ostringstream intervalstr;
                   intervalstr << (payloadLength*8)/(it->second * 1000000);
                   std::string intervalsta = intervalstr.str();
+
+                  //config.trafficInterval = UintegerValue (Time (intervalsta));
 
                   myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
                   randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
@@ -316,6 +318,23 @@ void onSTAAssociated(int i) {
 		if (nodes[i]->isAssociated)
 			nrOfSTAAssociated++;
 	}
+
+	for (int k = 0; k < config.rps.rpsset.size(); k++)
+	{
+		for (int j=0; j < config.rps.rpsset[k]->GetNumberOfRawGroups(); j++)
+		{
+			if (config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDStart() <= i+1 && i+1 <= config.rps.rpsset[k]->GetRawAssigmentObj(j).GetRawGroupAIDEnd())
+			{
+				nodes[i]->rpsIndex = k + 1;
+				nodes[i]->rawGroupNumber = j + 1;
+				nodes[i]->rawSlotIndex = nodes[i]->aId % config.rps.rpsset[k]->GetRawAssigmentObj(j).GetSlotNum() + 1;
+				/*cout << "Node " << i << " with AID " << (int)nodes[i]->aId << " belongs to " << (int)nodes[i]->rawSlotIndex << " slot of RAW group "
+	                                               << (int)nodes[i]->rawGroupNumber << " within the " << (int)nodes[i]->rpsIndex << " RPS." << endl;
+				 */
+			}
+		}
+	}
+
 	eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
@@ -324,9 +343,9 @@ void onSTAAssociated(int i) {
         // association complete, start sending packets
     	stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
-    	/*if(config.trafficType == "udp") {
+    	if(config.trafficType == "udp") {
     		configureUDPServer();
-    		configureUDPClients();
+    		//configureUDPClients();
     	}
     	else if(config.trafficType == "udpecho") {
     		configureUDPEchoServer();
@@ -352,7 +371,7 @@ void onSTAAssociated(int i) {
 			configureTCPSensorServer();
 			configureTCPSensorClients();
     	}
-    	else if (config.trafficType == "coap") {
+    	/*else if (config.trafficType == "coap") {
 			configureCoapServer();
 			configureCoapClients();
 		}*/
@@ -577,6 +596,357 @@ void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet) {
 		}
 }
 
+int getSTAIdFromAddress(Ipv4Address from) {
+    int staId = -1;
+    for (int i = 0; i < staNodeInterface.GetN(); i++) {
+        if (staNodeInterface.GetAddress(i) == from) {
+            staId = i;
+            break;
+        }
+    }
+    return staId;
+}
+
+void udpPacketReceivedAtServer(Ptr<const Packet> packet, Address from) { //works
+	//cout << "+++++++++++udpPacketReceivedAtServer" << endl;
+    int staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
+    if (staId != -1)
+        nodes[staId]->OnUdpPacketReceivedAtAP(packet);
+    else
+    	cout << "*** Node could not be determined from received packet at AP " << endl;
+}
+
+void tcpPacketReceivedAtServer (Ptr<const Packet> packet, Address from) {
+	int staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
+    if (staId != -1)
+        nodes[staId]->OnTcpPacketReceivedAtAP(packet);
+    else
+    	cout << "*** Node could not be determined from received packet at AP " << endl;
+}
+
+void tcpRetransmissionAtServer(Address to) {
+	int staId = getSTAIdFromAddress(Ipv4Address::ConvertFrom(to));
+	if (staId != -1)
+		nodes[staId]->OnTcpRetransmissionAtAP();
+	else
+		cout << "*** Node could not be determined from received packet at AP " << endl;
+}
+
+void tcpPacketDroppedAtServer(Address to, Ptr<Packet> packet, DropReason reason) {
+	int staId = getSTAIdFromAddress(Ipv4Address::ConvertFrom(to));
+	if(staId != -1) {
+		stats.get(staId).NumberOfDropsByReasonAtAP[reason]++;
+	}
+}
+
+void tcpStateChangeAtServer(TcpSocket::TcpStates_t oldState, TcpSocket::TcpStates_t newState, Address to) {
+
+    int staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(to).GetIpv4());
+    if(staId != -1)
+			nodes[staId]->OnTcpStateChangedAtAP(oldState, newState);
+		else
+			cout << "*** Node could not be determined from received packet at AP " << endl;
+
+	//cout << Simulator::Now().GetMicroSeconds() << " ********** TCP SERVER SOCKET STATE CHANGED FROM " << oldState << " TO " << newState << endl;
+}
+
+void tcpIPCameraDataReceivedAtServer(Address from, uint16_t nrOfBytes) {
+    int staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
+    if(staId != -1)
+			nodes[staId]->OnTcpIPCameraDataReceivedAtAP(nrOfBytes);
+		else
+			cout << "*** Node could not be determined from received packet at AP " << endl;
+}
+
+void configureUDPServer() {
+    UdpServerHelper myServer(9);
+    serverApp = myServer.Install(wifiApNode);
+    serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
+    serverApp.Start(Seconds(0));
+
+}
+
+void configureUDPEchoServer() {
+    UdpEchoServerHelper myServer(9);
+    serverApp = myServer.Install(wifiApNode);
+    serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
+    serverApp.Start(Seconds(0));
+}
+
+void configureTCPEchoServer() {
+	TcpEchoServerHelper myServer(80);
+	serverApp = myServer.Install(wifiApNode);
+	wireTCPServer(serverApp);
+	serverApp.Start(Seconds(0));
+}
+
+
+void configureTCPPingPongServer() {
+	// TCP ping pong is a test for the new base tcp-client and tcp-server applications
+	ObjectFactory factory;
+	factory.SetTypeId (TCPPingPongServer::GetTypeId ());
+	factory.Set("Port", UintegerValue (81));
+
+	Ptr<Application> tcpServer = factory.Create<TCPPingPongServer>();
+	wifiApNode.Get(0)->AddApplication(tcpServer);
+
+	auto serverApp = ApplicationContainer(tcpServer);
+	wireTCPServer(serverApp);
+	serverApp.Start(Seconds(0));
+}
+
+void configureTCPPingPongClients() {
+
+	ObjectFactory factory;
+	factory.SetTypeId (TCPPingPongClient::GetTypeId ());
+	factory.Set("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+	factory.Set("PacketSize", UintegerValue(config.payloadSize));
+
+	factory.Set("RemoteAddress", Ipv4AddressValue (apNodeInterface.GetAddress(0)));
+	factory.Set("RemotePort", UintegerValue (81));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+
+		Ptr<Application> tcpClient = factory.Create<TCPPingPongClient>();
+		wifiStaNode.Get(i)->AddApplication(tcpClient);
+		auto clientApp = ApplicationContainer(tcpClient);
+		wireTCPClient(clientApp,i);
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+		//clientApp.Stop(Seconds(simulationTime + 1));
+	}
+}
+
+
+void configureTCPIPCameraServer() {
+	ObjectFactory factory;
+	factory.SetTypeId (TCPIPCameraServer::GetTypeId ());
+	factory.Set("Port", UintegerValue (82));
+
+	Ptr<Application> tcpServer = factory.Create<TCPIPCameraServer>();
+	wifiApNode.Get(0)->AddApplication(tcpServer);
+
+
+	auto serverApp = ApplicationContainer(tcpServer);
+	wireTCPServer(serverApp);
+	serverApp.Start(Seconds(0));
+//	serverApp.Stop(Seconds(config.simulationTime));
+}
+
+void configureTCPIPCameraClients() {
+
+	ObjectFactory factory;
+	factory.SetTypeId (TCPIPCameraClient::GetTypeId ());
+	factory.Set("MotionPercentage", DoubleValue(config.ipcameraMotionPercentage));
+	factory.Set("MotionDuration", TimeValue(Seconds(config.ipcameraMotionDuration)));
+	factory.Set("DataRate", UintegerValue(config.ipcameraDataRate));
+
+	factory.Set("PacketSize", UintegerValue(config.payloadSize));
+
+	factory.Set("RemoteAddress", Ipv4AddressValue (apNodeInterface.GetAddress(0)));
+	factory.Set("RemotePort", UintegerValue (82));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+
+		Ptr<Application> tcpClient = factory.Create<TCPIPCameraClient>();
+		wifiStaNode.Get(i)->AddApplication(tcpClient);
+		auto clientApp = ApplicationContainer(tcpClient);
+		wireTCPClient(clientApp,i);
+
+		clientApp.Start(MilliSeconds(0));
+		clientApp.Stop(Seconds(config.simulationTime));
+	}
+}
+
+
+
+void configureTCPFirmwareServer() {
+	ObjectFactory factory;
+	factory.SetTypeId (TCPFirmwareServer::GetTypeId ());
+	factory.Set("Port", UintegerValue (83));
+
+	factory.Set("FirmwareSize", UintegerValue (config.firmwareSize));
+	factory.Set("BlockSize", UintegerValue (config.firmwareBlockSize));
+	factory.Set("NewUpdateProbability", DoubleValue (config.firmwareNewUpdateProbability));
+
+	Ptr<Application> tcpServer = factory.Create<TCPFirmwareServer>();
+	wifiApNode.Get(0)->AddApplication(tcpServer);
+
+
+	auto serverApp = ApplicationContainer(tcpServer);
+	wireTCPServer(serverApp);
+	serverApp.Start(Seconds(0));
+//	serverApp.Stop(Seconds(config.simulationTime));
+}
+
+void configureTCPFirmwareClients() {
+
+	ObjectFactory factory;
+	factory.SetTypeId (TCPFirmwareClient::GetTypeId ());
+	factory.Set("CorruptionProbability", DoubleValue(config.firmwareCorruptionProbability));
+	factory.Set("VersionCheckInterval", TimeValue(MilliSeconds(config.firmwareVersionCheckInterval)));
+	factory.Set("PacketSize", UintegerValue(config.payloadSize));
+
+	factory.Set("RemoteAddress", Ipv4AddressValue (apNodeInterface.GetAddress(0)));
+	factory.Set("RemotePort", UintegerValue (83));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+
+		Ptr<Application> tcpClient = factory.Create<TCPFirmwareClient>();
+		wifiStaNode.Get(i)->AddApplication(tcpClient);
+		auto clientApp = ApplicationContainer(tcpClient);
+		wireTCPClient(clientApp,i);
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+		clientApp.Stop(Seconds(config.simulationTime));
+	}
+}
+
+
+void configureTCPSensorServer() {
+	ObjectFactory factory;
+	factory.SetTypeId (TCPSensorServer::GetTypeId ());
+	factory.Set("Port", UintegerValue (84));
+
+	Ptr<Application> tcpServer = factory.Create<TCPSensorServer>();
+	wifiApNode.Get(0)->AddApplication(tcpServer);
+
+
+	auto serverApp = ApplicationContainer(tcpServer);
+	wireTCPServer(serverApp);
+	serverApp.Start(Seconds(0));
+//	serverApp.Stop(Seconds(config.simulationTime));
+}
+
+void configureTCPSensorClients() {
+
+	ObjectFactory factory;
+	factory.SetTypeId (TCPSensorClient::GetTypeId ());
+
+	factory.Set("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+	factory.Set("PacketSize", UintegerValue(config.payloadSize));
+	factory.Set("MeasurementSize", UintegerValue(config.sensorMeasurementSize));
+
+	factory.Set("RemoteAddress", Ipv4AddressValue (apNodeInterface.GetAddress(0)));
+	factory.Set("RemotePort", UintegerValue (84));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+
+		Ptr<Application> tcpClient = factory.Create<TCPSensorClient>();
+		wifiStaNode.Get(i)->AddApplication(tcpClient);
+		auto clientApp = ApplicationContainer(tcpClient);
+		wireTCPClient(clientApp,i);
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+		clientApp.Stop(Seconds(config.simulationTime));
+	}
+}
+
+
+void wireTCPServer(ApplicationContainer serverApp) {
+	serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&tcpPacketReceivedAtServer));
+	serverApp.Get(0)->TraceConnectWithoutContext("Retransmission", MakeCallback(&tcpRetransmissionAtServer));
+	serverApp.Get(0)->TraceConnectWithoutContext("PacketDropped", MakeCallback(&tcpPacketDroppedAtServer));
+	serverApp.Get(0)->TraceConnectWithoutContext("TCPStateChanged", MakeCallback(&tcpStateChangeAtServer));
+
+	if(config.trafficType == "tcpipcamera") {
+		serverApp.Get(0)->TraceConnectWithoutContext("DataReceived", MakeCallback(&tcpIPCameraDataReceivedAtServer));
+	}
+}
+
+void wireTCPClient(ApplicationContainer clientApp, int i) {
+
+	clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnTcpPacketSent, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnTcpEchoPacketReceived, nodes[i]));
+
+	clientApp.Get(0)->TraceConnectWithoutContext("CongestionWindow", MakeCallback(&NodeEntry::OnTcpCongestionWindowChanged, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("RTO", MakeCallback(&NodeEntry::OnTcpRTOChanged, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("RTT", MakeCallback(&NodeEntry::OnTcpRTTChanged, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("SlowStartThreshold", MakeCallback(&NodeEntry::OnTcpSlowStartThresholdChanged, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("EstimatedBW", MakeCallback(&NodeEntry::OnTcpEstimatedBWChanged, nodes[i]));
+
+	clientApp.Get(0)->TraceConnectWithoutContext("TCPStateChanged", MakeCallback(&NodeEntry::OnTcpStateChanged, nodes[i]));
+	clientApp.Get(0)->TraceConnectWithoutContext("Retransmission", MakeCallback(&NodeEntry::OnTcpRetransmission, nodes[i]));
+
+	clientApp.Get(0)->TraceConnectWithoutContext("PacketDropped", MakeCallback(&NodeEntry::OnTcpPacketDropped, nodes[i]));
+
+	if(config.trafficType == "tcpfirmware") {
+		clientApp.Get(0)->TraceConnectWithoutContext("FirmwareUpdated", MakeCallback(&NodeEntry::OnTcpFirmwareUpdated, nodes[i]));
+	}
+	else if(config.trafficType == "tcpipcamera") {
+	    clientApp.Get(0)->TraceConnectWithoutContext("DataSent", MakeCallback(&NodeEntry::OnTcpIPCameraDataSent, nodes[i]));
+	    clientApp.Get(0)->TraceConnectWithoutContext("StreamStateChanged", MakeCallback(&NodeEntry::OnTcpIPCameraStreamStateChanged, nodes[i]));
+	}
+}
+
+void configureTCPEchoClients() {
+	TcpEchoClientHelper clientHelper(apNodeInterface.GetAddress(0), 80); //address of remote node
+	clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
+	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+		ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(i));
+		wireTCPClient(clientApp,i);
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+		//clientApp.Stop(Seconds(simulationTime + 1));
+	}
+}
+
+void configureUDPClients() {
+    UdpClientHelper clientHelper(apNodeInterface.GetAddress(0), 9); //address of remote node
+    clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
+    clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+    clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
+
+    Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+    for (uint16_t i = 0; i < config.Nsta; i++) {
+        ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(i));
+        clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+        //clientApp.Stop(Seconds(simulationTime + 1));
+    }
+}
+
+void configureUDPEchoClients() {
+	UdpEchoClientHelper clientHelper(apNodeInterface.GetAddress(0), 9); //address of remote node
+	clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
+	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	for (uint16_t i = 0; i < config.Nsta; i++) {
+		ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(i));
+		clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
+		clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnUdpEchoPacketReceived, nodes[i]));
+
+		double random = m_rv->GetValue(0, config.trafficInterval);
+		clientApp.Start(MilliSeconds(0+random));
+		//clientApp.Stop(Seconds(simulationTime + 1));
+	}
+}
+
 int main (int argc, char *argv[])
 {
   //LogComponentEnable ("UdpServer", LOG_INFO);
@@ -645,7 +1015,7 @@ int main (int argc, char *argv[])
 
   //NodeContainer wifiStaNode;
   wifiStaNode.Create (config.Nsta);
-  NodeContainer wifiApNode;
+  //NodeContainer wifiApNode;
   wifiApNode.Create (1);
 
   YansWifiChannelHelper channelBuilder = YansWifiChannelHelper ();
@@ -743,7 +1113,7 @@ int main (int argc, char *argv[])
 
   address.SetBase ("192.168.0.0", "255.255.0.0");
   //Ipv4InterfaceContainer staNodeInterface;
-  Ipv4InterfaceContainer apNodeInterface;
+  //Ipv4InterfaceContainer apNodeInterface;
 
   staNodeInterface = address.Assign (staDevice);
   apNodeInterface = address.Assign (apDevice);

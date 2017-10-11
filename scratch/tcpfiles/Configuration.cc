@@ -14,7 +14,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("simulationTime", "Simulation time in seconds", simulationTime);
     cmd.AddValue("Nsta", "number of total stations", Nsta);
     cmd.AddValue("NRawSta", "number of stations supporting RAW. If -1 it will be based on NSta, should be divisible by NGroup", NRawSta);
-    cmd.AddValue ("payloadSize", "Size of payload", payloadSize);
+    cmd.AddValue ("payloadSize", "Size of payload to send in bytes", payloadSize);
     cmd.AddValue("BeaconInterval", "Beacon interval time in us", BeaconInterval);
     cmd.AddValue("DataMode", "Date mode (check MCStoWifiMode for more details) (format: MCSbw_mcs, e.g. MCS1_0 is OfdmRate300KbpsBW1Mhz)", DataMode);
     cmd.AddValue("datarate", "data rate in Mbps", datarate);
@@ -25,6 +25,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue ("TrafficPath", "files path of traffic file", TrafficPath);
     cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", S1g1MfieldEnabled);
     cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
+    cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, -tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
@@ -43,8 +44,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("TrafficInterval", "Traffic interval time in ms", trafficInterval);
     cmd.AddValue("TrafficIntervalDeviation", "Traffic interval deviation time in ms, each interval will have a random deviation between - dev/2 and + dev/2", trafficIntervalDeviation);
 
-    cmd.AddValue("TrafficPacketSize", "Size of packets to send in bytes. Default of -1 means the TCP Segment size - 100 bytes will be used", trafficPacketSize);
-    cmd.AddValue("TrafficType", "Kind of traffic (udp, udpecho, tcpecho, tcpipcamera, tcpfirmware, tcpsensor, coap)", trafficType);
+
 
     cmd.AddValue("MinRTO", "Minimum retransmission timeout for TCP sockets in microseconds", MinRTO);
     cmd.AddValue("TCPConnectionTimeout", "TCP Connection timeout to use for all Tcp Sockets", TCPConnectionTimeout);

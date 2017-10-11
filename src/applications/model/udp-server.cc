@@ -59,6 +59,10 @@ UdpServer::GetTypeId (void)
                    MakeUintegerAccessor (&UdpServer::GetPacketWindowSize,
                                          &UdpServer::SetPacketWindowSize),
                    MakeUintegerChecker<uint16_t> (8,256))
+	.AddTraceSource("Rx",
+					"A packet is received",
+					MakeTraceSourceAccessor(&UdpServer::m_packetReceived),
+					"ns3::UdpServer::PacketReceivedCallback");
   ;
   return tid;
 }
@@ -160,6 +164,7 @@ UdpServer::HandleRead (Ptr<Socket> socket)
     {
       if (packet->GetSize () > 0)
         {
+    	  m_packetReceived(packet, from);
           SeqTsHeader seqTs;
           packet->RemoveHeader (seqTs);
           uint32_t currentSequenceNumber = seqTs.GetSeq ();
