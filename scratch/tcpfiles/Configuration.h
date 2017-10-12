@@ -85,7 +85,7 @@ struct Configuration {
 	uint32_t trafficInterval = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
 	uint32_t trafficIntervalDeviation = 100; //1000 discuss with Jeroen
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-	string trafficType = "udp"; // important
+	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss
 
 	int SlotFormat=0; //0;
 	int NRawSlotCount=0; //162;

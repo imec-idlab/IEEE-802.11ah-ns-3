@@ -23,7 +23,7 @@ public:
     long double GetInterPacketDelayDeviation(std::vector<Time>& delayVector);
     long double GetInterPacketDelayDeviationPercentage(std::vector<Time>& delayVector);
     Time GetAverageInterPacketDelay(std::vector<Time>& delayVector);
-    float GetReliability (void);
+    float GetPacketLoss (std::string trafficType);
     long double GetInterPacketDelayAtServer (void);
     long double GetInterPacketDelayAtClient (void);
 
