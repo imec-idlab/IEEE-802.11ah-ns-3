@@ -154,6 +154,8 @@ ApWifiMac::ApWifiMac ()
   AuthenThreshold = 0;
   currentRawGroup = 0;
   //m_SlotFormat = 0;
+  m_AidToMacAddr.clear ();
+  m_accessList.clear ();
 }
 
 ApWifiMac::~ApWifiMac ()
@@ -555,6 +557,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
   uint8_t aid_h = mac[4] & 0x1f;
   uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
   assoc.SetAID(aid); //
+  m_AidToMacAddr[aid]=to;
   StatusCode code;
   if (success)
     {
@@ -644,6 +647,7 @@ ApWifiMac::SendOneBeacon (void)
             RpsIndex = 1;
           }
       beacon.SetRPS (*m_rps);
+      
       /*
       RPS m_rps;
       NS_LOG_UNCOND ("send beacon at" << Simulator::Now ());
@@ -689,6 +693,23 @@ ApWifiMac::SendOneBeacon (void)
 
       auto nRaw = m_rps->GetNumberOfRawGroups();
       currentRawGroup = (currentRawGroup + 1) % nRaw;
+      
+      uint16_t startaid;
+      uint16_t endaid;
+      Mac48Address stasAddr;
+      for (uint16_t i=0; i< 8192;i++)
+       {  
+      // assume all station sleeps, then change some to awake state based on downlink data
+      //This implementation is temporary, should be removed if ps-poll is supported    
+        if (m_AidToMacAddr.find(i)->second != NULL)
+           {
+            stasAddr = m_AidToMacAddr.find(i)->second;
+            if (m_stationManager->IsAssociated (stasAddr))
+              {
+                m_accessList[stasAddr]=false;
+              }
+           }
+       }
       // schedule the slot start
       Time timeToSlotStart = Time ();
       for (uint32_t g = 0; g < nRaw; g++)
@@ -699,9 +720,27 @@ ApWifiMac::SendOneBeacon (void)
 						bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
 						&ApWifiMac::OnRAWSlotStart, this, RpsIndex, g + 1, i + 1);
 			timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
+                        
 			}
+                  startaid = m_rps->GetRawAssigmentObj(g).GetRawGroupAIDStart();
+                  endaid = m_rps->GetRawAssigmentObj(g).GetRawGroupAIDEnd();
+                  for (uint32_t k = startaid; g <= endaid; k++)
+                       {
+                            if (m_AidToMacAddr.find(k)->second != NULL)
+                                {
+                                    stasAddr = m_AidToMacAddr.find(k)->second;
+                                    if (m_stationManager->IsAssociated (stasAddr))
+                                        {
+                                             m_accessList[stasAddr]=true;
+                                        }
+                                }
+                       }
 
-        }
+        }  
+        m_edca.find (AC_VO)->second->SetaccessList (m_accessList);
+        m_edca.find (AC_VI)->second->SetaccessList (m_accessList);
+        m_edca.find (AC_BE)->second->SetaccessList (m_accessList);
+        m_edca.find (AC_BK)->second->SetaccessList (m_accessList);
      }
     else
      {

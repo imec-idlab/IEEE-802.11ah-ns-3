@@ -263,6 +263,8 @@ private:
   std::vector<uint16_t> m_sensorList; //stations allowed to transmit in last beacon
   std::vector<uint16_t> m_OffloadList;
   std::vector<uint16_t> m_receivedAid;
+  std::map<uint16_t, Mac48Address> m_AidToMacAddr;
+  std::map<Mac48Address, bool> m_accessList;
     
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons

@@ -476,6 +476,8 @@ public:
   void AccessAllowedIfRaw (bool allowed);
   void RawStart (Time duration, bool crossSlotBoundaryAllowed);
   void OutsideRawStart (void);
+  
+  void SetaccessList (std::map<Mac48Address, bool> list);
 
 
 private:
@@ -574,6 +576,8 @@ private:
   uint16_t m_blockAckInactivityTimeout;
   struct Bar m_currentBar;
   bool m_ampduExist;
+  
+  std::map<Mac48Address, bool> m_accessList;
   
   TracedCallback<uint32_t> m_collisionTrace;
   TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;

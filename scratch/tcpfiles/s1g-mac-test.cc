@@ -1179,6 +1179,7 @@ int main (int argc, char *argv[])
         }
 
       //eventManager.onStartHeader();
+      /*
       eventManager.onStart(config);
       if (config.rps.rpsset.size() > 0)
     	  for (uint32_t i = 0; i < config.rps.rpsset.size(); i++)
@@ -1190,7 +1191,7 @@ int main (int argc, char *argv[])
 
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
 
-      sendStatistics(true);
+      sendStatistics(true); */
 
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
