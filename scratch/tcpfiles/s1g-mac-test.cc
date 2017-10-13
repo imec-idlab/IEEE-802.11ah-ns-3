@@ -1200,19 +1200,20 @@ int main (int argc, char *argv[])
       //UDP
       uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
       throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-
+/*
       // Visualizer throughput
-      int paketi=0, pay=0;
+      int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
       for (int i=0; i < config.Nsta; i++){
-    	  paketi+= stats.get(i).NumberOfSuccessfulPackets;
+    	  totalSuccessfulPackets+= stats.get(i).NumberOfSuccessfulPackets;
+    	  totalSentPackets+= stats.get(i).NumberOfSentPackets;
     	  pay+=stats.get(i).TotalPacketPayloadSize;
     	  cout << i << " sent: " << stats.get(i).NumberOfSentPackets << " ;succesfull: " << stats.get(i).NumberOfSuccessfulPackets << "; packetloss: "<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
       }
-      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << paketi << endl;
+      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
       cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
-
+      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       // Visualizer Packet loss
-      //stats.get(i).GetPacketLoss()
+      //stats.get(i).GetPacketLoss()*/
 
 		//Le's throughput
       std::cout << "datarate" << "\t" << "throughput" << std::endl;

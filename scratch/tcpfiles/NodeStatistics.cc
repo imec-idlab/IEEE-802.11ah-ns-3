@@ -3,8 +3,8 @@
 #include <cmath>
 
 long double NodeStatistics::getAveragePacketSentReceiveTime() { //milliseconds
-	if(NumberOfSuccessfulPacketsWithSeqHeader > 0)
-		return static_cast<long double>(TotalPacketSentReceiveTime.GetMilliSeconds()) / NumberOfSuccessfulPacketsWithSeqHeader;
+	if(NumberOfSuccessfulPackets > 0)
+		return static_cast<long double>(TotalPacketSentReceiveTime.GetMilliSeconds()) / NumberOfSuccessfulPackets;
 	else
 		return -1;
 }

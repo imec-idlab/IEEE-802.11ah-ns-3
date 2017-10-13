@@ -557,7 +557,9 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 		//	<< std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
 
 		stats->get(this->id).NumberOfSuccessfulPackets++;
-		//stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
+		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
+		stats->get(this->id).latency = timeDiff;
+		//cout << "id = " << this->id << " ; latency = " << timeDiff << " ; seq =  " << seqTs.GetSeq() << endl;
 		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 
 	} catch (std::runtime_error e) {

@@ -54,6 +54,7 @@ public:
     long getNumberOfDroppedPackets();
 
     Time TotalPacketSentReceiveTime = Time();
+    Time latency = Time();
 
     // for jitter RMS - cumulative sum of abs differences
     uint64_t jitterAcc = 0;

@@ -166,7 +166,8 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).GetInterPacketDelayAtServer()),
 			std::to_string(stats.get(i).GetInterPacketDelayAtClient()),
 			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer)),
-			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient))
+			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient)),
+			std::to_string(stats.get(i).latency.GetMilliSeconds())
 		});
 	}
 }
