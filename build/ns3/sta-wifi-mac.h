@@ -222,13 +222,23 @@ private:
   void OutsideRawStartBackoff (void);
   bool Is(uint8_t blockbitmap, uint8_t j);
   void InsideBackoff (void);
-  void RawSlotStartBackoff (void);
+  void RawSlotStartBackoff (void);  
+  void RawSlotStartBackoffPostpone (void);
 
 
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
   void SetInRAWgroup(void);
   void UnsetInRAWgroup(void);
+  
+   /**
+   * wake up operation
+   */
+  void WakeUp (void);
+  void SleepIfQueueIsEmpty(bool);
+  bool HasPacketsInQueue();
+  void BeaconWakeUp (void);
+  void GoToSleep (int value);
 
   TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
 
@@ -256,6 +266,16 @@ private:
   bool fasTAssocType;
   uint16_t fastAssocThreshold;
     uint16_t assocVaule;
+    
+  bool firstBeacon;
+  bool receivingBeacon;  
+  EventId m_beaconWakeUpEvent; 
+  Time beaconInterval;
+  uint64_t timeDifferenceBeacon;  
+  uint64_t timeBeacon;
+  bool outsideraw;
+  bool stationrawslot;
+  bool waitingack;
 
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons

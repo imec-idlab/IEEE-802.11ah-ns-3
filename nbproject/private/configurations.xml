@@ -1,0 +1,4167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="100">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name=".waf-1.8.12-f00e5b53f6bbeab1384a38c9cc5d51f7">
+        <df name="waflib">
+          <df name="extras">
+          </df>
+          <df name="Tools">
+          </df>
+        </df>
+      </df>
+      <df name="bindings">
+        <df name="python">
+          <df name="ns">
+          </df>
+          <df name="ns3">
+          </df>
+          <df name="pch">
+          </df>
+          <in>ns3module_helpers.cc</in>
+        </df>
+      </df>
+      <df name="build">
+        <df name="c4che">
+        </df>
+        <df name="ns3">
+          <df name="private">
+            <in>tcp-option-rfc793.h</in>
+            <in>tcp-option-ts.h</in>
+            <in>tcp-option-winscale.h</in>
+          </df>
+          <in>a2-a4-rsrq-handover-algorithm.h</in>
+          <in>a3-rsrp-handover-algorithm.h</in>
+          <in>aarf-wifi-manager.h</in>
+          <in>aarfcd-wifi-manager.h</in>
+          <in>abort.h</in>
+          <in>acoustic-modem-energy-model-helper.h</in>
+          <in>acoustic-modem-energy-model.h</in>
+          <in>address-utils.h</in>
+          <in>address.h</in>
+          <in>adhoc-aloha-noack-ideal-phy-helper.h</in>
+          <in>adhoc-wifi-mac.h</in>
+          <in>aloha-noack-mac-header.h</in>
+          <in>aloha-noack-net-device.h</in>
+          <in>ampdu-subframe-header.h</in>
+          <in>ampdu-tag.h</in>
+          <in>amrr-wifi-manager.h</in>
+          <in>amsdu-subframe-header.h</in>
+          <in>angles.h</in>
+          <in>animation-interface.h</in>
+          <in>antenna-model.h</in>
+          <in>antenna-module.h</in>
+          <in>aodv-dpd.h</in>
+          <in>aodv-helper.h</in>
+          <in>aodv-id-cache.h</in>
+          <in>aodv-module.h</in>
+          <in>aodv-neighbor.h</in>
+          <in>aodv-packet.h</in>
+          <in>aodv-routing-protocol.h</in>
+          <in>aodv-rqueue.h</in>
+          <in>aodv-rtable.h</in>
+          <in>ap-wifi-mac.h</in>
+          <in>aparf-wifi-manager.h</in>
+          <in>application-container.h</in>
+          <in>application-packet-probe.h</in>
+          <in>application.h</in>
+          <in>applications-module.h</in>
+          <in>arf-wifi-manager.h</in>
+          <in>arp-cache.h</in>
+          <in>arp-header.h</in>
+          <in>arp-l3-protocol.h</in>
+          <in>ascii-file.h</in>
+          <in>ascii-test.h</in>
+          <in>assert.h</in>
+          <in>athstats-helper.h</in>
+          <in>attribute-accessor-helper.h</in>
+          <in>attribute-construction-list.h</in>
+          <in>attribute-helper.h</in>
+          <in>attribute.h</in>
+          <in>authentication-control.h</in>
+          <in>average.h</in>
+          <in>backoff.h</in>
+          <in>basic-data-calculators.h</in>
+          <in>basic-energy-harvester-helper.h</in>
+          <in>basic-energy-harvester.h</in>
+          <in>basic-energy-source-helper.h</in>
+          <in>basic-energy-source.h</in>
+          <in>block-ack-agreement.h</in>
+          <in>block-ack-cache.h</in>
+          <in>block-ack-manager.h</in>
+          <in>boolean-probe.h</in>
+          <in>boolean.h</in>
+          <in>box.h</in>
+          <in>breakpoint.h</in>
+          <in>bridge-channel.h</in>
+          <in>bridge-helper.h</in>
+          <in>bridge-module.h</in>
+          <in>bridge-net-device.h</in>
+          <in>bs-net-device.h</in>
+          <in>bs-scheduler-rtps.h</in>
+          <in>bs-scheduler-simple.h</in>
+          <in>bs-scheduler.h</in>
+          <in>bs-service-flow-manager.h</in>
+          <in>bs-uplink-scheduler-mbqos.h</in>
+          <in>bs-uplink-scheduler-rtps.h</in>
+          <in>bs-uplink-scheduler-simple.h</in>
+          <in>bs-uplink-scheduler.h</in>
+          <in>bsm-application.h</in>
+          <in>buffer.h</in>
+          <in>build-profile.h</in>
+          <in>building-allocator.h</in>
+          <in>building-container.h</in>
+          <in>building-list.h</in>
+          <in>building-position-allocator.h</in>
+          <in>building.h</in>
+          <in>buildings-helper.h</in>
+          <in>buildings-module.h</in>
+          <in>buildings-propagation-loss-model.h</in>
+          <in>bulk-send-application.h</in>
+          <in>bulk-send-helper.h</in>
+          <in>bvec.h</in>
+          <in>byte-tag-list.h</in>
+          <in>calendar-scheduler.h</in>
+          <in>callback.h</in>
+          <in>candidate-queue.h</in>
+          <in>capability-information.h</in>
+          <in>cara-wifi-manager.h</in>
+          <in>channel-coordinator.h</in>
+          <in>channel-list.h</in>
+          <in>channel-manager.h</in>
+          <in>channel-scheduler.h</in>
+          <in>channel.h</in>
+          <in>chunk.h</in>
+          <in>cid-factory.h</in>
+          <in>cid.h</in>
+          <in>codel-queue-disc.h</in>
+          <in>command-line.h</in>
+          <in>config-store-config.h</in>
+          <in>config-store-module.h</in>
+          <in>config-store.h</in>
+          <in>config.h</in>
+          <in>connection-manager.h</in>
+          <in>constant-acceleration-mobility-model.h</in>
+          <in>constant-position-mobility-model.h</in>
+          <in>constant-rate-wifi-manager.h</in>
+          <in>constant-spectrum-propagation-loss.h</in>
+          <in>constant-velocity-helper.h</in>
+          <in>constant-velocity-mobility-model.h</in>
+          <in>core-config.h</in>
+          <in>core-module.h</in>
+          <in>cosine-antenna-model.h</in>
+          <in>cost231-propagation-loss-model.h</in>
+          <in>cqa-ff-mac-scheduler.h</in>
+          <in>crc32.h</in>
+          <in>crc8.h</in>
+          <in>cs-parameters.h</in>
+          <in>csma-channel.h</in>
+          <in>csma-helper.h</in>
+          <in>csma-layout-module.h</in>
+          <in>csma-module.h</in>
+          <in>csma-net-device.h</in>
+          <in>csma-star-helper.h</in>
+          <in>ctrl-headers.h</in>
+          <in>data-calculator.h</in>
+          <in>data-collection-object.h</in>
+          <in>data-collector.h</in>
+          <in>data-output-interface.h</in>
+          <in>data-rate.h</in>
+          <in>dca-txop.h</in>
+          <in>dcf-manager.h</in>
+          <in>dcf.h</in>
+          <in>default-channel-scheduler.h</in>
+          <in>default-deleter.h</in>
+          <in>default-simulator-impl.h</in>
+          <in>delay-jitter-estimation.h</in>
+          <in>deprecated.h</in>
+          <in>device-energy-model-container.h</in>
+          <in>device-energy-model.h</in>
+          <in>dl-mac-messages.h</in>
+          <in>dot11s-installer.h</in>
+          <in>dot11s-mac-header.h</in>
+          <in>double-probe.h</in>
+          <in>double.h</in>
+          <in>drop-reason.h</in>
+          <in>drop-tail-queue.h</in>
+          <in>dsdv-helper.h</in>
+          <in>dsdv-module.h</in>
+          <in>dsdv-packet-queue.h</in>
+          <in>dsdv-packet.h</in>
+          <in>dsdv-routing-protocol.h</in>
+          <in>dsdv-rtable.h</in>
+          <in>dsr-errorbuff.h</in>
+          <in>dsr-fs-header.h</in>
+          <in>dsr-gratuitous-reply-table.h</in>
+          <in>dsr-helper.h</in>
+          <in>dsr-main-helper.h</in>
+          <in>dsr-maintain-buff.h</in>
+          <in>dsr-module.h</in>
+          <in>dsr-network-queue.h</in>
+          <in>dsr-option-header.h</in>
+          <in>dsr-options.h</in>
+          <in>dsr-passive-buff.h</in>
+          <in>dsr-rcache.h</in>
+          <in>dsr-routing.h</in>
+          <in>dsr-rreq-table.h</in>
+          <in>dsr-rsendbuff.h</in>
+          <in>dsss-error-rate-model.h</in>
+          <in>edca-txop-n.h</in>
+          <in>empty.h</in>
+          <in>emu-epc-helper.h</in>
+          <in>emu-fd-net-device-helper.h</in>
+          <in>energy-harvester-container.h</in>
+          <in>energy-harvester-helper.h</in>
+          <in>energy-harvester.h</in>
+          <in>energy-model-helper.h</in>
+          <in>energy-module.h</in>
+          <in>energy-source-container.h</in>
+          <in>energy-source.h</in>
+          <in>enum.h</in>
+          <in>epc-enb-application.h</in>
+          <in>epc-enb-s1-sap.h</in>
+          <in>epc-gtpu-header.h</in>
+          <in>epc-helper.h</in>
+          <in>epc-mme.h</in>
+          <in>epc-s11-sap.h</in>
+          <in>epc-s1ap-sap.h</in>
+          <in>epc-sgw-pgw-application.h</in>
+          <in>epc-tft-classifier.h</in>
+          <in>epc-tft.h</in>
+          <in>epc-ue-nas.h</in>
+          <in>epc-x2-header.h</in>
+          <in>epc-x2-sap.h</in>
+          <in>epc-x2.h</in>
+          <in>eps-bearer-tag.h</in>
+          <in>eps-bearer.h</in>
+          <in>error-model.h</in>
+          <in>error-rate-model.h</in>
+          <in>ethernet-header.h</in>
+          <in>ethernet-trailer.h</in>
+          <in>event-garbage-collector.h</in>
+          <in>event-id.h</in>
+          <in>event-impl.h</in>
+          <in>extension-headers.h</in>
+          <in>fatal-error.h</in>
+          <in>fatal-impl.h</in>
+          <in>fd-net-device-helper.h</in>
+          <in>fd-net-device-module.h</in>
+          <in>fd-net-device.h</in>
+          <in>fdbet-ff-mac-scheduler.h</in>
+          <in>fdmt-ff-mac-scheduler.h</in>
+          <in>fdtbfq-ff-mac-scheduler.h</in>
+          <in>ff-mac-common.h</in>
+          <in>ff-mac-csched-sap.h</in>
+          <in>ff-mac-sched-sap.h</in>
+          <in>ff-mac-scheduler.h</in>
+          <in>file-aggregator.h</in>
+          <in>file-config.h</in>
+          <in>file-helper.h</in>
+          <in>flame-header.h</in>
+          <in>flame-installer.h</in>
+          <in>flame-protocol-mac.h</in>
+          <in>flame-protocol.h</in>
+          <in>flame-rtable.h</in>
+          <in>flow-classifier.h</in>
+          <in>flow-id-tag.h</in>
+          <in>flow-monitor-helper.h</in>
+          <in>flow-monitor-module.h</in>
+          <in>flow-monitor.h</in>
+          <in>flow-probe.h</in>
+          <in>friis-spectrum-propagation-loss.h</in>
+          <in>gauss-markov-mobility-model.h</in>
+          <in>generic-phy.h</in>
+          <in>geographic-positions.h</in>
+          <in>get-wildcard-matches.h</in>
+          <in>global-route-manager-impl.h</in>
+          <in>global-route-manager.h</in>
+          <in>global-router-interface.h</in>
+          <in>global-value.h</in>
+          <in>gnuplot-aggregator.h</in>
+          <in>gnuplot-helper.h</in>
+          <in>gnuplot.h</in>
+          <in>half-duplex-ideal-phy-signal-parameters.h</in>
+          <in>half-duplex-ideal-phy.h</in>
+          <in>hash-fnv.h</in>
+          <in>hash-function.h</in>
+          <in>hash-murmur3.h</in>
+          <in>hash.h</in>
+          <in>header.h</in>
+          <in>heap-scheduler.h</in>
+          <in>hierarchical-mobility-model.h</in>
+          <in>higher-tx-tag.h</in>
+          <in>histogram.h</in>
+          <in>ht-capabilities.h</in>
+          <in>ht-wifi-mac-helper.h</in>
+          <in>hwmp-protocol.h</in>
+          <in>hwmp-rtable.h</in>
+          <in>hybrid-buildings-propagation-loss-model.h</in>
+          <in>icmpv4-l4-protocol.h</in>
+          <in>icmpv4.h</in>
+          <in>icmpv6-header.h</in>
+          <in>icmpv6-l4-protocol.h</in>
+          <in>ideal-wifi-manager.h</in>
+          <in>ie-dot11s-beacon-timing.h</in>
+          <in>ie-dot11s-configuration.h</in>
+          <in>ie-dot11s-id.h</in>
+          <in>ie-dot11s-metric-report.h</in>
+          <in>ie-dot11s-peer-management.h</in>
+          <in>ie-dot11s-peering-protocol.h</in>
+          <in>ie-dot11s-perr.h</in>
+          <in>ie-dot11s-prep.h</in>
+          <in>ie-dot11s-preq.h</in>
+          <in>ie-dot11s-rann.h</in>
+          <in>inet-socket-address.h</in>
+          <in>inet-topology-reader.h</in>
+          <in>inet6-socket-address.h</in>
+          <in>int-to-type.h</in>
+          <in>int64x64-128.h</in>
+          <in>int64x64-double.h</in>
+          <in>int64x64.h</in>
+          <in>integer.h</in>
+          <in>interference-helper.h</in>
+          <in>internet-module.h</in>
+          <in>internet-stack-helper.h</in>
+          <in>internet-trace-helper.h</in>
+          <in>ip-l4-protocol.h</in>
+          <in>ipcs-classifier-record.h</in>
+          <in>ipcs-classifier.h</in>
+          <in>ipv4-address-generator.h</in>
+          <in>ipv4-address-helper.h</in>
+          <in>ipv4-address.h</in>
+          <in>ipv4-flow-classifier.h</in>
+          <in>ipv4-flow-probe.h</in>
+          <in>ipv4-global-routing-helper.h</in>
+          <in>ipv4-global-routing.h</in>
+          <in>ipv4-header.h</in>
+          <in>ipv4-interface-address.h</in>
+          <in>ipv4-interface-container.h</in>
+          <in>ipv4-interface.h</in>
+          <in>ipv4-l3-protocol.h</in>
+          <in>ipv4-list-routing-helper.h</in>
+          <in>ipv4-list-routing.h</in>
+          <in>ipv4-nix-vector-helper.h</in>
+          <in>ipv4-nix-vector-routing.h</in>
+          <in>ipv4-packet-filter.h</in>
+          <in>ipv4-packet-info-tag.h</in>
+          <in>ipv4-packet-probe.h</in>
+          <in>ipv4-queue-disc-item.h</in>
+          <in>ipv4-raw-socket-factory.h</in>
+          <in>ipv4-raw-socket-impl.h</in>
+          <in>ipv4-route.h</in>
+          <in>ipv4-routing-helper.h</in>
+          <in>ipv4-routing-protocol.h</in>
+          <in>ipv4-routing-table-entry.h</in>
+          <in>ipv4-static-routing-helper.h</in>
+          <in>ipv4-static-routing.h</in>
+          <in>ipv4.h</in>
+          <in>ipv6-address-generator.h</in>
+          <in>ipv6-address-helper.h</in>
+          <in>ipv6-address.h</in>
+          <in>ipv6-extension-demux.h</in>
+          <in>ipv6-extension-header.h</in>
+          <in>ipv6-extension.h</in>
+          <in>ipv6-flow-classifier.h</in>
+          <in>ipv6-flow-probe.h</in>
+          <in>ipv6-header.h</in>
+          <in>ipv6-interface-address.h</in>
+          <in>ipv6-interface-container.h</in>
+          <in>ipv6-interface.h</in>
+          <in>ipv6-l3-protocol.h</in>
+          <in>ipv6-list-routing-helper.h</in>
+          <in>ipv6-list-routing.h</in>
+          <in>ipv6-option-header.h</in>
+          <in>ipv6-packet-filter.h</in>
+          <in>ipv6-packet-info-tag.h</in>
+          <in>ipv6-packet-probe.h</in>
+          <in>ipv6-pmtu-cache.h</in>
+          <in>ipv6-queue-disc-item.h</in>
+          <in>ipv6-raw-socket-factory.h</in>
+          <in>ipv6-route.h</in>
+          <in>ipv6-routing-helper.h</in>
+          <in>ipv6-routing-protocol.h</in>
+          <in>ipv6-routing-table-entry.h</in>
+          <in>ipv6-static-routing-helper.h</in>
+          <in>ipv6-static-routing.h</in>
+          <in>ipv6.h</in>
+          <in>isotropic-antenna-model.h</in>
+          <in>itu-r-1238-propagation-loss-model.h</in>
+          <in>itu-r-1411-los-propagation-loss-model.h</in>
+          <in>itu-r-1411-nlos-over-rooftop-propagation-loss-model.h</in>
+          <in>jakes-process.h</in>
+          <in>jakes-propagation-loss-model.h</in>
+          <in>kun-2600-mhz-propagation-loss-model.h</in>
+          <in>li-ion-energy-source.h</in>
+          <in>list-scheduler.h</in>
+          <in>llc-snap-header.h</in>
+          <in>log-macros-disabled.h</in>
+          <in>log-macros-enabled.h</in>
+          <in>log.h</in>
+          <in>loopback-net-device.h</in>
+          <in>lr-wpan-csmaca.h</in>
+          <in>lr-wpan-error-model.h</in>
+          <in>lr-wpan-helper.h</in>
+          <in>lr-wpan-interference-helper.h</in>
+          <in>lr-wpan-lqi-tag.h</in>
+          <in>lr-wpan-mac-header.h</in>
+          <in>lr-wpan-mac-trailer.h</in>
+          <in>lr-wpan-mac.h</in>
+          <in>lr-wpan-module.h</in>
+          <in>lr-wpan-net-device.h</in>
+          <in>lr-wpan-phy.h</in>
+          <in>lr-wpan-spectrum-signal-parameters.h</in>
+          <in>lr-wpan-spectrum-value-helper.h</in>
+          <in>lte-amc.h</in>
+          <in>lte-anr-sap.h</in>
+          <in>lte-anr.h</in>
+          <in>lte-as-sap.h</in>
+          <in>lte-asn1-header.h</in>
+          <in>lte-chunk-processor.h</in>
+          <in>lte-common.h</in>
+          <in>lte-control-messages.h</in>
+          <in>lte-enb-cmac-sap.h</in>
+          <in>lte-enb-cphy-sap.h</in>
+          <in>lte-enb-mac.h</in>
+          <in>lte-enb-net-device.h</in>
+          <in>lte-enb-phy-sap.h</in>
+          <in>lte-enb-phy.h</in>
+          <in>lte-enb-rrc.h</in>
+          <in>lte-ffr-algorithm.h</in>
+          <in>lte-ffr-distributed-algorithm.h</in>
+          <in>lte-ffr-enhanced-algorithm.h</in>
+          <in>lte-ffr-rrc-sap.h</in>
+          <in>lte-ffr-sap.h</in>
+          <in>lte-ffr-soft-algorithm.h</in>
+          <in>lte-fr-hard-algorithm.h</in>
+          <in>lte-fr-no-op-algorithm.h</in>
+          <in>lte-fr-soft-algorithm.h</in>
+          <in>lte-fr-strict-algorithm.h</in>
+          <in>lte-global-pathloss-database.h</in>
+          <in>lte-handover-algorithm.h</in>
+          <in>lte-handover-management-sap.h</in>
+          <in>lte-harq-phy.h</in>
+          <in>lte-helper.h</in>
+          <in>lte-hex-grid-enb-topology-helper.h</in>
+          <in>lte-interference.h</in>
+          <in>lte-mac-sap.h</in>
+          <in>lte-mi-error-model.h</in>
+          <in>lte-module.h</in>
+          <in>lte-net-device.h</in>
+          <in>lte-pdcp-header.h</in>
+          <in>lte-pdcp-sap.h</in>
+          <in>lte-pdcp-tag.h</in>
+          <in>lte-pdcp.h</in>
+          <in>lte-phy-tag.h</in>
+          <in>lte-phy.h</in>
+          <in>lte-radio-bearer-info.h</in>
+          <in>lte-radio-bearer-tag.h</in>
+          <in>lte-rlc-am-header.h</in>
+          <in>lte-rlc-am.h</in>
+          <in>lte-rlc-header.h</in>
+          <in>lte-rlc-sap.h</in>
+          <in>lte-rlc-sdu-status-tag.h</in>
+          <in>lte-rlc-sequence-number.h</in>
+          <in>lte-rlc-tag.h</in>
+          <in>lte-rlc-tm.h</in>
+          <in>lte-rlc-um.h</in>
+          <in>lte-rlc.h</in>
+          <in>lte-rrc-header.h</in>
+          <in>lte-rrc-protocol-ideal.h</in>
+          <in>lte-rrc-protocol-real.h</in>
+          <in>lte-rrc-sap.h</in>
+          <in>lte-spectrum-phy.h</in>
+          <in>lte-spectrum-signal-parameters.h</in>
+          <in>lte-spectrum-value-helper.h</in>
+          <in>lte-stats-calculator.h</in>
+          <in>lte-ue-cmac-sap.h</in>
+          <in>lte-ue-cphy-sap.h</in>
+          <in>lte-ue-mac.h</in>
+          <in>lte-ue-net-device.h</in>
+          <in>lte-ue-phy-sap.h</in>
+          <in>lte-ue-phy.h</in>
+          <in>lte-ue-power-control.h</in>
+          <in>lte-ue-rrc.h</in>
+          <in>lte-vendor-specific-parameters.h</in>
+          <in>mac-low.h</in>
+          <in>mac-messages.h</in>
+          <in>mac-rx-middle.h</in>
+          <in>mac-stats-calculator.h</in>
+          <in>mac16-address.h</in>
+          <in>mac48-address.h</in>
+          <in>mac64-address.h</in>
+          <in>make-event.h</in>
+          <in>map-scheduler.h</in>
+          <in>math.h</in>
+          <in>mesh-helper.h</in>
+          <in>mesh-information-element-vector.h</in>
+          <in>mesh-information-element.h</in>
+          <in>mesh-l2-routing-protocol.h</in>
+          <in>mesh-module.h</in>
+          <in>mesh-point-device.h</in>
+          <in>mesh-stack-installer.h</in>
+          <in>mesh-wifi-beacon.h</in>
+          <in>mesh-wifi-interface-mac-plugin.h</in>
+          <in>mesh-wifi-interface-mac.h</in>
+          <in>mgt-headers.h</in>
+          <in>microwave-oven-spectrum-value-helper.h</in>
+          <in>minstrel-wifi-manager.h</in>
+          <in>mobility-building-info.h</in>
+          <in>mobility-helper.h</in>
+          <in>mobility-model.h</in>
+          <in>mobility-module.h</in>
+          <in>mpdu-aggregator.h</in>
+          <in>mpdu-standard-aggregator.h</in>
+          <in>mpi-interface.h</in>
+          <in>mpi-module.h</in>
+          <in>mpi-receiver.h</in>
+          <in>msdu-aggregator.h</in>
+          <in>multi-model-spectrum-channel.h</in>
+          <in>names.h</in>
+          <in>ndisc-cache.h</in>
+          <in>net-device-container.h</in>
+          <in>net-device.h</in>
+          <in>netanim-module.h</in>
+          <in>network-module.h</in>
+          <in>nist-error-rate-model.h</in>
+          <in>nix-vector-routing-module.h</in>
+          <in>nix-vector.h</in>
+          <in>no-op-handover-algorithm.h</in>
+          <in>node-container.h</in>
+          <in>node-list.h</in>
+          <in>node.h</in>
+          <in>non-communicating-net-device.h</in>
+          <in>non-copyable.h</in>
+          <in>nqos-wifi-mac-helper.h</in>
+          <in>ns2-mobility-helper.h</in>
+          <in>nstime.h</in>
+          <in>object-base.h</in>
+          <in>object-factory.h</in>
+          <in>object-map.h</in>
+          <in>object-ptr-container.h</in>
+          <in>object-vector.h</in>
+          <in>object.h</in>
+          <in>ocb-wifi-mac.h</in>
+          <in>ofdm-downlink-frame-prefix.h</in>
+          <in>oh-buildings-propagation-loss-model.h</in>
+          <in>okumura-hata-propagation-loss-model.h</in>
+          <in>olsr-header.h</in>
+          <in>olsr-helper.h</in>
+          <in>olsr-module.h</in>
+          <in>olsr-repositories.h</in>
+          <in>olsr-routing-protocol.h</in>
+          <in>olsr-state.h</in>
+          <in>omnet-data-output.h</in>
+          <in>on-off-helper.h</in>
+          <in>onoe-wifi-manager.h</in>
+          <in>onoff-application.h</in>
+          <in>orbis-topology-reader.h</in>
+          <in>originator-block-ack-agreement.h</in>
+          <in>output-stream-wrapper.h</in>
+          <in>packet-burst.h</in>
+          <in>packet-data-calculators.h</in>
+          <in>packet-filter.h</in>
+          <in>packet-loss-counter.h</in>
+          <in>packet-metadata.h</in>
+          <in>packet-probe.h</in>
+          <in>packet-sink-helper.h</in>
+          <in>packet-sink.h</in>
+          <in>packet-socket-address.h</in>
+          <in>packet-socket-client.h</in>
+          <in>packet-socket-factory.h</in>
+          <in>packet-socket-helper.h</in>
+          <in>packet-socket-server.h</in>
+          <in>packet-socket.h</in>
+          <in>packet-tag-list.h</in>
+          <in>packet.h</in>
+          <in>packetbb.h</in>
+          <in>parabolic-antenna-model.h</in>
+          <in>parallel-communication-interface.h</in>
+          <in>parf-wifi-manager.h</in>
+          <in>pcap-file-wrapper.h</in>
+          <in>pcap-file.h</in>
+          <in>pcap-test.h</in>
+          <in>peer-link-frame.h</in>
+          <in>peer-link.h</in>
+          <in>peer-management-protocol.h</in>
+          <in>pf-ff-mac-scheduler.h</in>
+          <in>pfifo-fast-queue-disc.h</in>
+          <in>phy-rx-stats-calculator.h</in>
+          <in>phy-stats-calculator.h</in>
+          <in>phy-tx-stats-calculator.h</in>
+          <in>ping6-helper.h</in>
+          <in>ping6.h</in>
+          <in>point-to-point-channel.h</in>
+          <in>point-to-point-dumbbell.h</in>
+          <in>point-to-point-epc-helper.h</in>
+          <in>point-to-point-grid.h</in>
+          <in>point-to-point-helper.h</in>
+          <in>point-to-point-layout-module.h</in>
+          <in>point-to-point-module.h</in>
+          <in>point-to-point-net-device.h</in>
+          <in>point-to-point-remote-channel.h</in>
+          <in>point-to-point-star.h</in>
+          <in>pointer.h</in>
+          <in>position-allocator.h</in>
+          <in>ppp-header.h</in>
+          <in>probe.h</in>
+          <in>propagation-cache.h</in>
+          <in>propagation-delay-model.h</in>
+          <in>propagation-environment.h</in>
+          <in>propagation-loss-model.h</in>
+          <in>propagation-module.h</in>
+          <in>pss-ff-mac-scheduler.h</in>
+          <in>ptr.h</in>
+          <in>qos-tag.h</in>
+          <in>qos-utils.h</in>
+          <in>qos-wifi-mac-helper.h</in>
+          <in>queue-disc-container.h</in>
+          <in>queue-disc.h</in>
+          <in>queue.h</in>
+          <in>radio-bearer-stats-calculator.h</in>
+          <in>radio-bearer-stats-connector.h</in>
+          <in>radio-environment-map-helper.h</in>
+          <in>radiotap-header.h</in>
+          <in>radvd-helper.h</in>
+          <in>radvd-interface.h</in>
+          <in>radvd-prefix.h</in>
+          <in>radvd.h</in>
+          <in>random-direction-2d-mobility-model.h</in>
+          <in>random-variable-stream-helper.h</in>
+          <in>random-variable-stream.h</in>
+          <in>random-walk-2d-mobility-model.h</in>
+          <in>random-waypoint-mobility-model.h</in>
+          <in>realtime-simulator-impl.h</in>
+          <in>rectangle.h</in>
+          <in>red-queue-disc.h</in>
+          <in>ref-count-base.h</in>
+          <in>regular-wifi-mac.h</in>
+          <in>rem-spectrum-phy.h</in>
+          <in>rip-header.h</in>
+          <in>rip-helper.h</in>
+          <in>rip.h</in>
+          <in>ripng-header.h</in>
+          <in>ripng-helper.h</in>
+          <in>ripng.h</in>
+          <in>rng-seed-manager.h</in>
+          <in>rng-stream.h</in>
+          <in>rocketfuel-topology-reader.h</in>
+          <in>rps.h</in>
+          <in>rr-ff-mac-scheduler.h</in>
+          <in>rraa-wifi-manager.h</in>
+          <in>rtt-estimator.h</in>
+          <in>rv-battery-model-helper.h</in>
+          <in>rv-battery-model.h</in>
+          <in>s1g-beacon-compatibility.h</in>
+          <in>s1g-capabilities.h</in>
+          <in>s1g-raw-control.h</in>
+          <in>s1g-wifi-mac-helper.h</in>
+          <in>scheduler.h</in>
+          <in>send-params.h</in>
+          <in>seq-ts-header.h</in>
+          <in>sequence-number.h</in>
+          <in>service-flow-manager.h</in>
+          <in>service-flow-record.h</in>
+          <in>service-flow.h</in>
+          <in>sgi-hashmap.h</in>
+          <in>simple-channel.h</in>
+          <in>simple-device-energy-model.h</in>
+          <in>simple-net-device-helper.h</in>
+          <in>simple-net-device.h</in>
+          <in>simple-ofdm-send-param.h</in>
+          <in>simple-ofdm-wimax-channel.h</in>
+          <in>simple-ofdm-wimax-phy.h</in>
+          <in>simple-ref-count.h</in>
+          <in>simulation-singleton.h</in>
+          <in>simulator-impl.h</in>
+          <in>simulator.h</in>
+          <in>single-model-spectrum-channel.h</in>
+          <in>singleton.h</in>
+          <in>sixlowpan-header.h</in>
+          <in>sixlowpan-helper.h</in>
+          <in>sixlowpan-module.h</in>
+          <in>sixlowpan-net-device.h</in>
+          <in>sll-header.h</in>
+          <in>snr-tag.h</in>
+          <in>snr-to-block-error-rate-manager.h</in>
+          <in>snr-to-block-error-rate-record.h</in>
+          <in>socket-factory.h</in>
+          <in>socket.h</in>
+          <in>spectrum-analyzer-helper.h</in>
+          <in>spectrum-analyzer.h</in>
+          <in>spectrum-channel.h</in>
+          <in>spectrum-converter.h</in>
+          <in>spectrum-error-model.h</in>
+          <in>spectrum-helper.h</in>
+          <in>spectrum-interference.h</in>
+          <in>spectrum-model-300kHz-300GHz-log.h</in>
+          <in>spectrum-model-ism2400MHz-res1MHz.h</in>
+          <in>spectrum-model.h</in>
+          <in>spectrum-module.h</in>
+          <in>spectrum-phy.h</in>
+          <in>spectrum-propagation-loss-model.h</in>
+          <in>spectrum-signal-parameters.h</in>
+          <in>spectrum-test.h</in>
+          <in>spectrum-value.h</in>
+          <in>ss-manager.h</in>
+          <in>ss-net-device.h</in>
+          <in>ss-record.h</in>
+          <in>ss-service-flow-manager.h</in>
+          <in>ssid.h</in>
+          <in>sta-wifi-mac.h</in>
+          <in>stats-module.h</in>
+          <in>status-code.h</in>
+          <in>steady-state-random-waypoint-mobility-model.h</in>
+          <in>string.h</in>
+          <in>supported-rates.h</in>
+          <in>synchronizer.h</in>
+          <in>system-condition.h</in>
+          <in>system-mutex.h</in>
+          <in>system-path.h</in>
+          <in>system-thread.h</in>
+          <in>system-wall-clock-ms.h</in>
+          <in>tag-buffer.h</in>
+          <in>tag.h</in>
+          <in>tap-bridge-helper.h</in>
+          <in>tap-bridge-module.h</in>
+          <in>tap-bridge.h</in>
+          <in>tap-fd-net-device-helper.h</in>
+          <in>tap.h</in>
+          <in>tcp-client.h</in>
+          <in>tcp-congestion-ops.h</in>
+          <in>tcp-echo-client.h</in>
+          <in>tcp-echo-helper.h</in>
+          <in>tcp-echo-server.h</in>
+          <in>tcp-header.h</in>
+          <in>tcp-highspeed.h</in>
+          <in>tcp-hybla.h</in>
+          <in>tcp-l4-protocol.h</in>
+          <in>tcp-option.h</in>
+          <in>tcp-rx-buffer.h</in>
+          <in>tcp-server.h</in>
+          <in>tcp-socket-base.h</in>
+          <in>tcp-socket-factory.h</in>
+          <in>tcp-socket.h</in>
+          <in>tcp-tx-buffer.h</in>
+          <in>tcp-westwood.h</in>
+          <in>tdbet-ff-mac-scheduler.h</in>
+          <in>tdmt-ff-mac-scheduler.h</in>
+          <in>tdtbfq-ff-mac-scheduler.h</in>
+          <in>test.h</in>
+          <in>tim.h</in>
+          <in>time-data-calculators.h</in>
+          <in>time-probe.h</in>
+          <in>time-series-adaptor.h</in>
+          <in>timer-impl.h</in>
+          <in>timer.h</in>
+          <in>topology-read-module.h</in>
+          <in>topology-reader-helper.h</in>
+          <in>topology-reader.h</in>
+          <in>trace-fading-loss-model.h</in>
+          <in>trace-helper.h</in>
+          <in>trace-source-accessor.h</in>
+          <in>traced-callback.h</in>
+          <in>traced-value.h</in>
+          <in>traffic-control-helper.h</in>
+          <in>traffic-control-layer.h</in>
+          <in>traffic-control-module.h</in>
+          <in>trailer.h</in>
+          <in>tta-ff-mac-scheduler.h</in>
+          <in>tv-spectrum-transmitter-helper.h</in>
+          <in>tv-spectrum-transmitter.h</in>
+          <in>type-id.h</in>
+          <in>type-name.h</in>
+          <in>type-traits.h</in>
+          <in>uan-address.h</in>
+          <in>uan-channel.h</in>
+          <in>uan-header-common.h</in>
+          <in>uan-header-rc.h</in>
+          <in>uan-helper.h</in>
+          <in>uan-mac-aloha.h</in>
+          <in>uan-mac-cw.h</in>
+          <in>uan-mac-rc-gw.h</in>
+          <in>uan-mac-rc.h</in>
+          <in>uan-mac.h</in>
+          <in>uan-module.h</in>
+          <in>uan-net-device.h</in>
+          <in>uan-noise-model-default.h</in>
+          <in>uan-noise-model.h</in>
+          <in>uan-phy-dual.h</in>
+          <in>uan-phy-gen.h</in>
+          <in>uan-phy.h</in>
+          <in>uan-prop-model-ideal.h</in>
+          <in>uan-prop-model-thorp.h</in>
+          <in>uan-prop-model.h</in>
+          <in>uan-transducer-hd.h</in>
+          <in>uan-transducer.h</in>
+          <in>uan-tx-mode.h</in>
+          <in>udp-client-server-helper.h</in>
+          <in>udp-client.h</in>
+          <in>udp-echo-client.h</in>
+          <in>udp-echo-helper.h</in>
+          <in>udp-echo-server.h</in>
+          <in>udp-header.h</in>
+          <in>udp-l4-protocol.h</in>
+          <in>udp-server.h</in>
+          <in>udp-socket-factory.h</in>
+          <in>udp-socket.h</in>
+          <in>udp-trace-client.h</in>
+          <in>uinteger-16-probe.h</in>
+          <in>uinteger-32-probe.h</in>
+          <in>uinteger-8-probe.h</in>
+          <in>uinteger.h</in>
+          <in>ul-job.h</in>
+          <in>ul-mac-messages.h</in>
+          <in>unix-fd-reader.h</in>
+          <in>unused.h</in>
+          <in>v4ping-helper.h</in>
+          <in>v4ping.h</in>
+          <in>valgrind.h</in>
+          <in>vector.h</in>
+          <in>vendor-specific-action.h</in>
+          <in>virtual-net-device-module.h</in>
+          <in>virtual-net-device.h</in>
+          <in>vsa-manager.h</in>
+          <in>wall-clock-synchronizer.h</in>
+          <in>watchdog.h</in>
+          <in>wave-bsm-helper.h</in>
+          <in>wave-bsm-stats.h</in>
+          <in>wave-helper.h</in>
+          <in>wave-mac-helper.h</in>
+          <in>wave-mac-low.h</in>
+          <in>wave-module.h</in>
+          <in>wave-net-device.h</in>
+          <in>waveform-generator-helper.h</in>
+          <in>waveform-generator.h</in>
+          <in>waypoint-mobility-model.h</in>
+          <in>waypoint.h</in>
+          <in>wifi-80211p-helper.h</in>
+          <in>wifi-channel.h</in>
+          <in>wifi-helper.h</in>
+          <in>wifi-information-element-vector.h</in>
+          <in>wifi-information-element.h</in>
+          <in>wifi-mac-header.h</in>
+          <in>wifi-mac-queue.h</in>
+          <in>wifi-mac-trailer.h</in>
+          <in>wifi-mac.h</in>
+          <in>wifi-mode.h</in>
+          <in>wifi-module.h</in>
+          <in>wifi-net-device.h</in>
+          <in>wifi-phy-standard.h</in>
+          <in>wifi-phy-state-helper.h</in>
+          <in>wifi-phy.h</in>
+          <in>wifi-preamble.h</in>
+          <in>wifi-radio-energy-model-helper.h</in>
+          <in>wifi-radio-energy-model.h</in>
+          <in>wifi-remote-station-manager.h</in>
+          <in>wifi-spectrum-value-helper.h</in>
+          <in>wifi-tx-current-model.h</in>
+          <in>wifi-tx-vector.h</in>
+          <in>wimax-channel.h</in>
+          <in>wimax-connection.h</in>
+          <in>wimax-helper.h</in>
+          <in>wimax-mac-header.h</in>
+          <in>wimax-mac-queue.h</in>
+          <in>wimax-mac-to-mac-header.h</in>
+          <in>wimax-module.h</in>
+          <in>wimax-net-device.h</in>
+          <in>wimax-phy.h</in>
+          <in>wimax-tlv.h</in>
+          <in>yans-error-rate-model.h</in>
+          <in>yans-wifi-channel.h</in>
+          <in>yans-wifi-helper.h</in>
+          <in>yans-wifi-phy.h</in>
+        </df>
+        <df name="scratch">
+          <df name="subdir">
+          </df>
+          <df name="tcpfiles">
+          </df>
+        </df>
+        <df name="src">
+          <df name="antenna">
+            <df name="model">
+            </df>
+          </df>
+          <df name="aodv">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="applications">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="bridge">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="buildings">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="config-store">
+            <df name="model">
+            </df>
+          </df>
+          <df name="core">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="csma">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="csma-layout">
+            <df name="model">
+            </df>
+          </df>
+          <df name="dsdv">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="dsr">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="energy">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="fd-net-device">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="flow-monitor">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="internet">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="lr-wpan">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="lte">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="mesh">
+            <df name="helper">
+              <df name="dot11s">
+              </df>
+              <df name="flame">
+              </df>
+            </df>
+            <df name="model">
+              <df name="dot11s">
+              </df>
+              <df name="flame">
+              </df>
+            </df>
+          </df>
+          <df name="mobility">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="mpi">
+            <df name="model">
+            </df>
+          </df>
+          <df name="netanim">
+            <df name="model">
+            </df>
+          </df>
+          <df name="network">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+            <df name="utils">
+            </df>
+          </df>
+          <df name="nix-vector-routing">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="olsr">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="point-to-point">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="point-to-point-layout">
+            <df name="model">
+            </df>
+          </df>
+          <df name="propagation">
+            <df name="model">
+            </df>
+          </df>
+          <df name="sixlowpan">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="spectrum">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="stats">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="tap-bridge">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="test">
+          </df>
+          <df name="topology-read">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="traffic-control">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="uan">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="virtual-net-device">
+            <df name="model">
+            </df>
+          </df>
+          <df name="wave">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="wifi">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+          <df name="wimax">
+            <df name="helper">
+            </df>
+            <df name="model">
+            </df>
+          </df>
+        </df>
+        <df name="utils">
+        </df>
+      </df>
+      <df name="doc">
+        <df name="manual">
+          <df name="figures">
+          </df>
+          <df name="source">
+            <df name="_static">
+            </df>
+            <df name="figures">
+            </df>
+          </df>
+        </df>
+        <df name="models">
+          <df name="figures">
+          </df>
+          <df name="source">
+            <df name="_static">
+            </df>
+          </df>
+        </df>
+        <df name="ns3_html_theme">
+          <df name="static">
+          </df>
+        </df>
+        <df name="tutorial">
+          <df name="figures">
+          </df>
+          <df name="source">
+            <df name="_static">
+            </df>
+            <df name="figures">
+            </df>
+          </df>
+        </df>
+        <df name="tutorial-pt-br">
+          <df name="figures">
+          </df>
+          <df name="locale">
+            <df name="language">
+              <df name="LC_MESSAGES">
+              </df>
+            </df>
+          </df>
+          <df name="source">
+            <df name="_static">
+            </df>
+          </df>
+        </df>
+        <in>main.h</in>
+      </df>
+      <df name="examples">
+        <df name="energy">
+          <in>energy-model-example.cc</in>
+          <in>energy-model-with-harvesting-example.cc</in>
+        </df>
+        <df name="error-model">
+          <in>simple-error-model.cc</in>
+        </df>
+        <df name="ipv6">
+          <in>fragmentation-ipv6-two-MTU.cc</in>
+          <in>fragmentation-ipv6.cc</in>
+          <in>icmpv6-redirect.cc</in>
+          <in>loose-routing-ipv6.cc</in>
+          <in>ping6.cc</in>
+          <in>radvd-two-prefix.cc</in>
+          <in>radvd.cc</in>
+          <in>test-ipv6.cc</in>
+          <in>wsn-ping6.cc</in>
+        </df>
+        <df name="matrix-topology">
+          <in>matrix-topology.cc</in>
+        </df>
+        <df name="naming">
+          <in>object-names.cc</in>
+        </df>
+        <df name="realtime">
+          <in>realtime-udp-echo.cc</in>
+        </df>
+        <df name="routing">
+          <in>dynamic-global-routing.cc</in>
+          <in>global-injection-slash32.cc</in>
+          <in>global-routing-slash32.cc</in>
+          <in>manet-routing-compare.cc</in>
+          <in>mixed-global-routing.cc</in>
+          <in>ripng-simple-network.cc</in>
+          <in>simple-alternate-routing.cc</in>
+          <in>simple-global-routing.cc</in>
+          <in>simple-routing-ping6.cc</in>
+          <in>static-routing-slash32.cc</in>
+        </df>
+        <df name="socket">
+          <in>socket-bound-static-routing.cc</in>
+          <in>socket-bound-tcp-static-routing.cc</in>
+          <in>socket-options-ipv4.cc</in>
+          <in>socket-options-ipv6.cc</in>
+        </df>
+        <df name="stats">
+          <in>wifi-example-apps.cc</in>
+          <in>wifi-example-apps.h</in>
+          <in>wifi-example-sim.cc</in>
+        </df>
+        <df name="tcp">
+          <in>star.cc</in>
+          <in>tcp-bulk-send.cc</in>
+          <in>tcp-large-transfer.cc</in>
+          <in>tcp-nsc-comparison.cc</in>
+          <in>tcp-nsc-lfn.cc</in>
+          <in>tcp-nsc-zoo.cc</in>
+          <in>tcp-star-server.cc</in>
+          <in>tcp-variants-comparison.cc</in>
+        </df>
+        <df name="tutorial">
+          <in>fifth.cc</in>
+          <in>first.cc</in>
+          <in>fourth.cc</in>
+          <in>hello-simulator.cc</in>
+          <in>second.cc</in>
+          <in>seventh.cc</in>
+          <in>sixth.cc</in>
+          <in>third.cc</in>
+        </df>
+        <df name="udp">
+          <in>udp-echo.cc</in>
+        </df>
+        <df name="udp-client-server">
+          <in>udp-client-server.cc</in>
+          <in>udp-trace-client-server.cc</in>
+        </df>
+        <df name="wireless">
+          <in>ht-wifi-network.cc</in>
+          <in>mixed-wireless.cc</in>
+          <in>multirate.cc</in>
+          <in>ofdm-ht-validation.cc</in>
+          <in>ofdm-validation.cc</in>
+          <in>power-adaptation-distance.cc</in>
+          <in>power-adaptation-interference.cc</in>
+          <in>rate-adaptation-distance.cc</in>
+          <in>simple-ht-hidden-stations.cc</in>
+          <in>simple-mpdu-aggregation.cc</in>
+          <in>simple-msdu-aggregation.cc</in>
+          <in>simple-two-level-aggregation.cc</in>
+          <in>wifi-adhoc.cc</in>
+          <in>wifi-ap.cc</in>
+          <in>wifi-blockack.cc</in>
+          <in>wifi-clear-channel-cmu.cc</in>
+          <in>wifi-hidden-terminal.cc</in>
+          <in>wifi-simple-adhoc-grid.cc</in>
+          <in>wifi-simple-adhoc.cc</in>
+          <in>wifi-simple-infra.cc</in>
+          <in>wifi-simple-interference.cc</in>
+          <in>wifi-sleep.cc</in>
+          <in>wifi-timing-attributes.cc</in>
+          <in>wifi-wired-bridging.cc</in>
+        </df>
+      </df>
+      <df name="OptimalRawGroup">
+        <df name="datarate-7.8">
+          <df name="traffic-0.82">
+            <df name="numGroup-2">
+              <df name="numSlot-2">
+                <df name="simResult-32-seed1">
+                </df>
+              </df>
+            </df>
+          </df>
+        </df>
+        <df name="traffic">
+        </df>
+      </df>
+      <df name="scratch">
+        <df name="subdir">
+          <in>scratch-simulator-subdir.cc</in>
+        </df>
+        <df name="tcpfiles">
+          <in>Configuration.cc</in>
+          <in>Configuration.h</in>
+          <in>NodeEntry.cc</in>
+          <in>NodeEntry.h</in>
+          <in>NodeStatistics.cc</in>
+          <in>NodeStatistics.h</in>
+          <in>SimpleTCPClient.cc</in>
+          <in>SimpleTCPClient.h</in>
+          <in>SimulationEventManager.cc</in>
+          <in>SimulationEventManager.h</in>
+          <in>Statistics.cc</in>
+          <in>Statistics.h</in>
+          <in>TCPFirmwareClient.cc</in>
+          <in>TCPFirmwareClient.h</in>
+          <in>TCPFirmwareServer.cc</in>
+          <in>TCPFirmwareServer.h</in>
+          <in>TCPIPCameraClient.cc</in>
+          <in>TCPIPCameraClient.h</in>
+          <in>TCPIPCameraServer.cc</in>
+          <in>TCPIPCameraServer.h</in>
+          <in>TCPPingPongClient.cc</in>
+          <in>TCPPingPongClient.h</in>
+          <in>TCPPingPongServer.cc</in>
+          <in>TCPPingPongServer.h</in>
+          <in>TCPSensorClient.cc</in>
+          <in>TCPSensorClient.h</in>
+          <in>TCPSensorServer.cc</in>
+          <in>TCPSensorServer.h</in>
+          <in>s1g-mac-test.cc</in>
+          <in>s1g-mac-test.h</in>
+        </df>
+        <in>RAW-optimal-algorithm-notraffic.cc</in>
+        <in>s1g-mac-test.cc</in>
+        <in>scratch-simulator.cc</in>
+      </df>
+      <df name="src">
+        <df name="antenna">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <df name="source">
+              <df name="figures">
+              </df>
+            </df>
+          </df>
+          <df name="model">
+            <in>angles.cc</in>
+            <in>angles.h</in>
+            <in>antenna-model.cc</in>
+            <in>antenna-model.h</in>
+            <in>cosine-antenna-model.cc</in>
+            <in>cosine-antenna-model.h</in>
+            <in>isotropic-antenna-model.cc</in>
+            <in>isotropic-antenna-model.h</in>
+            <in>parabolic-antenna-model.cc</in>
+            <in>parabolic-antenna-model.h</in>
+          </df>
+          <df name="test">
+            <in>test-angles.cc</in>
+            <in>test-cosine-antenna.cc</in>
+            <in>test-degrees-radians.cc</in>
+            <in>test-isotropic-antenna.cc</in>
+            <in>test-parabolic-antenna.cc</in>
+          </df>
+        </df>
+        <df name="aodv">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>aodv.h</in>
+          </df>
+          <df name="examples">
+            <in>aodv.cc</in>
+          </df>
+          <df name="helper">
+            <in>aodv-helper.cc</in>
+            <in>aodv-helper.h</in>
+          </df>
+          <df name="model">
+            <in>aodv-dpd.cc</in>
+            <in>aodv-dpd.h</in>
+            <in>aodv-id-cache.cc</in>
+            <in>aodv-id-cache.h</in>
+            <in>aodv-neighbor.cc</in>
+            <in>aodv-neighbor.h</in>
+            <in>aodv-packet.cc</in>
+            <in>aodv-packet.h</in>
+            <in>aodv-routing-protocol.cc</in>
+            <in>aodv-routing-protocol.h</in>
+            <in>aodv-rqueue.cc</in>
+            <in>aodv-rqueue.h</in>
+            <in>aodv-rtable.cc</in>
+            <in>aodv-rtable.h</in>
+          </df>
+          <df name="test">
+            <in>aodv-id-cache-test-suite.cc</in>
+            <in>aodv-regression.cc</in>
+            <in>aodv-regression.h</in>
+            <in>aodv-test-suite.cc</in>
+            <in>bug-772.cc</in>
+            <in>bug-772.h</in>
+            <in>loopback.cc</in>
+            <in>loopback.h</in>
+          </df>
+        </df>
+        <df name="applications">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+            <in>applications.h</in>
+          </df>
+          <df name="helper">
+            <in>bulk-send-helper.cc</in>
+            <in>bulk-send-helper.h</in>
+            <in>on-off-helper.cc</in>
+            <in>on-off-helper.h</in>
+            <in>packet-sink-helper.cc</in>
+            <in>packet-sink-helper.h</in>
+            <in>ping6-helper.cc</in>
+            <in>ping6-helper.h</in>
+            <in>radvd-helper.cc</in>
+            <in>radvd-helper.h</in>
+            <in>tcp-echo-helper.cc</in>
+            <in>tcp-echo-helper.h</in>
+            <in>udp-client-server-helper.cc</in>
+            <in>udp-client-server-helper.h</in>
+            <in>udp-echo-helper.cc</in>
+            <in>udp-echo-helper.h</in>
+            <in>v4ping-helper.cc</in>
+            <in>v4ping-helper.h</in>
+          </df>
+          <df name="model">
+            <in>application-packet-probe.cc</in>
+            <in>application-packet-probe.h</in>
+            <in>bulk-send-application.cc</in>
+            <in>bulk-send-application.h</in>
+            <in>onoff-application.cc</in>
+            <in>onoff-application.h</in>
+            <in>packet-loss-counter.cc</in>
+            <in>packet-loss-counter.h</in>
+            <in>packet-sink.cc</in>
+            <in>packet-sink.h</in>
+            <in>ping6.cc</in>
+            <in>ping6.h</in>
+            <in>radvd-interface.cc</in>
+            <in>radvd-interface.h</in>
+            <in>radvd-prefix.cc</in>
+            <in>radvd-prefix.h</in>
+            <in>radvd.cc</in>
+            <in>radvd.h</in>
+            <in>seq-ts-header.cc</in>
+            <in>seq-ts-header.h</in>
+            <in>tcp-client.cc</in>
+            <in>tcp-client.h</in>
+            <in>tcp-echo-client.cc</in>
+            <in>tcp-echo-client.h</in>
+            <in>tcp-echo-server.cc</in>
+            <in>tcp-echo-server.h</in>
+            <in>tcp-server.cc</in>
+            <in>tcp-server.h</in>
+            <in>udp-client.cc</in>
+            <in>udp-client.h</in>
+            <in>udp-echo-client.cc</in>
+            <in>udp-echo-client.h</in>
+            <in>udp-echo-server.cc</in>
+            <in>udp-echo-server.h</in>
+            <in>udp-server.cc</in>
+            <in>udp-server.h</in>
+            <in>udp-trace-client.cc</in>
+            <in>udp-trace-client.h</in>
+            <in>v4ping.cc</in>
+            <in>v4ping.h</in>
+          </df>
+          <df name="test">
+            <in>udp-client-server-test.cc</in>
+          </df>
+        </df>
+        <df name="bridge">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>csma-bridge-one-hop.cc</in>
+            <in>csma-bridge.cc</in>
+          </df>
+          <df name="helper">
+            <in>bridge-helper.cc</in>
+            <in>bridge-helper.h</in>
+          </df>
+          <df name="model">
+            <in>bridge-channel.cc</in>
+            <in>bridge-channel.h</in>
+            <in>bridge-net-device.cc</in>
+            <in>bridge-net-device.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="brite">
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <df name="conf_files">
+            </df>
+            <in>brite-MPI-example.cc</in>
+            <in>brite-generic-example.cc</in>
+          </df>
+          <df name="helper">
+            <in>brite-topology-helper.cc</in>
+            <in>brite-topology-helper.h</in>
+          </df>
+          <df name="test">
+            <in>brite-test-topology.cc</in>
+          </df>
+        </df>
+        <df name="buildings">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <df name="source">
+            </df>
+          </df>
+          <df name="examples">
+            <in>buildings-pathloss-profiler.cc</in>
+          </df>
+          <df name="helper">
+            <in>building-allocator.cc</in>
+            <in>building-allocator.h</in>
+            <in>building-container.cc</in>
+            <in>building-container.h</in>
+            <in>building-position-allocator.cc</in>
+            <in>building-position-allocator.h</in>
+            <in>buildings-helper.cc</in>
+            <in>buildings-helper.h</in>
+          </df>
+          <df name="model">
+            <in>building-list.cc</in>
+            <in>building-list.h</in>
+            <in>building.cc</in>
+            <in>building.h</in>
+            <in>buildings-propagation-loss-model.cc</in>
+            <in>buildings-propagation-loss-model.h</in>
+            <in>hybrid-buildings-propagation-loss-model.cc</in>
+            <in>hybrid-buildings-propagation-loss-model.h</in>
+            <in>itu-r-1238-propagation-loss-model.cc</in>
+            <in>itu-r-1238-propagation-loss-model.h</in>
+            <in>mobility-building-info.cc</in>
+            <in>mobility-building-info.h</in>
+            <in>oh-buildings-propagation-loss-model.cc</in>
+            <in>oh-buildings-propagation-loss-model.h</in>
+          </df>
+          <df name="test">
+            <df name="reference">
+              <in>buildings_pathloss.m</in>
+              <in>loss_ITU1238.m</in>
+            </df>
+            <in>building-position-allocator-test.cc</in>
+            <in>buildings-helper-test.cc</in>
+            <in>buildings-pathloss-test.cc</in>
+            <in>buildings-pathloss-test.h</in>
+            <in>buildings-shadowing-test.cc</in>
+            <in>buildings-shadowing-test.h</in>
+          </df>
+        </df>
+        <df name="click">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>nsclick-defines.cc</in>
+            <in>nsclick-raw-wlan.cc</in>
+            <in>nsclick-routing.cc</in>
+            <in>nsclick-simple-lan.cc</in>
+            <in>nsclick-udp-client-server-csma.cc</in>
+            <in>nsclick-udp-client-server-wifi.cc</in>
+          </df>
+          <df name="helper">
+            <in>click-internet-stack-helper.cc</in>
+            <in>click-internet-stack-helper.h</in>
+          </df>
+          <df name="model">
+            <in>ipv4-click-routing.cc</in>
+            <in>ipv4-click-routing.h</in>
+            <in>ipv4-l3-click-protocol.cc</in>
+            <in>ipv4-l3-click-protocol.h</in>
+          </df>
+          <df name="test">
+            <in>ipv4-click-routing-test.cc</in>
+          </df>
+        </df>
+        <df name="config-store">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>config-store-save.cc</in>
+          </df>
+          <df name="model">
+            <in>attribute-default-iterator.cc</in>
+            <in>attribute-default-iterator.h</in>
+            <in>attribute-iterator.cc</in>
+            <in>attribute-iterator.h</in>
+            <in>config-store.cc</in>
+            <in>config-store.h</in>
+            <in>display-functions.cc</in>
+            <in>display-functions.h</in>
+            <in>file-config.cc</in>
+            <in>file-config.h</in>
+            <in>gtk-config-store.cc</in>
+            <in>gtk-config-store.h</in>
+            <in>model-node-creator.cc</in>
+            <in>model-node-creator.h</in>
+            <in>model-typeid-creator.cc</in>
+            <in>model-typeid-creator.h</in>
+            <in>raw-text-config.cc</in>
+            <in>raw-text-config.h</in>
+            <in>xml-config.cc</in>
+            <in>xml-config.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="core">
+          <df name="bindings">
+            <in>module_helpers.cc</in>
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+            <in>deprecated-example.h</in>
+          </df>
+          <df name="examples">
+            <in>command-line-example.cc</in>
+            <in>hash-example.cc</in>
+            <in>main-callback.cc</in>
+            <in>main-ptr.cc</in>
+            <in>main-random-variable-stream.cc</in>
+            <in>main-random-variable.cc</in>
+            <in>main-test-sync.cc</in>
+            <in>sample-random-variable-stream.cc</in>
+            <in>sample-random-variable.cc</in>
+            <in>sample-simulator.cc</in>
+          </df>
+          <df name="helper">
+            <in>event-garbage-collector.cc</in>
+            <in>event-garbage-collector.h</in>
+            <in>random-variable-stream-helper.cc</in>
+            <in>random-variable-stream-helper.h</in>
+          </df>
+          <df name="model">
+            <in>abort.h</in>
+            <in>assert.h</in>
+            <in>attribute-accessor-helper.h</in>
+            <in>attribute-construction-list.cc</in>
+            <in>attribute-construction-list.h</in>
+            <in>attribute-helper.h</in>
+            <in>attribute.cc</in>
+            <in>attribute.h</in>
+            <in>boolean.cc</in>
+            <in>boolean.h</in>
+            <in>breakpoint.cc</in>
+            <in>breakpoint.h</in>
+            <in>build-profile.h</in>
+            <in>cairo-wideint-private.h</in>
+            <in>cairo-wideint.c</in>
+            <in>calendar-scheduler.cc</in>
+            <in>calendar-scheduler.h</in>
+            <in>callback.cc</in>
+            <in>callback.h</in>
+            <in>command-line.cc</in>
+            <in>command-line.h</in>
+            <in>config.cc</in>
+            <in>config.h</in>
+            <in>default-deleter.h</in>
+            <in>default-simulator-impl.cc</in>
+            <in>default-simulator-impl.h</in>
+            <in>deprecated.h</in>
+            <in>double.cc</in>
+            <in>double.h</in>
+            <in>empty.h</in>
+            <in>enum.cc</in>
+            <in>enum.h</in>
+            <in>event-id.cc</in>
+            <in>event-id.h</in>
+            <in>event-impl.cc</in>
+            <in>event-impl.h</in>
+            <in>fatal-error.h</in>
+            <in>fatal-impl.cc</in>
+            <in>fatal-impl.h</in>
+            <in>global-value.cc</in>
+            <in>global-value.h</in>
+            <in>hash-fnv.cc</in>
+            <in>hash-fnv.h</in>
+            <in>hash-function.cc</in>
+            <in>hash-function.h</in>
+            <in>hash-murmur3.cc</in>
+            <in>hash-murmur3.h</in>
+            <in>hash.cc</in>
+            <in>hash.h</in>
+            <in>heap-scheduler.cc</in>
+            <in>heap-scheduler.h</in>
+            <in>int-to-type.h</in>
+            <in>int64x64-128.cc</in>
+            <in>int64x64-128.h</in>
+            <in>int64x64-cairo.cc</in>
+            <in>int64x64-cairo.h</in>
+            <in>int64x64-double.h</in>
+            <in>int64x64.cc</in>
+            <in>int64x64.h</in>
+            <in>integer.cc</in>
+            <in>integer.h</in>
+            <in>list-scheduler.cc</in>
+            <in>list-scheduler.h</in>
+            <in>log-macros-disabled.h</in>
+            <in>log-macros-enabled.h</in>
+            <in>log.cc</in>
+            <in>log.h</in>
+            <in>make-event.cc</in>
+            <in>make-event.h</in>
+            <in>map-scheduler.cc</in>
+            <in>map-scheduler.h</in>
+            <in>math.h</in>
+            <in>names.cc</in>
+            <in>names.h</in>
+            <in>non-copyable.h</in>
+            <in>nstime.h</in>
+            <in>object-base.cc</in>
+            <in>object-base.h</in>
+            <in>object-factory.cc</in>
+            <in>object-factory.h</in>
+            <in>object-map.h</in>
+            <in>object-ptr-container.cc</in>
+            <in>object-ptr-container.h</in>
+            <in>object-vector.h</in>
+            <in>object.cc</in>
+            <in>object.h</in>
+            <in>pointer.cc</in>
+            <in>pointer.h</in>
+            <in>ptr.h</in>
+            <in>random-variable-stream.cc</in>
+            <in>random-variable-stream.h</in>
+            <in>realtime-simulator-impl.cc</in>
+            <in>realtime-simulator-impl.h</in>
+            <in>ref-count-base.cc</in>
+            <in>ref-count-base.h</in>
+            <in>rng-seed-manager.cc</in>
+            <in>rng-seed-manager.h</in>
+            <in>rng-stream.cc</in>
+            <in>rng-stream.h</in>
+            <in>scheduler.cc</in>
+            <in>scheduler.h</in>
+            <in>simple-ref-count.h</in>
+            <in>simulation-singleton.h</in>
+            <in>simulator-impl.cc</in>
+            <in>simulator-impl.h</in>
+            <in>simulator.cc</in>
+            <in>simulator.h</in>
+            <in>singleton.h</in>
+            <in>string.cc</in>
+            <in>string.h</in>
+            <in>synchronizer.cc</in>
+            <in>synchronizer.h</in>
+            <in>system-condition.h</in>
+            <in>system-mutex.h</in>
+            <in>system-path.cc</in>
+            <in>system-path.h</in>
+            <in>system-thread.cc</in>
+            <in>system-thread.h</in>
+            <in>system-wall-clock-ms.h</in>
+            <in>test.cc</in>
+            <in>test.h</in>
+            <in>time.cc</in>
+            <in>timer-impl.h</in>
+            <in>timer.cc</in>
+            <in>timer.h</in>
+            <in>trace-source-accessor.cc</in>
+            <in>trace-source-accessor.h</in>
+            <in>traced-callback.h</in>
+            <in>traced-value.h</in>
+            <in>type-id.cc</in>
+            <in>type-id.h</in>
+            <in>type-name.cc</in>
+            <in>type-name.h</in>
+            <in>type-traits.h</in>
+            <in>uinteger.cc</in>
+            <in>uinteger.h</in>
+            <in>unix-fd-reader.cc</in>
+            <in>unix-fd-reader.h</in>
+            <in>unix-system-condition.cc</in>
+            <in>unix-system-mutex.cc</in>
+            <in>unix-system-wall-clock-ms.cc</in>
+            <in>unused.h</in>
+            <in>valgrind.h</in>
+            <in>vector.cc</in>
+            <in>vector.h</in>
+            <in>wall-clock-synchronizer.cc</in>
+            <in>wall-clock-synchronizer.h</in>
+            <in>watchdog.cc</in>
+            <in>watchdog.h</in>
+            <in>win32-system-wall-clock-ms.cc</in>
+          </df>
+          <df name="test">
+            <in>attribute-test-suite.cc</in>
+            <in>build-profile-test-suite.cc</in>
+            <in>callback-test-suite.cc</in>
+            <in>command-line-test-suite.cc</in>
+            <in>config-test-suite.cc</in>
+            <in>event-garbage-collector-test-suite.cc</in>
+            <in>global-value-test-suite.cc</in>
+            <in>hash-test-suite.cc</in>
+            <in>int64x64-test-suite.cc</in>
+            <in>many-uniform-random-variables-one-get-value-call-test-suite.cc</in>
+            <in>names-test-suite.cc</in>
+            <in>object-test-suite.cc</in>
+            <in>one-uniform-random-variable-many-get-value-calls-test-suite.cc</in>
+            <in>ptr-test-suite.cc</in>
+            <in>random-variable-stream-test-suite.cc</in>
+            <in>rng-test-suite.cc</in>
+            <in>sample-test-suite.cc</in>
+            <in>simulator-test-suite.cc</in>
+            <in>threaded-test-suite.cc</in>
+            <in>time-test-suite.cc</in>
+            <in>timer-test-suite.cc</in>
+            <in>traced-callback-test-suite.cc</in>
+            <in>type-id-test-suite.cc</in>
+            <in>type-traits-test-suite.cc</in>
+            <in>watchdog-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="csma">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>csma-broadcast.cc</in>
+            <in>csma-multicast.cc</in>
+            <in>csma-one-subnet.cc</in>
+            <in>csma-packet-socket.cc</in>
+            <in>csma-ping.cc</in>
+            <in>csma-raw-ip-socket.cc</in>
+          </df>
+          <df name="helper">
+            <in>csma-helper.cc</in>
+            <in>csma-helper.h</in>
+          </df>
+          <df name="model">
+            <in>backoff.cc</in>
+            <in>backoff.h</in>
+            <in>csma-channel.cc</in>
+            <in>csma-channel.h</in>
+            <in>csma-net-device.cc</in>
+            <in>csma-net-device.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="csma-layout">
+          <df name="bindings">
+          </df>
+          <df name="examples">
+            <in>csma-star.cc</in>
+          </df>
+          <df name="model">
+            <in>csma-star-helper.cc</in>
+            <in>csma-star-helper.h</in>
+          </df>
+        </df>
+        <df name="dsdv">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>dsdv.h</in>
+          </df>
+          <df name="examples">
+            <in>dsdv-manet.cc</in>
+          </df>
+          <df name="helper">
+            <in>dsdv-helper.cc</in>
+            <in>dsdv-helper.h</in>
+          </df>
+          <df name="model">
+            <in>dsdv-packet-queue.cc</in>
+            <in>dsdv-packet-queue.h</in>
+            <in>dsdv-packet.cc</in>
+            <in>dsdv-packet.h</in>
+            <in>dsdv-routing-protocol.cc</in>
+            <in>dsdv-routing-protocol.h</in>
+            <in>dsdv-rtable.cc</in>
+            <in>dsdv-rtable.h</in>
+          </df>
+          <df name="test">
+            <in>dsdv-testcase.cc</in>
+          </df>
+        </df>
+        <df name="dsr">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>dsr.h</in>
+          </df>
+          <df name="examples">
+            <in>dsr.cc</in>
+          </df>
+          <df name="helper">
+            <in>dsr-helper.cc</in>
+            <in>dsr-helper.h</in>
+            <in>dsr-main-helper.cc</in>
+            <in>dsr-main-helper.h</in>
+          </df>
+          <df name="model">
+            <in>dsr-errorbuff.cc</in>
+            <in>dsr-errorbuff.h</in>
+            <in>dsr-fs-header.cc</in>
+            <in>dsr-fs-header.h</in>
+            <in>dsr-gratuitous-reply-table.cc</in>
+            <in>dsr-gratuitous-reply-table.h</in>
+            <in>dsr-maintain-buff.cc</in>
+            <in>dsr-maintain-buff.h</in>
+            <in>dsr-network-queue.cc</in>
+            <in>dsr-network-queue.h</in>
+            <in>dsr-option-header.cc</in>
+            <in>dsr-option-header.h</in>
+            <in>dsr-options.cc</in>
+            <in>dsr-options.h</in>
+            <in>dsr-passive-buff.cc</in>
+            <in>dsr-passive-buff.h</in>
+            <in>dsr-rcache.cc</in>
+            <in>dsr-rcache.h</in>
+            <in>dsr-routing.cc</in>
+            <in>dsr-routing.h</in>
+            <in>dsr-rreq-table.cc</in>
+            <in>dsr-rreq-table.h</in>
+            <in>dsr-rsendbuff.cc</in>
+            <in>dsr-rsendbuff.h</in>
+          </df>
+          <df name="test">
+            <in>dsr-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="energy">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>li-ion-energy-source.cc</in>
+          </df>
+          <df name="helper">
+            <in>basic-energy-harvester-helper.cc</in>
+            <in>basic-energy-harvester-helper.h</in>
+            <in>basic-energy-source-helper.cc</in>
+            <in>basic-energy-source-helper.h</in>
+            <in>energy-harvester-container.cc</in>
+            <in>energy-harvester-container.h</in>
+            <in>energy-harvester-helper.cc</in>
+            <in>energy-harvester-helper.h</in>
+            <in>energy-model-helper.cc</in>
+            <in>energy-model-helper.h</in>
+            <in>energy-source-container.cc</in>
+            <in>energy-source-container.h</in>
+            <in>li-ion-energy-source-helper.cc</in>
+            <in>li-ion-energy-source-helper.h</in>
+            <in>rv-battery-model-helper.cc</in>
+            <in>rv-battery-model-helper.h</in>
+            <in>wifi-radio-energy-model-helper.cc</in>
+            <in>wifi-radio-energy-model-helper.h</in>
+          </df>
+          <df name="model">
+            <in>basic-energy-harvester.cc</in>
+            <in>basic-energy-harvester.h</in>
+            <in>basic-energy-source.cc</in>
+            <in>basic-energy-source.h</in>
+            <in>device-energy-model-container.cc</in>
+            <in>device-energy-model-container.h</in>
+            <in>device-energy-model.cc</in>
+            <in>device-energy-model.h</in>
+            <in>energy-harvester.cc</in>
+            <in>energy-harvester.h</in>
+            <in>energy-source.cc</in>
+            <in>energy-source.h</in>
+            <in>li-ion-energy-source.cc</in>
+            <in>li-ion-energy-source.h</in>
+            <in>rv-battery-model.cc</in>
+            <in>rv-battery-model.h</in>
+            <in>simple-device-energy-model.cc</in>
+            <in>simple-device-energy-model.h</in>
+            <in>wifi-radio-energy-model.cc</in>
+            <in>wifi-radio-energy-model.h</in>
+            <in>wifi-tx-current-model.cc</in>
+            <in>wifi-tx-current-model.h</in>
+          </df>
+          <df name="test">
+            <in>basic-energy-harvester-test.cc</in>
+            <in>basic-energy-model-test.cc</in>
+            <in>li-ion-energy-source-test.cc</in>
+            <in>rv-battery-model-test.cc</in>
+          </df>
+        </df>
+        <df name="fd-net-device">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>dummy-network.cc</in>
+            <in>fd-emu-onoff.cc</in>
+            <in>fd-emu-ping.cc</in>
+            <in>fd-emu-udp-echo.cc</in>
+            <in>fd-planetlab-ping.cc</in>
+            <in>fd-tap-ping.cc</in>
+            <in>fd-tap-ping6.cc</in>
+            <in>fd2fd-onoff.cc</in>
+            <in>realtime-dummy-network.cc</in>
+            <in>realtime-fd2fd-onoff.cc</in>
+          </df>
+          <df name="helper">
+            <in>creator-utils.cc</in>
+            <in>creator-utils.h</in>
+            <in>emu-fd-net-device-helper.cc</in>
+            <in>emu-fd-net-device-helper.h</in>
+            <in>encode-decode.cc</in>
+            <in>encode-decode.h</in>
+            <in>fd-net-device-helper.cc</in>
+            <in>fd-net-device-helper.h</in>
+            <in>planetlab-fd-net-device-helper.cc</in>
+            <in>planetlab-fd-net-device-helper.h</in>
+            <in>planetlab-tap-creator.cc</in>
+            <in>raw-sock-creator.cc</in>
+            <in>tap-device-creator.cc</in>
+            <in>tap-fd-net-device-helper.cc</in>
+            <in>tap-fd-net-device-helper.h</in>
+          </df>
+          <df name="model">
+            <in>fd-net-device.cc</in>
+            <in>fd-net-device.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="flow-monitor">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+          </df>
+          <df name="helper">
+            <in>flow-monitor-helper.cc</in>
+            <in>flow-monitor-helper.h</in>
+          </df>
+          <df name="model">
+            <in>flow-classifier.cc</in>
+            <in>flow-classifier.h</in>
+            <in>flow-monitor.cc</in>
+            <in>flow-monitor.h</in>
+            <in>flow-probe.cc</in>
+            <in>flow-probe.h</in>
+            <in>histogram.cc</in>
+            <in>histogram.h</in>
+            <in>ipv4-flow-classifier.cc</in>
+            <in>ipv4-flow-classifier.h</in>
+            <in>ipv4-flow-probe.cc</in>
+            <in>ipv4-flow-probe.h</in>
+            <in>ipv6-flow-classifier.cc</in>
+            <in>ipv6-flow-classifier.h</in>
+            <in>ipv6-flow-probe.cc</in>
+            <in>ipv6-flow-probe.h</in>
+          </df>
+          <df name="test">
+            <in>histogram-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="internet">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>internet.h</in>
+          </df>
+          <df name="examples">
+            <in>main-simple.cc</in>
+          </df>
+          <df name="helper">
+            <in>internet-stack-helper.cc</in>
+            <in>internet-stack-helper.h</in>
+            <in>internet-trace-helper.cc</in>
+            <in>internet-trace-helper.h</in>
+            <in>ipv4-address-helper.cc</in>
+            <in>ipv4-address-helper.h</in>
+            <in>ipv4-global-routing-helper.cc</in>
+            <in>ipv4-global-routing-helper.h</in>
+            <in>ipv4-interface-container.cc</in>
+            <in>ipv4-interface-container.h</in>
+            <in>ipv4-list-routing-helper.cc</in>
+            <in>ipv4-list-routing-helper.h</in>
+            <in>ipv4-routing-helper.cc</in>
+            <in>ipv4-routing-helper.h</in>
+            <in>ipv4-static-routing-helper.cc</in>
+            <in>ipv4-static-routing-helper.h</in>
+            <in>ipv6-address-helper.cc</in>
+            <in>ipv6-address-helper.h</in>
+            <in>ipv6-interface-container.cc</in>
+            <in>ipv6-interface-container.h</in>
+            <in>ipv6-list-routing-helper.cc</in>
+            <in>ipv6-list-routing-helper.h</in>
+            <in>ipv6-routing-helper.cc</in>
+            <in>ipv6-routing-helper.h</in>
+            <in>ipv6-static-routing-helper.cc</in>
+            <in>ipv6-static-routing-helper.h</in>
+            <in>rip-helper.cc</in>
+            <in>rip-helper.h</in>
+            <in>ripng-helper.cc</in>
+            <in>ripng-helper.h</in>
+          </df>
+          <df name="model">
+            <in>arp-cache.cc</in>
+            <in>arp-cache.h</in>
+            <in>arp-header.cc</in>
+            <in>arp-header.h</in>
+            <in>arp-l3-protocol.cc</in>
+            <in>arp-l3-protocol.h</in>
+            <in>candidate-queue.cc</in>
+            <in>candidate-queue.h</in>
+            <in>global-route-manager-impl.cc</in>
+            <in>global-route-manager-impl.h</in>
+            <in>global-route-manager.cc</in>
+            <in>global-route-manager.h</in>
+            <in>global-router-interface.cc</in>
+            <in>global-router-interface.h</in>
+            <in>global-routing.h</in>
+            <in>icmpv4-l4-protocol.cc</in>
+            <in>icmpv4-l4-protocol.h</in>
+            <in>icmpv4.cc</in>
+            <in>icmpv4.h</in>
+            <in>icmpv6-header.cc</in>
+            <in>icmpv6-header.h</in>
+            <in>icmpv6-l4-protocol.cc</in>
+            <in>icmpv6-l4-protocol.h</in>
+            <in>ip-l4-protocol.cc</in>
+            <in>ip-l4-protocol.h</in>
+            <in>ipv4-address-generator.cc</in>
+            <in>ipv4-address-generator.h</in>
+            <in>ipv4-end-point-demux.cc</in>
+            <in>ipv4-end-point-demux.h</in>
+            <in>ipv4-end-point.cc</in>
+            <in>ipv4-end-point.h</in>
+            <in>ipv4-global-routing.cc</in>
+            <in>ipv4-global-routing.h</in>
+            <in>ipv4-header.cc</in>
+            <in>ipv4-header.h</in>
+            <in>ipv4-interface-address.cc</in>
+            <in>ipv4-interface-address.h</in>
+            <in>ipv4-interface.cc</in>
+            <in>ipv4-interface.h</in>
+            <in>ipv4-l3-protocol.cc</in>
+            <in>ipv4-l3-protocol.h</in>
+            <in>ipv4-list-routing.cc</in>
+            <in>ipv4-list-routing.h</in>
+            <in>ipv4-packet-filter.cc</in>
+            <in>ipv4-packet-filter.h</in>
+            <in>ipv4-packet-info-tag.cc</in>
+            <in>ipv4-packet-info-tag.h</in>
+            <in>ipv4-packet-probe.cc</in>
+            <in>ipv4-packet-probe.h</in>
+            <in>ipv4-queue-disc-item.cc</in>
+            <in>ipv4-queue-disc-item.h</in>
+            <in>ipv4-raw-socket-factory-impl.cc</in>
+            <in>ipv4-raw-socket-factory-impl.h</in>
+            <in>ipv4-raw-socket-factory.cc</in>
+            <in>ipv4-raw-socket-factory.h</in>
+            <in>ipv4-raw-socket-impl.cc</in>
+            <in>ipv4-raw-socket-impl.h</in>
+            <in>ipv4-route.cc</in>
+            <in>ipv4-route.h</in>
+            <in>ipv4-routing-protocol.cc</in>
+            <in>ipv4-routing-protocol.h</in>
+            <in>ipv4-routing-table-entry.cc</in>
+            <in>ipv4-routing-table-entry.h</in>
+            <in>ipv4-static-routing.cc</in>
+            <in>ipv4-static-routing.h</in>
+            <in>ipv4.cc</in>
+            <in>ipv4.h</in>
+            <in>ipv6-address-generator.cc</in>
+            <in>ipv6-address-generator.h</in>
+            <in>ipv6-autoconfigured-prefix.cc</in>
+            <in>ipv6-autoconfigured-prefix.h</in>
+            <in>ipv6-end-point-demux.cc</in>
+            <in>ipv6-end-point-demux.h</in>
+            <in>ipv6-end-point.cc</in>
+            <in>ipv6-end-point.h</in>
+            <in>ipv6-extension-demux.cc</in>
+            <in>ipv6-extension-demux.h</in>
+            <in>ipv6-extension-header.cc</in>
+            <in>ipv6-extension-header.h</in>
+            <in>ipv6-extension.cc</in>
+            <in>ipv6-extension.h</in>
+            <in>ipv6-header.cc</in>
+            <in>ipv6-header.h</in>
+            <in>ipv6-interface-address.cc</in>
+            <in>ipv6-interface-address.h</in>
+            <in>ipv6-interface.cc</in>
+            <in>ipv6-interface.h</in>
+            <in>ipv6-l3-protocol.cc</in>
+            <in>ipv6-l3-protocol.h</in>
+            <in>ipv6-list-routing.cc</in>
+            <in>ipv6-list-routing.h</in>
+            <in>ipv6-option-demux.cc</in>
+            <in>ipv6-option-demux.h</in>
+            <in>ipv6-option-header.cc</in>
+            <in>ipv6-option-header.h</in>
+            <in>ipv6-option.cc</in>
+            <in>ipv6-option.h</in>
+            <in>ipv6-packet-filter.cc</in>
+            <in>ipv6-packet-filter.h</in>
+            <in>ipv6-packet-info-tag.cc</in>
+            <in>ipv6-packet-info-tag.h</in>
+            <in>ipv6-packet-probe.cc</in>
+            <in>ipv6-packet-probe.h</in>
+            <in>ipv6-pmtu-cache.cc</in>
+            <in>ipv6-pmtu-cache.h</in>
+            <in>ipv6-queue-disc-item.cc</in>
+            <in>ipv6-queue-disc-item.h</in>
+            <in>ipv6-raw-socket-factory-impl.cc</in>
+            <in>ipv6-raw-socket-factory-impl.h</in>
+            <in>ipv6-raw-socket-factory.cc</in>
+            <in>ipv6-raw-socket-factory.h</in>
+            <in>ipv6-raw-socket-impl.cc</in>
+            <in>ipv6-raw-socket-impl.h</in>
+            <in>ipv6-route.cc</in>
+            <in>ipv6-route.h</in>
+            <in>ipv6-routing-protocol.cc</in>
+            <in>ipv6-routing-protocol.h</in>
+            <in>ipv6-routing-table-entry.cc</in>
+            <in>ipv6-routing-table-entry.h</in>
+            <in>ipv6-static-routing.cc</in>
+            <in>ipv6-static-routing.h</in>
+            <in>ipv6.cc</in>
+            <in>ipv6.h</in>
+            <in>loopback-net-device.cc</in>
+            <in>loopback-net-device.h</in>
+            <in>ndisc-cache.cc</in>
+            <in>ndisc-cache.h</in>
+            <in>nsc-sysctl.cc</in>
+            <in>nsc-sysctl.h</in>
+            <in>nsc-tcp-l4-protocol.cc</in>
+            <in>nsc-tcp-l4-protocol.h</in>
+            <in>nsc-tcp-socket-factory-impl.cc</in>
+            <in>nsc-tcp-socket-factory-impl.h</in>
+            <in>nsc-tcp-socket-impl.cc</in>
+            <in>nsc-tcp-socket-impl.h</in>
+            <in>pending-data.cc</in>
+            <in>pending-data.h</in>
+            <in>rip-header.cc</in>
+            <in>rip-header.h</in>
+            <in>rip.cc</in>
+            <in>rip.h</in>
+            <in>ripng-header.cc</in>
+            <in>ripng-header.h</in>
+            <in>ripng.cc</in>
+            <in>ripng.h</in>
+            <in>rtt-estimator.cc</in>
+            <in>rtt-estimator.h</in>
+            <in>sim_errno.h</in>
+            <in>sim_interface.h</in>
+            <in>tcp-congestion-ops.cc</in>
+            <in>tcp-congestion-ops.h</in>
+            <in>tcp-header.cc</in>
+            <in>tcp-header.h</in>
+            <in>tcp-highspeed.cc</in>
+            <in>tcp-highspeed.h</in>
+            <in>tcp-hybla.cc</in>
+            <in>tcp-hybla.h</in>
+            <in>tcp-l4-protocol.cc</in>
+            <in>tcp-l4-protocol.h</in>
+            <in>tcp-option-rfc793.cc</in>
+            <in>tcp-option-rfc793.h</in>
+            <in>tcp-option-ts.cc</in>
+            <in>tcp-option-ts.h</in>
+            <in>tcp-option-winscale.cc</in>
+            <in>tcp-option-winscale.h</in>
+            <in>tcp-option.cc</in>
+            <in>tcp-option.h</in>
+            <in>tcp-rx-buffer.cc</in>
+            <in>tcp-rx-buffer.h</in>
+            <in>tcp-socket-base.cc</in>
+            <in>tcp-socket-base.h</in>
+            <in>tcp-socket-factory-impl.cc</in>
+            <in>tcp-socket-factory-impl.h</in>
+            <in>tcp-socket-factory.cc</in>
+            <in>tcp-socket-factory.h</in>
+            <in>tcp-socket.cc</in>
+            <in>tcp-socket.h</in>
+            <in>tcp-tx-buffer.cc</in>
+            <in>tcp-tx-buffer.h</in>
+            <in>tcp-westwood.cc</in>
+            <in>tcp-westwood.h</in>
+            <in>udp-header.cc</in>
+            <in>udp-header.h</in>
+            <in>udp-l4-protocol.cc</in>
+            <in>udp-l4-protocol.h</in>
+            <in>udp-socket-factory-impl.cc</in>
+            <in>udp-socket-factory-impl.h</in>
+            <in>udp-socket-factory.cc</in>
+            <in>udp-socket-factory.h</in>
+            <in>udp-socket-impl.cc</in>
+            <in>udp-socket-impl.h</in>
+            <in>udp-socket.cc</in>
+            <in>udp-socket.h</in>
+          </df>
+          <df name="test">
+            <in>error-channel.cc</in>
+            <in>error-channel.h</in>
+            <in>global-route-manager-impl-test-suite.cc</in>
+            <in>ipv4-address-generator-test-suite.cc</in>
+            <in>ipv4-address-helper-test-suite.cc</in>
+            <in>ipv4-forwarding-test.cc</in>
+            <in>ipv4-fragmentation-test.cc</in>
+            <in>ipv4-global-routing-test-suite.cc</in>
+            <in>ipv4-header-test.cc</in>
+            <in>ipv4-list-routing-test-suite.cc</in>
+            <in>ipv4-packet-info-tag-test-suite.cc</in>
+            <in>ipv4-raw-test.cc</in>
+            <in>ipv4-rip-test.cc</in>
+            <in>ipv4-static-routing-test-suite.cc</in>
+            <in>ipv4-test.cc</in>
+            <in>ipv6-address-generator-test-suite.cc</in>
+            <in>ipv6-address-helper-test-suite.cc</in>
+            <in>ipv6-dual-stack-test-suite.cc</in>
+            <in>ipv6-extension-header-test-suite.cc</in>
+            <in>ipv6-forwarding-test.cc</in>
+            <in>ipv6-fragmentation-test.cc</in>
+            <in>ipv6-list-routing-test-suite.cc</in>
+            <in>ipv6-packet-info-tag-test-suite.cc</in>
+            <in>ipv6-raw-test.cc</in>
+            <in>ipv6-ripng-test.cc</in>
+            <in>ipv6-test.cc</in>
+            <in>pfifo-fast-queue-disc-test-suite.cc</in>
+            <in>rtt-test.cc</in>
+            <in>tcp-bytes-in-flight-test.cc</in>
+            <in>tcp-cong-avoid-test.cc</in>
+            <in>tcp-cong-avoid-test.h</in>
+            <in>tcp-datasentcb-test.cc</in>
+            <in>tcp-endpoint-bug2211.cc</in>
+            <in>tcp-error-model.cc</in>
+            <in>tcp-error-model.h</in>
+            <in>tcp-fast-retr-test.cc</in>
+            <in>tcp-fast-retr-test.h</in>
+            <in>tcp-general-test.cc</in>
+            <in>tcp-general-test.h</in>
+            <in>tcp-header-test.cc</in>
+            <in>tcp-highspeed-test.cc</in>
+            <in>tcp-highspeed-test.h</in>
+            <in>tcp-hybla-test.cc</in>
+            <in>tcp-option-test.cc</in>
+            <in>tcp-pkts-acked-test.cc</in>
+            <in>tcp-rto-test.cc</in>
+            <in>tcp-rto-test.h</in>
+            <in>tcp-rtt-estimation.cc</in>
+            <in>tcp-slow-start-test.cc</in>
+            <in>tcp-slow-start-test.h</in>
+            <in>tcp-test.cc</in>
+            <in>tcp-timestamp-test.cc</in>
+            <in>tcp-wscaling-test.cc</in>
+            <in>tcp-zero-window-test.cc</in>
+            <in>udp-test.cc</in>
+          </df>
+        </df>
+        <df name="lr-wpan">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>lr-wpan-data.cc</in>
+            <in>lr-wpan-error-distance-plot.cc</in>
+            <in>lr-wpan-error-model-plot.cc</in>
+            <in>lr-wpan-packet-print.cc</in>
+            <in>lr-wpan-phy-test.cc</in>
+          </df>
+          <df name="helper">
+            <in>lr-wpan-helper.cc</in>
+            <in>lr-wpan-helper.h</in>
+          </df>
+          <df name="model">
+            <in>lr-wpan-csmaca.cc</in>
+            <in>lr-wpan-csmaca.h</in>
+            <in>lr-wpan-error-model.cc</in>
+            <in>lr-wpan-error-model.h</in>
+            <in>lr-wpan-interference-helper.cc</in>
+            <in>lr-wpan-interference-helper.h</in>
+            <in>lr-wpan-lqi-tag.cc</in>
+            <in>lr-wpan-lqi-tag.h</in>
+            <in>lr-wpan-mac-header.cc</in>
+            <in>lr-wpan-mac-header.h</in>
+            <in>lr-wpan-mac-trailer.cc</in>
+            <in>lr-wpan-mac-trailer.h</in>
+            <in>lr-wpan-mac.cc</in>
+            <in>lr-wpan-mac.h</in>
+            <in>lr-wpan-net-device.cc</in>
+            <in>lr-wpan-net-device.h</in>
+            <in>lr-wpan-phy.cc</in>
+            <in>lr-wpan-phy.h</in>
+            <in>lr-wpan-spectrum-signal-parameters.cc</in>
+            <in>lr-wpan-spectrum-signal-parameters.h</in>
+            <in>lr-wpan-spectrum-value-helper.cc</in>
+            <in>lr-wpan-spectrum-value-helper.h</in>
+          </df>
+          <df name="test">
+            <in>lr-wpan-ack-test.cc</in>
+            <in>lr-wpan-cca-test.cc</in>
+            <in>lr-wpan-collision-test.cc</in>
+            <in>lr-wpan-ed-test.cc</in>
+            <in>lr-wpan-error-model-test.cc</in>
+            <in>lr-wpan-packet-test.cc</in>
+            <in>lr-wpan-pd-plme-sap-test.cc</in>
+            <in>lr-wpan-spectrum-value-helper-test.cc</in>
+          </df>
+        </df>
+        <df name="lte">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <df name="source">
+              <df name="figures">
+              </df>
+            </df>
+          </df>
+          <df name="examples">
+            <in>lena-cqi-threshold.cc</in>
+            <in>lena-deactivate-bearer.cc</in>
+            <in>lena-distributed-ffr.cc</in>
+            <in>lena-dual-stripe.cc</in>
+            <in>lena-fading.cc</in>
+            <in>lena-frequency-reuse.cc</in>
+            <in>lena-intercell-interference.cc</in>
+            <in>lena-pathloss-traces.cc</in>
+            <in>lena-profiling.cc</in>
+            <in>lena-rem-sector-antenna.cc</in>
+            <in>lena-rem.cc</in>
+            <in>lena-rlc-traces.cc</in>
+            <in>lena-simple-epc-emu.cc</in>
+            <in>lena-simple-epc.cc</in>
+            <in>lena-simple.cc</in>
+            <in>lena-uplink-power-control.cc</in>
+            <in>lena-x2-handover-measures.cc</in>
+            <in>lena-x2-handover.cc</in>
+          </df>
+          <df name="helper">
+            <in>emu-epc-helper.cc</in>
+            <in>emu-epc-helper.h</in>
+            <in>epc-helper.cc</in>
+            <in>epc-helper.h</in>
+            <in>lte-global-pathloss-database.cc</in>
+            <in>lte-global-pathloss-database.h</in>
+            <in>lte-helper.cc</in>
+            <in>lte-helper.h</in>
+            <in>lte-hex-grid-enb-topology-helper.cc</in>
+            <in>lte-hex-grid-enb-topology-helper.h</in>
+            <in>lte-stats-calculator.cc</in>
+            <in>lte-stats-calculator.h</in>
+            <in>mac-stats-calculator.cc</in>
+            <in>mac-stats-calculator.h</in>
+            <in>phy-rx-stats-calculator.cc</in>
+            <in>phy-rx-stats-calculator.h</in>
+            <in>phy-stats-calculator.cc</in>
+            <in>phy-stats-calculator.h</in>
+            <in>phy-tx-stats-calculator.cc</in>
+            <in>phy-tx-stats-calculator.h</in>
+            <in>point-to-point-epc-helper.cc</in>
+            <in>point-to-point-epc-helper.h</in>
+            <in>radio-bearer-stats-calculator.cc</in>
+            <in>radio-bearer-stats-calculator.h</in>
+            <in>radio-bearer-stats-connector.cc</in>
+            <in>radio-bearer-stats-connector.h</in>
+            <in>radio-environment-map-helper.cc</in>
+            <in>radio-environment-map-helper.h</in>
+          </df>
+          <df name="model">
+            <df name="fading-traces">
+              <in>fading_trace_generator.m</in>
+            </df>
+            <in>a2-a4-rsrq-handover-algorithm.cc</in>
+            <in>a2-a4-rsrq-handover-algorithm.h</in>
+            <in>a3-rsrp-handover-algorithm.cc</in>
+            <in>a3-rsrp-handover-algorithm.h</in>
+            <in>cqa-ff-mac-scheduler.cc</in>
+            <in>cqa-ff-mac-scheduler.h</in>
+            <in>epc-enb-application.cc</in>
+            <in>epc-enb-application.h</in>
+            <in>epc-enb-s1-sap.cc</in>
+            <in>epc-enb-s1-sap.h</in>
+            <in>epc-gtpu-header.cc</in>
+            <in>epc-gtpu-header.h</in>
+            <in>epc-mme.cc</in>
+            <in>epc-mme.h</in>
+            <in>epc-s11-sap.cc</in>
+            <in>epc-s11-sap.h</in>
+            <in>epc-s1ap-sap.cc</in>
+            <in>epc-s1ap-sap.h</in>
+            <in>epc-sgw-pgw-application.cc</in>
+            <in>epc-sgw-pgw-application.h</in>
+            <in>epc-tft-classifier.cc</in>
+            <in>epc-tft-classifier.h</in>
+            <in>epc-tft.cc</in>
+            <in>epc-tft.h</in>
+            <in>epc-ue-nas.cc</in>
+            <in>epc-ue-nas.h</in>
+            <in>epc-x2-header.cc</in>
+            <in>epc-x2-header.h</in>
+            <in>epc-x2-sap.cc</in>
+            <in>epc-x2-sap.h</in>
+            <in>epc-x2.cc</in>
+            <in>epc-x2.h</in>
+            <in>eps-bearer-tag.cc</in>
+            <in>eps-bearer-tag.h</in>
+            <in>eps-bearer.cc</in>
+            <in>eps-bearer.h</in>
+            <in>fdbet-ff-mac-scheduler.cc</in>
+            <in>fdbet-ff-mac-scheduler.h</in>
+            <in>fdmt-ff-mac-scheduler.cc</in>
+            <in>fdmt-ff-mac-scheduler.h</in>
+            <in>fdtbfq-ff-mac-scheduler.cc</in>
+            <in>fdtbfq-ff-mac-scheduler.h</in>
+            <in>ff-mac-common.cc</in>
+            <in>ff-mac-common.h</in>
+            <in>ff-mac-csched-sap.cc</in>
+            <in>ff-mac-csched-sap.h</in>
+            <in>ff-mac-sched-sap.cc</in>
+            <in>ff-mac-sched-sap.h</in>
+            <in>ff-mac-scheduler.cc</in>
+            <in>ff-mac-scheduler.h</in>
+            <in>lte-amc.cc</in>
+            <in>lte-amc.h</in>
+            <in>lte-anr-sap.cc</in>
+            <in>lte-anr-sap.h</in>
+            <in>lte-anr.cc</in>
+            <in>lte-anr.h</in>
+            <in>lte-as-sap.cc</in>
+            <in>lte-as-sap.h</in>
+            <in>lte-asn1-header.cc</in>
+            <in>lte-asn1-header.h</in>
+            <in>lte-chunk-processor.cc</in>
+            <in>lte-chunk-processor.h</in>
+            <in>lte-common.cc</in>
+            <in>lte-common.h</in>
+            <in>lte-control-messages.cc</in>
+            <in>lte-control-messages.h</in>
+            <in>lte-enb-cmac-sap.cc</in>
+            <in>lte-enb-cmac-sap.h</in>
+            <in>lte-enb-cphy-sap.cc</in>
+            <in>lte-enb-cphy-sap.h</in>
+            <in>lte-enb-mac.cc</in>
+            <in>lte-enb-mac.h</in>
+            <in>lte-enb-net-device.cc</in>
+            <in>lte-enb-net-device.h</in>
+            <in>lte-enb-phy-sap.cc</in>
+            <in>lte-enb-phy-sap.h</in>
+            <in>lte-enb-phy.cc</in>
+            <in>lte-enb-phy.h</in>
+            <in>lte-enb-rrc.cc</in>
+            <in>lte-enb-rrc.h</in>
+            <in>lte-ffr-algorithm.cc</in>
+            <in>lte-ffr-algorithm.h</in>
+            <in>lte-ffr-distributed-algorithm.cc</in>
+            <in>lte-ffr-distributed-algorithm.h</in>
+            <in>lte-ffr-enhanced-algorithm.cc</in>
+            <in>lte-ffr-enhanced-algorithm.h</in>
+            <in>lte-ffr-rrc-sap.cc</in>
+            <in>lte-ffr-rrc-sap.h</in>
+            <in>lte-ffr-sap.cc</in>
+            <in>lte-ffr-sap.h</in>
+            <in>lte-ffr-soft-algorithm.cc</in>
+            <in>lte-ffr-soft-algorithm.h</in>
+            <in>lte-fr-hard-algorithm.cc</in>
+            <in>lte-fr-hard-algorithm.h</in>
+            <in>lte-fr-no-op-algorithm.cc</in>
+            <in>lte-fr-no-op-algorithm.h</in>
+            <in>lte-fr-soft-algorithm.cc</in>
+            <in>lte-fr-soft-algorithm.h</in>
+            <in>lte-fr-strict-algorithm.cc</in>
+            <in>lte-fr-strict-algorithm.h</in>
+            <in>lte-handover-algorithm.cc</in>
+            <in>lte-handover-algorithm.h</in>
+            <in>lte-handover-management-sap.cc</in>
+            <in>lte-handover-management-sap.h</in>
+            <in>lte-harq-phy.cc</in>
+            <in>lte-harq-phy.h</in>
+            <in>lte-interference.cc</in>
+            <in>lte-interference.h</in>
+            <in>lte-mac-sap.cc</in>
+            <in>lte-mac-sap.h</in>
+            <in>lte-mi-error-model.cc</in>
+            <in>lte-mi-error-model.h</in>
+            <in>lte-net-device.cc</in>
+            <in>lte-net-device.h</in>
+            <in>lte-pdcp-header.cc</in>
+            <in>lte-pdcp-header.h</in>
+            <in>lte-pdcp-sap.cc</in>
+            <in>lte-pdcp-sap.h</in>
+            <in>lte-pdcp-tag.cc</in>
+            <in>lte-pdcp-tag.h</in>
+            <in>lte-pdcp.cc</in>
+            <in>lte-pdcp.h</in>
+            <in>lte-phy-tag.cc</in>
+            <in>lte-phy-tag.h</in>
+            <in>lte-phy.cc</in>
+            <in>lte-phy.h</in>
+            <in>lte-radio-bearer-info.cc</in>
+            <in>lte-radio-bearer-info.h</in>
+            <in>lte-radio-bearer-tag.cc</in>
+            <in>lte-radio-bearer-tag.h</in>
+            <in>lte-rlc-am-header.cc</in>
+            <in>lte-rlc-am-header.h</in>
+            <in>lte-rlc-am.cc</in>
+            <in>lte-rlc-am.h</in>
+            <in>lte-rlc-header.cc</in>
+            <in>lte-rlc-header.h</in>
+            <in>lte-rlc-sap.cc</in>
+            <in>lte-rlc-sap.h</in>
+            <in>lte-rlc-sdu-status-tag.cc</in>
+            <in>lte-rlc-sdu-status-tag.h</in>
+            <in>lte-rlc-sequence-number.cc</in>
+            <in>lte-rlc-sequence-number.h</in>
+            <in>lte-rlc-tag.cc</in>
+            <in>lte-rlc-tag.h</in>
+            <in>lte-rlc-tm.cc</in>
+            <in>lte-rlc-tm.h</in>
+            <in>lte-rlc-um.cc</in>
+            <in>lte-rlc-um.h</in>
+            <in>lte-rlc.cc</in>
+            <in>lte-rlc.h</in>
+            <in>lte-rrc-header.cc</in>
+            <in>lte-rrc-header.h</in>
+            <in>lte-rrc-protocol-ideal.cc</in>
+            <in>lte-rrc-protocol-ideal.h</in>
+            <in>lte-rrc-protocol-real.cc</in>
+            <in>lte-rrc-protocol-real.h</in>
+            <in>lte-rrc-sap.cc</in>
+            <in>lte-rrc-sap.h</in>
+            <in>lte-spectrum-phy.cc</in>
+            <in>lte-spectrum-phy.h</in>
+            <in>lte-spectrum-signal-parameters.cc</in>
+            <in>lte-spectrum-signal-parameters.h</in>
+            <in>lte-spectrum-value-helper.cc</in>
+            <in>lte-spectrum-value-helper.h</in>
+            <in>lte-ue-cmac-sap.cc</in>
+            <in>lte-ue-cmac-sap.h</in>
+            <in>lte-ue-cphy-sap.cc</in>
+            <in>lte-ue-cphy-sap.h</in>
+            <in>lte-ue-mac.cc</in>
+            <in>lte-ue-mac.h</in>
+            <in>lte-ue-net-device.cc</in>
+            <in>lte-ue-net-device.h</in>
+            <in>lte-ue-phy-sap.cc</in>
+            <in>lte-ue-phy-sap.h</in>
+            <in>lte-ue-phy.cc</in>
+            <in>lte-ue-phy.h</in>
+            <in>lte-ue-power-control.cc</in>
+            <in>lte-ue-power-control.h</in>
+            <in>lte-ue-rrc.cc</in>
+            <in>lte-ue-rrc.h</in>
+            <in>lte-vendor-specific-parameters.cc</in>
+            <in>lte-vendor-specific-parameters.h</in>
+            <in>no-op-handover-algorithm.cc</in>
+            <in>no-op-handover-algorithm.h</in>
+            <in>pf-ff-mac-scheduler.cc</in>
+            <in>pf-ff-mac-scheduler.h</in>
+            <in>pss-ff-mac-scheduler.cc</in>
+            <in>pss-ff-mac-scheduler.h</in>
+            <in>rem-spectrum-phy.cc</in>
+            <in>rem-spectrum-phy.h</in>
+            <in>rr-ff-mac-scheduler.cc</in>
+            <in>rr-ff-mac-scheduler.h</in>
+            <in>tdbet-ff-mac-scheduler.cc</in>
+            <in>tdbet-ff-mac-scheduler.h</in>
+            <in>tdmt-ff-mac-scheduler.cc</in>
+            <in>tdmt-ff-mac-scheduler.h</in>
+            <in>tdtbfq-ff-mac-scheduler.cc</in>
+            <in>tdtbfq-ff-mac-scheduler.h</in>
+            <in>trace-fading-loss-model.cc</in>
+            <in>trace-fading-loss-model.h</in>
+            <in>tta-ff-mac-scheduler.cc</in>
+            <in>tta-ff-mac-scheduler.h</in>
+          </df>
+          <df name="test">
+            <df name="reference">
+              <in>bernuolliDistribution.m</in>
+              <in>gain_freespace.m</in>
+              <in>generate_test_data_lte_sinr.m</in>
+              <in>generate_test_data_lte_spectrum_model.m</in>
+              <in>generate_test_data_lte_spectrum_value_noise.m</in>
+              <in>generate_test_data_lte_spectrum_value_txpsd.m</in>
+              <in>lte_amc.m</in>
+              <in>lte_cqi_generation.m</in>
+              <in>lte_frequency_reuse.m</in>
+              <in>lte_link_budget.m</in>
+              <in>lte_link_budget_interference.m</in>
+              <in>lte_link_budget_interference_fr.m</in>
+              <in>lte_link_budget_x2_handover_measures.m</in>
+              <in>lte_pathloss.m</in>
+              <in>lte_ue_measurements.m</in>
+              <in>lte_uplink_power_control.m</in>
+              <in>path_loss.m</in>
+              <in>print_C_vector.m</in>
+            </df>
+            <in>epc-test-gtpu.cc</in>
+            <in>epc-test-gtpu.h</in>
+            <in>epc-test-s1u-downlink.cc</in>
+            <in>epc-test-s1u-uplink.cc</in>
+            <in>lte-ffr-simple.cc</in>
+            <in>lte-ffr-simple.h</in>
+            <in>lte-simple-helper.cc</in>
+            <in>lte-simple-helper.h</in>
+            <in>lte-simple-net-device.cc</in>
+            <in>lte-simple-net-device.h</in>
+            <in>lte-simple-spectrum-phy.cc</in>
+            <in>lte-simple-spectrum-phy.h</in>
+            <in>lte-test-cell-selection.cc</in>
+            <in>lte-test-cell-selection.h</in>
+            <in>lte-test-cqa-ff-mac-scheduler.cc</in>
+            <in>lte-test-cqa-ff-mac-scheduler.h</in>
+            <in>lte-test-cqi-generation.cc</in>
+            <in>lte-test-cqi-generation.h</in>
+            <in>lte-test-deactivate-bearer.cc</in>
+            <in>lte-test-deactivate-bearer.h</in>
+            <in>lte-test-downlink-power-control.cc</in>
+            <in>lte-test-downlink-power-control.h</in>
+            <in>lte-test-downlink-sinr.cc</in>
+            <in>lte-test-downlink-sinr.h</in>
+            <in>lte-test-earfcn.cc</in>
+            <in>lte-test-entities.cc</in>
+            <in>lte-test-entities.h</in>
+            <in>lte-test-fading.cc</in>
+            <in>lte-test-fading.h</in>
+            <in>lte-test-fdbet-ff-mac-scheduler.cc</in>
+            <in>lte-test-fdbet-ff-mac-scheduler.h</in>
+            <in>lte-test-fdmt-ff-mac-scheduler.cc</in>
+            <in>lte-test-fdmt-ff-mac-scheduler.h</in>
+            <in>lte-test-fdtbfq-ff-mac-scheduler.cc</in>
+            <in>lte-test-fdtbfq-ff-mac-scheduler.h</in>
+            <in>lte-test-frequency-reuse.cc</in>
+            <in>lte-test-frequency-reuse.h</in>
+            <in>lte-test-harq.cc</in>
+            <in>lte-test-harq.h</in>
+            <in>lte-test-interference-fr.cc</in>
+            <in>lte-test-interference-fr.h</in>
+            <in>lte-test-interference.cc</in>
+            <in>lte-test-interference.h</in>
+            <in>lte-test-link-adaptation.cc</in>
+            <in>lte-test-link-adaptation.h</in>
+            <in>lte-test-mimo.cc</in>
+            <in>lte-test-mimo.h</in>
+            <in>lte-test-pathloss-model.cc</in>
+            <in>lte-test-pathloss-model.h</in>
+            <in>lte-test-pf-ff-mac-scheduler.cc</in>
+            <in>lte-test-pf-ff-mac-scheduler.h</in>
+            <in>lte-test-phy-error-model.cc</in>
+            <in>lte-test-phy-error-model.h</in>
+            <in>lte-test-pss-ff-mac-scheduler.cc</in>
+            <in>lte-test-pss-ff-mac-scheduler.h</in>
+            <in>lte-test-rlc-am-e2e.cc</in>
+            <in>lte-test-rlc-am-e2e.h</in>
+            <in>lte-test-rlc-am-transmitter.cc</in>
+            <in>lte-test-rlc-am-transmitter.h</in>
+            <in>lte-test-rlc-um-e2e.cc</in>
+            <in>lte-test-rlc-um-e2e.h</in>
+            <in>lte-test-rlc-um-transmitter.cc</in>
+            <in>lte-test-rlc-um-transmitter.h</in>
+            <in>lte-test-rr-ff-mac-scheduler.cc</in>
+            <in>lte-test-rr-ff-mac-scheduler.h</in>
+            <in>lte-test-spectrum-value-helper.cc</in>
+            <in>lte-test-tdbet-ff-mac-scheduler.cc</in>
+            <in>lte-test-tdbet-ff-mac-scheduler.h</in>
+            <in>lte-test-tdmt-ff-mac-scheduler.cc</in>
+            <in>lte-test-tdmt-ff-mac-scheduler.h</in>
+            <in>lte-test-tdtbfq-ff-mac-scheduler.cc</in>
+            <in>lte-test-tdtbfq-ff-mac-scheduler.h</in>
+            <in>lte-test-tta-ff-mac-scheduler.cc</in>
+            <in>lte-test-tta-ff-mac-scheduler.h</in>
+            <in>lte-test-ue-measurements.cc</in>
+            <in>lte-test-ue-measurements.h</in>
+            <in>lte-test-ue-phy.cc</in>
+            <in>lte-test-ue-phy.h</in>
+            <in>lte-test-uplink-power-control.cc</in>
+            <in>lte-test-uplink-power-control.h</in>
+            <in>lte-test-uplink-sinr.cc</in>
+            <in>lte-test-uplink-sinr.h</in>
+            <in>test-asn1-encoding.cc</in>
+            <in>test-epc-tft-classifier.cc</in>
+            <in>test-lte-antenna.cc</in>
+            <in>test-lte-epc-e2e-data.cc</in>
+            <in>test-lte-handover-delay.cc</in>
+            <in>test-lte-handover-target.cc</in>
+            <in>test-lte-rlc-header.cc</in>
+            <in>test-lte-rrc.cc</in>
+            <in>test-lte-x2-handover-measures.cc</in>
+            <in>test-lte-x2-handover.cc</in>
+          </df>
+        </df>
+        <df name="mesh">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>mesh.h</in>
+          </df>
+          <df name="examples">
+            <in>mesh.cc</in>
+          </df>
+          <df name="helper">
+            <df name="dot11s">
+              <in>dot11s-installer.cc</in>
+              <in>dot11s-installer.h</in>
+            </df>
+            <df name="flame">
+              <in>flame-installer.cc</in>
+              <in>flame-installer.h</in>
+            </df>
+            <in>mesh-helper.cc</in>
+            <in>mesh-helper.h</in>
+            <in>mesh-stack-installer.cc</in>
+            <in>mesh-stack-installer.h</in>
+          </df>
+          <df name="model">
+            <df name="dot11s">
+              <in>airtime-metric.cc</in>
+              <in>airtime-metric.h</in>
+              <in>dot11s-mac-header.cc</in>
+              <in>dot11s-mac-header.h</in>
+              <in>dot11s.h</in>
+              <in>hwmp-protocol-mac.cc</in>
+              <in>hwmp-protocol-mac.h</in>
+              <in>hwmp-protocol.cc</in>
+              <in>hwmp-protocol.h</in>
+              <in>hwmp-rtable.cc</in>
+              <in>hwmp-rtable.h</in>
+              <in>hwmp-tag.cc</in>
+              <in>hwmp-tag.h</in>
+              <in>ie-dot11s-beacon-timing.cc</in>
+              <in>ie-dot11s-beacon-timing.h</in>
+              <in>ie-dot11s-configuration.cc</in>
+              <in>ie-dot11s-configuration.h</in>
+              <in>ie-dot11s-id.cc</in>
+              <in>ie-dot11s-id.h</in>
+              <in>ie-dot11s-metric-report.cc</in>
+              <in>ie-dot11s-metric-report.h</in>
+              <in>ie-dot11s-peer-management.cc</in>
+              <in>ie-dot11s-peer-management.h</in>
+              <in>ie-dot11s-peering-protocol.cc</in>
+              <in>ie-dot11s-peering-protocol.h</in>
+              <in>ie-dot11s-perr.cc</in>
+              <in>ie-dot11s-perr.h</in>
+              <in>ie-dot11s-prep.cc</in>
+              <in>ie-dot11s-prep.h</in>
+              <in>ie-dot11s-preq.cc</in>
+              <in>ie-dot11s-preq.h</in>
+              <in>ie-dot11s-rann.cc</in>
+              <in>ie-dot11s-rann.h</in>
+              <in>peer-link-frame.cc</in>
+              <in>peer-link-frame.h</in>
+              <in>peer-link.cc</in>
+              <in>peer-link.h</in>
+              <in>peer-management-protocol-mac.cc</in>
+              <in>peer-management-protocol-mac.h</in>
+              <in>peer-management-protocol.cc</in>
+              <in>peer-management-protocol.h</in>
+            </df>
+            <df name="flame">
+              <in>flame-header.cc</in>
+              <in>flame-header.h</in>
+              <in>flame-protocol-mac.cc</in>
+              <in>flame-protocol-mac.h</in>
+              <in>flame-protocol.cc</in>
+              <in>flame-protocol.h</in>
+              <in>flame-rtable.cc</in>
+              <in>flame-rtable.h</in>
+            </df>
+            <in>mesh-information-element-vector.cc</in>
+            <in>mesh-information-element-vector.h</in>
+            <in>mesh-information-element.h</in>
+            <in>mesh-l2-routing-protocol.cc</in>
+            <in>mesh-l2-routing-protocol.h</in>
+            <in>mesh-point-device.cc</in>
+            <in>mesh-point-device.h</in>
+            <in>mesh-wifi-beacon.cc</in>
+            <in>mesh-wifi-beacon.h</in>
+            <in>mesh-wifi-interface-mac-plugin.h</in>
+            <in>mesh-wifi-interface-mac.cc</in>
+            <in>mesh-wifi-interface-mac.h</in>
+          </df>
+          <df name="test">
+            <df name="dot11s">
+              <in>dot11s-test-suite.cc</in>
+              <in>hwmp-proactive-regression.cc</in>
+              <in>hwmp-proactive-regression.h</in>
+              <in>hwmp-reactive-regression.cc</in>
+              <in>hwmp-reactive-regression.h</in>
+              <in>hwmp-simplest-regression.cc</in>
+              <in>hwmp-simplest-regression.h</in>
+              <in>hwmp-target-flags-regression.cc</in>
+              <in>hwmp-target-flags-regression.h</in>
+              <in>pmp-regression.cc</in>
+              <in>pmp-regression.h</in>
+              <in>regression.cc</in>
+            </df>
+            <df name="flame">
+              <in>flame-regression.cc</in>
+              <in>flame-regression.h</in>
+              <in>flame-test-suite.cc</in>
+              <in>regression.cc</in>
+            </df>
+            <in>mesh-information-element-vector-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="mobility">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>bonnmotion-ns2-example.cc</in>
+            <in>main-grid-topology.cc</in>
+            <in>main-random-topology.cc</in>
+            <in>main-random-walk.cc</in>
+            <in>mobility-trace-example.cc</in>
+            <in>ns2-mobility-trace.cc</in>
+          </df>
+          <df name="helper">
+            <in>mobility-helper.cc</in>
+            <in>mobility-helper.h</in>
+            <in>ns2-mobility-helper.cc</in>
+            <in>ns2-mobility-helper.h</in>
+          </df>
+          <df name="model">
+            <in>box.cc</in>
+            <in>box.h</in>
+            <in>constant-acceleration-mobility-model.cc</in>
+            <in>constant-acceleration-mobility-model.h</in>
+            <in>constant-position-mobility-model.cc</in>
+            <in>constant-position-mobility-model.h</in>
+            <in>constant-velocity-helper.cc</in>
+            <in>constant-velocity-helper.h</in>
+            <in>constant-velocity-mobility-model.cc</in>
+            <in>constant-velocity-mobility-model.h</in>
+            <in>gauss-markov-mobility-model.cc</in>
+            <in>gauss-markov-mobility-model.h</in>
+            <in>geographic-positions.cc</in>
+            <in>geographic-positions.h</in>
+            <in>hierarchical-mobility-model.cc</in>
+            <in>hierarchical-mobility-model.h</in>
+            <in>mobility-model.cc</in>
+            <in>mobility-model.h</in>
+            <in>mobility.h</in>
+            <in>position-allocator.cc</in>
+            <in>position-allocator.h</in>
+            <in>random-direction-2d-mobility-model.cc</in>
+            <in>random-direction-2d-mobility-model.h</in>
+            <in>random-walk-2d-mobility-model.cc</in>
+            <in>random-walk-2d-mobility-model.h</in>
+            <in>random-waypoint-mobility-model.cc</in>
+            <in>random-waypoint-mobility-model.h</in>
+            <in>rectangle.cc</in>
+            <in>rectangle.h</in>
+            <in>steady-state-random-waypoint-mobility-model.cc</in>
+            <in>steady-state-random-waypoint-mobility-model.h</in>
+            <in>waypoint-mobility-model.cc</in>
+            <in>waypoint-mobility-model.h</in>
+            <in>waypoint.cc</in>
+            <in>waypoint.h</in>
+          </df>
+          <df name="test">
+            <in>geo-to-cartesian-test.cc</in>
+            <in>mobility-test-suite.cc</in>
+            <in>mobility-trace-test-suite.cc</in>
+            <in>ns2-mobility-helper-test-suite.cc</in>
+            <in>rand-cart-around-geo-test.cc</in>
+            <in>steady-state-random-waypoint-mobility-model-test.cc</in>
+            <in>waypoint-mobility-model-test.cc</in>
+          </df>
+        </df>
+        <df name="mpi">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>nms-p2p-nix-distributed.cc</in>
+            <in>simple-distributed-empty-node.cc</in>
+            <in>simple-distributed.cc</in>
+            <in>third-distributed.cc</in>
+          </df>
+          <df name="model">
+            <in>distributed-simulator-impl.cc</in>
+            <in>distributed-simulator-impl.h</in>
+            <in>granted-time-window-mpi-interface.cc</in>
+            <in>granted-time-window-mpi-interface.h</in>
+            <in>mpi-interface.cc</in>
+            <in>mpi-interface.h</in>
+            <in>mpi-receiver.cc</in>
+            <in>mpi-receiver.h</in>
+            <in>null-message-mpi-interface.cc</in>
+            <in>null-message-mpi-interface.h</in>
+            <in>null-message-simulator-impl.cc</in>
+            <in>null-message-simulator-impl.h</in>
+            <in>parallel-communication-interface.h</in>
+            <in>remote-channel-bundle-manager.cc</in>
+            <in>remote-channel-bundle-manager.h</in>
+            <in>remote-channel-bundle.cc</in>
+            <in>remote-channel-bundle.h</in>
+          </df>
+        </df>
+        <df name="netanim">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <df name="figures">
+            </df>
+          </df>
+          <df name="examples">
+            <in>dumbbell-animation.cc</in>
+            <in>dynamic_linknode.cc</in>
+            <in>grid-animation.cc</in>
+            <in>resources_demo.cc</in>
+            <in>star-animation.cc</in>
+            <in>uan-animation.cc</in>
+            <in>uan-animation.h</in>
+            <in>wireless-animation.cc</in>
+          </df>
+          <df name="model">
+            <in>animation-interface.cc</in>
+            <in>animation-interface.h</in>
+          </df>
+          <df name="test">
+            <in>netanim-test.cc</in>
+          </df>
+        </df>
+        <df name="network">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+            <in>network.h</in>
+          </df>
+          <df name="examples">
+            <in>main-packet-header.cc</in>
+            <in>main-packet-tag.cc</in>
+            <in>packet-socket-apps.cc</in>
+          </df>
+          <df name="helper">
+            <in>application-container.cc</in>
+            <in>application-container.h</in>
+            <in>delay-jitter-estimation.cc</in>
+            <in>delay-jitter-estimation.h</in>
+            <in>net-device-container.cc</in>
+            <in>net-device-container.h</in>
+            <in>node-container.cc</in>
+            <in>node-container.h</in>
+            <in>packet-socket-helper.cc</in>
+            <in>packet-socket-helper.h</in>
+            <in>simple-net-device-helper.cc</in>
+            <in>simple-net-device-helper.h</in>
+            <in>trace-helper.cc</in>
+            <in>trace-helper.h</in>
+          </df>
+          <df name="model">
+            <in>address.cc</in>
+            <in>address.h</in>
+            <in>application.cc</in>
+            <in>application.h</in>
+            <in>buffer.cc</in>
+            <in>buffer.h</in>
+            <in>byte-tag-list.cc</in>
+            <in>byte-tag-list.h</in>
+            <in>channel-list.cc</in>
+            <in>channel-list.h</in>
+            <in>channel.cc</in>
+            <in>channel.h</in>
+            <in>chunk.cc</in>
+            <in>chunk.h</in>
+            <in>header.cc</in>
+            <in>header.h</in>
+            <in>net-device.cc</in>
+            <in>net-device.h</in>
+            <in>nix-vector.cc</in>
+            <in>nix-vector.h</in>
+            <in>node-list.cc</in>
+            <in>node-list.h</in>
+            <in>node.cc</in>
+            <in>node.h</in>
+            <in>packet-metadata.cc</in>
+            <in>packet-metadata.h</in>
+            <in>packet-tag-list.cc</in>
+            <in>packet-tag-list.h</in>
+            <in>packet.cc</in>
+            <in>packet.h</in>
+            <in>socket-factory.cc</in>
+            <in>socket-factory.h</in>
+            <in>socket.cc</in>
+            <in>socket.h</in>
+            <in>tag-buffer.cc</in>
+            <in>tag-buffer.h</in>
+            <in>tag.cc</in>
+            <in>tag.h</in>
+            <in>trailer.cc</in>
+            <in>trailer.h</in>
+          </df>
+          <df name="test">
+            <in>buffer-test.cc</in>
+            <in>drop-tail-queue-test-suite.cc</in>
+            <in>error-model-test-suite.cc</in>
+            <in>ipv6-address-test-suite.cc</in>
+            <in>packet-metadata-test.cc</in>
+            <in>packet-socket-apps-test-suite.cc</in>
+            <in>packet-test-suite.cc</in>
+            <in>packetbb-test-suite.cc</in>
+            <in>pcap-file-test-suite.cc</in>
+            <in>sequence-number-test-suite.cc</in>
+          </df>
+          <df name="utils">
+            <in>address-utils.cc</in>
+            <in>address-utils.h</in>
+            <in>ascii-file.cc</in>
+            <in>ascii-file.h</in>
+            <in>ascii-test.h</in>
+            <in>crc32.cc</in>
+            <in>crc32.h</in>
+            <in>data-rate.cc</in>
+            <in>data-rate.h</in>
+            <in>drop-tail-queue.cc</in>
+            <in>drop-tail-queue.h</in>
+            <in>error-model.cc</in>
+            <in>error-model.h</in>
+            <in>ethernet-header.cc</in>
+            <in>ethernet-header.h</in>
+            <in>ethernet-trailer.cc</in>
+            <in>ethernet-trailer.h</in>
+            <in>flow-id-tag.cc</in>
+            <in>flow-id-tag.h</in>
+            <in>generic-phy.h</in>
+            <in>inet-socket-address.cc</in>
+            <in>inet-socket-address.h</in>
+            <in>inet6-socket-address.cc</in>
+            <in>inet6-socket-address.h</in>
+            <in>ipv4-address.cc</in>
+            <in>ipv4-address.h</in>
+            <in>ipv6-address.cc</in>
+            <in>ipv6-address.h</in>
+            <in>llc-snap-header.cc</in>
+            <in>llc-snap-header.h</in>
+            <in>mac16-address.cc</in>
+            <in>mac16-address.h</in>
+            <in>mac48-address.cc</in>
+            <in>mac48-address.h</in>
+            <in>mac64-address.cc</in>
+            <in>mac64-address.h</in>
+            <in>output-stream-wrapper.cc</in>
+            <in>output-stream-wrapper.h</in>
+            <in>packet-burst.cc</in>
+            <in>packet-burst.h</in>
+            <in>packet-data-calculators.cc</in>
+            <in>packet-data-calculators.h</in>
+            <in>packet-probe.cc</in>
+            <in>packet-probe.h</in>
+            <in>packet-socket-address.cc</in>
+            <in>packet-socket-address.h</in>
+            <in>packet-socket-client.cc</in>
+            <in>packet-socket-client.h</in>
+            <in>packet-socket-factory.cc</in>
+            <in>packet-socket-factory.h</in>
+            <in>packet-socket-server.cc</in>
+            <in>packet-socket-server.h</in>
+            <in>packet-socket.cc</in>
+            <in>packet-socket.h</in>
+            <in>packetbb.cc</in>
+            <in>packetbb.h</in>
+            <in>pcap-file-wrapper.cc</in>
+            <in>pcap-file-wrapper.h</in>
+            <in>pcap-file.cc</in>
+            <in>pcap-file.h</in>
+            <in>pcap-test.h</in>
+            <in>queue.cc</in>
+            <in>queue.h</in>
+            <in>radiotap-header.cc</in>
+            <in>radiotap-header.h</in>
+            <in>sequence-number.h</in>
+            <in>sgi-hashmap.h</in>
+            <in>simple-channel.cc</in>
+            <in>simple-channel.h</in>
+            <in>simple-net-device.cc</in>
+            <in>simple-net-device.h</in>
+            <in>sll-header.cc</in>
+            <in>sll-header.h</in>
+          </df>
+        </df>
+        <df name="nix-vector-routing">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>nix-vector-routing.h</in>
+          </df>
+          <df name="examples">
+            <in>nix-simple.cc</in>
+            <in>nms-p2p-nix.cc</in>
+          </df>
+          <df name="helper">
+            <in>ipv4-nix-vector-helper.cc</in>
+            <in>ipv4-nix-vector-helper.h</in>
+          </df>
+          <df name="model">
+            <in>ipv4-nix-vector-routing.cc</in>
+            <in>ipv4-nix-vector-routing.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="olsr">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>olsr-hna.cc</in>
+            <in>simple-point-to-point-olsr.cc</in>
+          </df>
+          <df name="helper">
+            <in>olsr-helper.cc</in>
+            <in>olsr-helper.h</in>
+          </df>
+          <df name="model">
+            <in>olsr-header.cc</in>
+            <in>olsr-header.h</in>
+            <in>olsr-repositories.h</in>
+            <in>olsr-routing-protocol.cc</in>
+            <in>olsr-routing-protocol.h</in>
+            <in>olsr-state.cc</in>
+            <in>olsr-state.h</in>
+          </df>
+          <df name="test">
+            <in>bug780-test.cc</in>
+            <in>bug780-test.h</in>
+            <in>hello-regression-test.cc</in>
+            <in>hello-regression-test.h</in>
+            <in>olsr-header-test-suite.cc</in>
+            <in>olsr-routing-protocol-test-suite.cc</in>
+            <in>regression-test-suite.cc</in>
+            <in>tc-regression-test.cc</in>
+            <in>tc-regression-test.h</in>
+          </df>
+        </df>
+        <df name="openflow">
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>openflow-switch.cc</in>
+          </df>
+          <df name="helper">
+            <in>openflow-switch-helper.cc</in>
+            <in>openflow-switch-helper.h</in>
+          </df>
+          <df name="model">
+            <in>openflow-interface.cc</in>
+            <in>openflow-interface.h</in>
+            <in>openflow-switch-net-device.cc</in>
+            <in>openflow-switch-net-device.h</in>
+          </df>
+          <df name="test">
+            <in>openflow-switch-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="point-to-point">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>main-attribute-value.cc</in>
+          </df>
+          <df name="helper">
+            <in>point-to-point-helper.cc</in>
+            <in>point-to-point-helper.h</in>
+          </df>
+          <df name="model">
+            <in>point-to-point-channel.cc</in>
+            <in>point-to-point-channel.h</in>
+            <in>point-to-point-net-device.cc</in>
+            <in>point-to-point-net-device.h</in>
+            <in>point-to-point-remote-channel.cc</in>
+            <in>point-to-point-remote-channel.h</in>
+            <in>ppp-header.cc</in>
+            <in>ppp-header.h</in>
+          </df>
+          <df name="test">
+            <in>point-to-point-test.cc</in>
+          </df>
+        </df>
+        <df name="point-to-point-layout">
+          <df name="bindings">
+          </df>
+          <df name="model">
+            <in>point-to-point-dumbbell.cc</in>
+            <in>point-to-point-dumbbell.h</in>
+            <in>point-to-point-grid.cc</in>
+            <in>point-to-point-grid.h</in>
+            <in>point-to-point-star.cc</in>
+            <in>point-to-point-star.h</in>
+          </df>
+        </df>
+        <df name="propagation">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>jakes-propagation-model-example.cc</in>
+            <in>main-propagation-loss.cc</in>
+          </df>
+          <df name="model">
+            <in>cost231-propagation-loss-model.cc</in>
+            <in>cost231-propagation-loss-model.h</in>
+            <in>itu-r-1411-los-propagation-loss-model.cc</in>
+            <in>itu-r-1411-los-propagation-loss-model.h</in>
+            <in>itu-r-1411-nlos-over-rooftop-propagation-loss-model.cc</in>
+            <in>itu-r-1411-nlos-over-rooftop-propagation-loss-model.h</in>
+            <in>jakes-process.cc</in>
+            <in>jakes-process.h</in>
+            <in>jakes-propagation-loss-model.cc</in>
+            <in>jakes-propagation-loss-model.h</in>
+            <in>kun-2600-mhz-propagation-loss-model.cc</in>
+            <in>kun-2600-mhz-propagation-loss-model.h</in>
+            <in>okumura-hata-propagation-loss-model.cc</in>
+            <in>okumura-hata-propagation-loss-model.h</in>
+            <in>propagation-cache.h</in>
+            <in>propagation-delay-model.cc</in>
+            <in>propagation-delay-model.h</in>
+            <in>propagation-environment.h</in>
+            <in>propagation-loss-model.cc</in>
+            <in>propagation-loss-model.h</in>
+          </df>
+          <df name="test">
+            <df name="reference">
+              <in>loss_COST231_large_cities_urban.m</in>
+              <in>loss_COST231_small_cities_urban.m</in>
+              <in>loss_ITU1411_LOS.m</in>
+              <in>loss_ITU1411_NLOS_over_rooftop.m</in>
+              <in>loss_Kun_2_6GHz.m</in>
+              <in>loss_OH_large_cities_urban.m</in>
+              <in>loss_OH_openareas.m</in>
+              <in>loss_OH_small_cities_urban.m</in>
+              <in>loss_OH_suburban.m</in>
+            </df>
+            <in>itu-r-1411-los-test-suite.cc</in>
+            <in>itu-r-1411-nlos-over-rooftop-test-suite.cc</in>
+            <in>kun-2600-mhz-test-suite.cc</in>
+            <in>okumura-hata-test-suite.cc</in>
+            <in>propagation-loss-model-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="sixlowpan">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>example-ping-lr-wpan.cc</in>
+            <in>example-sixlowpan.cc</in>
+          </df>
+          <df name="helper">
+            <in>sixlowpan-helper.cc</in>
+            <in>sixlowpan-helper.h</in>
+          </df>
+          <df name="model">
+            <in>sixlowpan-header.cc</in>
+            <in>sixlowpan-header.h</in>
+            <in>sixlowpan-net-device.cc</in>
+            <in>sixlowpan-net-device.h</in>
+          </df>
+          <df name="test">
+            <in>error-channel-sixlow.cc</in>
+            <in>error-channel-sixlow.h</in>
+            <in>sixlowpan-fragmentation-test.cc</in>
+            <in>sixlowpan-hc1-test.cc</in>
+            <in>sixlowpan-iphc-test.cc</in>
+          </df>
+        </df>
+        <df name="spectrum">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>adhoc-aloha-ideal-phy-matrix-propagation-loss-model.cc</in>
+            <in>adhoc-aloha-ideal-phy-with-microwave-oven.cc</in>
+            <in>adhoc-aloha-ideal-phy.cc</in>
+            <in>tv-trans-example.cc</in>
+            <in>tv-trans-regional-example.cc</in>
+          </df>
+          <df name="helper">
+            <in>adhoc-aloha-noack-ideal-phy-helper.cc</in>
+            <in>adhoc-aloha-noack-ideal-phy-helper.h</in>
+            <in>spectrum-analyzer-helper.cc</in>
+            <in>spectrum-analyzer-helper.h</in>
+            <in>spectrum-helper.cc</in>
+            <in>spectrum-helper.h</in>
+            <in>tv-spectrum-transmitter-helper.cc</in>
+            <in>tv-spectrum-transmitter-helper.h</in>
+            <in>waveform-generator-helper.cc</in>
+            <in>waveform-generator-helper.h</in>
+          </df>
+          <df name="model">
+            <in>aloha-noack-mac-header.cc</in>
+            <in>aloha-noack-mac-header.h</in>
+            <in>aloha-noack-net-device.cc</in>
+            <in>aloha-noack-net-device.h</in>
+            <in>constant-spectrum-propagation-loss.cc</in>
+            <in>constant-spectrum-propagation-loss.h</in>
+            <in>friis-spectrum-propagation-loss.cc</in>
+            <in>friis-spectrum-propagation-loss.h</in>
+            <in>half-duplex-ideal-phy-signal-parameters.cc</in>
+            <in>half-duplex-ideal-phy-signal-parameters.h</in>
+            <in>half-duplex-ideal-phy.cc</in>
+            <in>half-duplex-ideal-phy.h</in>
+            <in>microwave-oven-spectrum-value-helper.cc</in>
+            <in>microwave-oven-spectrum-value-helper.h</in>
+            <in>multi-model-spectrum-channel.cc</in>
+            <in>multi-model-spectrum-channel.h</in>
+            <in>non-communicating-net-device.cc</in>
+            <in>non-communicating-net-device.h</in>
+            <in>single-model-spectrum-channel.cc</in>
+            <in>single-model-spectrum-channel.h</in>
+            <in>spectrum-analyzer.cc</in>
+            <in>spectrum-analyzer.h</in>
+            <in>spectrum-channel.cc</in>
+            <in>spectrum-channel.h</in>
+            <in>spectrum-converter.cc</in>
+            <in>spectrum-converter.h</in>
+            <in>spectrum-error-model.cc</in>
+            <in>spectrum-error-model.h</in>
+            <in>spectrum-interference.cc</in>
+            <in>spectrum-interference.h</in>
+            <in>spectrum-model-300kHz-300GHz-log.cc</in>
+            <in>spectrum-model-300kHz-300GHz-log.h</in>
+            <in>spectrum-model-ism2400MHz-res1MHz.cc</in>
+            <in>spectrum-model-ism2400MHz-res1MHz.h</in>
+            <in>spectrum-model.cc</in>
+            <in>spectrum-model.h</in>
+            <in>spectrum-phy.cc</in>
+            <in>spectrum-phy.h</in>
+            <in>spectrum-propagation-loss-model.cc</in>
+            <in>spectrum-propagation-loss-model.h</in>
+            <in>spectrum-signal-parameters.cc</in>
+            <in>spectrum-signal-parameters.h</in>
+            <in>spectrum-value.cc</in>
+            <in>spectrum-value.h</in>
+            <in>tv-spectrum-transmitter.cc</in>
+            <in>tv-spectrum-transmitter.h</in>
+            <in>waveform-generator.cc</in>
+            <in>waveform-generator.h</in>
+            <in>wifi-spectrum-value-helper.cc</in>
+            <in>wifi-spectrum-value-helper.h</in>
+          </df>
+          <df name="test">
+            <in>spectrum-ideal-phy-test.cc</in>
+            <in>spectrum-interference-test.cc</in>
+            <in>spectrum-test.h</in>
+            <in>spectrum-value-test.cc</in>
+            <in>spectrum-waveform-generator-test.cc</in>
+            <in>tv-helper-distribution-test.cc</in>
+            <in>tv-spectrum-transmitter-test.cc</in>
+          </df>
+        </df>
+        <df name="stats">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>double-probe-example.cc</in>
+            <in>file-aggregator-example.cc</in>
+            <in>file-helper-example.cc</in>
+            <in>gnuplot-aggregator-example.cc</in>
+            <in>gnuplot-example.cc</in>
+            <in>gnuplot-helper-example.cc</in>
+            <in>time-probe-example.cc</in>
+          </df>
+          <df name="helper">
+            <in>file-helper.cc</in>
+            <in>file-helper.h</in>
+            <in>gnuplot-helper.cc</in>
+            <in>gnuplot-helper.h</in>
+          </df>
+          <df name="model">
+            <in>average.h</in>
+            <in>basic-data-calculators.h</in>
+            <in>boolean-probe.cc</in>
+            <in>boolean-probe.h</in>
+            <in>data-calculator.cc</in>
+            <in>data-calculator.h</in>
+            <in>data-collection-object.cc</in>
+            <in>data-collection-object.h</in>
+            <in>data-collector.cc</in>
+            <in>data-collector.h</in>
+            <in>data-output-interface.cc</in>
+            <in>data-output-interface.h</in>
+            <in>double-probe.cc</in>
+            <in>double-probe.h</in>
+            <in>file-aggregator.cc</in>
+            <in>file-aggregator.h</in>
+            <in>get-wildcard-matches.cc</in>
+            <in>get-wildcard-matches.h</in>
+            <in>gnuplot-aggregator.cc</in>
+            <in>gnuplot-aggregator.h</in>
+            <in>gnuplot.cc</in>
+            <in>gnuplot.h</in>
+            <in>omnet-data-output.cc</in>
+            <in>omnet-data-output.h</in>
+            <in>probe.cc</in>
+            <in>probe.h</in>
+            <in>sqlite-data-output.cc</in>
+            <in>sqlite-data-output.h</in>
+            <in>stats.h</in>
+            <in>time-data-calculators.cc</in>
+            <in>time-data-calculators.h</in>
+            <in>time-probe.cc</in>
+            <in>time-probe.h</in>
+            <in>time-series-adaptor.cc</in>
+            <in>time-series-adaptor.h</in>
+            <in>uinteger-16-probe.cc</in>
+            <in>uinteger-16-probe.h</in>
+            <in>uinteger-32-probe.cc</in>
+            <in>uinteger-32-probe.h</in>
+            <in>uinteger-8-probe.cc</in>
+            <in>uinteger-8-probe.h</in>
+          </df>
+          <df name="test">
+            <in>average-test-suite.cc</in>
+            <in>basic-data-calculators-test-suite.cc</in>
+            <in>double-probe-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="tap-bridge">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>tap.h</in>
+          </df>
+          <df name="examples">
+            <in>tap-csma-virtual-machine.cc</in>
+            <in>tap-csma.cc</in>
+            <in>tap-wifi-dumbbell.cc</in>
+            <in>tap-wifi-virtual-machine.cc</in>
+          </df>
+          <df name="helper">
+            <in>tap-bridge-helper.cc</in>
+            <in>tap-bridge-helper.h</in>
+          </df>
+          <df name="model">
+            <in>tap-bridge.cc</in>
+            <in>tap-bridge.h</in>
+            <in>tap-creator.cc</in>
+            <in>tap-encode-decode.cc</in>
+            <in>tap-encode-decode.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="test">
+          <df name="ns3tcp">
+            <df name="response-vectors">
+            </df>
+            <in>ns3tcp-cwnd-test-suite.cc</in>
+            <in>ns3tcp-interop-test-suite.cc</in>
+            <in>ns3tcp-loss-test-suite.cc</in>
+            <in>ns3tcp-no-delay-test-suite.cc</in>
+            <in>ns3tcp-socket-test-suite.cc</in>
+            <in>ns3tcp-socket-writer.cc</in>
+            <in>ns3tcp-socket-writer.h</in>
+            <in>ns3tcp-state-test-suite.cc</in>
+            <in>nsctcp-loss-test-suite.cc</in>
+          </df>
+          <df name="ns3wifi">
+            <in>wifi-interference-test-suite.cc</in>
+            <in>wifi-msdu-aggregator-test-suite.cc</in>
+          </df>
+          <df name="perf">
+            <in>perf-io.cc</in>
+          </df>
+          <in>csma-system-test-suite.cc</in>
+        </df>
+        <df name="topology-read">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+            <in>topology.h</in>
+          </df>
+          <df name="examples">
+            <in>topology-example-sim.cc</in>
+          </df>
+          <df name="helper">
+            <in>topology-reader-helper.cc</in>
+            <in>topology-reader-helper.h</in>
+          </df>
+          <df name="model">
+            <in>inet-topology-reader.cc</in>
+            <in>inet-topology-reader.h</in>
+            <in>orbis-topology-reader.cc</in>
+            <in>orbis-topology-reader.h</in>
+            <in>rocketfuel-topology-reader.cc</in>
+            <in>rocketfuel-topology-reader.h</in>
+            <in>topology-reader.cc</in>
+            <in>topology-reader.h</in>
+          </df>
+          <df name="test">
+            <in>rocketfuel-topology-reader-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="traffic-control">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>adaptive-red-tests.cc</in>
+            <in>codel-vs-pfifo-asymmetric.cc</in>
+            <in>codel-vs-pfifo-basic-test.cc</in>
+            <in>pfifo-vs-red.cc</in>
+            <in>red-tests.cc</in>
+            <in>red-vs-ared.cc</in>
+          </df>
+          <df name="helper">
+            <in>queue-disc-container.cc</in>
+            <in>queue-disc-container.h</in>
+            <in>traffic-control-helper.cc</in>
+            <in>traffic-control-helper.h</in>
+          </df>
+          <df name="model">
+            <in>codel-queue-disc.cc</in>
+            <in>codel-queue-disc.h</in>
+            <in>packet-filter.cc</in>
+            <in>packet-filter.h</in>
+            <in>pfifo-fast-queue-disc.cc</in>
+            <in>pfifo-fast-queue-disc.h</in>
+            <in>queue-disc.cc</in>
+            <in>queue-disc.h</in>
+            <in>red-queue-disc.cc</in>
+            <in>red-queue-disc.h</in>
+            <in>traffic-control-layer.cc</in>
+            <in>traffic-control-layer.h</in>
+          </df>
+          <df name="test">
+            <in>codel-queue-disc-test-suite.cc</in>
+            <in>red-queue-disc-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="uan">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>uan-cw-example.cc</in>
+            <in>uan-cw-example.h</in>
+            <in>uan-rc-example.cc</in>
+            <in>uan-rc-example.h</in>
+          </df>
+          <df name="helper">
+            <in>acoustic-modem-energy-model-helper.cc</in>
+            <in>acoustic-modem-energy-model-helper.h</in>
+            <in>uan-helper.cc</in>
+            <in>uan-helper.h</in>
+          </df>
+          <df name="model">
+            <in>acoustic-modem-energy-model.cc</in>
+            <in>acoustic-modem-energy-model.h</in>
+            <in>uan-address.cc</in>
+            <in>uan-address.h</in>
+            <in>uan-channel.cc</in>
+            <in>uan-channel.h</in>
+            <in>uan-header-common.cc</in>
+            <in>uan-header-common.h</in>
+            <in>uan-header-rc.cc</in>
+            <in>uan-header-rc.h</in>
+            <in>uan-mac-aloha.cc</in>
+            <in>uan-mac-aloha.h</in>
+            <in>uan-mac-cw.cc</in>
+            <in>uan-mac-cw.h</in>
+            <in>uan-mac-rc-gw.cc</in>
+            <in>uan-mac-rc-gw.h</in>
+            <in>uan-mac-rc.cc</in>
+            <in>uan-mac-rc.h</in>
+            <in>uan-mac.cc</in>
+            <in>uan-mac.h</in>
+            <in>uan-net-device.cc</in>
+            <in>uan-net-device.h</in>
+            <in>uan-noise-model-default.cc</in>
+            <in>uan-noise-model-default.h</in>
+            <in>uan-noise-model.cc</in>
+            <in>uan-noise-model.h</in>
+            <in>uan-phy-dual.cc</in>
+            <in>uan-phy-dual.h</in>
+            <in>uan-phy-gen.cc</in>
+            <in>uan-phy-gen.h</in>
+            <in>uan-phy.cc</in>
+            <in>uan-phy.h</in>
+            <in>uan-prop-model-ideal.cc</in>
+            <in>uan-prop-model-ideal.h</in>
+            <in>uan-prop-model-thorp.cc</in>
+            <in>uan-prop-model-thorp.h</in>
+            <in>uan-prop-model.cc</in>
+            <in>uan-prop-model.h</in>
+            <in>uan-transducer-hd.cc</in>
+            <in>uan-transducer-hd.h</in>
+            <in>uan-transducer.cc</in>
+            <in>uan-transducer.h</in>
+            <in>uan-tx-mode.cc</in>
+            <in>uan-tx-mode.h</in>
+          </df>
+          <df name="test">
+            <in>uan-energy-model-test.cc</in>
+            <in>uan-test.cc</in>
+          </df>
+        </df>
+        <df name="virtual-net-device">
+          <df name="bindings">
+          </df>
+          <df name="examples">
+            <in>virtual-net-device.cc</in>
+          </df>
+          <df name="model">
+            <in>virtual-net-device.cc</in>
+            <in>virtual-net-device.h</in>
+          </df>
+          <df name="test">
+          </df>
+        </df>
+        <df name="visualizer">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+          </df>
+          <df name="model">
+            <in>dummy-file-for-static-builds.cc</in>
+            <in>pyviz.cc</in>
+            <in>pyviz.h</in>
+            <in>visual-simulator-impl.cc</in>
+            <in>visual-simulator-impl.h</in>
+          </df>
+          <df name="visualizer">
+            <df name="plugins">
+            </df>
+            <df name="resource">
+            </df>
+          </df>
+        </df>
+        <df name="wave">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>vanet-routing-compare.cc</in>
+            <in>wave-simple-80211p.cc</in>
+            <in>wave-simple-device.cc</in>
+          </df>
+          <df name="helper">
+            <in>wave-bsm-helper.cc</in>
+            <in>wave-bsm-helper.h</in>
+            <in>wave-bsm-stats.cc</in>
+            <in>wave-bsm-stats.h</in>
+            <in>wave-helper.cc</in>
+            <in>wave-helper.h</in>
+            <in>wave-mac-helper.cc</in>
+            <in>wave-mac-helper.h</in>
+            <in>wifi-80211p-helper.cc</in>
+            <in>wifi-80211p-helper.h</in>
+          </df>
+          <df name="model">
+            <in>bsm-application.cc</in>
+            <in>bsm-application.h</in>
+            <in>channel-coordinator.cc</in>
+            <in>channel-coordinator.h</in>
+            <in>channel-manager.cc</in>
+            <in>channel-manager.h</in>
+            <in>channel-scheduler.cc</in>
+            <in>channel-scheduler.h</in>
+            <in>default-channel-scheduler.cc</in>
+            <in>default-channel-scheduler.h</in>
+            <in>higher-tx-tag.cc</in>
+            <in>higher-tx-tag.h</in>
+            <in>ocb-wifi-mac.cc</in>
+            <in>ocb-wifi-mac.h</in>
+            <in>vendor-specific-action.cc</in>
+            <in>vendor-specific-action.h</in>
+            <in>vsa-manager.cc</in>
+            <in>vsa-manager.h</in>
+            <in>wave-mac-low.cc</in>
+            <in>wave-mac-low.h</in>
+            <in>wave-net-device.cc</in>
+            <in>wave-net-device.h</in>
+          </df>
+          <df name="test">
+            <in>mac-extension-test-suite.cc</in>
+            <in>ocb-test-suite.cc</in>
+          </df>
+        </df>
+        <df name="wifi">
+          <df name="bindings">
+            <in>scan-header.h</in>
+          </df>
+          <df name="doc">
+            <df name="source">
+              <df name="figures">
+              </df>
+            </df>
+          </df>
+          <df name="examples">
+            <in>test-interference-helper.cc</in>
+            <in>wifi-phy-test.cc</in>
+          </df>
+          <df name="helper">
+            <in>athstats-helper.cc</in>
+            <in>athstats-helper.h</in>
+            <in>ht-wifi-mac-helper.cc</in>
+            <in>ht-wifi-mac-helper.h</in>
+            <in>nqos-wifi-mac-helper.cc</in>
+            <in>nqos-wifi-mac-helper.h</in>
+            <in>qos-wifi-mac-helper.cc</in>
+            <in>qos-wifi-mac-helper.h</in>
+            <in>s1g-wifi-mac-helper.cc</in>
+            <in>s1g-wifi-mac-helper.h</in>
+            <in>wifi-helper.cc</in>
+            <in>wifi-helper.h</in>
+            <in>yans-wifi-helper.cc</in>
+            <in>yans-wifi-helper.h</in>
+          </df>
+          <df name="model">
+            <in>aarf-wifi-manager.cc</in>
+            <in>aarf-wifi-manager.h</in>
+            <in>aarfcd-wifi-manager.cc</in>
+            <in>aarfcd-wifi-manager.h</in>
+            <in>adhoc-wifi-mac.cc</in>
+            <in>adhoc-wifi-mac.h</in>
+            <in>ampdu-subframe-header.cc</in>
+            <in>ampdu-subframe-header.h</in>
+            <in>ampdu-tag.cc</in>
+            <in>ampdu-tag.h</in>
+            <in>amrr-wifi-manager.cc</in>
+            <in>amrr-wifi-manager.h</in>
+            <in>amsdu-subframe-header.cc</in>
+            <in>amsdu-subframe-header.h</in>
+            <in>ap-wifi-mac.cc</in>
+            <in>ap-wifi-mac.h</in>
+            <in>aparf-wifi-manager.cc</in>
+            <in>aparf-wifi-manager.h</in>
+            <in>arf-wifi-manager.cc</in>
+            <in>arf-wifi-manager.h</in>
+            <in>authentication-control.cc</in>
+            <in>authentication-control.h</in>
+            <in>block-ack-agreement.cc</in>
+            <in>block-ack-agreement.h</in>
+            <in>block-ack-cache.cc</in>
+            <in>block-ack-cache.h</in>
+            <in>block-ack-manager.cc</in>
+            <in>block-ack-manager.h</in>
+            <in>capability-information.cc</in>
+            <in>capability-information.h</in>
+            <in>cara-wifi-manager.cc</in>
+            <in>cara-wifi-manager.h</in>
+            <in>constant-rate-wifi-manager.cc</in>
+            <in>constant-rate-wifi-manager.h</in>
+            <in>ctrl-headers.cc</in>
+            <in>ctrl-headers.h</in>
+            <in>dca-txop.cc</in>
+            <in>dca-txop.h</in>
+            <in>dcf-manager.cc</in>
+            <in>dcf-manager.h</in>
+            <in>dcf.cc</in>
+            <in>dcf.h</in>
+            <in>drop-reason.h</in>
+            <in>dsss-error-rate-model.cc</in>
+            <in>dsss-error-rate-model.h</in>
+            <in>edca-txop-n.cc</in>
+            <in>edca-txop-n.h</in>
+            <in>error-rate-model.cc</in>
+            <in>error-rate-model.h</in>
+            <in>extension-headers.cc</in>
+            <in>extension-headers.h</in>
+            <in>ht-capabilities.cc</in>
+            <in>ht-capabilities.h</in>
+            <in>ideal-wifi-manager.cc</in>
+            <in>ideal-wifi-manager.h</in>
+            <in>interference-helper.cc</in>
+            <in>interference-helper.h</in>
+            <in>mac-low.cc</in>
+            <in>mac-low.h</in>
+            <in>mac-rx-middle.cc</in>
+            <in>mac-rx-middle.h</in>
+            <in>mac-tx-middle.cc</in>
+            <in>mac-tx-middle.h</in>
+            <in>mgt-headers.cc</in>
+            <in>mgt-headers.h</in>
+            <in>minstrel-wifi-manager.cc</in>
+            <in>minstrel-wifi-manager.h</in>
+            <in>mpdu-aggregator.cc</in>
+            <in>mpdu-aggregator.h</in>
+            <in>mpdu-standard-aggregator.cc</in>
+            <in>mpdu-standard-aggregator.h</in>
+            <in>msdu-aggregator.cc</in>
+            <in>msdu-aggregator.h</in>
+            <in>msdu-standard-aggregator.cc</in>
+            <in>msdu-standard-aggregator.h</in>
+            <in>nist-error-rate-model.cc</in>
+            <in>nist-error-rate-model.h</in>
+            <in>onoe-wifi-manager.cc</in>
+            <in>onoe-wifi-manager.h</in>
+            <in>originator-block-ack-agreement.cc</in>
+            <in>originator-block-ack-agreement.h</in>
+            <in>parf-wifi-manager.cc</in>
+            <in>parf-wifi-manager.h</in>
+            <in>qos-blocked-destinations.cc</in>
+            <in>qos-blocked-destinations.h</in>
+            <in>qos-tag.cc</in>
+            <in>qos-tag.h</in>
+            <in>qos-utils.cc</in>
+            <in>qos-utils.h</in>
+            <in>random-stream.cc</in>
+            <in>random-stream.h</in>
+            <in>regular-wifi-mac.cc</in>
+            <in>regular-wifi-mac.h</in>
+            <in>rps.cc</in>
+            <in>rps.h</in>
+            <in>rraa-wifi-manager.cc</in>
+            <in>rraa-wifi-manager.h</in>
+            <in>s1g-beacon-compatibility.cc</in>
+            <in>s1g-beacon-compatibility.h</in>
+            <in>s1g-capabilities.cc</in>
+            <in>s1g-capabilities.h</in>
+            <in>s1g-raw-control.cc</in>
+            <in>s1g-raw-control.h</in>
+            <in>snr-tag.cc</in>
+            <in>snr-tag.h</in>
+            <in>ssid.cc</in>
+            <in>ssid.h</in>
+            <in>sta-wifi-mac.cc</in>
+            <in>sta-wifi-mac.h</in>
+            <in>status-code.cc</in>
+            <in>status-code.h</in>
+            <in>supported-rates.cc</in>
+            <in>supported-rates.h</in>
+            <in>tim.cc</in>
+            <in>tim.h</in>
+            <in>wifi-channel.cc</in>
+            <in>wifi-channel.h</in>
+            <in>wifi-information-element-vector.cc</in>
+            <in>wifi-information-element-vector.h</in>
+            <in>wifi-information-element.cc</in>
+            <in>wifi-information-element.h</in>
+            <in>wifi-mac-header.cc</in>
+            <in>wifi-mac-header.h</in>
+            <in>wifi-mac-queue.cc</in>
+            <in>wifi-mac-queue.h</in>
+            <in>wifi-mac-trailer.cc</in>
+            <in>wifi-mac-trailer.h</in>
+            <in>wifi-mac.cc</in>
+            <in>wifi-mac.h</in>
+            <in>wifi-mode.cc</in>
+            <in>wifi-mode.h</in>
+            <in>wifi-net-device.cc</in>
+            <in>wifi-net-device.h</in>
+            <in>wifi-phy-standard.h</in>
+            <in>wifi-phy-state-helper.cc</in>
+            <in>wifi-phy-state-helper.h</in>
+            <in>wifi-phy.cc</in>
+            <in>wifi-phy.h</in>
+            <in>wifi-preamble.h</in>
+            <in>wifi-remote-station-manager.cc</in>
+            <in>wifi-remote-station-manager.h</in>
+            <in>wifi-tx-vector.cc</in>
+            <in>wifi-tx-vector.h</in>
+            <in>yans-error-rate-model.cc</in>
+            <in>yans-error-rate-model.h</in>
+            <in>yans-wifi-channel.cc</in>
+            <in>yans-wifi-channel.h</in>
+            <in>yans-wifi-phy.cc</in>
+            <in>yans-wifi-phy.h</in>
+          </df>
+          <df name="test">
+            <in>block-ack-test-suite.cc</in>
+            <in>dcf-manager-test.cc</in>
+            <in>power-rate-adaptation-test.cc</in>
+            <in>tx-duration-test.cc</in>
+            <in>wifi-aggregation-test.cc</in>
+            <in>wifi-test.cc</in>
+          </df>
+        </df>
+        <df name="wimax">
+          <df name="bindings">
+          </df>
+          <df name="doc">
+          </df>
+          <df name="examples">
+            <in>wimax-ipv4.cc</in>
+            <in>wimax-multicast.cc</in>
+            <in>wimax-simple.cc</in>
+          </df>
+          <df name="helper">
+            <in>wimax-helper.cc</in>
+            <in>wimax-helper.h</in>
+          </df>
+          <df name="model">
+            <in>bandwidth-manager.cc</in>
+            <in>bandwidth-manager.h</in>
+            <in>bs-link-manager.cc</in>
+            <in>bs-link-manager.h</in>
+            <in>bs-net-device.cc</in>
+            <in>bs-net-device.h</in>
+            <in>bs-scheduler-rtps.cc</in>
+            <in>bs-scheduler-rtps.h</in>
+            <in>bs-scheduler-simple.cc</in>
+            <in>bs-scheduler-simple.h</in>
+            <in>bs-scheduler.cc</in>
+            <in>bs-scheduler.h</in>
+            <in>bs-service-flow-manager.cc</in>
+            <in>bs-service-flow-manager.h</in>
+            <in>bs-uplink-scheduler-mbqos.cc</in>
+            <in>bs-uplink-scheduler-mbqos.h</in>
+            <in>bs-uplink-scheduler-rtps.cc</in>
+            <in>bs-uplink-scheduler-rtps.h</in>
+            <in>bs-uplink-scheduler-simple.cc</in>
+            <in>bs-uplink-scheduler-simple.h</in>
+            <in>bs-uplink-scheduler.cc</in>
+            <in>bs-uplink-scheduler.h</in>
+            <in>burst-profile-manager.cc</in>
+            <in>burst-profile-manager.h</in>
+            <in>bvec.h</in>
+            <in>cid-factory.cc</in>
+            <in>cid-factory.h</in>
+            <in>cid.cc</in>
+            <in>cid.h</in>
+            <in>connection-manager.cc</in>
+            <in>connection-manager.h</in>
+            <in>crc8.cc</in>
+            <in>crc8.h</in>
+            <in>cs-parameters.cc</in>
+            <in>cs-parameters.h</in>
+            <in>default-traces.h</in>
+            <in>dl-mac-messages.cc</in>
+            <in>dl-mac-messages.h</in>
+            <in>ipcs-classifier-record.cc</in>
+            <in>ipcs-classifier-record.h</in>
+            <in>ipcs-classifier.cc</in>
+            <in>ipcs-classifier.h</in>
+            <in>mac-messages.cc</in>
+            <in>mac-messages.h</in>
+            <in>ofdm-downlink-frame-prefix.cc</in>
+            <in>ofdm-downlink-frame-prefix.h</in>
+            <in>send-params.cc</in>
+            <in>send-params.h</in>
+            <in>service-flow-manager.cc</in>
+            <in>service-flow-manager.h</in>
+            <in>service-flow-record.cc</in>
+            <in>service-flow-record.h</in>
+            <in>service-flow.cc</in>
+            <in>service-flow.h</in>
+            <in>simple-ofdm-send-param.cc</in>
+            <in>simple-ofdm-send-param.h</in>
+            <in>simple-ofdm-wimax-channel.cc</in>
+            <in>simple-ofdm-wimax-channel.h</in>
+            <in>simple-ofdm-wimax-phy.cc</in>
+            <in>simple-ofdm-wimax-phy.h</in>
+            <in>snr-to-block-error-rate-manager.cc</in>
+            <in>snr-to-block-error-rate-manager.h</in>
+            <in>snr-to-block-error-rate-record.cc</in>
+            <in>snr-to-block-error-rate-record.h</in>
+            <in>ss-link-manager.cc</in>
+            <in>ss-link-manager.h</in>
+            <in>ss-manager.cc</in>
+            <in>ss-manager.h</in>
+            <in>ss-net-device.cc</in>
+            <in>ss-net-device.h</in>
+            <in>ss-record.cc</in>
+            <in>ss-record.h</in>
+            <in>ss-scheduler.cc</in>
+            <in>ss-scheduler.h</in>
+            <in>ss-service-flow-manager.cc</in>
+            <in>ss-service-flow-manager.h</in>
+            <in>ul-job.cc</in>
+            <in>ul-job.h</in>
+            <in>ul-mac-messages.cc</in>
+            <in>ul-mac-messages.h</in>
+            <in>wimax-channel.cc</in>
+            <in>wimax-channel.h</in>
+            <in>wimax-connection.cc</in>
+            <in>wimax-connection.h</in>
+            <in>wimax-mac-header.cc</in>
+            <in>wimax-mac-header.h</in>
+            <in>wimax-mac-queue.cc</in>
+            <in>wimax-mac-queue.h</in>
+            <in>wimax-mac-to-mac-header.cc</in>
+            <in>wimax-mac-to-mac-header.h</in>
+            <in>wimax-net-device.cc</in>
+            <in>wimax-net-device.h</in>
+            <in>wimax-phy.cc</in>
+            <in>wimax-phy.h</in>
+            <in>wimax-tlv.cc</in>
+            <in>wimax-tlv.h</in>
+          </df>
+          <df name="test">
+            <in>mac-messages-test.cc</in>
+            <in>phy-test.cc</in>
+            <in>qos-test.cc</in>
+            <in>ss-mac-test.cc</in>
+            <in>wimax-fragmentation-test.cc</in>
+            <in>wimax-service-flow-test.cc</in>
+            <in>wimax-tlv-test.cc</in>
+          </df>
+        </df>
+      </df>
+      <df name="utils">
+        <df name="lcov">
+        </df>
+        <in>bench-packets.cc</in>
+        <in>bench-simulator.cc</in>
+        <in>print-introspected-doxygen.cc</in>
+        <in>test-runner.cc</in>
+        <in>utils.h</in>
+      </df>
+      <df name="waf-tools">
+      </df>
+    </df>
+  </logicalFolder>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>

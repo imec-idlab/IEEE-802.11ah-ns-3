@@ -92,7 +92,10 @@ public:
    * typedef for a callback to invoke when a
    * packet transmission was failed.
    */
-  typedef Callback <void, const WifiMacHeader&> TxFailed;
+  typedef Callback <void, const WifiMacHeader&> TxFailed;  
+  
+  typedef Callback <void, bool> sleepCallback;
+  
   typedef void (* CollisionCallback)(uint32_t nrOfSlotsToBackOff);
 
   typedef void (* TransmissionWillCrossRAWBoundaryCallback)(Time txDuration, Time remainingRawTime);
@@ -132,6 +135,13 @@ public:
    * packet transmission was completed unsuccessfully.
    */
   void SetTxFailedCallback (TxFailed callback);
+  
+  /**
+   * \param callback the callback to invoke when a
+   * packet transmission was completed to check if the queue is empty.
+   */
+  void SetsleepCallback (sleepCallback callback);
+  
   /**
    * Set WifiRemoteStationsManager this EdcaTxopN is associated to.
    *
@@ -546,7 +556,8 @@ private:
   DcfManager *m_manager;
   Ptr<WifiMacQueue> m_queue;
   TxOk m_txOkCallback;
-  TxFailed m_txFailedCallback;
+  TxFailed m_txFailedCallback;   
+  sleepCallback m_sleepCallback;
   Ptr<MacLow> m_low;
   MacTxMiddle *m_txMiddle;
   TransmissionListener *m_transmissionListener;
