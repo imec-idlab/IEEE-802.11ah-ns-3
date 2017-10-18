@@ -1,0 +1,10 @@
+prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include/ns3-dev
+
+Name: libns3-config-store
+Description: ns-3 module ns3-config-store
+Version: 3-dev
+Libs: -L${libdir} -Wl,-Bdynamic -lns3-dev-config-store-debug
+Cflags: -I${includedir}
+Requires: libns3-dev-core-debug libns3-dev-network-debug

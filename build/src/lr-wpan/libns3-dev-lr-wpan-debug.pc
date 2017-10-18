@@ -1,0 +1,10 @@
+prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include/ns3-dev
+
+Name: libns3-lr-wpan
+Description: ns-3 module ns3-lr-wpan
+Version: 3-dev
+Libs: -L${libdir} -Wl,-Bdynamic -lns3-dev-lr-wpan-debug
+Cflags: -I${includedir}
+Requires: libns3-dev-core-debug libns3-dev-network-debug libns3-dev-mobility-debug libns3-dev-spectrum-debug libns3-dev-propagation-debug

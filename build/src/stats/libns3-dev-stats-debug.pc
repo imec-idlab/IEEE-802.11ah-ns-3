@@ -1,0 +1,10 @@
+prefix=/usr/local
+libdir=/usr/local/lib
+includedir=/usr/local/include/ns3-dev
+
+Name: libns3-stats
+Description: ns-3 module ns3-stats
+Version: 3-dev
+Libs: -L${libdir} -Wl,-Bdynamic -lns3-dev-stats-debug
+Cflags: -I${includedir}
+Requires: libns3-dev-core-debug
