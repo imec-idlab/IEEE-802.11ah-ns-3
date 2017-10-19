@@ -28,6 +28,7 @@ struct Configuration {
 	  RPSVector rps;
       uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
       uint64_t totalRawSlots = 0;				// Total number of RAW slots in all RAW groups in all RPS elements
+      std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
 	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
@@ -46,7 +47,7 @@ struct Configuration {
 	  double bandWidth = 2;
 	  string rho="200"; //50
 
-	  string visualizerIP = "10.0.2.15"; // empty string if no visualization TODO
+	  string visualizerIP = "localhost"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 

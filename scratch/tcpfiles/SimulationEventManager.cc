@@ -68,6 +68,7 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  std::to_string(config.ContentionPerRAWSlot),
 		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup),
 		  std::to_string(config.rps.rpsset.size())
+		  //config.RawConfigString
 	});
 }
 
