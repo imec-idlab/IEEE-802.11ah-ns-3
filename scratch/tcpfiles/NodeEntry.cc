@@ -625,8 +625,9 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnMacPacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason) {
-	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
+	//cout << "============================Mac Packet Dropped!, reason:" << reason << endl;
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
+
 }
 
 void NodeEntry::OnTcpPacketDropped(Ptr<Packet> packet, DropReason reason) {

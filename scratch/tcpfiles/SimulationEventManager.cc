@@ -225,11 +225,6 @@ void SimulationEventManager::onRawConfig (uint32_t rpsIndex, uint32_t rawIndex, 
 void SimulationEventManager::onStartHeader() {
 	send({"startheader",
 		   "NRawSta",
-		   "NGroup",
-		   "SlotFormat",
-		   "NRawSlotCount",
-		   "NRawSlotDuration",
-		   "NRawSlotNum",
 		   "DataMode",
 		   "",
 		   "",
@@ -258,10 +253,16 @@ void SimulationEventManager::onStartHeader() {
 		   "FirmwareCorruptionProbability",
 		   "FirmwareNewUpdateProbability",
 		   "SensorMeasurementSize",
+		   "NGroup",
+		   "SlotFormat",
+		   "NRawSlotCount",
+		   "NRawSlotNum",
 		   "ContentionPerRAWSlot",
-		   "ContentionPerRAWSlotOnlyInFirstGroup"
+		   "ContentionPerRAWSlotOnlyInFirstGroup",
+		   "NumOfRpsElements"
 		});
 }
+
 
 void SimulationEventManager::onStatisticsHeader() {
 	send({"nodestatsheader", "STAIndex",
@@ -311,7 +312,8 @@ void SimulationEventManager::onStatisticsHeader() {
 		"InterPacketDelayAtServer",
 		"InterPacketDelayAtClient",
 		"InterPacketDelayDeviationPercentageAtServer",
-		"InterPacketDelayDeviationPercentageAtClient"
+		"InterPacketDelayDeviationPercentageAtClient",
+		"Latency"
 	});
 
 }

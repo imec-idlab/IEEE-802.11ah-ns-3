@@ -69,8 +69,8 @@ struct Configuration {
 	 * Amina's configuration parameters
 	 * */
 	bool useV6 = false; //false
-	uint32_t nControlLoops = 100;
-	uint32_t coapPayloadSize = 15;
+	uint32_t nControlLoops = 0;//  = 100;
+	uint32_t coapPayloadSize = 0;//  = 15;
 
 	//uint32_t seed = 1;
 	//double simulationTime = 200;
@@ -82,8 +82,8 @@ struct Configuration {
 	//double bandWidth = 2;
 	//string rho = "100.0"; //100
 
-	uint32_t trafficInterval = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
-	uint32_t trafficIntervalDeviation = 100; //1000 discuss with Jeroen
+	uint32_t trafficInterval = 0;//  = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
+	uint32_t trafficIntervalDeviation = 0;//  = 100; //1000 discuss with Jeroen
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
 	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss
 
@@ -94,11 +94,11 @@ struct Configuration {
 
 
 
-	uint32_t MinRTO = 81920000; //819200
-	uint32_t TCPConnectionTimeout = 6000000;
-	uint32_t TCPSegmentSize = 3216; //536
-	uint32_t TCPInitialSlowStartThreshold = 0xffff;
-	uint32_t TCPInitialCwnd = 1;
+	uint32_t MinRTO = 0;// 81920000; //819200
+	uint32_t TCPConnectionTimeout = 0;// = 6000000;
+	uint32_t TCPSegmentSize = 0;//  = 3216; //536
+	uint32_t TCPInitialSlowStartThreshold = 0;//  = 0xffff;
+	uint32_t TCPInitialCwnd = 0;//  = 1;
 
 	int ContentionPerRAWSlot=0; //-1
 	bool ContentionPerRAWSlotOnlyInFirstGroup=false; //false
@@ -107,21 +107,21 @@ struct Configuration {
 	double propagationLossReferenceLoss = 8;
 
 	bool APAlwaysSchedulesForNextSlot = false;
-	uint32_t APScheduleTransmissionForNextSlotIfLessThan = 5000;
+	uint32_t APScheduleTransmissionForNextSlotIfLessThan = 0;// = 5000;
 
-	double ipcameraMotionPercentage = 1; //0.1
-	uint16_t ipcameraMotionDuration = 10; //60
-	uint16_t ipcameraDataRate = 128; //20
+	double ipcameraMotionPercentage = 0;// = 1; //0.1
+	uint16_t ipcameraMotionDuration = 0;// = 10; //60
+	uint16_t ipcameraDataRate = 0;// = 128; //20
 
-	uint32_t firmwareSize = 1024 * 500;
-	uint16_t firmwareBlockSize = 1024;
-	double firmwareNewUpdateProbability = 0.01;
-	double firmwareCorruptionProbability = 0.01;
-	uint32_t firmwareVersionCheckInterval = 1000;
+	uint32_t firmwareSize = 0;// = 1024 * 500;
+	uint16_t firmwareBlockSize = 0;// = 1024;
+	double firmwareNewUpdateProbability;// = 0.01;
+	double firmwareCorruptionProbability;// = 0.01;
+	uint32_t firmwareVersionCheckInterval;// = 1000;
 
-	uint16_t sensorMeasurementSize = 54; //1024
+	uint16_t sensorMeasurementSize;// = 54; //1024
 
-	uint16_t MaxTimeOfPacketsInQueue = 1000; //100
+	uint16_t MaxTimeOfPacketsInQueue;// = 1000; //100
 
 	uint16_t CoolDownPeriod = 4; //60
 

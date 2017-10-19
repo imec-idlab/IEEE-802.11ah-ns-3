@@ -86,7 +86,7 @@ RegularWifiMac::OnCollision(std::string context, uint32_t nrOfBackOffSlots) {
 
 void
 RegularWifiMac::OnTransmissionWillCrossRAWBoundary(std::string context, Time txDuration, Time remainingTimeInRAWSlot) {
-	//std::cout << "TRANSMISSION WILL CROSS RAW BOUNDARY" << std::endl;
+	std::cout << "TRANSMISSION WILL CROSS RAW BOUNDARY" << std::endl;
 	m_transmissionWillCrossRAWBoundary(txDuration, remainingTimeInRAWSlot);
 }
 
