@@ -950,7 +950,8 @@ DcfManager::NotifyWakeupNow (void)
         }
       state->ResetCw ();
       state->m_accessRequested = false;
-      state->NotifyWakeUp ();
+      Simulator::Schedule(m_sifs, &DcfState::NotifyWakeUp, state);
+      //state->NotifyWakeUp ();
     }
 }
 

@@ -26,6 +26,7 @@ uint32_t StaNum=0;
 //string traffic_filepath;
 //uint32_t payloadLength;
 NetDeviceContainer staDeviceCont;
+const int MaxSta = 8000;
 
 Configuration config;
 Statistics stats;
@@ -959,6 +960,56 @@ void configureUDPEchoClients() {
 	}
 }
 
+
+Time timeTx;
+Time timeRx;
+Time timeIdle;
+Time timeSleep;
+
+//ns3::int64x64_t throughouputArray [MaxSta];
+Time timeIdleArray [MaxSta];
+Time timeRxArray [MaxSta];
+Time timeTxArray [MaxSta];
+Time timeSleepArray [MaxSta];
+double dist[MaxSta];
+
+//it prints the information regarding the state of the device
+void 
+PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::State state)
+{   
+    /*Get the number of the node from the context*/
+    /*context = "/NodeList/"+strSTA+"/DeviceList/'*'/Phy/$ns3::YansWifiPhy/State/State"*/
+    unsigned first = context.find("t/");
+    unsigned last = context.find("/D");
+    string strNew = context.substr ((first+2),(last-first-2));
+    
+    int node = std::stoi(strNew);
+        
+    //start calculating energy after complete association
+    if  (GetAssocNum () == StaNum)
+    {
+        switch (state)
+        {
+            case WifiPhy::State::IDLE: //Idle
+                timeIdle = timeIdle + duration;
+                timeIdleArray[node] = timeIdleArray[node] + duration;
+                break;
+            case WifiPhy::State::RX: //Rx
+                timeRx = timeRx + duration;
+                timeRxArray[node] = timeRxArray[node] + duration;
+                break;
+            case WifiPhy::State::TX: //Tx
+                timeTx = timeTx + duration;
+                timeTxArray[node] = timeTxArray[node] + duration;
+                break;
+            case WifiPhy::State::SLEEP: //Sleep  
+                timeSleep = timeSleep + duration;
+                timeSleepArray[node] = timeSleepArray[node] + duration;
+                break;        
+        }
+    }
+}
+
 int main (int argc, char *argv[])
 {
   LogComponentEnable ("UdpServer", LOG_INFO);
@@ -1177,9 +1228,20 @@ int main (int argc, char *argv[])
                nodes[i]->x = position.x;
                nodes[i]->y = position.y;
                std::cout << "Sta node#" << i << ", " << "position = " << position << std::endl;
+               dist[i] = mobility -> GetDistanceFrom (wifiApNode.Get (0)->GetObject<MobilityModel>());
                i++;
             }
           std::cout << "AP node, position = " << apposition << std::endl;
+        }
+    
+     /*Print of the state of the stations*/
+        for (uint32_t i=0; i< config.Nsta; i++)
+        {
+            std::ostringstream STA;
+            STA << i;
+            std::string strSTA = STA.str();
+
+            Config::Connect ("/NodeList/"+strSTA+"/DeviceList/*/Phy/$ns3::YansWifiPhy/State/State", MakeCallback(&PhyStateTrace));
         }
 
       eventManager.onStartHeader();
@@ -1245,8 +1307,40 @@ int main (int argc, char *argv[])
       // Visualizer Packet loss
       //stats.get(i).GetPacketLoss()
 
+
       //Le's throughput
      // std::cout << "datarate" << "\t" << "throughput" << std::endl;
      // std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+
+        //Energy consumption per station
+      timeRx = timeRx/config.Nsta;
+      timeIdle = timeIdle/config.Nsta;
+      timeTx = timeTx/config.Nsta;
+      timeSleep = timeSleep/config.Nsta;  
+      
+    
+        ofstream risultati;    
+        //string addressresults = Outputpath + "/moreinfo.txt";
+        string addressresults = config.OutputPath + "moreinfo.txt";
+        risultati.open (addressresults.c_str(), ios::out | ios::trunc); 
+
+        risultati << "Sta node#      distance        timerx      timeidle        timetx      timesleep      totenergy" << std::endl;           
+        int i = 0;
+        ns3::int64x64_t totenergycons = 0;
+        string spazio = "         ";
+        
+          while (i < config.Nsta)
+            {
+              totenergycons = (timeRxArray[i].GetSeconds() * 4.4) + (timeIdleArray[i].GetSeconds() * 4.4) + (timeTxArray[i].GetSeconds() * 7.2);
+               risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << spazio << timeIdleArray[i].GetSeconds() << spazio << timeTxArray[i].GetSeconds() << spazio << timeSleepArray[i].GetSeconds() << spazio << totenergycons << std::endl;
+               totenergycons = 0;
+               i++;
+            }
+
+          risultati.close();
+
+		//Le's throughput
+      std::cout << "datarate" << "\t" << "throughput" << std::endl;
+      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
       return 0;
 }

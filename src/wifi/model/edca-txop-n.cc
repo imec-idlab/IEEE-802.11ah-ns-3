@@ -369,6 +369,13 @@ EdcaTxopN::SetTxFailedCallback (TxFailed callback)
 }
 
 void
+EdcaTxopN::SetsleepCallback (sleepCallback callback)
+{
+  NS_LOG_FUNCTION (this << &callback);
+  m_sleepCallback = callback;
+}
+
+void
 EdcaTxopN::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> remoteManager)
 {
   NS_LOG_FUNCTION (this << remoteManager);
@@ -647,10 +654,22 @@ EdcaTxopN::NotifyAccessGranted (void)
 			}
 			else
 	      		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
-          m_low->StartTransmission (fragment, &hdr, params,
-                                    m_transmissionListener);
-          nrOfTransmissionsDuringRaw++;
+          //don't go to sleep after you send the packet, since it has to receive the ack
+          if(!m_low->GetPhy()->IsStateSleep())
+             {
+                if (!m_sleepCallback.IsNull())
+                {
+                    m_sleepCallback (false);
+                    // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
+                }
+
+                m_low->StartTransmission (fragment, &m_currentHdr,
+                                     params, m_transmissionListener);
+                nrOfTransmissionsDuringRaw++;
+            }
         }
+          //m_low->StartTransmission (fragment, &hdr, params, m_transmissionListener);          
+      
       else
         {
           WifiMacHeader peekedHdr;
@@ -718,9 +737,22 @@ EdcaTxopN::NotifyAccessGranted (void)
 	      else
 	      	NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
 
-          m_low->StartTransmission (m_currentPacket, &m_currentHdr,
-                                    params, m_transmissionListener);
-          nrOfTransmissionsDuringRaw++;
+          //m_low->StartTransmission (m_currentPacket, &m_currentHdr, params, m_transmissionListener);
+          
+          //don't go to sleep after you send the packet, since it has to receive the ack
+          if(!m_low->GetPhy()->IsStateSleep())
+             {
+                if (!m_sleepCallback.IsNull())
+                {
+                    m_sleepCallback (false);
+                    // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
+                }
+
+                m_low->StartTransmission (m_currentPacket, &m_currentHdr,
+                                     params, m_transmissionListener);
+                nrOfTransmissionsDuringRaw++;
+            }                  
+          
           if (!GetAmpduExist ())
             {
               CompleteTx ();
@@ -835,6 +867,12 @@ EdcaTxopN::NotifyWakeUp (void)
 }
 
 void
+EdcaTxopN::WakeUp (void)
+{
+    m_low->GetPhy()->ResumeFromSleep();
+}
+
+void
 EdcaTxopN::Queue (Ptr<const Packet> packet, const WifiMacHeader &hdr)
 {
   NS_LOG_FUNCTION (this << packet << &hdr);
@@ -892,6 +930,14 @@ EdcaTxopN::GotAck (double snr, WifiMode txMode)
     {
       NS_LOG_DEBUG ("got ack. tx not done, size=" << m_currentPacket->GetSize ());
     }
+  //after receiving ack
+    if (!m_sleepCallback.IsNull())
+    {
+        //NS_LOG_UNCOND ("the queue is empty");
+        //callback SleepIfQueueIsEmpty
+        //NS_LOG_UNCOND ("go to sleep true" << m_low->GetAddress());
+        m_sleepCallback (true);        
+    }
 }
 
 void
@@ -902,6 +948,14 @@ EdcaTxopN::MissedAck (void)
   if (!NeedDataRetransmission ())
     {
       NS_LOG_DEBUG ("Ack Fail");
+      //after receiving ack
+    if (!m_sleepCallback.IsNull())
+    {
+        //NS_LOG_UNCOND ("the queue is empty");
+        //callback SleepIfQueueIsEmpty
+        //NS_LOG_UNCOND ("go to sleep true" << m_low->GetAddress());
+        m_sleepCallback (true);        
+    }
       m_stationManager->ReportFinalDataFailed (m_currentHdr.GetAddr1 (), &m_currentHdr);
       if (!m_txFailedCallback.IsNull ())
         {
@@ -942,6 +996,14 @@ EdcaTxopN::MissedAck (void)
   else
     {
       NS_LOG_DEBUG ("Retransmit");
+      if (!m_sleepCallback.IsNull())
+        {
+          //If retransmit, shouldn't go to sleep if my slot
+          //but should go to sleep if not my slot
+          //NS_LOG_UNCOND ("go to sleep false retransmit " << m_low->GetAddress());
+          
+          m_sleepCallback (false);
+        }
       m_currentHdr.SetRetry ();
       m_dcf->UpdateFailedCw ();
     }
