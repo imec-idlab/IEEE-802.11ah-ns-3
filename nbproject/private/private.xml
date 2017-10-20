@@ -10,11 +10,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/home/serena/workspace/802.11ah-ns3-git/src/wifi/model/mac-low.cc</file>
-            <file>file:/home/serena/workspace/802.11ah-ns3-git/src/wifi/model/ap-wifi-mac.cc</file>
-            <file>file:/home/serena/workspace/802.11ah-ns3-git/src/wifi/model/edca-txop-n.cc</file>
-            <file>file:/home/serena/workspace/802.11ah-ns3-git/src/wifi/model/sta-wifi-mac.cc</file>
-            <file>file:/home/serena/workspace/802.11ah-ns3-git/src/wifi/model/dcf-manager.cc</file>
+            <file>file:/home/serena/workspace/802.11ah-ns3-git/scratch/tcpfiles/s1g-mac-test.cc</file>
         </group>
     </open-files>
 </project-private>

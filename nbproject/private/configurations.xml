@@ -1266,6 +1266,352 @@
           <in>wifi-wired-bridging.cc</in>
         </df>
       </df>
+      <df name="forwardsocketdata">
+        <df name=".vscode">
+        </df>
+        <df name="node_modules">
+          <df name=".bin">
+          </df>
+          <df name="accepts">
+          </df>
+          <df name="after">
+            <df name="test">
+            </df>
+          </df>
+          <df name="array-flatten">
+          </df>
+          <df name="arraybuffer.slice">
+            <df name="test">
+            </df>
+          </df>
+          <df name="backo2">
+            <df name="test">
+            </df>
+          </df>
+          <df name="base64-arraybuffer">
+            <df name="lib">
+            </df>
+          </df>
+          <df name="base64id">
+            <df name="lib">
+            </df>
+          </df>
+          <df name="better-assert">
+          </df>
+          <df name="blob">
+            <df name="test">
+            </df>
+          </df>
+          <df name="body-parser">
+            <df name="lib">
+              <df name="types">
+              </df>
+            </df>
+          </df>
+          <df name="bytes">
+          </df>
+          <df name="callsite">
+          </df>
+          <df name="component-bind">
+          </df>
+          <df name="component-emitter">
+          </df>
+          <df name="component-inherit">
+            <df name="test">
+            </df>
+          </df>
+          <df name="content-disposition">
+          </df>
+          <df name="content-type">
+          </df>
+          <df name="cookie">
+          </df>
+          <df name="cookie-signature">
+          </df>
+          <df name="debug">
+            <df name="src">
+            </df>
+          </df>
+          <df name="depd">
+            <df name="lib">
+              <df name="browser">
+              </df>
+              <df name="compat">
+              </df>
+            </df>
+          </df>
+          <df name="destroy">
+          </df>
+          <df name="ee-first">
+          </df>
+          <df name="encodeurl">
+          </df>
+          <df name="engine.io">
+            <df name="lib">
+              <df name="transports">
+              </df>
+            </df>
+            <df name="node_modules">
+              <df name="accepts">
+              </df>
+            </df>
+          </df>
+          <df name="engine.io-client">
+            <df name="lib">
+              <df name="transports">
+              </df>
+            </df>
+          </df>
+          <df name="engine.io-parser">
+            <df name="lib">
+            </df>
+          </df>
+          <df name="escape-html">
+          </df>
+          <df name="etag">
+          </df>
+          <df name="express">
+            <df name="lib">
+              <df name="middleware">
+              </df>
+              <df name="router">
+              </df>
+            </df>
+          </df>
+          <df name="finalhandler">
+          </df>
+          <df name="forwarded">
+          </df>
+          <df name="fresh">
+          </df>
+          <df name="has-binary2">
+          </df>
+          <df name="has-cors">
+          </df>
+          <df name="http-errors">
+            <df name="node_modules">
+              <df name="setprototypeof">
+              </df>
+            </df>
+          </df>
+          <df name="iconv-lite">
+            <df name="encodings">
+              <df name="tables">
+              </df>
+            </df>
+            <df name="lib">
+            </df>
+          </df>
+          <df name="indexof">
+          </df>
+          <df name="inherits">
+          </df>
+          <df name="ipaddr.js">
+            <df name="lib">
+            </df>
+            <df name="src">
+            </df>
+            <df name="test">
+            </df>
+          </df>
+          <df name="isarray">
+          </df>
+          <df name="media-typer">
+          </df>
+          <df name="merge-descriptors">
+          </df>
+          <df name="methods">
+          </df>
+          <df name="mime">
+            <df name="build">
+            </df>
+          </df>
+          <df name="mime-db">
+          </df>
+          <df name="mime-types">
+          </df>
+          <df name="ms">
+          </df>
+          <df name="negotiator">
+            <df name="lib">
+            </df>
+          </df>
+          <df name="object-assign">
+          </df>
+          <df name="object-component">
+            <df name="test">
+            </df>
+          </df>
+          <df name="on-finished">
+          </df>
+          <df name="parseqs">
+          </df>
+          <df name="parseuri">
+          </df>
+          <df name="parseurl">
+          </df>
+          <df name="path-to-regexp">
+          </df>
+          <df name="proxy-addr">
+          </df>
+          <df name="qs">
+            <df name="dist">
+            </df>
+            <df name="lib">
+            </df>
+            <df name="test">
+            </df>
+          </df>
+          <df name="range-parser">
+          </df>
+          <df name="raw-body">
+          </df>
+          <df name="safe-buffer">
+          </df>
+          <df name="send">
+          </df>
+          <df name="serve-static">
+          </df>
+          <df name="setprototypeof">
+          </df>
+          <df name="socket.io">
+            <df name="lib">
+            </df>
+          </df>
+          <df name="socket.io-adapter">
+          </df>
+          <df name="socket.io-client">
+            <df name="dist">
+            </df>
+            <df name="lib">
+            </df>
+          </df>
+          <df name="socket.io-parser">
+          </df>
+          <df name="statuses">
+          </df>
+          <df name="to-array">
+          </df>
+          <df name="type-is">
+          </df>
+          <df name="ultron">
+          </df>
+          <df name="unpipe">
+          </df>
+          <df name="utils-merge">
+          </df>
+          <df name="uws">
+            <df name="build">
+              <df name="Release">
+                <df name=".deps">
+                  <df name="Release">
+                    <df name="obj.target">
+                      <df name="uws">
+                        <df name="src">
+                        </df>
+                      </df>
+                    </df>
+                  </df>
+                </df>
+                <df name="obj.target">
+                  <df name="uws">
+                    <df name="src">
+                    </df>
+                  </df>
+                </df>
+              </df>
+            </df>
+            <df name="src">
+              <in>Asio.h</in>
+              <in>Backend.h</in>
+              <in>Epoll.cpp</in>
+              <in>Epoll.h</in>
+              <in>Extensions.cpp</in>
+              <in>Extensions.h</in>
+              <in>Group.cpp</in>
+              <in>Group.h</in>
+              <in>HTTPSocket.cpp</in>
+              <in>HTTPSocket.h</in>
+              <in>Hub.cpp</in>
+              <in>Hub.h</in>
+              <in>Libuv.h</in>
+              <in>Networking.cpp</in>
+              <in>Networking.h</in>
+              <in>Node.cpp</in>
+              <in>Node.h</in>
+              <in>Socket.cpp</in>
+              <in>Socket.h</in>
+              <in>WebSocket.cpp</in>
+              <in>WebSocket.h</in>
+              <in>WebSocketProtocol.h</in>
+              <in>addon.cpp</in>
+              <in>addon.h</in>
+              <in>http.h</in>
+              <in>uWS.h</in>
+            </df>
+          </df>
+          <df name="vary">
+          </df>
+          <df name="ws">
+            <df name="lib">
+            </df>
+            <df name="node_modules">
+              <df name="safe-buffer">
+              </df>
+            </df>
+          </df>
+          <df name="xmlhttprequest-ssl">
+            <df name="example">
+            </df>
+            <df name="lib">
+            </df>
+            <df name="tests">
+            </df>
+          </df>
+          <df name="yeast">
+          </df>
+        </df>
+        <df name="public">
+          <df name="css">
+          </df>
+          <df name="fonts">
+          </df>
+          <df name="images">
+          </df>
+          <df name="js">
+            <df name="custom">
+              <df name="index">
+                <df name=".vscode">
+                </df>
+              </df>
+            </df>
+            <df name="libs">
+              <df name="highcharts">
+              </df>
+            </df>
+          </df>
+        </df>
+        <df name="simulations">
+          <df name="mojesimulacije">
+          </df>
+        </df>
+        <df name="typings">
+          <df name="globals">
+            <df name="highcharts">
+            </df>
+            <df name="jquery">
+            </df>
+            <df name="node">
+            </df>
+            <df name="select2">
+            </df>
+            <df name="socket.io">
+            </df>
+            <df name="sql.js">
+            </df>
+          </df>
+        </df>
+      </df>
       <df name="OptimalRawGroup">
         <df name="datarate-7.8">
           <df name="traffic-0.82">
@@ -1276,6 +1622,8 @@
               </df>
             </df>
           </df>
+        </df>
+        <df name="resultsenergyconsumption">
         </df>
         <df name="traffic">
         </df>
@@ -1317,7 +1665,6 @@
           <in>s1g-mac-test.h</in>
         </df>
         <in>RAW-optimal-algorithm-notraffic.cc</in>
-        <in>s1g-mac-test.cc</in>
         <in>scratch-simulator.cc</in>
       </df>
       <df name="src">
