@@ -126,6 +126,7 @@ public:
    * \return the number of stream indices assigned by this model
    */
   int64_t AssignStreams (int64_t stream);
+  void SetaccessList (std::map<Mac48Address, bool> list);
 
 private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);

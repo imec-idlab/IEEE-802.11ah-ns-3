@@ -38,6 +38,9 @@
 #include "msdu-aggregator.h"
 #include "ns3/uinteger.h"
 #include "wifi-mac-queue.h"
+#include <map>
+
+
 
 namespace ns3 {
 
@@ -614,8 +617,33 @@ Addheader:
 }
 
 void
+ApWifiMac::SetaccessList (std::map<Mac48Address, bool> list)
+{
+        Mac48Address stasAddr;
+
+            
+        if (list.size () == 0)
+         {
+            return;
+         }
+              
+        for (uint32_t k = 1; k <= m_totalStaNum; k++)
+          {   
+            stasAddr = m_AidToMacAddr.find(k)->second;
+            NS_LOG_UNCOND ( "aid "  << k << ", send " << list.find(stasAddr)->second << ", at " << Simulator::Now () << ", size " << list.size ());
+          }     
+               
+        m_edca.find (AC_VO)->second->SetaccessList (list);
+        m_edca.find (AC_VI)->second->SetaccessList (list);
+        m_edca.find (AC_BE)->second->SetaccessList (list);
+        m_edca.find (AC_BK)->second->SetaccessList (list);
+}
+
+  
+void
 ApWifiMac::SendOneBeacon (void)
 {
+
   NS_LOG_FUNCTION (this);
   WifiMacHeader hdr;
     
@@ -647,7 +675,6 @@ ApWifiMac::SendOneBeacon (void)
             RpsIndex = 1;
           }
       beacon.SetRPS (*m_rps);
-      
       /*
       RPS m_rps;
       NS_LOG_UNCOND ("send beacon at" << Simulator::Now ());
@@ -690,57 +717,103 @@ ApWifiMac::SendOneBeacon (void)
       NS_LOG_DEBUG(
       			"Transmission of beacon will take " << txTime << ", delaying RAW start for that amount");
       Time bufferTimeToAllowBeaconToBeReceived = txTime;
+      bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
 
       auto nRaw = m_rps->GetNumberOfRawGroups();
       currentRawGroup = (currentRawGroup + 1) % nRaw;
-      
+
       uint16_t startaid;
       uint16_t endaid;
       Mac48Address stasAddr;
-      for (uint16_t i=0; i< 8192;i++)
+      uint16_t offset;
+      uint16_t statsPerSlot;
+      uint16_t statRawSlot;
+               
+      NS_LOG_UNCOND ("ap send beacon at " << Simulator::Now ());
+      
+      m_accessList.clear ();
+      for (uint16_t i=1; i<= m_totalStaNum;i++)
        {  
       // assume all station sleeps, then change some to awake state based on downlink data
       //This implementation is temporary, should be removed if ps-poll is supported    
-        if (m_AidToMacAddr.find(i)->second != NULL)
-           {
+        if (m_AidToMacAddr.size () == 0)
+         { 
+            break;
+         }
+        //if (m_AidToMacAddr.find(i)->second != NULL )
+         //  {
             stasAddr = m_AidToMacAddr.find(i)->second;
+
             if (m_stationManager->IsAssociated (stasAddr))
               {
                 m_accessList[stasAddr]=false;
               }
-           }
+          // }
        }
+     NS_LOG_UNCOND ("m_accessList.size " << m_accessList.size ());
+
+     
       // schedule the slot start
       Time timeToSlotStart = Time ();
       for (uint32_t g = 0; g < nRaw; g++)
-        {
-		  for (uint32_t i = 0; i < m_rps->GetRawAssigmentObj(g).GetSlotNum(); i++)
-			{
-			Simulator::Schedule(
-						bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
-						&ApWifiMac::OnRAWSlotStart, this, RpsIndex, g + 1, i + 1);
-			timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
-                        
-			}
+        {         
+                 if (m_AidToMacAddr.size () == 0)
+                  {
+                     break;
+                  }
+
+                              
                   startaid = m_rps->GetRawAssigmentObj(g).GetRawGroupAIDStart();
                   endaid = m_rps->GetRawAssigmentObj(g).GetRawGroupAIDEnd();
-                  for (uint32_t k = startaid; g <= endaid; k++)
-                       {
-                            if (m_AidToMacAddr.find(k)->second != NULL)
-                                {
-                                    stasAddr = m_AidToMacAddr.find(k)->second;
-                                    if (m_stationManager->IsAssociated (stasAddr))
-                                        {
-                                             m_accessList[stasAddr]=true;
-                                        }
-                                }
-                       }
+                  
 
+                                
+                  offset =0; // for test
+                  m_slotNum=m_rps->GetRawAssigmentObj(g).GetSlotNum();
+                  statsPerSlot = (endaid - startaid + 1)/m_slotNum;
+               
+		  for (uint32_t i = 0; i < m_rps->GetRawAssigmentObj(g).GetSlotNum(); i++)
+			{                
+                                for (uint32_t k = startaid; k <= endaid; k++)
+                                   {   
+                                     
+                                        statRawSlot = ((k & 0x03ff)+offset)%m_slotNum; //slot that the station k will be
+                                        // station is in sot i
+                                        if (statRawSlot == i )
+                                           {
+                                              stasAddr = m_AidToMacAddr.find(k)->second;
+                                              if (m_stationManager->IsAssociated (stasAddr))
+                                                {
+                                                    m_accessList[stasAddr]=true;
+                                                }
+                                            }
+
+                                    }                        
+                         Simulator::Schedule(bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
+						&ApWifiMac::SetaccessList, this, m_accessList);
+
+                         Simulator::Schedule(
+						bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
+						&ApWifiMac::OnRAWSlotStart, this, RpsIndex, g + 1, i + 1);
+			 timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
+                         
+                        for (uint16_t i=1; i<= m_totalStaNum;i++)
+                            {  
+                               stasAddr = m_AidToMacAddr.find(i)->second;
+
+                               if (m_stationManager->IsAssociated (stasAddr))
+                                  {
+                                       m_accessList[stasAddr]=false;
+                                  }
+                            }
+			}
         }  
-        m_edca.find (AC_VO)->second->SetaccessList (m_accessList);
+      
+        NS_LOG_UNCOND(GetAddress () << ", "  << startaid << "\t" << endaid << ", at " << Simulator::Now () << ", bufferTimeToAllowBeaconToBeReceived " << bufferTimeToAllowBeaconToBeReceived);
+       /* m_edca.find (AC_VO)->second->SetaccessList (m_accessList);
         m_edca.find (AC_VI)->second->SetaccessList (m_accessList);
         m_edca.find (AC_BE)->second->SetaccessList (m_accessList);
-        m_edca.find (AC_BK)->second->SetaccessList (m_accessList);
+        m_edca.find (AC_BK)->second->SetaccessList (m_accessList);*/
      }
     else
      {
@@ -775,6 +848,7 @@ void ApWifiMac::OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot)
 	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
 	m_rawSlotTrace = slot;
+        //NS_LOG_UNCOND("AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
 }
 
 

@@ -204,6 +204,9 @@ public:
   Ptr<const Packet> PeekFirstAvailable (WifiMacHeader *hdr,
                                         Time &tStamp,
                                         const QosBlockedDestinations *blockedPackets);
+  
+  Ptr<const Packet> PeekAvailable (WifiMacHeader *hdr, Time &timestamp,
+                                  const QosBlockedDestinations *blockedPackets, uint16_t k);
   /**
    * Flush the queue.
    */

@@ -137,7 +137,6 @@ double NodeStatistics::getIPCameraSendingRate() {
 			elapsedSeconds = (Simulator::Now() -TimeStreamStarted).GetSeconds();
 		else
 			elapsedSeconds = IPCameraTotalTimeSent.GetSeconds();
-
 		return (IPCameraTotalDataSent / elapsedSeconds) / 1024 * 8;
 	}
 }

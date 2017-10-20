@@ -537,12 +537,18 @@ EdcaTxopN::NotifyAccessGranted (void)
             }
           
           //temporary, should be removed when ps-poll is suported
-          Ptr<const Packet> PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
-          
+          Ptr<const Packet> PacketTest;
+          uint16_t count = 0;
           while (1)
             {
-              PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);     
-              if (! m_accessList.find(m_currentHdr.GetAddr1())->second || m_accessList.size ()== 0) // "m_accessList.size ()== 0" for non-ap stations
+              PacketTest = m_queue->PeekAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations, count); 
+              count++;
+              if (m_accessList.size ()== 0 || PacketTest==0)
+                {
+                   goto Transmission;
+                }
+              //NS_LOG_UNCOND (m_low->GetAddress() << "m_currentHdr.GetAddr1())->second " << m_currentHdr.GetAddr1() << ", m_accessList.size () " << m_accessList.size ());
+              if (m_accessList.find(m_currentHdr.GetAddr1())->second) // "m_accessList.size ()== 0" for non-ap stations
               // no sleep 
                 {
                     goto Transmission;
@@ -579,6 +585,7 @@ EdcaTxopN::NotifyAccessGranted (void)
 
       Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
      			&m_currentHdr, params);
+      NS_LOG_UNCOND ("m_crossSlotBoundaryAllowed " << m_crossSlotBoundaryAllowed);
      	if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
      		NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
      		m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);

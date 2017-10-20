@@ -325,7 +325,7 @@ void onSTAAssociated(int i) {
 		}
 	}
 
-	eventManager.onNodeAssociated(*nodes[i]);
+	//eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
 	if (nrOfSTAAssociated == config.Nsta) {
@@ -655,7 +655,7 @@ void configureUDPServer() {
 void configureUDPEchoServer() {
     UdpEchoServerHelper myServer(9);
     serverApp = myServer.Install(wifiApNode);
-    serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
+    //serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
     serverApp.Start(Seconds(0));
 }
 
@@ -943,15 +943,15 @@ void configureUDPEchoClients() {
 	UdpEchoClientHelper clientHelper(apNodeInterface.GetAddress(0), 9); //address of remote node
 	clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
 	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
-	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	//clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
 	clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
 	for (uint16_t i = 0; i < config.Nsta; i++) {
 		ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(i));
-		clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
-		clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnUdpEchoPacketReceived, nodes[i]));
+		//clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
+		//clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnUdpEchoPacketReceived, nodes[i]));
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0+random));
@@ -961,7 +961,11 @@ void configureUDPEchoClients() {
 
 int main (int argc, char *argv[])
 {
-  //LogComponentEnable ("UdpServer", LOG_INFO);
+  LogComponentEnable ("UdpServer", LOG_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+  LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+
+  
 
 
   /*double simulationTime = 10;
@@ -988,7 +992,7 @@ int main (int argc, char *argv[])
   config.Nsta = config.NRawSta;
 
   stats = Statistics(config.Nsta);
-  eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
+  //eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
   uint32_t totalRawGroups (0);
   for (int i = 0; i < config.rps.rpsset.size(); i++)
   {
@@ -1195,12 +1199,11 @@ int main (int argc, char *argv[])
 
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
-      Simulator::Destroy ();
 
       double throughput = 0;
       //UDP
-      uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
       /*
       int paketi=0, pay=0;
       for (int i=0; i < config.Nsta; i++){
@@ -1210,7 +1213,22 @@ int main (int argc, char *argv[])
       cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << paketi << endl;
       cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
        */
-      std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
-      return 0;
+      //std::cout << "datarate" << "\t" << "throughput" << std::endl;
+      //std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+     float sendrate;
+     float Receiverate;
+     for (uint16_t kk=0; kk< config.Nsta; kk++)
+        {
+            sendrate = stats.get(kk).getIPCameraSendingRate();
+            std::cout << "sta " << kk << ", SendingRate " << sendrate << " Mbit/s" << std::endl;
+        }
+    
+    for (uint16_t kk=0; kk< config.Nsta; kk++)
+    {
+        Receiverate = stats.get(kk).getIPCameraAPReceivingRate();
+        std::cout << "sta " << kk << ", Receiverate " << Receiverate << " Kbit/s" << std::endl;
+        
+    }
+    Simulator::Destroy ();
+    return 0;
 }

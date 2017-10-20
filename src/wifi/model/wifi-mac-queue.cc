@@ -348,4 +348,30 @@ WifiMacQueue::PeekFirstAvailable (WifiMacHeader *hdr, Time &timestamp,
   return 0;
 }
 
+
+Ptr<const Packet>
+WifiMacQueue::PeekAvailable (WifiMacHeader *hdr, Time &timestamp,
+                                  const QosBlockedDestinations *blockedPackets, uint16_t k)
+{
+  Cleanup ();
+  uint16_t count;
+  count = 0;
+  for (PacketQueueI it = m_queue.begin (); it != m_queue.end (); it++)
+    {
+      if (count < k)
+        {
+          count++;
+          continue;
+        }
+      if (!it->hdr.IsQosData ()
+          || !blockedPackets->IsBlocked (it->hdr.GetAddr1 (), it->hdr.GetQosTid ()))
+        {
+          *hdr = it->hdr;
+          timestamp = it->tstamp;
+          return it->packet;
+        }
+    }
+  return 0;
+}
+
 } //namespace ns3
