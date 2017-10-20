@@ -325,7 +325,7 @@ void onSTAAssociated(int i) {
 		}
 	}
 
-	//eventManager.onNodeAssociated(*nodes[i]);
+	eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
 	if (nrOfSTAAssociated == config.Nsta) {
@@ -745,7 +745,7 @@ void configureTCPIPCameraClients() {
 		wireTCPClient(clientApp,i);
 
 		clientApp.Start(MilliSeconds(0));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -992,7 +992,7 @@ int main (int argc, char *argv[])
   config.Nsta = config.NRawSta;
 
   stats = Statistics(config.Nsta);
-  //eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
+  eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
   uint32_t totalRawGroups (0);
   for (int i = 0; i < config.rps.rpsset.size(); i++)
   {
@@ -1182,8 +1182,8 @@ int main (int argc, char *argv[])
           std::cout << "AP node, position = " << apposition << std::endl;
         }
 
-      //eventManager.onStartHeader();
-      /*
+      eventManager.onStartHeader();
+    
       eventManager.onStart(config);
       if (config.rps.rpsset.size() > 0)
     	  for (uint32_t i = 0; i < config.rps.rpsset.size(); i++)
@@ -1195,9 +1195,9 @@ int main (int argc, char *argv[])
 
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
 
-      sendStatistics(true); */
+      sendStatistics(true);
 
-      Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
+      //Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
 
       double throughput = 0;

@@ -46,7 +46,7 @@ struct Configuration {
 	  double bandWidth = 2;
 	  string rho="200"; //50
 
-	  string visualizerIP = "10.0.2.15"; // empty string if no visualization TODO
+	  string visualizerIP = "127.0.0.1"; //"10.0.2.15"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 

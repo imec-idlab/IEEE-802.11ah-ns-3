@@ -1,5 +1,6 @@
 #include "NodeStatistics.h"
 #include "Configuration.h"
+#include <numeric>
 #include <cmath>
 
 long double NodeStatistics::getAveragePacketSentReceiveTime() { //milliseconds
@@ -19,13 +20,12 @@ long NodeStatistics::GetAverageJitter(void)
 }
 
 Time NodeStatistics::GetAverageInterPacketDelay(std::vector<Time>& delayVector){
-	/*if (delayVector.size() != 0)
+	if (delayVector.size() != 0)
 	{
 		//cout << "inter packet delay vector size " << delayVector.size() << endl;
 		return std::accumulate(delayVector.begin(), delayVector.end(), Seconds(0.0))/delayVector.size();
 	}
-	else return Time();*/
-    return Time();
+	else return Time();
 }
 
 long double NodeStatistics::GetInterPacketDelayDeviation(std::vector<Time>& delayVector) // in microseconds
