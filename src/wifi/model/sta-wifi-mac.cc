@@ -481,7 +481,7 @@ StaWifiMac::OutsideRawStartBackoff (void)
      {
        m_insideBackoffEvent.Cancel ();
      }
-   stationrawslot = false;
+   //stationrawslot = false;
    outsideraw = true;
   /*Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
   Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_dca);

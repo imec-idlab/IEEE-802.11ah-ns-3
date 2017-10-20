@@ -46,7 +46,8 @@ struct Configuration {
 	  double bandWidth = 2;
 	  string rho="200"; //50
 
-	  string visualizerIP = "10.0.2.15"; // empty string if no visualization TODO
+	  //string visualizerIP = "10.0.2.15"; // empty string if no visualization TODO
+	  string visualizerIP = "localhost"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 
@@ -64,7 +65,7 @@ struct Configuration {
 	  bool S1g1MfieldEnabled=false;
 	  string RAWConfigFile = "./OptimalRawGroup/RawConfig-32-2-2.txt";
 	  string DataMode = "MCS2_0"; //TODO copy this from Dwight, OfdmRate7_8MbpsBW2MHz MCS2
-
+          string OutputPath = "./OptimalRawGroup/resultsenergyconsumption/";
 	/*
 	 * Amina's configuration parameters
 	 * */

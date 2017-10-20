@@ -838,6 +838,12 @@ EdcaTxopN::NotifyWakeUp (void)
 }
 
 void
+EdcaTxopN::WakeUp (void)
+{
+    m_low->GetPhy()->ResumeFromSleep();
+}
+
+void
 EdcaTxopN::Queue (Ptr<const Packet> packet, const WifiMacHeader &hdr)
 {
   NS_LOG_FUNCTION (this << packet << &hdr);

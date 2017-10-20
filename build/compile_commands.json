@@ -256,7 +256,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/s1g-mac-test.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/s1g-mac-test.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/s1g-mac-test.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/s1g-mac-test.cc.2.o", 
     "file": "../scratch/tcpfiles/s1g-mac-test.cc"
   }, 
   {
@@ -308,11 +308,6 @@
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -Isrc/sixlowpan -I../src/sixlowpan -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/sixlowpan/model/sixlowpan-header.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/sixlowpan/model/sixlowpan-header.cc.1.o", 
     "file": "../src/sixlowpan/model/sixlowpan-header.cc"
-  }, 
-  {
-    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/lte/model/pf-ff-mac-scheduler.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/lte/model/pf-ff-mac-scheduler.cc.1.o", 
-    "file": "../src/lte/model/pf-ff-mac-scheduler.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -506,7 +501,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/scratch-simulator.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/scratch-simulator.cc.5.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/scratch-simulator.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/scratch-simulator.cc.6.o", 
     "file": "../scratch/scratch-simulator.cc"
   }, 
   {
@@ -691,7 +686,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/Configuration.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/Configuration.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/Configuration.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/Configuration.cc.2.o", 
     "file": "../scratch/tcpfiles/Configuration.cc"
   }, 
   {
@@ -716,7 +711,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/subdir/scratch-simulator-subdir.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/subdir/scratch-simulator-subdir.cc.2.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/subdir/scratch-simulator-subdir.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/subdir/scratch-simulator-subdir.cc.3.o", 
     "file": "../scratch/subdir/scratch-simulator-subdir.cc"
   }, 
   {
@@ -781,6 +776,11 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/mesh/model/dot11s/airtime-metric.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/mesh/model/dot11s/airtime-metric.cc.1.o", 
+    "file": "../src/mesh/model/dot11s/airtime-metric.cc"
+  }, 
+  {
+    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/internet/model/tcp-socket-factory.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/internet/model/tcp-socket-factory.cc.1.o", 
     "file": "../src/internet/model/tcp-socket-factory.cc"
   }, 
@@ -793,6 +793,11 @@
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/wifi/helper/s1g-wifi-mac-helper.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/wifi/helper/s1g-wifi-mac-helper.cc.1.o", 
     "file": "../src/wifi/helper/s1g-wifi-mac-helper.cc"
+  }, 
+  {
+    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/lte/model/lte-fr-hard-algorithm.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/lte/model/lte-fr-hard-algorithm.cc.1.o", 
+    "file": "../src/lte/model/lte-fr-hard-algorithm.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -816,7 +821,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/Statistics.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/Statistics.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/Statistics.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/Statistics.cc.4.o", 
     "file": "../scratch/tcpfiles/Statistics.cc"
   }, 
   {
@@ -866,8 +871,8 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/spectrum/model/spectrum-converter.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/spectrum/model/spectrum-converter.cc.1.o", 
-    "file": "../src/spectrum/model/spectrum-converter.cc"
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/internet/model/candidate-queue.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/internet/model/candidate-queue.cc.1.o", 
+    "file": "../src/internet/model/candidate-queue.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -1186,7 +1191,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPFirmwareServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPFirmwareServer.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPFirmwareServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPFirmwareServer.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPFirmwareServer.cc"
   }, 
   {
@@ -1401,7 +1406,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPIPCameraClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPIPCameraClient.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPIPCameraClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPIPCameraClient.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPIPCameraClient.cc"
   }, 
   {
@@ -1561,8 +1566,8 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/internet/model/candidate-queue.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/internet/model/candidate-queue.cc.1.o", 
-    "file": "../src/internet/model/candidate-queue.cc"
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/spectrum/model/spectrum-converter.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/spectrum/model/spectrum-converter.cc.1.o", 
+    "file": "../src/spectrum/model/spectrum-converter.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -1691,7 +1696,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/SimpleTCPClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/SimpleTCPClient.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/SimpleTCPClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/SimpleTCPClient.cc.4.o", 
     "file": "../scratch/tcpfiles/SimpleTCPClient.cc"
   }, 
   {
@@ -1936,7 +1941,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPPingPongServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPPingPongServer.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPPingPongServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPPingPongServer.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPPingPongServer.cc"
   }, 
   {
@@ -1998,6 +2003,11 @@
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/applications/model/seq-ts-header.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/applications/model/seq-ts-header.cc.1.o", 
     "file": "../src/applications/model/seq-ts-header.cc"
+  }, 
+  {
+    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/s1g-mac-test_EC.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/s1g-mac-test_EC.cc.5.o", 
+    "file": "../scratch/s1g-mac-test_EC.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -2156,7 +2166,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPFirmwareClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPFirmwareClient.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPFirmwareClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPFirmwareClient.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPFirmwareClient.cc"
   }, 
   {
@@ -2186,7 +2196,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPSensorClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPSensorClient.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPSensorClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPSensorClient.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPSensorClient.cc"
   }, 
   {
@@ -2281,13 +2291,18 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPSensorServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPSensorServer.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPSensorServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPSensorServer.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPSensorServer.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/wifi/model/block-ack-cache.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/wifi/model/block-ack-cache.cc.1.o", 
     "file": "../src/wifi/model/block-ack-cache.cc"
+  }, 
+  {
+    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/s1g-mac-test_ufficiale.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/s1g-mac-test_ufficiale.cc.1.o", 
+    "file": "../scratch/s1g-mac-test_ufficiale.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -2516,18 +2531,13 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPIPCameraServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPIPCameraServer.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPIPCameraServer.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPIPCameraServer.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPIPCameraServer.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
     "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/network/model/packet-metadata.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/network/model/packet-metadata.cc.1.o", 
     "file": "../src/network/model/packet-metadata.cc"
-  }, 
-  {
-    "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/internet/model/ipv6-option-header.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/internet/model/ipv6-option-header.cc.1.o", 
-    "file": "../src/internet/model/ipv6-option-header.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -2561,7 +2571,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/NodeStatistics.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/NodeStatistics.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/NodeStatistics.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/NodeStatistics.cc.2.o", 
     "file": "../scratch/tcpfiles/NodeStatistics.cc"
   }, 
   {
@@ -3396,7 +3406,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPPingPongClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPPingPongClient.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/TCPPingPongClient.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/TCPPingPongClient.cc.4.o", 
     "file": "../scratch/tcpfiles/TCPPingPongClient.cc"
   }, 
   {
@@ -3501,8 +3511,8 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/mesh/model/dot11s/airtime-metric.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/mesh/model/dot11s/airtime-metric.cc.1.o", 
-    "file": "../src/mesh/model/dot11s/airtime-metric.cc"
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/lte/model/pf-ff-mac-scheduler.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/lte/model/pf-ff-mac-scheduler.cc.1.o", 
+    "file": "../src/lte/model/pf-ff-mac-scheduler.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -3861,8 +3871,8 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/lte/model/lte-fr-hard-algorithm.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/lte/model/lte-fr-hard-algorithm.cc.1.o", 
-    "file": "../src/lte/model/lte-fr-hard-algorithm.cc"
+    "command": "/usr/bin/g++ -std=c++11 -fPIC -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../src/internet/model/ipv6-option-header.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/src/internet/model/ipv6-option-header.cc.1.o", 
+    "file": "../src/internet/model/ipv6-option-header.cc"
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
@@ -4036,7 +4046,7 @@
   }, 
   {
     "directory": "/home/serena/workspace/802.11ah-ns3-git/build", 
-    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/SimulationEventManager.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/SimulationEventManager.cc.3.o", 
+    "command": "/usr/bin/g++ -std=c++11 -pthread -I. -I.. -DNS3_ASSERT_ENABLE -DNS3_LOG_ENABLE -DHAVE_SYS_IOCTL_H=1 -DHAVE_IF_NETS_H=1 -DHAVE_NET_ETHERNET_H=1 -DHAVE_PACKET_H=1 -DHAVE_IF_TUN_H=1 ../scratch/tcpfiles/SimulationEventManager.cc -c -o /home/serena/workspace/802.11ah-ns3-git/build/scratch/tcpfiles/SimulationEventManager.cc.2.o", 
     "file": "../scratch/tcpfiles/SimulationEventManager.cc"
   }, 
   {

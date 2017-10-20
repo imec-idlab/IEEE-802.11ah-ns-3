@@ -248,6 +248,10 @@ public:
    * When wake up operation occurs, restart channel access
    */
   void NotifyWakeUp (void);
+   /**
+   * wake up operation
+   */
+  void WakeUp (void);
 
   /* Event handlers */
   /**
