@@ -4,8 +4,8 @@
 #include <cmath>
 
 long double NodeStatistics::getAveragePacketSentReceiveTime() { //milliseconds
-	if(NumberOfSuccessfulPacketsWithSeqHeader > 0)
-		return static_cast<long double>(TotalPacketSentReceiveTime.GetMilliSeconds()) / NumberOfSuccessfulPacketsWithSeqHeader;
+	if(NumberOfSuccessfulPackets > 0)
+		return static_cast<long double>(TotalPacketSentReceiveTime.GetMilliSeconds()) / NumberOfSuccessfulPackets;
 	else
 		return -1;
 }
@@ -43,10 +43,12 @@ long double NodeStatistics::GetInterPacketDelayDeviation(std::vector<Time>& dela
 
 //reliability for one node or for all nodes in whole network? impossible with dummy nodes.
 //try whole net when testing max nr of control loops
-float NodeStatistics::GetReliability (void)
+float NodeStatistics::GetPacketLoss (std::string trafficType)
 {
-	if (NumberOfSuccessfulRoundtripPackets != 0) //was number of sent packets
-		return 100*NumberOfSuccessfulRoundtripPackets/NumberOfSentPackets;
+	if (NumberOfSuccessfulRoundtripPackets > 0 && (trafficType == "coap" || trafficType == "tcpipcamera" || trafficType == "tcpecho" || trafficType == "udpecho"))
+		return 100 - 100 * (float)NumberOfSuccessfulRoundtripPackets / NumberOfSentPackets;
+	else if (NumberOfSuccessfulPackets > 0 && (trafficType == "udp"))
+		return 100 - 100 * (float)NumberOfSuccessfulPackets / NumberOfSentPackets;
 	else return -1;
 }
 

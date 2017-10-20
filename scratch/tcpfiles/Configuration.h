@@ -28,6 +28,7 @@ struct Configuration {
 	  RPSVector rps;
       uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
       uint64_t totalRawSlots = 0;				// Total number of RAW slots in all RAW groups in all RPS elements
+      std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
 	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
@@ -46,7 +47,8 @@ struct Configuration {
 	  double bandWidth = 2;
 	  string rho="200"; //50
 
-	  string visualizerIP = "127.0.0.1"; //"10.0.2.15"; // empty string if no visualization TODO
+
+	  string visualizerIP = "localhost"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 
@@ -69,8 +71,8 @@ struct Configuration {
 	 * Amina's configuration parameters
 	 * */
 	bool useV6 = false; //false
-	uint32_t nControlLoops = 100;
-	uint32_t coapPayloadSize = 15;
+	uint32_t nControlLoops = 0;//  = 100;
+	uint32_t coapPayloadSize = 0;//  = 15;
 
 	//uint32_t seed = 1;
 	//double simulationTime = 200;
@@ -94,11 +96,11 @@ struct Configuration {
 
 
 
-	uint32_t MinRTO = 81920000; //819200
-	uint32_t TCPConnectionTimeout = 6000000;
-	uint32_t TCPSegmentSize = 3216; //536
-	uint32_t TCPInitialSlowStartThreshold = 0xffff;
-	uint32_t TCPInitialCwnd = 1;
+	uint32_t MinRTO = 0;// 81920000; //819200
+	uint32_t TCPConnectionTimeout = 0;// = 6000000;
+	uint32_t TCPSegmentSize = 0;//  = 3216; //536
+	uint32_t TCPInitialSlowStartThreshold = 0;//  = 0xffff;
+	uint32_t TCPInitialCwnd = 0;//  = 1;
 
 	int ContentionPerRAWSlot=0; //-1
 	bool ContentionPerRAWSlotOnlyInFirstGroup=false; //false
@@ -107,21 +109,21 @@ struct Configuration {
 	double propagationLossReferenceLoss = 8;
 
 	bool APAlwaysSchedulesForNextSlot = false;
-	uint32_t APScheduleTransmissionForNextSlotIfLessThan = 5000;
+	uint32_t APScheduleTransmissionForNextSlotIfLessThan = 0;// = 5000;
 
-	double ipcameraMotionPercentage = 1; //0.1
-	uint16_t ipcameraMotionDuration = 10; //60
-	uint16_t ipcameraDataRate = 128; //20
+	double ipcameraMotionPercentage = 0;// = 1; //0.1
+	uint16_t ipcameraMotionDuration = 0;// = 10; //60
+	uint16_t ipcameraDataRate = 0;// = 128; //20
 
-	uint32_t firmwareSize = 1024 * 500;
-	uint16_t firmwareBlockSize = 1024;
-	double firmwareNewUpdateProbability = 0.01;
-	double firmwareCorruptionProbability = 0.01;
-	uint32_t firmwareVersionCheckInterval = 1000;
+	uint32_t firmwareSize = 0;// = 1024 * 500;
+	uint16_t firmwareBlockSize = 0;// = 1024;
+	double firmwareNewUpdateProbability;// = 0.01;
+	double firmwareCorruptionProbability;// = 0.01;
+	uint32_t firmwareVersionCheckInterval;// = 1000;
 
-	uint16_t sensorMeasurementSize = 54; //1024
+	uint16_t sensorMeasurementSize;// = 54; //1024
 
-	uint16_t MaxTimeOfPacketsInQueue = 1000; //100
+	uint16_t MaxTimeOfPacketsInQueue;// = 1000; //100
 
 	uint16_t CoolDownPeriod = 4; //60
 

@@ -23,7 +23,7 @@ public:
     long double GetInterPacketDelayDeviation(std::vector<Time>& delayVector);
     long double GetInterPacketDelayDeviationPercentage(std::vector<Time>& delayVector);
     Time GetAverageInterPacketDelay(std::vector<Time>& delayVector);
-    float GetReliability (void);
+    float GetPacketLoss (std::string trafficType);
     long double GetInterPacketDelayAtServer (void);
     long double GetInterPacketDelayAtClient (void);
 
@@ -54,6 +54,7 @@ public:
     long getNumberOfDroppedPackets();
 
     Time TotalPacketSentReceiveTime = Time();
+    Time latency = Time();
 
     // for jitter RMS - cumulative sum of abs differences
     uint64_t jitterAcc = 0;
@@ -107,8 +108,8 @@ public:
     Time FirmwareTransferTime;
 
     Time TimeStreamStarted = Time(0);
-    long IPCameraTotalDataSent = 0;
-    long IPCameraTotalDataReceivedAtAP = 0;
+    double IPCameraTotalDataSent = 0;
+    double IPCameraTotalDataReceivedAtAP = 0;
     Time IPCameraTotalTimeSent = Time(0);
 
     double getIPCameraSendingRate();

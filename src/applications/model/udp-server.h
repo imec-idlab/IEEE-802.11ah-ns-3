@@ -85,10 +85,10 @@ public:
 
 protected:
   virtual void DoDispose (void);
+  TracedCallback<Ptr<const Packet>, Address> m_packetReceived;
 
 private:
 
-  TracedCallback<Ptr<const Packet>, Address> m_packetReceived;
 
   virtual void StartApplication (void);
   virtual void StopApplication (void);

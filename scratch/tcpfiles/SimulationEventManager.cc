@@ -68,6 +68,7 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  std::to_string(config.ContentionPerRAWSlot),
 		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup),
 		  std::to_string(config.rps.rpsset.size())
+		  //config.RawConfigString
 	});
 }
 
@@ -162,11 +163,12 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).getIPCameraAPReceivingRate()),
 			std::to_string(stats.get(i).NumberOfTransmissionsCancelledDueToCrossingRAWBoundary),
 			std::to_string(stats.get(i).GetAverageJitter()), // I have jitter in micros abs delay between subsequent packets
-			std::to_string(stats.get(i).GetReliability()),
+			std::to_string(stats.get(i).GetPacketLoss(m_config.trafficType)),
 			std::to_string(stats.get(i).GetInterPacketDelayAtServer()),
 			std::to_string(stats.get(i).GetInterPacketDelayAtClient()),
 			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer)),
-			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient))
+			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient)),
+			std::to_string(stats.get(i).latency.GetMilliSeconds())
 		});
 	}
 }
@@ -224,16 +226,11 @@ void SimulationEventManager::onRawConfig (uint32_t rpsIndex, uint32_t rawIndex, 
 void SimulationEventManager::onStartHeader() {
 	send({"startheader",
 		   "NRawSta",
-		   "NGroup",
-		   "SlotFormat",
-		   "NRawSlotCount",
-		   "NRawSlotDuration",
-		   "NRawSlotNum",
 		   "DataMode",
 		   "",
 		   "",
 		   "TrafficInterval",
-		   "TrafficPacketSize",
+		   "PayloadSize",
 		   "BeaconInterval",
 		   "Name",
 		   "PropagationLossExponent",
@@ -257,10 +254,16 @@ void SimulationEventManager::onStartHeader() {
 		   "FirmwareCorruptionProbability",
 		   "FirmwareNewUpdateProbability",
 		   "SensorMeasurementSize",
+		   "NGroup",
+		   "SlotFormat",
+		   "NRawSlotCount",
+		   "NRawSlotNum",
 		   "ContentionPerRAWSlot",
-		   "ContentionPerRAWSlotOnlyInFirstGroup"
+		   "ContentionPerRAWSlotOnlyInFirstGroup",
+		   "NumOfRpsElements"
 		});
 }
+
 
 void SimulationEventManager::onStatisticsHeader() {
 	send({"nodestatsheader", "STAIndex",
@@ -306,11 +309,12 @@ void SimulationEventManager::onStatisticsHeader() {
 		"IPCameraReceivingRate",
 		"NumberOfTransmissionsCancelledDueToCrossingRAWBoundary",
 		"Jitter",
-		"Reliability",
+		"PacketLoss",
 		"InterPacketDelayAtServer",
 		"InterPacketDelayAtClient",
 		"InterPacketDelayDeviationPercentageAtServer",
-		"InterPacketDelayDeviationPercentageAtClient"
+		"InterPacketDelayDeviationPercentageAtClient",
+		"Latency"
 	});
 
 }
