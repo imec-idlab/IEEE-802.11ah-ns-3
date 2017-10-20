@@ -1198,6 +1198,8 @@ int main (int argc, char *argv[])
       sendStatistics(true);
 
       //Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
+      //Simulator::Stop(Seconds(config.simulationTime));
+
       Simulator::Run ();
 
       double throughput = 0;
@@ -1205,9 +1207,9 @@ int main (int argc, char *argv[])
 
       //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
       //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-      /*
-      int paketi=0, pay=0;
-
+    
+      //int paketi=0, pay=0;
+    
        uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
       throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
 
@@ -1221,9 +1223,8 @@ int main (int argc, char *argv[])
       }
       cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
       cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
-       */
-      //std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      //std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+    
+       
      float sendrate;
      float Receiverate;
      for (uint16_t kk=0; kk< config.Nsta; kk++)
@@ -1240,12 +1241,12 @@ int main (int argc, char *argv[])
     }
     Simulator::Destroy ();
     
-      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
+     // cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       // Visualizer Packet loss
       //stats.get(i).GetPacketLoss()
 
       //Le's throughput
-      std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+     // std::cout << "datarate" << "\t" << "throughput" << std::endl;
+     // std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
       return 0;
 }

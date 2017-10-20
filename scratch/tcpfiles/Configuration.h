@@ -48,7 +48,7 @@ struct Configuration {
 	  string rho="200"; //50
 
 
-	  string visualizerIP = "localhost"; // empty string if no visualization TODO
+	  string visualizerIP = "127.0.0.1"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 
@@ -87,7 +87,7 @@ struct Configuration {
 	uint32_t trafficInterval = 1; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
 	uint32_t trafficIntervalDeviation = 100; //1000 discuss with Jeroen
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-	string trafficType = "tcpipcamera"; // important
+	string trafficType = "udpecho"; // important
 
 	int SlotFormat=0; //0;
 	int NRawSlotCount=0; //162;
