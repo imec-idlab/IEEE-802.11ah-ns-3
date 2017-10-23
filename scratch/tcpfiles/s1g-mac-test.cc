@@ -348,12 +348,27 @@ void onSTAAssociated(int i) {
     	else if(config.trafficType == "tcppingpong") {
     		configureTCPPingPongServer();
 			configureTCPPingPongClients();
-		}
+    	}
     	else if(config.trafficType == "tcpipcamera") {
-			configureTCPIPCameraServer();
-			configureTCPIPCameraClients();
-		}
+    		config.ipcameraMotionPercentage = 1;// = 1; //0.1
+    		config.ipcameraMotionDuration = 10;// = 10; //60
+    		config.ipcameraDataRate = 128;// = 128; //20
+    		config.MinRTO = 81920000;// 81920000; //819200
+    		config.TCPConnectionTimeout = 6000000;
+    		config.TCPSegmentSize = 3216;//  = 3216; //536
+    		config.TCPInitialSlowStartThreshold = 0xffff;
+    		config.TCPInitialCwnd = 1;
+
+    		configureTCPIPCameraServer();
+    		configureTCPIPCameraClients();
+    	}
     	else if(config.trafficType == "tcpfirmware") {
+    		config.firmwareSize = 1024 * 500;
+    		config.firmwareBlockSize = 1024;
+    		config.firmwareNewUpdateProbability = 0.01;
+    		config.firmwareCorruptionProbability = 0.01;
+    		config.firmwareVersionCheckInterval = 1000;
+
 			configureTCPFirmwareServer();
 			configureTCPFirmwareClients();
 		}
@@ -1195,12 +1210,7 @@ int main (int argc, char *argv[])
 
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
-      Simulator::Destroy ();
 
-      double throughput = 0;
-      //UDP
-      uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
 
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
@@ -1210,14 +1220,19 @@ int main (int argc, char *argv[])
     	  pay+=stats.get(i).TotalPacketPayloadSize;
     	  cout << i << " sent: " << stats.get(i).NumberOfSentPackets << " ;succesfull: " << stats.get(i).NumberOfSuccessfulPackets << "; packetloss: "<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
       }
-      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
-      cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
-      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
-      // Visualizer Packet loss
-      //stats.get(i).GetPacketLoss()
+      if (config.trafficType == "udp")
+      {
+          double throughput = 0;
+          uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+          throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+          cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
+          cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
+          std::cout << "datarate" << "\t" << "throughput" << std::endl;
+          std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
-      //Le's throughput
-      std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+      }
+      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
+      Simulator::Destroy ();
+
       return 0;
 }

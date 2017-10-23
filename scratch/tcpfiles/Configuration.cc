@@ -25,7 +25,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue ("TrafficPath", "files path of traffic file", TrafficPath);
     cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", S1g1MfieldEnabled);
     cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
-    cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, -tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
+    cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
