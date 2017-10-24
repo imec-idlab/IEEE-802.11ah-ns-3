@@ -351,7 +351,6 @@ void onSTAAssociated(int i) {
 			configureTCPPingPongClients();
     	}
     	else if(config.trafficType == "tcpipcamera") {
-<<<<<<< HEAD
     		config.ipcameraMotionPercentage = 1;// = 1; //0.1
     		config.ipcameraMotionDuration = 10;// = 10; //60
     		config.ipcameraDataRate = 128;// = 128; //20
@@ -1285,39 +1284,11 @@ int main (int argc, char *argv[])
       eventManager.onStatisticsHeader();
 
       sendStatistics(true);
-<<<<<<< HEAD
-
-      //Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
-      //Simulator::Stop(Seconds(config.simulationTime));
-
-      Simulator::Run ();
-
-//<<<<<<< HEAD
-      double throughput = 0;
-      //UDP
-
-      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-    
-      //int paketi=0, pay=0;
-    
-       uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-//=======
-//>>>>>>> 87dafb41ffdd691431c64b4f10edcab8af8196d3
 
 
-      
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
-      Simulator::Destroy ();
-      
-      //double throughput = 0;
-      //UDP
-      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-/*
->>>>>>> d9c2a70eaac30b7443546db8262911aa9024fe01
+
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
       for (int i=0; i < config.Nsta; i++){
@@ -1326,35 +1297,8 @@ int main (int argc, char *argv[])
     	  pay+=stats.get(i).TotalPacketPayloadSize;
     	  cout << i << " sent: " << stats.get(i).NumberOfSentPackets << " ;succesfull: " << stats.get(i).NumberOfSuccessfulPackets << "; packetloss: "<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
       }
-//<<<<<<< HEAD
-      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
-      cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
-    
-       
-     float sendrate;
-     float Receiverate;
-     for (uint16_t kk=0; kk< config.Nsta; kk++)
-        {
-            sendrate = stats.get(kk).getIPCameraSendingRate();
-            std::cout << "sta " << kk << ", SendingRate " << sendrate << " Mbit/s" << std::endl;
-        }
-    
-    for (uint16_t kk=0; kk< config.Nsta; kk++)
-    {
-        Receiverate = stats.get(kk).getIPCameraAPReceivingRate();
-        std::cout << "sta " << kk << ", Receiverate " << Receiverate << " Kbit/s" << std::endl;
-        
-    }
-    Simulator::Destroy ();
-    
-     // cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
-      // Visualizer Packet loss
-      //stats.get(i).GetPacketLoss()
 
 
-      //Le's throughput
-     // std::cout << "datarate" << "\t" << "throughput" << std::endl;
-     // std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
         //Energy consumption per station
       timeRx = timeRx/config.Nsta;
@@ -1383,10 +1327,7 @@ int main (int argc, char *argv[])
 
           risultati.close();
 
-		//Le's throughput
-      std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
-//=======
+		
       if (config.trafficType == "udp")
       {
           double throughput = 0;
@@ -1401,6 +1342,5 @@ int main (int argc, char *argv[])
       cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       Simulator::Destroy ();
 
-//>>>>>>> 87dafb41ffdd691431c64b4f10edcab8af8196d3
       return 0;
 }
