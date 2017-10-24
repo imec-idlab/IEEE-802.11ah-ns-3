@@ -351,6 +351,7 @@ void onSTAAssociated(int i) {
 			configureTCPPingPongClients();
     	}
     	else if(config.trafficType == "tcpipcamera") {
+<<<<<<< HEAD
     		config.ipcameraMotionPercentage = 1;// = 1; //0.1
     		config.ipcameraMotionDuration = 10;// = 10; //60
     		config.ipcameraDataRate = 128;// = 128; //20
@@ -370,6 +371,17 @@ void onSTAAssociated(int i) {
     		config.firmwareCorruptionProbability = 0.01;
     		config.firmwareVersionCheckInterval = 1000;
 
+			configureTCPIPCameraServer();
+			configureTCPIPCameraClients();
+		}
+    	else if(config.trafficType == "tcpfirmware") {
+            
+            config.firmwareSize = 1024 * 500;
+     		config.firmwareBlockSize = 1024;
+     		config.firmwareNewUpdateProbability = 0.01;
+     		config.firmwareCorruptionProbability = 0.01;
+     		config.firmwareVersionCheckInterval = 1000;
+ 
 			configureTCPFirmwareServer();
 			configureTCPFirmwareClients();
 		}
@@ -414,7 +426,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 
         n->SetAssociatedCallback([ = ]{onSTAAssociated(i);});
         n->SetDeassociatedCallback([ = ]{onSTADeassociated(i);});
-
+        
         nodes.push_back(n);
         // hook up Associated and Deassociated events
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
@@ -1268,11 +1280,12 @@ int main (int argc, char *argv[])
 
       for (uint32_t i = 0; i < config.Nsta; i++)
       	eventManager.onSTANodeCreated(*nodes[i]);
-
+          
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
       eventManager.onStatisticsHeader();
 
       sendStatistics(true);
+<<<<<<< HEAD
 
       //Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       //Simulator::Stop(Seconds(config.simulationTime));
@@ -1293,6 +1306,18 @@ int main (int argc, char *argv[])
 //=======
 //>>>>>>> 87dafb41ffdd691431c64b4f10edcab8af8196d3
 
+
+      
+      Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
+      Simulator::Run ();
+      Simulator::Destroy ();
+      
+      //double throughput = 0;
+      //UDP
+      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+/*
+>>>>>>> d9c2a70eaac30b7443546db8262911aa9024fe01
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
       for (int i=0; i < config.Nsta; i++){

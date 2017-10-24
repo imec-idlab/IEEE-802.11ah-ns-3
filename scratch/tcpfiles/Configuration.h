@@ -26,13 +26,14 @@ struct Configuration {
 	 *
 	 * */
 	  RPSVector rps;
+<<<<<<< HEAD
       uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
       uint64_t totalRawSlots = 0;				// Total number of RAW slots in all RAW groups in all RPS elements
       std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
   	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
   	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
-
+  
 	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
 	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
@@ -83,12 +84,7 @@ struct Configuration {
 	uint32_t trafficInterval = 1; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
 	uint32_t trafficIntervalDeviation = 100; //1000 discuss with Jeroen
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-	string trafficType = "udpecho"; // important
-//=======
-	//uint32_t trafficInterval = 0;//  = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
-	//uint32_t trafficIntervalDeviation = 0;//  = 100; //1000 discuss with Jeroen
 
-//>>>>>>> 87dafb41ffdd691431c64b4f10edcab8af8196d3
 
 	int SlotFormat=0; //0;
 	int NRawSlotCount=0; //162;
@@ -106,6 +102,7 @@ struct Configuration {
 	uint32_t TCPInitialSlowStartThreshold = 0;//  = 0xffff;
 	uint32_t TCPInitialCwnd = 0;//  = 1;
 
+
 	int ContentionPerRAWSlot=0; //-1
 	bool ContentionPerRAWSlotOnlyInFirstGroup=false; //false
 
@@ -114,6 +111,7 @@ struct Configuration {
 
 	bool APAlwaysSchedulesForNextSlot = false;
 	uint32_t APScheduleTransmissionForNextSlotIfLessThan = 0;// = 5000;
+
 
 	uint32_t firmwareSize = 0;// = 1024 * 500;
 	uint16_t firmwareBlockSize = 0;// = 1024;

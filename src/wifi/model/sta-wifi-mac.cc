@@ -605,7 +605,7 @@ void
 StaWifiMac::SleepIfQueueIsEmpty(bool value)
 {
    waitingack = !value;
-        
+   
    if (IsAssociated() && !receivingBeacon)
      {
          if(!HasPacketsInQueue() && !waitingack)
@@ -620,8 +620,8 @@ StaWifiMac::SleepIfQueueIsEmpty(bool value)
                 m_low->GetPhy()->SetSleepMode();
             }
             
-         if (waitingack && !outsideraw && !stationrawslot)
-
+         //if (waitingack && !outsideraw && !stationrawslot)
+         if (!outsideraw && !stationrawslot)
             {
                 m_low->GetPhy()->SetSleepMode();
             }
