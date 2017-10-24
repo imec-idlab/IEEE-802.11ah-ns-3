@@ -624,22 +624,27 @@ EdcaTxopN::NotifyAccessGranted (void)
 				return;
 			}
 			else
+                        {
 	      		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
-          //don't go to sleep after you send the packet, since it has to receive the ack
-          if(!m_low->GetPhy()->IsStateSleep())
-             {
-                if (!m_sleepCallback.IsNull())
-                {
-                    m_sleepCallback (false);
-                    // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
-                }
-
-                m_low->StartTransmission (fragment, &m_currentHdr,
-                                     params, m_transmissionListener);
-                nrOfTransmissionsDuringRaw++;
-            }
-        }
-          //m_low->StartTransmission (fragment, &hdr, params, m_transmissionListener);          
+                        //don't go to sleep after you send the packet, since it has to receive the ack
+                        if(!m_low->GetPhy()->IsStateSleep())
+                           {
+                              if (!m_sleepCallback.IsNull())
+                              {
+                                  m_sleepCallback (false);
+                                  // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
+                              }
+                              //temporary double check in order to not start the transmission if not my slot or shared slot
+                            if(!m_low->GetPhy()->IsStateSleep())
+                           {  
+                              m_low->StartTransmission (fragment, &m_currentHdr,
+                                                   params, m_transmissionListener);
+                              nrOfTransmissionsDuringRaw++;
+                            }
+                          }
+                      }
+                        //m_low->StartTransmission (fragment, &hdr, params, m_transmissionListener);     
+      }
       
       else
         {
@@ -698,6 +703,7 @@ EdcaTxopN::NotifyAccessGranted (void)
               NS_LOG_DEBUG ("tx unicast");
             }
           params.DisableNextData ();
+          
           Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
                          			&m_currentHdr, params);
 	      if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
@@ -706,23 +712,27 @@ EdcaTxopN::NotifyAccessGranted (void)
 			return;
 		  }
 	      else
+              {
 	      	NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
 
-          //m_low->StartTransmission (m_currentPacket, &m_currentHdr, params, m_transmissionListener);
-          
-          //don't go to sleep after you send the packet, since it has to receive the ack
-          if(!m_low->GetPhy()->IsStateSleep())
-             {
-                if (!m_sleepCallback.IsNull())
-                {
-                    m_sleepCallback (false);
-                    // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
-                }
+                //m_low->StartTransmission (m_currentPacket, &m_currentHdr, params, m_transmissionListener);
 
-                m_low->StartTransmission (m_currentPacket, &m_currentHdr,
-                                     params, m_transmissionListener);
-                nrOfTransmissionsDuringRaw++;
-            }                  
+                //don't go to sleep after you send the packet, since it has to receive the ack
+                if(!m_low->GetPhy()->IsStateSleep())
+                   {
+                      if (!m_sleepCallback.IsNull())
+                      {
+                          m_sleepCallback (false);
+                          // NS_LOG_UNCOND ("**--not go to sleep, start transmit " << m_low->GetAddress() << "size "<< m_currentPacket->GetSize()  );
+                      }
+                    //temporary double check in order to not start the transmission if not my slot or shared slot
+                        if(!m_low->GetPhy()->IsStateSleep())
+                        {
+                        m_low->StartTransmission (m_currentPacket, &m_currentHdr, params, m_transmissionListener);
+                        nrOfTransmissionsDuringRaw++;
+                        }
+                  }   
+              }
           
           if (!GetAmpduExist ())
             {

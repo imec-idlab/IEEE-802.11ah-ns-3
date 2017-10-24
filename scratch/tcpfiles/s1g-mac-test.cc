@@ -351,10 +351,25 @@ void onSTAAssociated(int i) {
 			configureTCPPingPongClients();
 		}
     	else if(config.trafficType == "tcpipcamera") {
+                        config.ipcameraMotionPercentage = 1;// = 1; //0.1
+                        config.ipcameraMotionDuration = 10;// = 10; //60
+                        config.ipcameraDataRate = 128;// = 128; //20
+                        config.MinRTO = 81920000;// 81920000; //819200
+                        config.TCPConnectionTimeout = 6000000;
+                        config.TCPSegmentSize = 3216;//  = 3216; //536
+                        config.TCPInitialSlowStartThreshold = 0xffff;
+                        config.TCPInitialCwnd = 1;
 			configureTCPIPCameraServer();
 			configureTCPIPCameraClients();
 		}
     	else if(config.trafficType == "tcpfirmware") {
+            
+            config.firmwareSize = 1024 * 500;
+     		config.firmwareBlockSize = 1024;
+     		config.firmwareNewUpdateProbability = 0.01;
+     		config.firmwareCorruptionProbability = 0.01;
+     		config.firmwareVersionCheckInterval = 1000;
+ 
 			configureTCPFirmwareServer();
 			configureTCPFirmwareClients();
 		}
@@ -399,7 +414,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 
         n->SetAssociatedCallback([ = ]{onSTAAssociated(i);});
         n->SetDeassociatedCallback([ = ]{onSTADeassociated(i);});
-
+        
         nodes.push_back(n);
         // hook up Associated and Deassociated events
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n)); //happens
@@ -1249,19 +1264,19 @@ int main (int argc, char *argv[])
 
       for (uint32_t i = 0; i < config.Nsta; i++)
       	eventManager.onSTANodeCreated(*nodes[i]);
-
+          
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
 
       sendStatistics(true);
-
+      
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
       Simulator::Destroy ();
-
+      
       double throughput = 0;
       //UDP
-      uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
 /*
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
