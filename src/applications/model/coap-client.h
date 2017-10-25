@@ -23,12 +23,12 @@
 #ifndef COAP_CLIENT_H
 #define COAP_CLIENT_H
 
-#include "ns3-dev/ns3/application.h"
-#include "ns3-dev/ns3/event-id.h"
-#include "ns3-dev/ns3/ptr.h"
-#include "ns3-dev/ns3/ipv4-address.h"
-#include "ns3-dev/ns3/traced-callback.h"
-#include "ns3-dev/ns3/random-variable-stream.h"
+#include "ns3/application.h"
+#include "ns3/event-id.h"
+#include "ns3/ptr.h"
+#include "ns3/ipv4-address.h"
+#include "ns3/traced-callback.h"
+#include "ns3/random-variable-stream.h"
 
 #include "coap-pdu.h"
 #define WITH_NS3 1
