@@ -338,6 +338,8 @@ void onSTAAssociated(int i) {
     		configureUDPClients();
     	}
     	else if(config.trafficType == "udpecho") {
+    		config.trafficInterval = 1000;
+    		config.trafficIntervalDeviation = 100;
     		configureUDPEchoServer();
     		configureUDPEchoClients();
     	}
@@ -348,12 +350,27 @@ void onSTAAssociated(int i) {
     	else if(config.trafficType == "tcppingpong") {
     		configureTCPPingPongServer();
 			configureTCPPingPongClients();
-		}
+    	}
     	else if(config.trafficType == "tcpipcamera") {
-			configureTCPIPCameraServer();
-			configureTCPIPCameraClients();
-		}
+    		config.ipcameraMotionPercentage = 1;// = 1; //0.1
+    		config.ipcameraMotionDuration = 10;// = 10; //60
+    		config.ipcameraDataRate = 128;// = 128; //20
+    		config.MinRTO = 81920000;// 81920000; //819200
+    		config.TCPConnectionTimeout = 6000000;
+    		config.TCPSegmentSize = 3216;//  = 3216; //536
+    		config.TCPInitialSlowStartThreshold = 0xffff;
+    		config.TCPInitialCwnd = 1;
+
+    		configureTCPIPCameraServer();
+    		configureTCPIPCameraClients();
+    	}
     	else if(config.trafficType == "tcpfirmware") {
+    		config.firmwareSize = 1024 * 500;
+    		config.firmwareBlockSize = 1024;
+    		config.firmwareNewUpdateProbability = 0.01;
+    		config.firmwareCorruptionProbability = 0.01;
+    		config.firmwareVersionCheckInterval = 1000;
+
 			configureTCPFirmwareServer();
 			configureTCPFirmwareClients();
 		}
@@ -361,10 +378,17 @@ void onSTAAssociated(int i) {
 			configureTCPSensorServer();
 			configureTCPSensorClients();
     	}
-    	/*else if (config.trafficType == "coap") {
+    	else if (config.trafficType == "coap") {
+    		config.useV6 = false; //TODO enable
+    		config.nControlLoops = config.Nsta / 2;//  = 100;
+    		config.coapPayloadSize = 15;//  = 15;
+
+    		config.trafficInterval = 1000;//  = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
+    		config.trafficIntervalDeviation = 500;//  = 100; //1000
+
 			configureCoapServer();
 			configureCoapClients();
-		}*/
+		}
         updateNodesQueueLength();
     }
 }
@@ -401,31 +425,31 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 
         nodes.push_back(n);
         // hook up Associated and Deassociated events
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n)); //happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback(&NodeEntry::UnsetAssociation, n)); //never
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/NrOfTransmissionsDuringRAWSlot", MakeCallback(&NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged, n)); //NEVER
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback(&NodeEntry::UnsetAssociation, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/NrOfTransmissionsDuringRAWSlot", MakeCallback(&NodeEntry::OnNrOfTransmissionsDuringRAWSlotChanged, n));//not implem
 
         //Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/S1gBeaconMissed", MakeCallback(&NodeEntry::OnS1gBeaconMissed, n));
 
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/PacketDropped", MakeCallback(&NodeEntry::OnMacPacketDropped, n)); //never
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Collision", MakeCallback(&NodeEntry::OnCollision, n)); //never
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/TransmissionWillCrossRAWBoundary", MakeCallback(&NodeEntry::OnTransmissionWillCrossRAWBoundary, n)); //never
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/PacketDropped", MakeCallback(&NodeEntry::OnMacPacketDropped, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Collision", MakeCallback(&NodeEntry::OnCollision, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/TransmissionWillCrossRAWBoundary", MakeCallback(&NodeEntry::OnTransmissionWillCrossRAWBoundary, n)); //?
 
         // hook up TX
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxBegin", MakeCallback(&NodeEntry::OnPhyTxBegin, n)); //happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxEnd", MakeCallback(&NodeEntry::OnPhyTxEnd, n)); // never happens TODO
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxDropWithReason", MakeCallback(&NodeEntry::OnPhyTxDrop, n)); // never happens TODO
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxBegin", MakeCallback(&NodeEntry::OnPhyTxBegin, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxEnd", MakeCallback(&NodeEntry::OnPhyTxEnd, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyTxDropWithReason", MakeCallback(&NodeEntry::OnPhyTxDrop, n));//?
 
         // hook up RX
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxBegin", MakeCallback(&NodeEntry::OnPhyRxBegin, n)); //happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxEnd", MakeCallback(&NodeEntry::OnPhyRxEnd, n)); //happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxDropWithReason", MakeCallback(&NodeEntry::OnPhyRxDrop, n)); //happens
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxBegin", MakeCallback(&NodeEntry::OnPhyRxBegin, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxEnd", MakeCallback(&NodeEntry::OnPhyRxEnd, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/PhyRxDropWithReason", MakeCallback(&NodeEntry::OnPhyRxDrop, n));
 
         // hook up MAC traces
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxRtsFailed", MakeCallback(&NodeEntry::OnMacTxRtsFailed, n)); //never happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxDataFailed", MakeCallback(&NodeEntry::OnMacTxDataFailed, n)); //happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalRtsFailed", MakeCallback(&NodeEntry::OnMacTxFinalRtsFailed, n)); //never happens
-        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalDataFailed", MakeCallback(&NodeEntry::OnMacTxFinalDataFailed, n)); //never happens
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxRtsFailed", MakeCallback(&NodeEntry::OnMacTxRtsFailed, n)); //?
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxDataFailed", MakeCallback(&NodeEntry::OnMacTxDataFailed, n));
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalRtsFailed", MakeCallback(&NodeEntry::OnMacTxFinalRtsFailed, n)); //?
+        Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/MacTxFinalDataFailed", MakeCallback(&NodeEntry::OnMacTxFinalDataFailed, n));//?
 
         // hook up PHY State change
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Phy/State/State", MakeCallback(&NodeEntry::OnPhyStateChange, n));
@@ -593,6 +617,17 @@ int getSTAIdFromAddress(Ipv4Address from) {
     return staId;
 }
 
+int getSTAIdFromAddress(Ipv6Address from) {
+    int staId = -1;
+    for (uint32_t i = 0; i < staNodeInterface6.GetN(); i++) {
+        if (staNodeInterface6.GetAddress(i,0) == from) {
+            staId = i;
+            break;
+        }
+    }
+    return staId;
+}
+
 void udpPacketReceivedAtServer(Ptr<const Packet> packet, Address from) { //works
 	//cout << "+++++++++++udpPacketReceivedAtServer" << endl;
     int staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
@@ -642,6 +677,18 @@ void tcpIPCameraDataReceivedAtServer(Address from, uint16_t nrOfBytes) {
 			nodes[staId]->OnTcpIPCameraDataReceivedAtAP(nrOfBytes);
 		else
 			cout << "*** Node could not be determined from received packet at AP " << endl;
+}
+
+void coapPacketReceivedAtServer(Ptr<const Packet> packet, Address from) {
+	int staId;
+	if (!config.useV6)
+		staId = getSTAIdFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
+	else
+		staId = getSTAIdFromAddress(Inet6SocketAddress::ConvertFrom(from).GetIpv6());
+    if (staId != -1)
+        nodes[staId]->OnCoapPacketReceivedAtServer(packet); ///ami OnCoapPacketReceivedAtAP
+    else
+    	cout << "*** Node could not be determined from received packet at server " << endl;
 }
 
 void configureUDPServer() {
@@ -959,6 +1006,117 @@ void configureUDPEchoClients() {
 	}
 }
 
+/* In control loops, odd nodes (1, 3, 5, ...) are clients
+ * even nodes and zeroth node can be servers (0, 2, 4, ...)
+ *
+ * */
+void configureCoapServer() {
+    CoapServerHelper myServer(5683);
+    for (uint32_t i = 0; i < config.nControlLoops*2; i += 2)
+    {
+        serverApp = myServer.Install(wifiStaNode.Get(i));
+        nodes[i]->m_nodeType = NodeEntry::SERVER;
+        serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
+        serverApp.Start(Seconds(0));
+    }
+}
+
+void configureCoapClients()
+{
+	for (uint32_t i = 0; i < config.Nsta; i++)
+	{
+		if (!config.useV6)
+		{
+			// Configure client (cpntroller) that sends PUT control value to the server (process = sensor+actuator)
+			if (i % 2 == 0 && i < 2*config.nControlLoops)
+			{
+				// address of remote node n0 (server)
+				Ptr<Ipv4> ip = wifiStaNode.Get(i)->GetObject<Ipv4>();
+				Ipv4InterfaceAddress iAddr = ip->GetAddress(1,0);
+				CoapClientHelper clientHelper (iAddr.GetLocal(), 5683);
+				configureCoapClientHelper(clientHelper, i+1);
+				nodes[i+1]->m_nodeType = NodeEntry::CLIENT;
+			}
+			else if (i >= 2*config.nControlLoops)
+			{
+				// Dummy clients for network congestion send packets to some external service over AP
+				CoapClientHelper clientHelperDummy (externalInterfaces.GetAddress(0), 5683); //address of AP
+				//std::cout << " external node address is " << externalInterfaces.GetAddress(0) << std::endl;
+				clientHelperDummy.SetAttribute("MaxPackets", config.maxNumberOfPackets); //4294967295u
+				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval*2)));
+				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval*2/10)));
+				clientHelperDummy.SetAttribute("PayloadSize", UintegerValue(config.coapPayloadSize));
+				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(1));
+				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1));
+				Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+				ApplicationContainer clientApp = clientHelperDummy.Install(wifiStaNode.Get(i));
+				clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnCoapPacketSent, nodes[i]));
+				clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[i]));
+				nodes[i]->m_nodeType = NodeEntry::DUMMY;
+
+				double random = m_rv->GetValue(0, 3000);
+				clientApp.Start(MilliSeconds(0+random));
+
+			}
+
+		}
+		else
+		{
+			// Configure client (cpntroller) that sends PUT control value to the server (process = sensor+actuator)
+			if (i % 2 == 0 && i < 2*config.nControlLoops)
+			{
+				// address of remote node n0 (server)
+				Ptr<Ipv6> ip = wifiStaNode.Get(i)->GetObject<Ipv6>();
+				Ipv6InterfaceAddress iAddr = ip->GetAddress(1,0);
+				CoapClientHelper clientHelper (iAddr.GetAddress(), 5683);
+				configureCoapClientHelper(clientHelper, i+1);
+			}
+			else if (i >= 2*config.nControlLoops)
+			{
+				// Dummy clients for network congestion send packets to some external service over AP
+				CoapClientHelper clientHelperDummy (externalInterfaces6.GetAddress(0, 0), 5683); //address of AP
+				//std::cout << " external node address is " << externalInterfaces.GetAddress(0) << std::endl;
+				clientHelperDummy.SetAttribute("MaxPackets", config.maxNumberOfPackets); //4294967295u
+				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval*2)));
+				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval*2)));
+				clientHelperDummy.SetAttribute("PayloadSize", UintegerValue(config.coapPayloadSize));
+				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(1));
+				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1));
+				Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+				ApplicationContainer clientApp = clientHelperDummy.Install(wifiStaNode.Get(i));
+				clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnCoapPacketSent, nodes[i]));
+				clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[i]));
+
+				double random = m_rv->GetValue(0, 3000);
+				clientApp.Start(MilliSeconds(0+random));
+			}
+
+		}
+	}
+}
+
+void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n)
+{
+	clientHelper.SetAttribute("MaxPackets", config.maxNumberOfPackets);//4294967295u
+	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	clientHelper.SetAttribute("PayloadSize", UintegerValue(config.coapPayloadSize));
+	clientHelper.SetAttribute("RequestMethod", UintegerValue(3));
+	clientHelper.SetAttribute("MessageType", UintegerValue(0));
+
+
+	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+
+	ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(n));
+	clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnCoapPacketSent, nodes[n]));
+	clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[n]));
+	double random = m_rv->GetValue(0, config.trafficInterval);
+	clientApp.Start(MilliSeconds(0+random));
+
+}
+
 int main (int argc, char *argv[])
 {
   //LogComponentEnable ("UdpServer", LOG_INFO);
@@ -1121,18 +1279,38 @@ int main (int argc, char *argv[])
   stack.Install (wifiApNode);
   stack.Install (wifiStaNode);
 
+  if (config.trafficType == "coap")
+  {
+	  externalNodes.Create(1);
+	  externalNodes.Add(wifiApNode.Get(0));
+	  PointToPointHelper pointToPoint;
+	  pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
+	  pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
+	  externalDevices = pointToPoint.Install (externalNodes);
+	  InternetStackHelper stack;
+	  stack.Install(externalNodes.Get(0));
+  }
+
   Ipv4AddressHelper address;
-
   address.SetBase ("192.168.0.0", "255.255.0.0");
-  //Ipv4InterfaceContainer staNodeInterface;
-  //Ipv4InterfaceContainer apNodeInterface;
-
   staNodeInterface = address.Assign (staDevice);
   apNodeInterface = address.Assign (apDevice);
 
+  if (config.trafficType == "coap")
+  {
+	  address.SetBase("169.200.0.0", "255.255.0.0");
+	  externalInterfaces = address.Assign (externalDevices);
+
+	  CoapServerHelper myServer(5683);
+	  serverApp = myServer.Install(externalNodes.Get(0));
+	  //serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
+	  serverApp.Start(Seconds(0));
+	  serverApp.Stop (Seconds (config.simulationTime));
+  }
+
   //trace association
   for (uint16_t kk=0; kk< config.Nsta; kk++)
-    {
+  {
       std::ostringstream STA;
       STA << kk;
       std::string strSTA = STA.str();
@@ -1178,7 +1356,7 @@ int main (int argc, char *argv[])
           std::cout << "AP node, position = " << apposition << std::endl;
         }
 
-      //eventManager.onStartHeader();
+      eventManager.onStartHeader();
       eventManager.onStart(config);
       if (config.rps.rpsset.size() > 0)
     	  for (uint32_t i = 0; i < config.rps.rpsset.size(); i++)
@@ -1189,18 +1367,14 @@ int main (int argc, char *argv[])
       	eventManager.onSTANodeCreated(*nodes[i]);
 
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
+      eventManager.onStatisticsHeader();
 
       sendStatistics(true);
 
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
-      Simulator::Destroy ();
 
-      double throughput = 0;
-      //UDP
-      uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
-/*
+
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
       for (int i=0; i < config.Nsta; i++){
@@ -1209,14 +1383,19 @@ int main (int argc, char *argv[])
     	  pay+=stats.get(i).TotalPacketPayloadSize;
     	  cout << i << " sent: " << stats.get(i).NumberOfSentPackets << " ;succesfull: " << stats.get(i).NumberOfSuccessfulPackets << "; packetloss: "<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
       }
-      cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
-      cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
-      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
-      // Visualizer Packet loss
-      //stats.get(i).GetPacketLoss()*/
+      if (config.trafficType == "udp")
+      {
+          double throughput = 0;
+          uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+          throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+          cout << "totalPacketsThrough " << totalPacketsThrough << " ++my " << totalSuccessfulPackets << endl;
+          cout << "throughput " << throughput << " ++my " << pay*8./(config.simulationTime * 1000000.0) << endl;
+          std::cout << "datarate" << "\t" << "throughput" << std::endl;
+          std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
-		//Le's throughput
-      std::cout << "datarate" << "\t" << "throughput" << std::endl;
-      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+      }
+      cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
+      Simulator::Destroy ();
+
       return 0;
 }

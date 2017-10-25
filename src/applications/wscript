@@ -1,7 +1,30 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+def configure(conf):
+    conf.env['ENABLE_FDNETDEV'] = False
 
+    # set libcoap compile flags
+    conf.env.append_value('CXXFLAGS', '-DWITH_POSIX=1') #conf.env.append_value('CXXFLAGS', '-DWITH_POSIX=1 -DWITH_NS3=1' )
+    conf.env['coap-1'] = conf.check(mandatory = True, lib = 'coap-1', uselib_store='COAP-1')
+
+    have_libcoap = conf.check_nonfatal(header_name='coap/coap.h',
+            define_name = 'HAVE_LIBCOAP',
+            use='COAP-1')
+
+    if conf.env['ENABLE_THREADING']:
+        # Check for system dependencies
+        have_sysioctl = conf.check_nonfatal(header_name='sys/ioctl.h',
+            define_name = 'HAVE_SYS_IOCTL_H')
+        have_netif =  conf.check_nonfatal(header_name='net/if.h',
+            define_name = 'HAVE_IF_NETS_H')
+
+        # Enable the FdNetDevice module.
+        # Besides threading support, we also require ethernet.h
+        conf.env['ENABLE_FDNETDEV'] = conf.check_nonfatal(header_name='net/ethernet.h',
+                                                          define_name='HAVE_NET_ETHERNET_H')
 def build(bld):
     module = bld.create_ns3_module('applications', ['internet', 'config-store','stats'])
+    if bld.env['coap-1']:
+        module.use.extend(['COAP-1'])
     module.source = [
         'model/bulk-send-application.cc',
         'model/onoff-application.cc',
@@ -13,7 +36,11 @@ def build(bld):
         'model/udp-client.cc',
         'model/udp-server.cc',
         'model/seq-ts-header.cc',
+        'model/coap-pdu.cc',
+        'model/coap-client.cc',
+        'model/coap-server.cc',
         'model/udp-trace-client.cc',
+		'model/coap-trace-client.cc',
         'model/packet-loss-counter.cc',
         'model/udp-echo-client.cc',
         'model/udp-echo-server.cc',
@@ -28,6 +55,7 @@ def build(bld):
         'helper/packet-sink-helper.cc',
         'helper/ping6-helper.cc',
         'helper/udp-client-server-helper.cc',
+        'helper/coap-client-server-helper.cc',
         'helper/udp-echo-helper.cc',
         'helper/v4ping-helper.cc',
         'helper/radvd-helper.cc',
@@ -52,9 +80,13 @@ def build(bld):
         'model/udp-client.h',
         'model/udp-server.h',
         'model/seq-ts-header.h',
+        'model/coap-pdu.h',
+        'model/coap-client.h',
+        'model/coap-server.h',
         'model/udp-trace-client.h',
+        'model/coap-trace-client.h',
         'model/packet-loss-counter.h',
-        'model/udp-echo-client.h',
+        'model/udp-echo-client.h', 	
         'model/udp-echo-server.h',
         'model/v4ping.h',
         'model/application-packet-probe.h',
@@ -68,10 +100,15 @@ def build(bld):
         'helper/packet-sink-helper.h',
         'helper/ping6-helper.h',
         'helper/udp-client-server-helper.h',
+        'helper/coap-client-server-helper.h',
         'helper/udp-echo-helper.h',
         'helper/v4ping-helper.h',
         'helper/radvd-helper.h',
         'helper/tcp-echo-helper.h'
         ]
+        
+    module.env.append_value("CXXFLAGS", "-I/usr/local/include")  
+    module.env.append_value("LINKFLAGS", ["-L/usr/local/lib"]) 
+    module.env.append_value("LIB", ["coap-1"])
 
     bld.ns3_python_bindings()

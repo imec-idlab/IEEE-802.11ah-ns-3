@@ -32,6 +32,8 @@
 #include "TCPFirmwareServer.h"
 #include "TCPSensorClient.h"
 #include "TCPSensorServer.h"
+#include "ns3/point-to-point-module.h"
+
 
 using namespace std;
 using namespace ns3;
@@ -44,6 +46,11 @@ Ipv6InterfaceContainer staNodeInterface6;
 
 Ipv4InterfaceContainer apNodeInterface;
 Ipv6InterfaceContainer apNodeInterface6;
+
+NodeContainer externalNodes;
+NetDeviceContainer externalDevices;
+Ipv4InterfaceContainer externalInterfaces;
+Ipv6InterfaceContainer externalInterfaces6;
 
 NetDeviceContainer apDevice;
 
@@ -89,9 +96,9 @@ void configureTCPFirmwareClients();
 void configureTCPSensorServer();
 void configureTCPSensorClients();
 
-/*void configureCoapServer();
+void configureCoapServer();
 void configureCoapClients();
-void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n);*/
+void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n);
 
 void wireTCPServer(ApplicationContainer serverApp);
 void wireTCPClient(ApplicationContainer clientApp, int i);

@@ -28,6 +28,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
 #include "udp-echo-client.h"
+#include "seq-ts-header.h"
 
 namespace ns3 {
 
@@ -67,9 +68,20 @@ UdpEchoClient::GetTypeId (void)
                    MakeUintegerAccessor (&UdpEchoClient::SetDataSize,
                                          &UdpEchoClient::GetDataSize),
                    MakeUintegerChecker<uint32_t> ())
+	.AddAttribute ("IntervalDeviation",
+				   "The possible deviation from the interval to send packets",
+				   TimeValue (Seconds (0)),
+				   MakeTimeAccessor (&UdpEchoClient::m_intervalDeviation),
+				   MakeTimeChecker ())
+
     .AddTraceSource ("Tx", "A new packet is created and is sent",
                      MakeTraceSourceAccessor (&UdpEchoClient::m_txTrace),
                      "ns3::Packet::TracedCallback")
+	.AddTraceSource("Rx",
+					"An echo packet is received",
+					MakeTraceSourceAccessor(&UdpEchoClient::m_packetReceived),
+					"ns3::UdpEchoClient::PacketReceivedCallback");
+
   ;
   return tid;
 }
@@ -82,6 +94,7 @@ UdpEchoClient::UdpEchoClient ()
   m_sendEvent = EventId ();
   m_data = 0;
   m_dataSize = 0;
+  m_rv = CreateObject<UniformRandomVariable> ();
 }
 
 UdpEchoClient::~UdpEchoClient()
@@ -122,6 +135,7 @@ void
 UdpEchoClient::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
+  m_rv = 0;
   Application::DoDispose ();
 }
 
@@ -148,7 +162,8 @@ UdpEchoClient::StartApplication (void)
 
   m_socket->SetRecvCallback (MakeCallback (&UdpEchoClient::HandleRead, this));
 
-  ScheduleTransmit (Seconds (0.));
+  double deviation = m_rv->GetValue(-m_intervalDeviation.GetMicroSeconds(), m_intervalDeviation.GetMicroSeconds());
+  ScheduleTransmit (m_interval + MicroSeconds(deviation));
 }
 
 void 
@@ -307,6 +322,12 @@ UdpEchoClient::Send (void)
       //
       p = Create<Packet> (m_size);
     }
+
+  // add sequence header to the packet
+  SeqTsHeader seqTs;
+  seqTs.SetSeq (m_sent);
+  p->AddHeader (seqTs);
+
   // call to the trace sinks before the packet is actually sent,
   // so that tags added to the packet can be sent as well
   m_txTrace (p);
@@ -327,7 +348,8 @@ UdpEchoClient::Send (void)
 
   if (m_sent < m_count) 
     {
-      ScheduleTransmit (m_interval);
+	  double deviation = m_rv->GetValue(-m_intervalDeviation.GetMicroSeconds(), m_intervalDeviation.GetMicroSeconds());
+	  ScheduleTransmit (m_interval + MicroSeconds(deviation));
     }
 }
 
@@ -339,6 +361,7 @@ UdpEchoClient::HandleRead (Ptr<Socket> socket)
   Address from;
   while ((packet = socket->RecvFrom (from)))
     {
+	  m_packetReceived(packet, from);
       if (InetSocketAddress::IsMatchingType (from))
         {
           NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client received " << packet->GetSize () << " bytes from " <<

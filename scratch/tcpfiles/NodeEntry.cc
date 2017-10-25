@@ -539,7 +539,7 @@ void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
 		}
 		stats->get(this->id).m_prevPacketSeqClient = currentSequenceNumber;
 		stats->get(this->id).m_prevPacketTimeClient = newNow;
-
+		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get the header from fragements
 	}
@@ -617,7 +617,7 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 			stats->get(this->id).m_prevPacketTimeServer = newNow;
 
 		}
-		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize() - 4 - 7; //deduct coap hdr & opts, only payload here
+		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize(); //deduct coap hdr & opts, only payload here
 		//std::cout << packet->GetSize() << std::endl;
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get header
@@ -625,8 +625,9 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnMacPacketDropped(std::string context, Ptr<const Packet> packet, DropReason reason) {
-	//cout << "Mac Packet Dropped!, reason:" << reason << endl;
+	//cout << "============================Mac Packet Dropped!, reason:" << reason << endl;
 	stats->get(this->id).NumberOfDropsByReason[reason]++;
+
 }
 
 void NodeEntry::OnTcpPacketDropped(Ptr<Packet> packet, DropReason reason) {
