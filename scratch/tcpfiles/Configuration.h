@@ -31,7 +31,11 @@ struct Configuration {
       std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
   	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-  	string trafficType = "coap"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+  	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+
+	  //vector<uint16_t> nRawGroupsPerRpsList;
+	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
+	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
 
 	/*
 	 * Common configuration parameters
@@ -72,8 +76,9 @@ struct Configuration {
 	uint32_t nControlLoops = 0;//  = 100;
 	uint32_t coapPayloadSize = 0;//  = 15;
 
+
 	uint32_t trafficInterval = 0;//  = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
-	uint32_t trafficIntervalDeviation = 0;//  = 100; //1000
+	uint32_t trafficIntervalDeviation = 0;//  = 100; //1000 discuss with Jeroen
 
 
 	int SlotFormat=0; //0;
