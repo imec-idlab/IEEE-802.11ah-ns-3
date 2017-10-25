@@ -1,4 +1,7 @@
+[Installation instructions for CoAP support](../../wiki/coap)
+
 ### Installation and usage instructions ###
+
 * Download source code from our repository.
 * Change into ./802.11ah-ns3/ns-3 directory.  
 * Build and run:
