@@ -303,12 +303,12 @@ void updateNodesQueueLength() {
 
 void onSTAAssociated(int i) {
 	cout << "Node " << std::to_string(i) << " is associated and has aid " << nodes[i]->aId << endl;
-
+	/*
 	uint32_t nrOfSTAAssociated (0);
 	for (uint32_t i = 0; i < config.Nsta; i++) {
 		if (nodes[i]->isAssociated)
 			nrOfSTAAssociated++;
-	}
+	}*/
 
 	for (int k = 0; k < config.rps.rpsset.size(); k++)
 	{
@@ -329,7 +329,9 @@ void onSTAAssociated(int i) {
 	eventManager.onNodeAssociated(*nodes[i]);
 
 	// RPS, Raw group and RAW slot assignment
-	if (nrOfSTAAssociated == config.Nsta) {
+	//stats.numAssoc = GetAssocNum ( );
+
+	if (GetAssocNum ( ) == config.Nsta) {
 		cout << "All stations associated, configuring clients & server" << endl;
         // association complete, start sending packets
     	stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
@@ -907,7 +909,7 @@ void configureTCPEchoClients() {
 	TcpEchoClientHelper clientHelper(apNodeInterface.GetAddress(0), 80); //address of remote node
 	clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
 	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
-	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	//clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
 	clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
@@ -1003,6 +1005,7 @@ double dist[MaxSta];
 void 
 PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::State state)
 {   
+
     /*Get the number of the node from the context*/
     /*context = "/NodeList/"+strSTA+"/DeviceList/'*'/Phy/$ns3::YansWifiPhy/State/State"*/
     unsigned first = context.find("t/");
@@ -1010,7 +1013,7 @@ PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::Sta
     string strNew = context.substr ((first+2),(last-first-2));
     
     int node = std::stoi(strNew);
-        
+
     //start calculating energy after complete association
     if  (GetAssocNum () == StaNum)
     {
@@ -1042,27 +1045,7 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
   LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-  
-
-
-  /*double simulationTime = 10;
-  uint32_t seed = 1;
-  uint32_t  payloadSize = 256;
-  uint32_t Nsta =1;
-  uint32_t NRawSta = 1;
-  uint32_t BeaconInterval = 100000;*/
   bool OutputPosition = true;
-  /*string DataMode = "OfdmRate7_8MbpsBW2MHz";
-  double datarate = 7.8;
-  double bandWidth = 2;
-  string rho="250.0";
-  string folder="./scratch/";
-  string file="./scratch/mac-sta.txt";
-  string TrafficPath;
-  uint16_t Nactive;
-  double poissonrate;
-  bool S1g1MfieldEnabled;
-  string RAWConfigFile;*/
   config = Configuration(argc, argv);
 
   config.rps = configureRAW (config.rps, config.RAWConfigFile);
@@ -1084,31 +1067,10 @@ int main (int argc, char *argv[])
   }
   transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval = vector<long>(config.totalRawSlots, 0);
   transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval = vector<long>(config.totalRawSlots, 0);
-  /*CommandLine cmd;
-  cmd.AddValue ("seed", "random seed", config.seed);
-  cmd.AddValue ("simulationTime", "Simulation time in seconds", config.simulationTime);
-  cmd.AddValue ("payloadSize", "Size of payload", config.payloadSize);
-  cmd.AddValue ("Nsta", "number of total stations", config.Nsta);
-  cmd.AddValue ("NRawSta", "number of stations supporting RAW", config.NRawSta);
-  cmd.AddValue ("BeaconInterval", "Beacon interval time in us", config.BeaconInterval);
-  cmd.AddValue ("DataMode", "Date mode", config.DataMode);
-  cmd.AddValue ("datarate", "data rate in Mbps", config.datarate);
-  cmd.AddValue ("bandWidth", "bandwidth in MHz", config.bandWidth);
-  cmd.AddValue ("rho", "maximal distance between AP and stations", config.rho);
-  cmd.AddValue ("folder", "folder where result files are placed", config.folder);
-  cmd.AddValue ("file", "files containing reslut information", config.file);
-  cmd.AddValue ("TrafficPath", "files path of traffic file", config.TrafficPath);
-  cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", config.S1g1MfieldEnabled);
-  cmd.AddValue ("RAWConfigFile", "RAW Config file Path", config.RAWConfigFile);
-
-
-  cmd.Parse (argc,argv);*/
 
   RngSeedManager::SetSeed (config.seed);
 
-  //NodeContainer wifiStaNode;
   wifiStaNode.Create (config.Nsta);
-  //NodeContainer wifiApNode;
   wifiApNode.Create (1);
 
   YansWifiChannelHelper channelBuilder = YansWifiChannelHelper ();
@@ -1321,7 +1283,18 @@ int main (int argc, char *argv[])
             {
               totenergycons = (timeRxArray[i].GetSeconds() * 4.4) + (timeIdleArray[i].GetSeconds() * 4.4) + (timeTxArray[i].GetSeconds() * 7.2);
                risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << spazio << timeIdleArray[i].GetSeconds() << spazio << timeTxArray[i].GetSeconds() << spazio << timeSleepArray[i].GetSeconds() << spazio << totenergycons << std::endl;
+
                totenergycons = 0;
+
+/*
+               cout << "================== Sleep " << stats.get(i).TotalSleepTime.GetSeconds() << endl;
+               cout << "================== Tx " << stats.get(i).TotalTxTime.GetSeconds() << endl;
+               cout << "================== Rx " << stats.get(i).TotalRxTime.GetSeconds() << endl;
+               cout << "+++++++++++++++++++IDLE " << stats.get(i).TotalIdleTime.GetSeconds() << endl;
+               cout << "ooooooooooooooooooo TOTENERGY " <<  stats.get(i).GetTotalEnergyConsumption() << " mW" << endl;
+               cout << "Rx+Idle ENERGY " <<  stats.get(i).EnergyRxIdle << " mW" << endl;
+               cout << "Tx ENERGY " <<  stats.get(i).EnergyTx << " mW" << endl;*/
+
                i++;
             }
 
