@@ -19,6 +19,11 @@ long NodeStatistics::GetAverageJitter(void)
 		return -1;
 }
 
+double NodeStatistics::GetTotalEnergyConsumption (void)
+{
+	return this->EnergyRxIdle + this->EnergyTx; //mW
+}
+
 Time NodeStatistics::GetAverageInterPacketDelay(std::vector<Time>& delayVector){
 	if (delayVector.size() != 0)
 	{
@@ -45,9 +50,9 @@ long double NodeStatistics::GetInterPacketDelayDeviation(std::vector<Time>& dela
 //try whole net when testing max nr of control loops
 float NodeStatistics::GetPacketLoss (std::string trafficType)
 {
-	if (NumberOfSuccessfulRoundtripPackets > 0 && (trafficType == "coap" || trafficType == "tcpipcamera" || trafficType == "tcpecho" || trafficType == "udpecho"))
+	if (NumberOfSuccessfulRoundtripPackets > 0)
 		return 100 - 100 * (float)NumberOfSuccessfulRoundtripPackets / NumberOfSentPackets;
-	else if (NumberOfSuccessfulPackets > 0 && (trafficType == "udp"))
+	else if (NumberOfSuccessfulPackets > 0)
 		return 100 - 100 * (float)NumberOfSuccessfulPackets / NumberOfSentPackets;
 	else return -1;
 }

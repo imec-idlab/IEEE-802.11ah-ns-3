@@ -220,7 +220,7 @@ void NodeEntry::OnPhyRxDrop(std::string context, Ptr<const Packet> packet,
 }
 
 void NodeEntry::OnPhyStateChange(std::string context, const Time start,	const Time duration, const WifiPhy::State state) {
-	switch (state) {
+	/*switch (state) {
 
 	case WifiPhy::State::SLEEP:
 		stats->get(this->id).TotalDozeTime += duration;
@@ -237,7 +237,27 @@ void NodeEntry::OnPhyStateChange(std::string context, const Time start,	const Ti
 		// not sure why this is counted as the same as sleep
 		// so state change is fired with the same duration for both SLEEP and CCA_BUSY
 		break;
-	}
+	}*/
+	if  (stats->TimeWhenEverySTAIsAssociated > 0)
+	    {
+	        switch (state)
+	        {
+	            case WifiPhy::State::IDLE: //Idle
+	            	stats->get(this->id).TotalIdleTime += duration;
+	                break;
+	            case WifiPhy::State::RX: //Rx
+	            	stats->get(this->id).TotalRxTime += duration;
+	                break;
+	            case WifiPhy::State::TX: //Tx
+	            	stats->get(this->id).TotalTxTime += duration;
+	                break;
+	            case WifiPhy::State::SLEEP: //Sleep
+	        		stats->get(this->id).TotalSleepTime += duration;
+	                break;
+	        }
+	    }
+	stats->get(this->id).EnergyRxIdle = (stats->get(this->id).TotalRxTime.GetSeconds() + stats->get(this->id).TotalIdleTime.GetSeconds()) * 4.4;
+	stats->get(this->id).EnergyTx = stats->get(this->id).TotalTxTime.GetSeconds() * 7.2;
 
 	/*cout << "[" << this->id << "] " << Simulator::Now().GetMicroSeconds() << "State change, new state is ";
 

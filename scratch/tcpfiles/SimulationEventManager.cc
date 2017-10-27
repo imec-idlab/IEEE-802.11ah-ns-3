@@ -67,6 +67,7 @@ void SimulationEventManager::onStart(Configuration& config) {
 		  std::to_string(config.NRawSlotNum),
 		  std::to_string(config.ContentionPerRAWSlot),
 		  std::to_string(config.ContentionPerRAWSlotOnlyInFirstGroup),
+		  config.TrafficPath,
 		  std::to_string(config.rps.rpsset.size())
 		  //config.RawConfigString
 	});
@@ -121,10 +122,10 @@ void SimulationEventManager::onUpdateSlotStatistics(vector<long>& transmissionsP
 void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 	for(int i = 0; i < stats.getNumberOfNodes(); i++) {
 		send({"nodestats", std::to_string(i),
-			std::to_string(stats.get(i).TotalTransmitTime.GetMilliSeconds()),
-			std::to_string(stats.get(i).TotalReceiveTime.GetMilliSeconds()),
-			std::to_string(stats.get(i).TotalDozeTime.GetMilliSeconds()),
-			std::to_string((Simulator::Now() - stats.get(i).TotalDozeTime).GetMilliSeconds()),
+			std::to_string(stats.get(i).TotalTxTime.GetMilliSeconds()),
+			std::to_string(stats.get(i).TotalRxTime.GetMilliSeconds()),
+			std::to_string(stats.get(i).TotalSleepTime.GetMilliSeconds()),
+			std::to_string(stats.get(i).TotalIdleTime.GetMilliSeconds()),
 			std::to_string(stats.get(i).NumberOfTransmissions),
 			std::to_string(stats.get(i).NumberOfTransmissionsDropped),
 			std::to_string(stats.get(i).NumberOfReceives),
@@ -168,7 +169,9 @@ void SimulationEventManager::onUpdateStatistics(Statistics& stats) {
 			std::to_string(stats.get(i).GetInterPacketDelayAtClient()),
 			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer)),
 			std::to_string(stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient)),
-			std::to_string(stats.get(i).latency.GetMilliSeconds())
+			std::to_string(stats.get(i).latency.GetMilliSeconds()),
+			std::to_string(stats.get(i).EnergyRxIdle),
+			std::to_string(stats.get(i).EnergyTx)
 		});
 	}
 }
@@ -260,6 +263,7 @@ void SimulationEventManager::onStartHeader() {
 		   "NRawSlotNum",
 		   "ContentionPerRAWSlot",
 		   "ContentionPerRAWSlotOnlyInFirstGroup",
+		   "TrafficString",
 		   "NumOfRpsElements"
 		});
 }
@@ -269,8 +273,8 @@ void SimulationEventManager::onStatisticsHeader() {
 	send({"nodestatsheader", "STAIndex",
 		"TotalTransmitTime",
 		"TotalReceiveTime",
-		"TotalDozeTime",
-		"TotalActiveTime",
+		"TotalSleepTime", //doye
+		"TotalIdleTime", // active
 		"NumberOfTransmissions",
 		"NumberOfTransmissionsDropped",
 		"NumberOfReceives",
@@ -314,7 +318,9 @@ void SimulationEventManager::onStatisticsHeader() {
 		"InterPacketDelayAtClient",
 		"InterPacketDelayDeviationPercentageAtServer",
 		"InterPacketDelayDeviationPercentageAtClient",
-		"Latency"
+		"Latency",
+		"EnergyRxIdle",
+		"EnergyTx"
 	});
 
 }
