@@ -1064,9 +1064,18 @@ int main (int argc, char *argv[])
   bool S1g1MfieldEnabled;
   string RAWConfigFile;*/
   config = Configuration(argc, argv);
+    
+    
 
   config.rps = configureRAW (config.rps, config.RAWConfigFile);
   config.Nsta = config.NRawSta;
+    
+    config.NSSFile = config.trafficType + "_" +
+    std::to_string(config.Nsta) + "sta_"+
+    std::to_string(config.NGroup) + "Group_" +
+    std::to_string(config.NRawSlotNum)+ "slots_" +
+    std::to_string(config.payloadSize) + "payload_" +
+    std::to_string(config.BeaconInterval) + "BI"  + ".nss";
 
   stats = Statistics(config.Nsta);
   eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);

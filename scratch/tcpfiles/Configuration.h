@@ -31,7 +31,7 @@ struct Configuration {
       std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
   	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-  	string trafficType = "udpecho"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+  	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
   
 	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons

@@ -630,7 +630,7 @@ ApWifiMac::SetaccessList (std::map<Mac48Address, bool> list)
         for (uint32_t k = 1; k <= m_totalStaNum; k++)
           {   
             stasAddr = m_AidToMacAddr.find(k)->second;
-            NS_LOG_UNCOND ( "aid "  << k << ", send " << list.find(stasAddr)->second << ", at " << Simulator::Now () << ", size " << list.size ());
+            //NS_LOG_UNCOND ( "aid "  << k << ", send " << list.find(stasAddr)->second << ", at " << Simulator::Now () << ", size " << list.size ());
           }     
                
         m_edca.find (AC_VO)->second->SetaccessList (list);
