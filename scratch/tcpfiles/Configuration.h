@@ -88,7 +88,12 @@ struct Configuration {
 	int NRawSlotCount=0; //162;
 	uint32_t NRawSlotNum=0;
 	uint32_t NGroup=0;
-	/*
+    
+    uint32_t tcpipcameraStart;
+    uint32_t tcpipcameraEnd;
+    uint32_t udpStart;
+    uint32_t udpEnd;
+ 	/*
 	 * tcpipcamera configuration parameters
 	 * */
 	double ipcameraMotionPercentage;// = 1; //0.1

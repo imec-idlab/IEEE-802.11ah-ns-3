@@ -766,7 +766,7 @@ void configureTCPIPCameraClients() {
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
-	for (uint16_t i = 0; i < config.Nsta; i++) {
+	for (uint16_t i = config.tcpipcameraStart; i <= config.tcpipcameraEnd; i++) {
 
 		Ptr<Application> tcpClient = factory.Create<TCPIPCameraClient>();
 		wifiStaNode.Get(i)->AddApplication(tcpClient);
@@ -937,7 +937,7 @@ void configureUDPClients() {
 	                 {
 	                  uint16_t sta_id;
 	                  float  sta_traffic;
-	                  for (uint16_t kk=0; kk< config.Nsta; kk++)
+	                  for (uint16_t kk=config.udpStart; kk<= config.udpEnd; kk++)
 	                    {
 	                      trafficfile >> sta_id;
 	                      trafficfile >> sta_traffic;
