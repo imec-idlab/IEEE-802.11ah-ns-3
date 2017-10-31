@@ -1322,6 +1322,14 @@ int main (int argc, char *argv[])
           std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
       }
+    
+    for (uint16_t kk=config.tcpipcameraStart; kk<= config.tcpipcameraEnd; kk++)
+    {
+        uint32_t Receiverate;
+        Receiverate = stats.get(kk).getIPCameraAPReceivingRate();
+        std::cout << "sta " << kk << ", Receiverate " << Receiverate << " Kbit/s" << std::endl;
+        
+    }
       cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       Simulator::Destroy ();
 
