@@ -49,6 +49,8 @@ struct Configuration {
 	  double datarate = 7.8;
 	  double bandWidth = 2;
 	  string rho="200"; //50
+    
+      double totaltraffic = 2;
 
 
 

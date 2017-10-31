@@ -1058,6 +1058,7 @@ int main (int argc, char *argv[])
     std::to_string(config.NGroup) + "Group_" +
     std::to_string(config.NRawSlotNum)+ "slots_" +
     std::to_string(config.payloadSize) + "payload_" +
+    std::to_string(config.totaltraffic) + "Mbps_" +
     std::to_string(config.BeaconInterval) + "BI"  + ".nss";
 
   stats = Statistics(config.Nsta);

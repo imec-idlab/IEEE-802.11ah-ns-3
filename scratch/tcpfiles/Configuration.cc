@@ -22,6 +22,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("rho", "maximal distance between AP and stations", rho);
     cmd.AddValue ("folder", "folder where result files are placed", folder);
     cmd.AddValue ("file", "files containing reslut information", file);
+    cmd.AddValue ("totaltraffic", "totaltraffic", totaltraffic);
     cmd.AddValue ("TrafficPath", "files path of traffic file", TrafficPath);
     cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", S1g1MfieldEnabled);
     cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
