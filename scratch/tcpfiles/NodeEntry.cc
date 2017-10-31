@@ -461,7 +461,13 @@ void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
 
 void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) { //works
     //cout << "[" << this->id << "] " << "UDP packet sent " << endl;
+	auto pCopy = packet->Copy();
 
+		SeqTsHeader seqTs;
+		pCopy->RemoveHeader(seqTs);
+		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
+	if (this->id == 90)
+		cout << "++++++++++++++++++++++++++++++++++++++++++++++ TX at " << Simulator::Now() << "seq " << seqTs.GetSeq() << endl;
 	stats->get(this->id).NumberOfSentPackets++;
 
 	/*		cout << "[" << this->id << "] "  << Simulator::Now().GetMicroSeconds() <<
@@ -569,13 +575,15 @@ void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
 void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 	auto pCopy = packet->Copy();
 	try {
+
 		SeqTsHeader seqTs;
 		pCopy->RemoveHeader(seqTs);
 		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
 
 //cout << "[" << this->id << "] " << "UDP packet received at AP after "
 		//	<< std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
-
+		if (this->id == 90)
+			cout << "++++++++++++++++++++++++++++++++++++++++++++++ RX at " << Simulator::Now() << "seq " << seqTs.GetSeq() << endl;
 		stats->get(this->id).NumberOfSuccessfulPackets++;
 		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
 		stats->get(this->id).latency = timeDiff;

@@ -339,6 +339,21 @@ void onSTAAssociated(int i) {
     	if(config.trafficType == "udp") {
     		configureUDPServer();
     		configureUDPClients();
+
+    		config.trafficType = "tcpipcamera";
+    		config.ipcameraMotionPercentage = 0.5;// = 1; //0.1
+    		config.ipcameraMotionDuration = 2;// = 10; //60
+    		config.ipcameraDataRate = 2;// = 128; //20
+    		config.MinRTO = 81920000;// 81920000; //819200
+    		config.TCPConnectionTimeout = 6000000;
+    		config.TCPSegmentSize = 536;//  = 3216; //536
+    		config.TCPInitialSlowStartThreshold = 0xffff;
+    		config.TCPInitialCwnd = 1;
+
+    		configureTCPIPCameraServer();
+    		configureTCPIPCameraClients();
+    		config.trafficType = "udp";
+
     	}
     	else if(config.trafficType == "udpecho") {
     		configureUDPEchoServer();
@@ -365,16 +380,6 @@ void onSTAAssociated(int i) {
     		configureTCPIPCameraServer();
     		configureTCPIPCameraClients();
     	}
-    	else if(config.trafficType == "tcpfirmware") {
-    		config.firmwareSize = 1024 * 500;
-    		config.firmwareBlockSize = 1024;
-    		config.firmwareNewUpdateProbability = 0.01;
-    		config.firmwareCorruptionProbability = 0.01;
-    		config.firmwareVersionCheckInterval = 1000;
-
-			configureTCPIPCameraServer();
-			configureTCPIPCameraClients();
-		}
     	else if(config.trafficType == "tcpfirmware") {
             
             config.firmwareSize = 1024 * 500;
@@ -1041,10 +1046,10 @@ PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::Sta
 
 int main (int argc, char *argv[])
 {
-  LogComponentEnable ("UdpServer", LOG_INFO);
+  /*LogComponentEnable ("UdpServer", LOG_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
   LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
-
+*/
   bool OutputPosition = true;
   config = Configuration(argc, argv);
     
