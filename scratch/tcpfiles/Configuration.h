@@ -31,7 +31,11 @@ struct Configuration {
       std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
   	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-  	string trafficType = "tcpipcamera"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+  	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+  
+	  //vector<uint16_t> nRawGroupsPerRpsList;
+	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
+	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
 
 	/*
 	 * Common configuration parameters
@@ -45,6 +49,8 @@ struct Configuration {
 	  double datarate = 7.8;
 	  double bandWidth = 2;
 	  string rho="200"; //50
+    
+      double totaltraffic = 2;
 
 
 
@@ -82,7 +88,12 @@ struct Configuration {
 	int NRawSlotCount=0; //162;
 	uint32_t NRawSlotNum=0;
 	uint32_t NGroup=0;
-	/*
+    
+    uint32_t tcpipcameraStart;
+    uint32_t tcpipcameraEnd;
+    uint32_t udpStart;
+    uint32_t udpEnd;
+ 	/*
 	 * tcpipcamera configuration parameters
 	 * */
 	double ipcameraMotionPercentage;// = 1; //0.1

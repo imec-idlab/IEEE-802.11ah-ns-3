@@ -1270,7 +1270,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                  SetInRAWgroup ();
                  m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
 
-                   NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() <<  ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+                  // NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() <<  ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
                   //break; //break should not used if multiple RAW is supported
                }
                //NS_LOG_UNCOND (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);

@@ -766,7 +766,7 @@ void configureTCPIPCameraClients() {
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
-	for (uint16_t i = 0; i < config.Nsta; i++) {
+	for (uint16_t i = config.tcpipcameraStart; i <= config.tcpipcameraEnd; i++) {
 
 		Ptr<Application> tcpClient = factory.Create<TCPIPCameraClient>();
 		wifiStaNode.Get(i)->AddApplication(tcpClient);
@@ -937,7 +937,7 @@ void configureUDPClients() {
 	                 {
 	                  uint16_t sta_id;
 	                  float  sta_traffic;
-	                  for (uint16_t kk=0; kk< config.Nsta; kk++)
+	                  for (uint16_t kk=config.udpStart; kk<= config.udpEnd; kk++)
 	                    {
 	                      trafficfile >> sta_id;
 	                      trafficfile >> sta_traffic;
@@ -1047,9 +1047,19 @@ int main (int argc, char *argv[])
 
   bool OutputPosition = true;
   config = Configuration(argc, argv);
+    
+    
 
   config.rps = configureRAW (config.rps, config.RAWConfigFile);
   config.Nsta = config.NRawSta;
+    
+    config.NSSFile = config.trafficType + "_" +
+    std::to_string(config.Nsta) + "sta_"+
+    std::to_string(config.NGroup) + "Group_" +
+    std::to_string(config.NRawSlotNum)+ "slots_" +
+    std::to_string(config.payloadSize) + "payload_" +
+    std::to_string(config.totaltraffic) + "Mbps_" +
+    std::to_string(config.BeaconInterval) + "BI"  + ".nss";
 
   stats = Statistics(config.Nsta);
   eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
@@ -1314,6 +1324,14 @@ int main (int argc, char *argv[])
           std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
       }
+    
+    for (uint16_t kk=config.tcpipcameraStart; kk<= config.tcpipcameraEnd; kk++)
+    {
+        uint32_t Receiverate;
+        Receiverate = stats.get(kk).getIPCameraAPReceivingRate();
+        std::cout << "sta " << kk << ", Receiverate " << Receiverate << " Kbit/s" << std::endl;
+        
+    }
       cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       Simulator::Destroy ();
 

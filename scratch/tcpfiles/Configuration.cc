@@ -22,10 +22,18 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("rho", "maximal distance between AP and stations", rho);
     cmd.AddValue ("folder", "folder where result files are placed", folder);
     cmd.AddValue ("file", "files containing reslut information", file);
+    cmd.AddValue ("totaltraffic", "totaltraffic", totaltraffic);
     cmd.AddValue ("TrafficPath", "files path of traffic file", TrafficPath);
     cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", S1g1MfieldEnabled);
     cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
     cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
+    cmd.AddValue("NGroup", "number of RAW groups", NGroup);
+    cmd.AddValue("NRawSlotNum", "number of slots per RAW", NRawSlotNum);
+    cmd.AddValue("tcpipcameraStart", "start aid using tcpipcamera", tcpipcameraStart);
+    cmd.AddValue("tcpipcameraEnd", "end aid using tcpipcamera", tcpipcameraEnd);
+    cmd.AddValue("udpStart", "start aid using udp", udpStart);
+    cmd.AddValue("udpEnd", "end aid using udp", udpEnd);
+
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
