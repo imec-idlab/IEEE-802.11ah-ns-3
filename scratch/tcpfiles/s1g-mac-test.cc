@@ -1143,9 +1143,11 @@ int main (int argc, char *argv[])
 
   // mobility.
   MobilityHelper mobility;
+  double xpos = std::stoi(config.rho, nullptr,0);
+  double ypos = xpos;
   mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
-                                       "X", StringValue ("1000.0"),
-                                       "Y", StringValue ("1000.0"),
+                                       "X", StringValue (std::to_string(xpos)),
+                                       "Y", StringValue (std::to_string(ypos)),
                                        "rho", StringValue (config.rho));
   mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobility.Install(wifiStaNode);
@@ -1153,7 +1155,7 @@ int main (int argc, char *argv[])
 
   MobilityHelper mobilityAp;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (1000.0, 1000.0, 0.0));
+  positionAlloc->Add (Vector (xpos, ypos, 0.0));
   mobilityAp.SetPositionAllocator (positionAlloc);
   mobilityAp.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobilityAp.Install(wifiApNode);
