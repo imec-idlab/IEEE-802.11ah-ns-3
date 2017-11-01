@@ -1146,6 +1146,18 @@ int main (int argc, char *argv[])
 
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxPacketNumber", UintegerValue(10));
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxDelay", TimeValue (NanoSeconds (6000000000000)));
+    
+    string DataModeCamera = "OfdmRate650KbpsBW2MHz";
+    StringValue aa=StringValue(DataModeCamera);
+    for (uint16_t k=config.udpStart; k <= config.udpEnd; k++)
+    {
+        std::ostringstream APSTA;
+        APSTA << k;
+        std::string strAP = APSTA.str();
+        Config::Set ("/NodeList/"+strAP + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/DataMode", aa);
+        Config::Set ("/NodeList/"+strAP +"/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/ControlMode", aa);
+        Config::Set ("/NodeList/"+strAP +"/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/ChannelWidth", UintegerValue(1));
+    }
 
   std::ostringstream oss;
   oss << "/NodeList/"

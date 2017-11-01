@@ -29,7 +29,7 @@ NumSlot=4
 
 simTime=100
 BeaconInterval=102400
-DataMode="MCS1_1"
+DataMode="MCS2_8"
 datarate=0.6
 bandWidth=1
 S1g1MfieldEnabled=false
