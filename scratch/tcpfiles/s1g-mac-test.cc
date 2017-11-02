@@ -1156,7 +1156,7 @@ int main (int argc, char *argv[])
         std::string strAP = APSTA.str();
         Config::Set ("/NodeList/"+strAP + "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/DataMode", aa);
         Config::Set ("/NodeList/"+strAP +"/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/ControlMode", aa);
-        Config::Set ("/NodeList/"+strAP +"/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/ChannelWidth", UintegerValue(1));
+        Config::Set ("/NodeList/"+strAP +"/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/ChannelWidth", UintegerValue(2));
     }
 
   std::ostringstream oss;
@@ -1186,6 +1186,42 @@ int main (int argc, char *argv[])
   mobilityAp.SetPositionAllocator (positionAlloc);
   mobilityAp.SetMobilityModel("ns3::ConstantPositionMobilityModel");
   mobilityAp.Install(wifiApNode);
+    
+    
+    
+    
+     MobilityHelper mobilityApCamera;
+     Ptr<ListPositionAllocator> positionAllocAp = CreateObject<ListPositionAllocator> ();
+     positionAllocAp->Add (Vector (xpos, ypos, 0.0));
+     mobilityApCamera.SetPositionAllocator (positionAllocAp);
+     mobilityApCamera.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
+     mobilityApCamera.Install (wifiApNode);
+     
+     float deltaAngle = 2* M_PI / (config.tcpipcameraEnd - config.tcpipcameraStart +1);
+     float angle = 0.0;
+     double x = 0.0;
+     double y = 0.0;
+    
+     double Distance = 50.0;
+     
+     
+     Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+     
+     
+     for (int i = config.tcpipcameraStart; i <= config.tcpipcameraEnd; i++)
+     {
+     x = cos(angle) * Distance + xpos;
+     y = sin(angle) * Distance + ypos;
+     
+     MobilityHelper mobilityCamera;
+     Ptr<ListPositionAllocator> positionAllocSta = CreateObject<ListPositionAllocator> ();
+     positionAllocSta->Add(Vector(x, y, 0.0));
+     mobilityCamera.SetPositionAllocator(positionAllocSta);
+     mobilityCamera.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+     mobilityCamera.Install(wifiStaNode.Get(i));
+     angle += deltaAngle;
+     }
+
 
 
    /* Internet stack*/
@@ -1330,7 +1366,7 @@ int main (int argc, char *argv[])
           risultati.close();
 
 		
-      if (config.trafficType == "udp")
+     /* if (config.trafficType == "udp")
       {
           double throughput = 0;
           uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
@@ -1340,7 +1376,7 @@ int main (int argc, char *argv[])
           std::cout << "datarate" << "\t" << "throughput" << std::endl;
           std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
-      }
+      } */
     
     for (uint16_t kk=config.tcpipcameraStart; kk<= config.tcpipcameraEnd; kk++)
     {
