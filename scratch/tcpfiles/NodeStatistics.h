@@ -11,10 +11,22 @@ using namespace ns3;
 class NodeStatistics {
 
 public:
-    Time TotalTransmitTime = Time();
-    Time TotalReceiveTime = Time();
-    Time TotalDozeTime = Time();
-    Time TotalActiveTime = Time();
+    Time TotalTransmitTime = Time(); // tx
+    Time TotalTxTime = Time(); // rx
+
+    Time TotalReceiveTime = Time(); // rx
+    Time TotalRxTime = Time(); // rx
+
+    Time TotalDozeTime = Time(); // sleep
+    Time TotalSleepTime = Time(); // sleep
+
+    Time TotalActiveTime = Time(); // switching
+
+    Time TotalIdleTime = Time(); //idle
+
+    double EnergyRxIdle = 0;
+    double EnergyTx = 0;
+    double GetTotalEnergyConsumption (void);
     
     Time interPacketDelayAtServer = Time(); ///ami
     Time interPacketDelayAtClient = Time(); ///ami
