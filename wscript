@@ -1,6 +1,7 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 # python lib modules
+from __future__ import print_function
 import sys
 import shutil
 import types
@@ -29,9 +30,19 @@ modules_enabled  = ['all_modules']
 examples_enabled = False
 tests_enabled    = False
 
+# Compiler warning suppressions
+
 # Bug 1868:  be conservative about -Wstrict-overflow for optimized builds
 # on older compilers; it can generate spurious warnings.  
-cc_version_warn_strict_overflow = ('4', '8', '2')
+gcc_version_warn_strict_overflow = ('4', '8', '2')
+
+# Bug 2181:  clang warnings about unused local typedefs and potentially
+# evaluated expressions affecting darwin clang/LLVM version 7.0.0 (Xcode 7)
+# or clang/LLVM version 3.6 or greater.  We must make this platform-specific.
+darwin_clang_version_warn_unused_local_typedefs = ('7', '0', '0')
+darwin_clang_version_warn_potentially_evaluated = ('7', '0', '0')
+clang_version_warn_unused_local_typedefs = ('3', '6', '0')
+clang_version_warn_potentially_evaluated = ('3', '6', '0')
 
 # Get the information out of the NS-3 configuration file.
 config_file_exists = False
@@ -44,17 +55,17 @@ finally:
     sys.path.pop(0)
 
 cflags.profiles = {
-	# profile name: [optimization_level, warnings_level, debug_level]
-	'debug':     [0, 2, 3],
-	'optimized': [3, 2, 1],
-	'release':   [3, 2, 0],
-	}
+    # profile name: [optimization_level, warnings_level, debug_level]
+    'debug':     [0, 2, 3],
+    'optimized': [3, 2, 1],
+    'release':   [3, 2, 0],
+    }
 cflags.default_profile = 'debug'
 
 Configure.autoconfig = 0
 
 # the following two variables are used by the target "waf dist"
-VERSION = file("VERSION", "rt").read().strip()
+VERSION = open("VERSION", "rt").read().strip()
 APPNAME = 'ns'
 
 wutils.VERSION = VERSION
@@ -106,14 +117,27 @@ def print_module_names(names):
     # Print the list of module names in 3 columns.
     i = 1
     for name in names:
-        print name.ljust(25),
+        print(name.ljust(25), end=' ')
         if i == 3:
-                print
+                print()
                 i = 0
         i = i+1
 
     if i != 1:
-        print
+        print()
+
+# return types of some APIs differ in Python 2/3 (type string vs class bytes)
+# This method will decode('utf-8') a byte object in Python 3, 
+# and do nothing in Python 2
+def maybe_decode(input):
+    if sys.version_info < (3,):
+        return input
+    else:
+        try:
+            return input.decode('utf-8')
+        except:
+            sys.exc_clear()
+            return input
 
 def options(opt):
     # options provided by the modules
@@ -122,6 +146,11 @@ def options(opt):
     opt.load('cflags')
     opt.load('gnu_dirs')
 
+    opt.add_option('--check-config',
+                   help=('Print the current configuration.'),
+                   action="store_true", default=False,
+                   dest="check_config")
+    
     opt.add_option('--cwd',
                    help=('Set the working directory for a program.'),
                    action="store", type="string", default=None,
@@ -208,6 +237,10 @@ def options(opt):
                          'but do not wait for ns-3 to finish the full build.'),
                    action="store_true", default=False,
                    dest='doxygen_no_build')
+    opt.add_option('--enable-des-metrics',
+                   help=('Log all events in a json file with the name of the executable (which must call CommandLine::Parse(argc, argv)'),
+                   action="store_true", default=False,
+                   dest='enable_desmetrics')
 
     # options provided in subdirectories
     opt.recurse('src')
@@ -232,7 +265,7 @@ def _check_compilation_flag(conf, flag, mode='cxx', linkflags=None):
         flag_str = 'flags ' + ' '.join(l)
     else:
         flag_str = 'flag ' + ' '.join(l)
-    if flag_str > 28:
+    if len(flag_str) > 28:
         flag_str = flag_str[:28] + "..."
 
     conf.start_msg('Checking for compilation %s support' % (flag_str,))
@@ -251,7 +284,7 @@ def _check_compilation_flag(conf, flag, mode='cxx', linkflags=None):
         env.append_value("LINKFLAGS", linkflags)
 
     try:
-        retval = conf.check(compiler=mode, fragment='int main() { return 0; }', features='c')
+        retval = conf.check(compiler=mode, fragment='int main() { return 0; }', features='c', env=env)
     except Errors.ConfigurationError:
         ok = False
     else:
@@ -280,6 +313,29 @@ def _check_nonfatal(conf, *args, **kwargs):
     except conf.errors.ConfigurationError:
         return None
 
+# Write a summary of optional features status
+def print_config(env, phase='configure'):
+    if phase == 'configure':
+        profile = get_build_profile(env)
+    else:
+        profile = get_build_profile()
+        
+    print("---- Summary of optional NS-3 features:")
+    print("%-30s: %s%s%s" % ("Build profile", Logs.colors('GREEN'),
+                             profile, Logs.colors('NORMAL')))
+    bld = wutils.bld
+    print("%-30s: %s%s%s" % ("Build directory", Logs.colors('GREEN'),
+                             Options.options.out, Logs.colors('NORMAL')))
+    
+    
+    for (name, caption, was_enabled, reason_not_enabled) in sorted(env['NS3_OPTIONAL_FEATURES'], key=lambda s : s[1]):
+        if was_enabled:
+            status = 'enabled'
+            color = 'GREEN'
+        else:
+            status = 'not enabled (%s)' % reason_not_enabled
+            color = 'RED'
+        print("%-30s: %s%s%s" % (caption, Logs.colors(color), status, Logs.colors('NORMAL')))
 
 def configure(conf):
     conf.load('relocation', tooldir=['waf-tools'])
@@ -312,8 +368,15 @@ def configure(conf):
         env.append_value('LINKFLAGS', '-coverage')
 
     if Options.options.build_profile == 'debug':
+        env.append_value('DEFINES', 'NS3_BUILD_PROFILE_DEBUG')
         env.append_value('DEFINES', 'NS3_ASSERT_ENABLE')
         env.append_value('DEFINES', 'NS3_LOG_ENABLE')
+
+    if Options.options.build_profile == 'release':
+        env.append_value('DEFINES', 'NS3_BUILD_PROFILE_RELEASE')
+
+    if Options.options.build_profile == 'optimized':
+        env.append_value('DEFINES', 'NS3_BUILD_PROFILE_OPTIMIZED')
 
     env['PLATFORM'] = sys.platform
     env['BUILD_PROFILE'] = Options.options.build_profile
@@ -332,8 +395,8 @@ def configure(conf):
             if conf.check_compilation_flag('-march=native'):
                 env.append_value('CXXFLAGS', '-march=native') 
             env.append_value('CXXFLAGS', '-fstrict-overflow')
-            if conf.env['CC_VERSION'] == cc_version_warn_strict_overflow:
-                env.append_value('CXXFLAGS', '-Wstrict-overflow=5')
+            if conf.env['CC_VERSION'] >= gcc_version_warn_strict_overflow:
+                env.append_value('CXXFLAGS', '-Wstrict-overflow=2')
 
         if sys.platform == 'win32':
             env.append_value("LINKFLAGS", "-Wl,--enable-runtime-pseudo-reloc")
@@ -343,7 +406,8 @@ def configure(conf):
         cxx = env['CXX']
         cxx_check_libstdcxx = cxx + ['-print-file-name=libstdc++.so']
         p = subprocess.Popen(cxx_check_libstdcxx, stdout=subprocess.PIPE)
-        libstdcxx_location = os.path.dirname(p.stdout.read().strip())
+        libstdcxx_output = maybe_decode(p.stdout.read().strip())
+        libstdcxx_location = os.path.dirname(libstdcxx_output)
         p.wait()
         if libstdcxx_location:
             conf.env.append_value('NS3_MODULE_PATH', libstdcxx_location)
@@ -352,6 +416,18 @@ def configure(conf):
             if conf.check_compilation_flag('-Wl,--soname=foo'):
                 env['WL_SONAME_SUPPORTED'] = True
 
+    # bug 2181 on clang warning suppressions
+    if conf.env['CXX_NAME'] in ['clang']:
+        if Options.platform == 'darwin':
+            if conf.env['CC_VERSION'] >= darwin_clang_version_warn_unused_local_typedefs:
+                env.append_value('CXXFLAGS', '-Wno-unused-local-typedefs')
+            if conf.env['CC_VERSION'] >= darwin_clang_version_warn_potentially_evaluated: 
+                env.append_value('CXXFLAGS', '-Wno-potentially-evaluated-expression')
+        else:
+            if conf.env['CC_VERSION'] >= clang_version_warn_unused_local_typedefs:
+                env.append_value('CXXFLAGS', '-Wno-unused-local-typedefs')
+            if conf.env['CC_VERSION'] >= clang_version_warn_potentially_evaluated: 
+                env.append_value('CXXFLAGS', '-Wno-potentially-evaluated-expression')
     env['ENABLE_STATIC_NS3'] = False
     if Options.options.enable_static:
         if Options.platform == 'darwin':
@@ -368,6 +444,9 @@ def configure(conf):
             else:
                 conf.report_optional_feature("static", "Static build", False,
                                              "Link flag -Wl,--whole-archive,-Bstatic does not work")
+
+    # Enable C++-11 support
+    env.append_value('CXXFLAGS', '-std=c++11')
 
     # Set this so that the lists won't be printed at the end of this
     # configure command.
@@ -448,7 +527,7 @@ def configure(conf):
         else:
             why_not_tests = "defaults to disabled"
 
-    conf.report_optional_feature("ENABLE_TESTS", "Build tests", env['ENABLE_TESTS'], why_not_tests)
+    conf.report_optional_feature("ENABLE_TESTS", "Tests", env['ENABLE_TESTS'], why_not_tests)
 
     # Decide if examples will be built or not.
     if Options.options.enable_examples:
@@ -469,8 +548,15 @@ def configure(conf):
         else:
             why_not_examples = "defaults to disabled"
 
-    conf.report_optional_feature("ENABLE_EXAMPLES", "Build examples", env['ENABLE_EXAMPLES'], 
+    conf.report_optional_feature("ENABLE_EXAMPLES", "Examples", env['ENABLE_EXAMPLES'], 
                                  why_not_examples)
+    try:
+        for dir in os.listdir('examples'):
+            if dir.startswith('.') or dir == 'CVS':
+                continue
+            conf.env.append_value('EXAMPLE_DIRECTORIES', dir)
+    except OSError:
+        return
 
     env['VALGRIND_FOUND'] = False
     try:
@@ -494,6 +580,21 @@ def configure(conf):
     conf.report_optional_feature("GSL", "GNU Scientific Library (GSL)",
                                  conf.env['ENABLE_GSL'],
                                  "GSL not found")
+
+    conf.find_program('libgcrypt-config', var='LIBGCRYPT_CONFIG', msg="python-config", mandatory=False)
+    if env.LIBGCRYPT_CONFIG:
+        conf.check_cfg(path=env.LIBGCRYPT_CONFIG, msg="Checking for libgcrypt", args='--cflags --libs', package='',
+                                     define_name="HAVE_CRYPTO", global_define=True, uselib_store='GCRYPT', mandatory=False)
+    conf.report_optional_feature("libgcrypt", "Gcrypt library",
+                                 conf.env.HAVE_GCRYPT, "libgcrypt not found: you can use libgcrypt-config to find its location.")
+
+    why_not_desmetrics = "defaults to disabled"
+    if Options.options.enable_desmetrics:
+        conf.env['ENABLE_DES_METRICS'] = True
+        env.append_value('DEFINES', 'ENABLE_DES_METRICS')
+        why_not_desmetrics = "option --enable-des-metrics selected"
+    conf.report_optional_feature("DES Metrics", "DES Metrics event collection", conf.env['ENABLE_DES_METRICS'], why_not_desmetrics)
+
 
     # for compiling C code, copy over the CXX* flags
     conf.env.append_value('CCFLAGS', conf.env['CXXFLAGS'])
@@ -524,24 +625,8 @@ def configure(conf):
             value = shlex.split(os.environ[envvar])
             conf.env.append_value(confvar, value)
 
-    # Write a summary of optional features status
-    print "---- Summary of optional NS-3 features:"
-    print "%-30s: %s%s%s" % ("Build profile", Logs.colors('GREEN'),
-                             Options.options.build_profile, Logs.colors('NORMAL'))
-    bld = wutils.bld
-    print "%-30s: %s%s%s" % ("Build directory", Logs.colors('GREEN'),
-                             Options.options.out, Logs.colors('NORMAL'))
+    print_config(env)
     
-    
-    for (name, caption, was_enabled, reason_not_enabled) in conf.env['NS3_OPTIONAL_FEATURES']:
-        if was_enabled:
-            status = 'enabled'
-            color = 'GREEN'
-        else:
-            status = 'not enabled (%s)' % reason_not_enabled
-            color = 'RED'
-        print "%-30s: %s%s%s" % (caption, Logs.colors(color), status, Logs.colors('NORMAL'))
-
 
 class SuidBuild_task(Task.Task):
     """task that makes a binary Suid
@@ -552,14 +637,14 @@ class SuidBuild_task(Task.Task):
         self.m_display = 'build-suid'
         try:
             program_obj = wutils.find_program(self.generator.name, self.generator.env)
-        except ValueError, ex:
+        except ValueError as ex:
             raise WafError(str(ex))
         program_node = program_obj.path.find_or_declare(program_obj.target)
         self.filename = program_node.get_bld().abspath()
 
 
     def run(self):
-        print >> sys.stderr, 'setting suid bit on executable ' + self.filename
+        print('setting suid bit on executable ' + self.filename, file=sys.stderr)
         if subprocess.Popen(['sudo', 'chown', 'root', self.filename]).wait():
             return 1
         if subprocess.Popen(['sudo', 'chmod', 'u+s', self.filename]).wait():
@@ -685,9 +770,37 @@ def _find_ns3_module(self, name):
             return obj
     raise KeyError(name)
 
+# Parse the waf lockfile generated by latest 'configure' operation
+def get_build_profile(env=None):
+    if env == None:
+        lockfile = os.environ.get('WAFLOCK', '.lock-waf_%s_build' % sys.platform)
+        profile = "not found"
+        with open(lockfile, "r") as f:
+            for line in f:
+                if line.startswith("options ="):
+                    key, val = line.split('=')
+                    arr = val.split(',')
+                    for x in arr:
+                        optkey,optval = x.split(':')
+                        if (optkey.lstrip() == '\'build_profile\''):
+                            profile = str(optval.lstrip()).replace("'","")
+    else:
+        profile = Options.options.build_profile
+    return profile
 
 def build(bld):
     env = bld.env
+
+    if Options.options.check_config:
+        print_config(env, 'build')
+    else:
+        if Options.options.check_profile:
+            profile = get_build_profile()
+            print("Build profile: %s" % profile)
+        
+    if Options.options.check_profile or Options.options.check_config:
+        raise SystemExit(0)
+        return
 
     # If --enabled-modules option was given, then print a warning
     # message and exit this function.
@@ -900,8 +1013,8 @@ def shutdown(ctx):
     if (env['PRINT_BUILT_MODULES_AT_END']):
 
         # Print the list of built modules.
-        print
-        print 'Modules built:'
+        print()
+        print('Modules built:')
         names_without_prefix = []
         for name in env['NS3_ENABLED_MODULES']:
             name1 = name[len('ns3-'):]
@@ -909,13 +1022,13 @@ def shutdown(ctx):
                 name1 += " (no Python)"
             names_without_prefix.append(name1)
         print_module_names(names_without_prefix)
-        print
+        print()
 
         # Print the list of enabled modules that were not built.
         if env['MODULES_NOT_BUILT']:
-            print 'Modules not built (see ns-3 tutorial for explanation):'
+            print('Modules not built (see ns-3 tutorial for explanation):')
             print_module_names(env['MODULES_NOT_BUILT'])
-            print
+            print()
 
         # Set this so that the lists won't be printed until the next
         # build is done.
@@ -960,15 +1073,13 @@ def shutdown(ctx):
 class CheckContext(Context.Context):
     """run the equivalent of the old ns-3 unit tests using test.py"""
     cmd = 'check'
-
     def execute(self):
-
         # first we execute the build
-	bld = Context.create_context("build")
-	bld.options = Options.options # provided for convenience
-	bld.cmd = "build"
-	bld.execute()
-
+        bld = Context.create_context("build")
+        bld.options = Options.options # provided for convenience
+        bld.cmd = "build"
+        bld.execute()
+        
         wutils.bld = bld
         wutils.run_python_program("test.py -n -c core", bld.env)
 
@@ -1055,19 +1166,18 @@ def check_shell(bld):
 class Ns3ShellContext(Context.Context):
     """run a shell with an environment suitably modified to run locally built programs"""
     cmd = 'shell'
-
+    
     def execute(self):
-
         # first we execute the build
-	bld = Context.create_context("build")
-	bld.options = Options.options # provided for convenience
-	bld.cmd = "build"
-	bld.execute()
+        bld = Context.create_context("build")
+        bld.options = Options.options # provided for convenience
+        bld.cmd = "build"
+        bld.execute()
 
         # Set this so that the lists won't be printed when the user
         # exits the shell.
         bld.env['PRINT_BUILT_MODULES_AT_END'] = False
-
+        
         if sys.platform == 'win32':
             shell = os.environ.get("COMSPEC", "cmd.exe")
         else:
@@ -1137,10 +1247,10 @@ class Ns3DoxygenContext(Context.Context):
     cmd = 'doxygen'
     def execute(self):
         # first we execute the build
-	bld = Context.create_context("build")
-	bld.options = Options.options # provided for convenience
-	bld.cmd = "build"
-	bld.execute()
+        bld = Context.create_context("build")
+        bld.options = Options.options # provided for convenience
+        bld.cmd = "build"
+        bld.execute()
         _doxygen(bld)
 
 class Ns3SphinxContext(Context.Context):
@@ -1149,8 +1259,8 @@ class Ns3SphinxContext(Context.Context):
     cmd = 'sphinx'
 
     def sphinx_build(self, path):
-        print
-        print "[waf] Building sphinx docs for " + path
+        print()
+        print("[waf] Building sphinx docs for " + path)
         if subprocess.Popen(["make", "SPHINXOPTS=-N", "-k",
                              "html", "singlehtml", "latexpdf" ],
                             cwd=path).wait() :
