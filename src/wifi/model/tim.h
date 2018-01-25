@@ -151,13 +151,13 @@ public:
 
 private:
   uint8_t m_DTIMCount; //!< DTIM Count
-  uint8_t m_DTIMPeriod; //!< DTIM Period
+  uint8_t m_DTIMPeriod; //!< DTIM Period is uint32 (0-255)
   uint8_t m_BitmapControl; //!< Bitmap Control
   uint8_t m_TrafficIndicator;
   uint8_t m_PageSliceNum;
   uint8_t m_PageIndex;
   TIM::EncodedBlock m_encodeblock; //!< encoded block subfield of partial Virtual Bitmap field
-  uint8_t m_partialVBitmap_arrary[251];
+  uint8_t m_partialVBitmap_arrary[251]; // see 9.4.2.6.1
   uint8_t * m_partialVBitmap;
 
   uint8_t * subblock; 

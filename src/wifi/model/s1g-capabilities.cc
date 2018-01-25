@@ -28,7 +28,8 @@ NS_LOG_COMPONENT_DEFINE ("S1gCapabilities");
 
 S1gCapabilities::S1gCapabilities ()
   :  m_staType (0),
-    m_s1gSupported (0)
+    m_s1gSupported (0),
+	m_pageSlicingImplemented (0)
 {
 }
 
@@ -48,6 +49,19 @@ void
 S1gCapabilities::SetStaType (uint8_t type)
 {
   m_staType = type;
+}
+
+void
+S1gCapabilities::SetPageSlicingSupport (uint8_t pageSlicingImplemented)
+{
+	NS_ASSERT (pageSlicingImplemented <= 1);
+	m_pageSlicingImplemented = pageSlicingImplemented;
+}
+
+uint8_t
+S1gCapabilities::GetPageSlicingSupport (void) const
+{
+	return m_pageSlicingImplemented;
 }
 
 uint8_t
@@ -88,7 +102,8 @@ uint64_t
 S1gCapabilities::GetS1gCapabilitiesInfoL64 (void) const
 {
   uint64_t val = 0;
-  val |= (uint64_t(m_staType) << 38) & (uint64_t(0x03) << 38);
+  val |= ((uint64_t(m_staType) << 38) & (uint64_t(0x03) << 38)) | ((uint64_t(m_pageSlicingImplemented) << 52) & (uint64_t(0x01) << 52));
+  std::cout << "m_pageSlicingImplemented = " << (int)m_pageSlicingImplemented << std::endl;
   return val;
 }
     
@@ -117,6 +132,7 @@ void
 S1gCapabilities::SetS1gCapabilitiesInfoL64 (uint64_t info)
 {
   m_staType = (info >> 38) & 0x03;
+  m_pageSlicingImplemented = (info >> 52) & 0x01;
 }
     
 void

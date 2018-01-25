@@ -745,20 +745,22 @@ ApWifiMac::SendOneBeacon (void)
             RpsIndex = 1;
           }
       beacon.SetRPS (*m_rps);
-      
+
     Mac48Address stasleepAddr;
-    for (uint16_t i=0; i< 8192;i++)
+    for (auto i=m_AidToMacAddr.begin(); i != m_AidToMacAddr.end() ; ++i)
        {  
       // assume all station sleeps, then change some to awake state based on downlink data
-      //This implementation is temporary, should be removed if ps-poll is supported    
-        if (m_AidToMacAddr.find(i)->second != NULL)
-           {
-            stasleepAddr = m_AidToMacAddr.find(i)->second;
-            if (m_stationManager->IsAssociated (stasleepAddr))
-              {
-                m_sleepList[stasleepAddr]=true;
-              }
-           }
+      //This implementation is temporary, should be removed if ps-poll is supported
+
+				if (i->second != NULL)
+				{
+					stasleepAddr = i->second;
+					if (m_stationManager->IsAssociated (stasleepAddr))
+					{
+						m_sleepList[stasleepAddr]=true;
+					}
+				}
+
        }
       
     if (m_DTIMCount == 0)

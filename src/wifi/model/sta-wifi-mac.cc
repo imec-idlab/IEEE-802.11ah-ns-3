@@ -519,7 +519,7 @@ StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
     {
       m_dca->AccessAllowedIfRaw (true);
     }
-  else if (m_rawStart & m_inRawGroup && m_pagedStaRaw && m_dataBuffered ) // if m_pagedStaRaw is true, only m_dataBuffered can access channel
+  else if (m_rawStart && m_inRawGroup && m_pagedStaRaw && m_dataBuffered ) // if m_pagedStaRaw is true, only m_dataBuffered can access channel
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
 

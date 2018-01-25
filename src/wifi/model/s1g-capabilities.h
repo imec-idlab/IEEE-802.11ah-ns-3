@@ -48,6 +48,7 @@ public:
   S1gCapabilities ();
   void SetS1gSupported (uint8_t s1gsupported);
   void SetStaType (uint8_t type);
+  void SetPageSlicingSupport (uint8_t pageSlicingImplemented);
   //Set the lowest 64bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
   void SetS1gCapabilitiesInfoL64 (uint64_t info);
   //Set the higest 16bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
@@ -57,7 +58,7 @@ public:
   //Set lowest 8 bytes of Supported MCS and NSS set
   void SetSupportedMCS_NSSH8 (uint8_t MCS_NSS_H);
     
-
+  uint8_t GetPageSlicingSupport (void) const;
   uint8_t GetStaType (void) const;
   //Return the lowest 64bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
   uint64_t GetS1gCapabilitiesInfoL64 (void) const;
@@ -98,6 +99,7 @@ private:
   uint8_t m_staType;
   //this is used to decide if this element should be added to the frame or not
   uint8_t m_s1gSupported;
+  uint8_t m_pageSlicingImplemented;
 };
 
 std::ostream &operator << (std::ostream &os, const S1gCapabilities &s1gcapabilities);
