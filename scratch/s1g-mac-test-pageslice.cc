@@ -124,9 +124,23 @@ uint32_t AppStartTime = 0;
 uint32_t ApStopTime = 0;
 
 std::map<uint16_t, float> traffic_sta;
+Ipv4InterfaceContainer staNodeInterface;
 
+/*int getStaAidFromAddress (Ipv4Address address)
+{
+	int staAid = -1;
+	for (uint32_t i = 0; i < staNodeInterface.GetN(); i++){
+		if (staNodeInterface.GetAddress(i) == address){
+			staAid = i + 1;
+			break;
+		}
+	}
+	return staAid;
+}*/
 
-
+void udpPacketReceivedAtServer (Ptr<const Packet> packet, Address from)
+{
+}
 
 void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode, NodeContainer  wifiStaNode, Ipv4InterfaceContainer apNodeInterface)
 {
@@ -141,11 +155,16 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         UdpServerHelper myServer (9);
         //ApplicationContainer serverApp;
         serverApp = myServer.Install (wifiApNode);
+        serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
         serverApp.Start (Seconds (0));
 
-        UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
+        UdpEchoClientHelper echoClient (apNodeInterface.GetAddress (0), 9);
+         echoClient.SetAttribute ("MaxPackets", UintegerValue (2));
+         echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
+
+        /*UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
         myClient.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
-        myClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
+        myClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));*/
 
           traffic_sta.clear ();
           
@@ -165,7 +184,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                     }
                   trafficfile.close();
                 }
-           else cout << "Unable to open file \n";
+           else cout << "Unable to open traffic file \n";
 
           
           double randomStart = 0.0;
@@ -176,12 +195,16 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   intervalstr << (payloadLength*8)/(it->second * 1000000);
                   std::string intervalsta = intervalstr.str();
 
-                  myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
+                  echoClient.SetAttribute ("Interval", TimeValue (Time (intervalsta)));
+                  //myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
                   randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
-                  ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
+                  ApplicationContainer clientApps = echoClient.Install (wifiStaNode.Get(it->first));
+                  clientApps.Start (Seconds (1 + randomStart));
+                  clientApps.Stop (Seconds (simulationTime+1));
+                  /*ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
 
                   clientApp.Start (Seconds (1 + randomStart));
-                  clientApp.Stop (Seconds (simulationTime+1)); //
+                  clientApp.Stop (Seconds (simulationTime+1)); //*/
                }
           
               AppStartTime=Simulator::Now ().GetSeconds () + 1;
@@ -245,6 +268,7 @@ PopulateArpCache ()
 RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
 {
     uint16_t NRPS = 0;
+    uint16_t NRAWPERBEACON = 0;
     uint16_t Value = 0;
     uint32_t page = 0;
     uint32_t aid_start = 0;
@@ -261,32 +285,37 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
         for (uint16_t kk=0; kk< NRPS; kk++)
         {
             RPS *m_rps = new RPS;
-            RPS::RawAssignment *m_raw = new RPS::RawAssignment;
-            
-            myfile >> Value;
-            m_raw->SetRawControl (Value);//support paged STA or not
-            myfile >> Value;
-            m_raw->SetSlotCrossBoundary (Value);
-            myfile >> Value;
-            m_raw->SetSlotFormat (Value);
-            myfile >> Value;
-            m_raw->SetSlotDurationCount (Value);
-            myfile >> Value;
-            m_raw->SetSlotNum (Value);
-            
-            myfile >> page;
-            myfile >> aid_start;
-            myfile >> aid_end;
-            rawinfo = (aid_end << 13) | (aid_start << 2) | page;
-            m_raw->SetRawGroup (rawinfo);
-            
-            m_rps->SetRawAssignment(*m_raw);
-            
+            myfile >> NRAWPERBEACON;
+
+            for (uint16_t i = 0; i < NRAWPERBEACON; i++)
+            {
+				RPS::RawAssignment *m_raw = new RPS::RawAssignment;
+
+				myfile >> Value;
+				m_raw->SetRawControl (Value);//support paged STA or not
+				myfile >> Value;
+				m_raw->SetSlotCrossBoundary (Value);
+				myfile >> Value;
+				m_raw->SetSlotFormat (Value);
+				myfile >> Value;
+				m_raw->SetSlotDurationCount (Value);
+				myfile >> Value;
+				m_raw->SetSlotNum (Value);
+
+				myfile >> page;
+				myfile >> aid_start;
+				myfile >> aid_end;
+				rawinfo = (aid_end << 13) | (aid_start << 2) | page;
+				m_raw->SetRawGroup (rawinfo);
+
+				m_rps->SetRawAssignment(*m_raw);
+				delete m_raw;
+            }
             rpslist.rpsset.push_back (m_rps);
         }
         myfile.close();
     }
-    else cout << "Unable to open file \n";
+    else cout << "Unable to open RAW config file \n";
     
     return rpslist;
 }
@@ -321,11 +350,11 @@ pageSlice configurePageSlice (pageSlice m_page)
 {
     m_page.SetPageindex (0);
     
-    m_page.SetPagePeriod (8);
+    m_page.SetPagePeriod (4); //2 TIM groups between DTIMs
     
-    m_page.SetPageSliceLen (4);
-    m_page.SetPageSliceCount (8);
-    m_page.SetBlockOffset (0);
+    m_page.SetPageSliceLen (7); //each TIM group has 1 block (2 blocks in 2 TIM groups)
+    m_page.SetPageSliceCount (4); //
+    m_page.SetBlockOffset (0); //
     m_page.SetTIMOffset (0);
     
     return m_page;
@@ -340,7 +369,7 @@ TIM configureTIM (TIM m_TIM)
 {
     m_TIM.SetPageIndex (0);
     
-    m_TIM.SetDTIMPeriod (8);
+    m_TIM.SetDTIMPeriod (4);
     // 8 pages between two DTIM
     return m_TIM;
 }
@@ -349,27 +378,33 @@ TIM configureTIM (TIM m_TIM)
 
 int main (int argc, char *argv[])
 {
-  //LogComponentEnable ("UdpServer", LOG_INFO);
+  /*LogComponentEnable ("pageSlice", LOG_DEBUG);
+  LogComponentEnable ("ApWifiMac", LOG_FUNCTION);
+  LogComponentEnable ("StaWifiMac", LOG_FUNCTION);*/
+  LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+  LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("StaWifiMac", LOG_LEVEL_DEBUG);
 
-
+  //LogComponentEnable ("DcaTxop", LOG_LEVEL_INFO);
   double simulationTime = 10;
   uint32_t seed = 1;
-  uint32_t  payloadSize = 256;
+  uint32_t  payloadSize = 100;//256
   uint32_t Nsta =1;
   uint32_t NRawSta = 1;
-  uint32_t BeaconInterval = 100000;
+  uint32_t BeaconInterval = 102400;
   bool OutputPosition = true;
   string DataMode = "OfdmRate7_8MbpsBW2MHz";
   double datarate = 7.8;
   double bandWidth = 2;
-  string rho="250.0";
+  string rho="50.0";
   string folder="./scratch/";
   string file="./scratch/mac-sta.txt";
-  string TrafficPath;
+  string TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt";
   uint16_t Nactive;
   double poissonrate;
   bool S1g1MfieldEnabled;
-  string RAWConfigFile;
+  string RAWConfigFile="./OptimalRawGroup/RawConfig-32-2-2.txt";
     
 
   CommandLine cmd;
@@ -493,7 +528,6 @@ int main (int argc, char *argv[])
   Ipv4AddressHelper address;
 
   address.SetBase ("192.168.0.0", "255.255.0.0");
-  Ipv4InterfaceContainer staNodeInterface;
   Ipv4InterfaceContainer apNodeInterface;
 
   staNodeInterface = address.Assign (staDevice);
