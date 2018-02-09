@@ -29,8 +29,10 @@ namespace ns3 {
     
 NS_LOG_COMPONENT_DEFINE ("pageSlice");
     
-pageSlice::pageSlice ()
+pageSlice::pageSlice () :  m_ElementId (209)
 {
+	for (auto i=0; i < 4; i++)
+		m_PageBitmaparry[i] = 0;
 }
 
 pageSlice::~pageSlice ()
@@ -114,6 +116,9 @@ pageSlice::SetPageBitmap (uint32_t control)
          | ((m_BlockOffset & 0x1f )<< 12 ) | ( (m_TIMOffset & 0x0f) << 17 );
   
   m_PageBitmap = m_PageBitmaparry;
+  printf("     ---pageSlice::SetPageBitmap -- m_PageBitmap = %x\n", *m_PageBitmap);
+  printf("     ---pageSlice::SetPageBitmap -- m_length = %d\n", m_length);
+
 }
 
 uint8_t
@@ -165,6 +170,13 @@ pageSlice::GetPageBitmap (void) const
   return m_PageBitmap;
 }
 
+uint8_t
+pageSlice::GetPageBitmapLength (void) const
+{
+	//NS_ASSERT (m_length < 5);
+	return m_length;
+}
+
 
 WifiInformationElementId
 pageSlice::ElementId () const
@@ -175,6 +187,7 @@ pageSlice::ElementId () const
 uint8_t
 pageSlice::GetInformationFieldSize () const
 {
+	  NS_ASSERT (m_length < 5);
   return (m_length + 4);
 }
 
@@ -187,6 +200,7 @@ pageSlice::SerializeInformationField (Buffer::Iterator start) const
  start.WriteU8 ((uint8_t) (m_PageSliceControl >> 16)); // 16-23
  //start.WriteU32 (m_PageBitmap);
  //start.Write (m_PageBitmapP, m_length);
+ NS_ASSERT (m_length < 5);
  for (uint8_t i=0; i < m_length; i++ )
    {
       start.Write (&m_PageBitmaparry[i], m_length);
@@ -217,7 +231,7 @@ pageSlice::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
    m_BlockOffset = (m_PageSliceControl >> 12) & 0x0000001f;
    m_TIMOffset = (m_PageSliceControl >> 17) & 0x0000000f;
    m_length = length - 4;
-  
+   NS_ASSERT (m_length < 5);
   return length;
 }
 

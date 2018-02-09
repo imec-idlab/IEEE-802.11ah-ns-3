@@ -208,7 +208,8 @@ S1gBeaconHeader::GetSerializedSize (void) const
   size += m_beaconcompatibility.GetSerializedSize ();
   size += m_tim.GetSerializedSize ();
   size += m_rps.GetSerializedSize ();
-  size += m_pageSlice.GetSerializedSize ();
+  if (!m_tim.GetDTIMCount())
+	  size += m_pageSlice.GetSerializedSize ();
   size += m_auth.GetSerializedSize ();
   
   return size;
@@ -232,7 +233,8 @@ S1gBeaconHeader::Serialize (Buffer::Iterator start) const
     i = m_beaconcompatibility.Serialize (i);
     i = m_tim.Serialize (i);
     i = m_rps.Serialize (i);
-    i = m_pageSlice.Serialize (i);
+    if (!m_tim.GetDTIMCount())
+    	i = m_pageSlice.Serialize (i);
     i = m_auth.Serialize (i);
 }
 
@@ -253,7 +255,8 @@ S1gBeaconHeader::Deserialize (Buffer::Iterator start)
     i = m_beaconcompatibility.Deserialize (i);
     i = m_tim.Deserialize (i);
     i = m_rps.Deserialize (i);
-    i = m_pageSlice.Deserialize (i);
+    if (!m_tim.GetDTIMCount())
+    	i = m_pageSlice.Deserialize (i);
     i = m_auth.DeserializeIfPresent (i);
 
     return i.GetDistanceFrom (start);

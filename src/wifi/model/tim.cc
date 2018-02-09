@@ -24,7 +24,8 @@
 
 namespace ns3 {
     
-    
+	NS_LOG_COMPONENT_DEFINE ("TIM");
+
 TIM::EncodedBlock::EncodedBlock ()
 {
 }
@@ -163,31 +164,34 @@ TIM::SetDTIMPeriod (uint8_t count)
   m_DTIMPeriod = count;
 }
 
-//to be implemented, should divided into traffic indicator, page slice and page index
-/*
 void
 TIM::SetBitmapControl (uint8_t control)
 {
-  //to be implemented
+  this->SetTafficIndicator(control & 0x01);
+  this->SetPageSliceNum((control >> 1) & 0x1f);
+  this->SetPageIndex((control >> 6) & 0x03);
   m_BitmapControl = control;
 }
-*/
+
 
 void 
 TIM::SetTafficIndicator (uint8_t control)
 {
+   NS_ASSERT (control <= 1);
    m_TrafficIndicator = control;
 }
 
 void
 TIM::SetPageSliceNum (uint8_t control)
 {
+   NS_ASSERT (control <= 31);
    m_PageSliceNum = control; 
 }
 
 void 
 TIM::SetPageIndex (uint8_t control)
 {
+   NS_ASSERT (control <= 3);
    m_PageIndex = control;
 }
   
@@ -217,7 +221,7 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
   }
   m_partialVBitmap = m_partialVBitmap_arrary;
   NS_ASSERT ( m_length < 252);
-  NS_ASSERT ( m_length > 0);
+  //NS_ASSERT ( m_length > 0);
 }
     
 uint8_t
@@ -270,32 +274,42 @@ TIM::ElementId () const
 uint8_t
 TIM::GetInformationFieldSize () const
 {
-  return (m_length + 3);
+  if (!m_BitmapControl && !m_length)
+	return 2;
+  else
+    return (m_length + 3);
 }
 
 void
 TIM::SerializeInformationField (Buffer::Iterator start) const
 {
+ NS_LOG_FUNCTION (this);
  start.WriteU8 (m_DTIMCount);
  start.WriteU8 (m_DTIMPeriod);
- start.WriteU8 ((m_TrafficIndicator & 0x01) | ((m_PageSliceNum  & 0x1f) << 1) | ((m_PageSliceNum & 0x03) << 6));
+
+ if (m_BitmapControl)
+   {
+     start.WriteU8 (m_BitmapControl);
+     NS_LOG_DEBUG ("Bitmap Control field is " << m_BitmapControl);
+   }
+ else
+     NS_LOG_DEBUG ("Bitmap Control field contains all zeros and IS NOT ENCODED in TIM element.");
  start.Write (m_partialVBitmap, m_length);
 }
 
 uint8_t
 TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 {
+  NS_LOG_FUNCTION (this << length);
   m_DTIMCount = start.ReadU8 ();
   m_DTIMPeriod = start.ReadU8 ();
-  m_BitmapControl = start.ReadU8 ();
-  start.Read (m_partialVBitmap_arrary, (length-3));
-  m_length = length-3;
-  
-  m_TrafficIndicator = m_BitmapControl & 0x01;
-  m_PageSliceNum = (m_BitmapControl  >> 1) & 0x1f;
-  m_PageIndex = (m_BitmapControl  >> 6) & 0x03;
-  m_partialVBitmap = m_partialVBitmap_arrary;
-
+  if (length > 2)
+    {
+	  SetBitmapControl (start.ReadU8 ());
+	  start.Read (m_partialVBitmap_arrary, (length-3));
+	  m_length = length-3;
+	  m_partialVBitmap = m_partialVBitmap_arrary;
+    }
   return length;
 }
 

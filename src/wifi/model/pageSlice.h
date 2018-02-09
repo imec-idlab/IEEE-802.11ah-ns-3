@@ -60,11 +60,13 @@ public:
   //uint32_t GetPageSliceControl (void) const;
   uint8_t * GetPageBitmap (void) const;
   
+
   uint8_t GetPageindex (void) const;
   uint8_t GetPageSliceLen (void) const;
   uint8_t GetPageSliceCount (void) const;
   uint8_t GetBlockOffset (void) const;
   uint8_t GetTIMOffset (void) const;
+  uint8_t GetPageBitmapLength (void) const;
 
 
   WifiInformationElementId ElementId () const;
@@ -76,6 +78,7 @@ public:
   uint8_t m_length; //!< length of m_PageBitmap field*/     
 
 private:
+  uint8_t m_ElementId;
   uint8_t m_PagePeriod; //!< DPAGESLICE Count
   uint32_t m_PageSliceControl; //!< DPAGESLICE Period
   uint8_t m_Pageindex;
