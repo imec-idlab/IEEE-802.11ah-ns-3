@@ -103,7 +103,6 @@ S1gCapabilities::GetS1gCapabilitiesInfoL64 (void) const
 {
   uint64_t val = 0;
   val |= ((uint64_t(m_staType) << 38) & (uint64_t(0x03) << 38)) | ((uint64_t(m_pageSlicingImplemented) << 52) & (uint64_t(0x01) << 52));
-  std::cout << "m_pageSlicingImplemented = " << (int)m_pageSlicingImplemented << std::endl;
   return val;
 }
     

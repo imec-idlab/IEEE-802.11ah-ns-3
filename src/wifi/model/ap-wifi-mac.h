@@ -230,7 +230,9 @@ private:
   uint32_t GetSlotCrossBoundary (void) const;
   uint32_t GetSlotDurationCount (void) const;
   uint32_t GetSlotNum (void) const;
-    
+  void SetPageSlicingActivated (bool activate);
+  bool GetPageSlicingActivated (void) const;
+
   RPSVector m_rpsset;
   pageSlice m_pageslice;
   TIM m_TIM;
@@ -272,7 +274,8 @@ private:
   std::vector<uint16_t> m_receivedAid;
   std::map<uint16_t, Mac48Address> m_AidToMacAddr;
   std::map<Mac48Address, bool> m_sleepList;
-    
+  std::map<Mac48Address, bool> m_supportPageSlicingList;
+
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
@@ -281,6 +284,7 @@ private:
   Ptr<UniformRandomVariable> m_beaconJitter; //!< UniformRandomVariable used to randomize the time of the first beacon
   bool m_enableBeaconJitter;                 //!< Flag if the first beacon should be generated at random time
   std::string  m_outputpath;
+  bool m_pageSlicingActivated;
 };
 
 } //namespace ns3

@@ -114,6 +114,11 @@ ApWifiMac::GetTypeId (void)
                    pageSliceValue (),
                    MakepageSliceAccessor (&ApWifiMac::m_pageslice),
                    MakepageSliceChecker ())
+	.AddAttribute ("PageSlicingActivated", "Whether or not page slicing is activated.",
+				    BooleanValue (true),
+				    MakeBooleanAccessor (&ApWifiMac::SetPageSlicingActivated,
+				                         &ApWifiMac::GetPageSlicingActivated),
+				    MakeBooleanChecker ())
      .AddAttribute ("TIMSet", "configuration of TIM",
                    TIMValue (),
                    MakeTIMAccessor (&ApWifiMac::m_TIM),
@@ -146,6 +151,7 @@ ApWifiMac::ApWifiMac ()
   AuthenThreshold = 0;
   //m_SlotFormat = 0;
   m_AidToMacAddr.clear ();
+  m_supportPageSlicingList.clear();
   m_sleepList.clear ();
   m_DTIMCount = 0;
   m_DTIMOffset = 0;
@@ -174,6 +180,18 @@ ApWifiMac::SetAddress (Mac48Address address)
   //overriding this function and setting both in our parent class.
   RegularWifiMac::SetAddress (address);
   RegularWifiMac::SetBssid (address);
+}
+
+void
+ApWifiMac::SetPageSlicingActivated (bool activate)
+{
+	m_pageSlicingActivated = activate;
+}
+
+bool
+ApWifiMac::GetPageSlicingActivated (void) const
+{
+	return m_pageSlicingActivated;
 }
 
 void
@@ -623,20 +641,25 @@ Addheader:
 
 //For now, to avoid adjust pageslicecount and pageslicecount dynamicly,   page bitmap is always 4 bytes
 uint32_t
-ApWifiMac:: HasPacketsToPage (uint8_t blockstart , uint8_t Page)
+ApWifiMac::HasPacketsToPage (uint8_t blockstart , uint8_t Page)
 {
-   uint16_t sta_aid; 
    uint8_t blockBitmap;
    uint32_t PageBitmap;
    PageBitmap = 0;
-   for (uint32_t i=blockstart; i<= 31; i++ ) 
+   uint32_t numBlocks = m_pageslice.GetPageSliceLen();
+   printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap includes blocks from %d to %d\n", blockstart, blockstart + numBlocks - 1);
+   for (uint32_t i=blockstart; i< blockstart + numBlocks ; i++ )
     {
        blockBitmap = HasPacketsToBlock (i,  Page);
        if (blockBitmap != 0)
          {
            PageBitmap = PageBitmap | (1 << i);
          }
+       printf("		ApWifiMac::HasPacketsToPage --- Block Bitmap = %x\n", blockBitmap);
     }
+   printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap before >> blockstart = %x\n", PageBitmap);
+   PageBitmap = PageBitmap >> blockstart;
+   printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap after >> blockstart = %x\n", PageBitmap);
    return PageBitmap;
 }
 
@@ -656,10 +679,13 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
         {
            sta_aid = subblock | j;
            if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
-             {
-               blockBitmap = blockBitmap | (1 << i); 
-               break;
-             } 
+            {
+        	   blockBitmap = blockBitmap | (1 << i);
+        	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
+        	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
+        		   m_PageSliceNum = 31;
+        	   break;
+            }
         }
      }
   
@@ -752,25 +778,28 @@ ApWifiMac::SendOneBeacon (void)
       // assume all station sleeps, then change some to awake state based on downlink data
       //This implementation is temporary, should be removed if ps-poll is supported
 
-				if (i->second != NULL)
-				{
+				/*if (i->second != NULL)
+				{*/
 					stasleepAddr = i->second;
 					if (m_stationManager->IsAssociated (stasleepAddr))
 					{
 						m_sleepList[stasleepAddr]=true;
 					}
-				}
+				//}
 
        }
       
-    if (m_DTIMCount == 0)
+    if (m_DTIMCount == 0 && GetPageSlicingActivated ()) // TODO filter when GetPageSlicingActivated() is false
       {
-        m_pagebitmap = HasPacketsToPage (m_pageslice.GetBlockOffset (), m_pageslice.GetPageindex());
+    	printf ("***DTIM***\n");
+        m_pagebitmap = HasPacketsToPage (m_pageslice.GetBlockOffset (), m_pageslice.GetPageindex()); //TODO check set m_PageSliceNum = 31
         //for now, only configure Page Bit map based on real-time traffic, other parameters configured beforehand. 
         m_pageslice.SetPageBitmap (m_pagebitmap);
         //For now, page bitmap is always 4 bytes
         beacon.SetpageSlice (m_pageslice);
       }
+    else if (m_DTIMCount != 0 && GetPageSlicingActivated ())
+    		printf ("***TIM %d***\n", m_DTIMCount);
     
       /*
       RPS m_rps;
@@ -790,40 +819,70 @@ ApWifiMac::SendOneBeacon (void)
     m_TrafficIndicator = 0; //for group addressed MSDU/MMPDU, not supported.
     m_TIM.SetTafficIndicator (m_TrafficIndicator); //from page slice
 
+    if (m_PageSliceNum != 31)
+      {
+		if (m_DTIMOffset == m_pageslice.GetTIMOffset ()) //first page slice start at TIM offset
+		  {
+			 m_PageSliceNum = 0;
+		  }
+		else
+		  {
+			m_PageSliceNum++;
+		  }
+	    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() ); //or do not use m_PageSliceNum when it's larger (equal) than slice count.
+	    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() );
+      }
 
-    if (m_DTIMOffset == m_pageslice.GetTIMOffset ()) //first page slice start at TIM offset
-      {
-         m_PageSliceNum = 0;
-      }
-    else
-      {
-        m_PageSliceNum++;  
-      }
-        
-    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() ); //or do not use m_PageSliceNum when it's larger (equal) than slice count.
-    NS_ASSERT(m_PageSliceNum < m_pageslice.GetPageSliceCount() );
     
-    m_TIM.SetPageSliceNum (m_PageSliceNum); //from page slice
     m_PageIndex = m_pageslice.GetPageindex();
     // m_TIM.SetPageIndex (m_PageIndex); 
+    bool pagedStaExists (false);
+    for (auto it = m_supportPageSlicingList.begin(); it != m_supportPageSlicingList.end(); ++it){
+    	if (m_stationManager->IsAssociated (it->first) && HasPacketsInQueueTo(it->first) )
+    	{
+    		pagedStaExists = true;
+    		if (pagedStaExists) NS_LOG_DEBUG ("Paged STA exists, MAC: " << it->first);
+    		break;
+    	}
+    }
     
+	if (m_pageslice.GetPageSliceCount() == 0 && pagedStaExists)// special case
+	{
+		if (m_pageslice.GetPageSliceLen() > 1)
+		{
+			// 32nd TIM in this DTIM can contain DL information for (1) STAs that do not support page slicing or (2)STAs that support page slicing and
+			// whose AID is within 32nd block of this page
+			m_PageSliceNum = 31;
+			// TODO
+		}
+		else if (m_pageslice.GetPageSliceLen() == 1)
+		{
+			//there is only 1 TIM and all STAs that have DL data are included in it
+			// TODO
+		}
+	}
+
     uint8_t NumEncodedBlock; 
-    if (m_PageSliceNum == m_pageslice.GetPageSliceCount() - 1)
+    if (m_PageSliceNum != (m_pageslice.GetPageSliceCount() - 1))
       {
-         NumEncodedBlock = m_pageslice.GetPageSliceLen();
+    		NumEncodedBlock = m_pageslice.GetPageSliceLen();
       }
-    else
+    else if (m_pageslice.GetPageBitmapLength() > 0)//Last Page slice has max value of 32 (5 bits)
       {
-         NumEncodedBlock = (m_pageslice.GetInformationFieldSize ()  - 4 )* 8 - (m_pageslice.GetPageSliceCount() - 1) * m_pageslice.GetPageSliceLen();
+    	// PSlast = 8 * PageBitmap_length - (PScount-1) * PSlength
+    	NS_ASSERT (m_pageslice.GetPageSliceCount() > 0);
+        NumEncodedBlock = 0x1f & (m_pageslice.GetPageBitmapLength() * 8 - (m_pageslice.GetPageSliceCount() - 1) * m_pageslice.GetPageSliceLen());
          //As page bitmap of page slice element is fixed to 4 bytes for now, "m_pageslice.GetInformationFieldSize ()" is alwawys 8.
          //Section 9.4.2.193 oage slice element, Draft 802.11ah_D9.0
       }
-    
+    m_TIM.SetPageSliceNum (m_PageSliceNum); //from page slice
+
    if (m_PageSliceNum == 0)
       {
         m_blockoffset = m_pageslice.GetBlockOffset ();
       }
     
+    if (m_pageslice.GetPageBitmapLength() > 0)
     for (uint8_t i = 0; i< NumEncodedBlock; i++)
       {
         TIM::EncodedBlock * m_encodedBlock = new TIM::EncodedBlock;
@@ -872,7 +931,7 @@ ApWifiMac::SendOneBeacon (void)
       {
         m_DTIMCount--;
       }
-    NS_ASSERT (m_DTIMCount+m_DTIMOffset-1==m_DTIMPeriod || (m_DTIMCount ==0 && m_DTIMOffset == 0));
+    NS_ASSERT (m_DTIMCount + m_DTIMOffset == m_DTIMPeriod || (m_DTIMCount == 0 && m_DTIMOffset == 0));
     
     //set sleep list, temporary, removed if ps-poll supported 
     m_edca.find (AC_VO)->second->SetsleepList (m_sleepList);
@@ -1137,6 +1196,8 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                     {
                       S1gCapabilities s1gcapabilities = assocReq.GetS1gCapabilities ();
                       uint8_t sta_type = s1gcapabilities.GetStaType ();
+                      bool pageSlicingSupported = s1gcapabilities.GetPageSlicingSupport() != 0;
+                      m_supportPageSlicingList[hdr->GetAddr2 ()] = pageSlicingSupported;
                       SendAssocResp (hdr->GetAddr2 (), true, sta_type);
                     }
                   else

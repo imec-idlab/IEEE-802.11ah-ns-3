@@ -94,6 +94,8 @@ public:
     void SetStaType (uint32_t statype);
     void SendDisAssociationRequest (void);
     void SendAssociationRequest (void);
+    /*void SetPageSlicingSupported (uint8_t support);
+    uint8_t GetPageSlicingSupported (void) const;*/
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;
@@ -276,7 +278,9 @@ private:
   uint8_t m_TIMOffset;  
   uint8_t m_PageBitmap[4];
   uint8_t m_PageBitmapLen;
-  uint8_t m_TIMSeq;  // 0 for DTIM 
+  uint8_t m_TIMSeq;  // 0 for DTIM ???
+
+  bool m_receivedDtim;
 
 
   uint8_t m_selfBlock;
@@ -284,7 +288,7 @@ private:
   uint8_t m_selfSubBlock;
   uint8_t m_selfAid;
   
-
+  uint8_t m_supportsPageSlicing;
 
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;
