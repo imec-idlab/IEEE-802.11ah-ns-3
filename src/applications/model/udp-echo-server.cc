@@ -32,6 +32,7 @@
 
 #include "udp-echo-server.h"
 
+
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("UdpEchoServerApplication");
@@ -49,6 +50,10 @@ UdpEchoServer::GetTypeId (void)
                    UintegerValue (9),
                    MakeUintegerAccessor (&UdpEchoServer::m_port),
                    MakeUintegerChecker<uint16_t> ())
+	.AddTraceSource("Rx",
+					"A packet is received",
+					MakeTraceSourceAccessor(&UdpEchoServer::m_packetReceived),
+					"ns3::UdpEchoServer::PacketReceivedCallback");
   ;
   return tid;
 }
