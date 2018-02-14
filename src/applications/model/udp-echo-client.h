@@ -137,6 +137,8 @@ public:
    */
   void SetFill (uint8_t *fill, uint32_t fillSize, uint32_t dataSize);
 
+  typedef void (* PacketReceivedCallback)
+		  (Ptr<const Packet>, Address from);
 protected:
   virtual void DoDispose (void);
 
@@ -179,6 +181,8 @@ private:
 
   /// Callbacks for tracing the packet Tx events
   TracedCallback<Ptr<const Packet> > m_txTrace;
+
+  TracedCallback<Ptr<const Packet>, Address> m_packetReceived;
 };
 
 } // namespace ns3

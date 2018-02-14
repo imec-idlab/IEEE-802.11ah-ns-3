@@ -137,9 +137,21 @@ Ipv4InterfaceContainer staNodeInterface;
 	}
 	return staAid;
 }*/
-
+uint32_t clientSent = 0;
+uint32_t clientReceived = 0;
+uint32_t serverReceived = 0;
 void udpPacketReceivedAtServer (Ptr<const Packet> packet, Address from)
 {
+	serverReceived++;
+}
+
+void udpPacketSentByClient (Ptr<const Packet> packet)
+{
+	clientSent++;
+}
+void udpPacketReceivedAtClient (Ptr<const Packet> packet, Address from)
+{
+	clientReceived++;
 }
 
 void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode, NodeContainer  wifiStaNode, Ipv4InterfaceContainer apNodeInterface)
@@ -152,14 +164,14 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         //Application start time
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
         //UDP flow
-        UdpServerHelper myServer (9);
+        UdpEchoServerHelper myServer (9);
         //ApplicationContainer serverApp;
         serverApp = myServer.Install (wifiApNode);
         serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
         serverApp.Start (Seconds (0));
 
         UdpEchoClientHelper echoClient (apNodeInterface.GetAddress (0), 9);
-         echoClient.SetAttribute ("MaxPackets", UintegerValue (2));
+         echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
          echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
 
         /*UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
@@ -199,6 +211,9 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   //myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
                   randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
                   ApplicationContainer clientApps = echoClient.Install (wifiStaNode.Get(it->first));
+                  clientApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&udpPacketSentByClient));
+                  clientApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtClient));
+
                   clientApps.Start (Seconds (1 + randomStart));
                   clientApps.Stop (Seconds (simulationTime+1));
                   /*ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
@@ -383,15 +398,18 @@ int main (int argc, char *argv[])
   LogComponentEnable ("StaWifiMac", LOG_FUNCTION);*/
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-  LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("StaWifiMac", LOG_LEVEL_DEBUG);
+  //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
+  LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
 
-  //LogComponentEnable ("DcaTxop", LOG_LEVEL_INFO);
+  //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_ALL);
+
+  //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
   double simulationTime = 10;
   uint32_t seed = 1;
   uint32_t  payloadSize = 100;//256
-  uint32_t Nsta =1;
-  uint32_t NRawSta = 1;
+  uint32_t Nsta = 1;
+  uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 102400;
   bool OutputPosition = true;
   string DataMode = "OfdmRate7_8MbpsBW2MHz";
@@ -577,8 +595,9 @@ int main (int argc, char *argv[])
 
       double throughput = 0;
       //UDP
-      uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
-      throughput = totalPacketsThrough * payloadSize * 8 / (simulationTime * 1000000.0);
+      uint32_t a = serverReceived + clientReceived;
+      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+      throughput = a * payloadSize * 8 / (simulationTime * 1000000.0);
       std::cout << "datarate" << "\t" << "throughput" << std::endl;
       std::cout << datarate << "\t" << throughput << " Mbit/s" << std::endl;
     

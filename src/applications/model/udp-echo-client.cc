@@ -70,6 +70,9 @@ UdpEchoClient::GetTypeId (void)
     .AddTraceSource ("Tx", "A new packet is created and is sent",
                      MakeTraceSourceAccessor (&UdpEchoClient::m_txTrace),
                      "ns3::Packet::TracedCallback")
+	.AddTraceSource ("Rx", "An echo packet is received",
+					 MakeTraceSourceAccessor (&UdpEchoClient::m_packetReceived),
+					 "ns3::UdpEchoClient::PacketReceivedCallback")
   ;
   return tid;
 }
@@ -339,6 +342,7 @@ UdpEchoClient::HandleRead (Ptr<Socket> socket)
   Address from;
   while ((packet = socket->RecvFrom (from)))
     {
+	  m_packetReceived (packet, from);
       if (InetSocketAddress::IsMatchingType (from))
         {
           NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client received " << packet->GetSize () << " bytes from " <<
