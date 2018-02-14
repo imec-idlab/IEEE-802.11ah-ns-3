@@ -320,7 +320,6 @@ ApWifiMac::SetTotalStaNum (uint32_t num)
 {
   NS_LOG_FUNCTION (this << num);
   m_totalStaNum = num;
-    std::cout << "ApWifiMac::SetTotalStaNum = " << m_totalStaNum  << "  \n";
   //m_S1gRawCtr.RAWGroupping (m_totalStaNum, 1, m_beaconInterval.GetMicroSeconds ());
   //m_S1gRawCtr.configureRAW ();
     
@@ -439,7 +438,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
   if (!to.IsBroadcast ())
   {
 	  while (m_AidToMacAddr.find(aid)->second != to) aid++; //TODO optimize search
-	  NS_LOG_DEBUG (Simulator::Now().GetMicroSeconds() << " ms: Data for [aid=" << aid << "]");
+	  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: Data for [aid=" << aid << "]");
 
 	  uint8_t block = (aid >> 6 ) & 0x001f;
 	  uint8_t page = (aid >> 11 ) & 0x0003;
@@ -688,7 +687,6 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
       assoc.SetHtCapabilities (GetHtCapabilities ());
       hdr.SetNoOrder ();
     }
-    NS_LOG_UNCOND ("ApWifiMac::SendAssocResp =" );
 
    
   if (m_s1gSupported && success)
@@ -702,7 +700,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                  goto Addheader;
             }
           m_sensorList.push_back (aid);
-          NS_LOG_UNCOND ("m_sensorList =" << m_sensorList.size ());
+          NS_LOG_DEBUG ("m_sensorList =" << m_sensorList.size ());
   
         }
        else if (staType == 2)
@@ -713,7 +711,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                   goto Addheader;
             }
           m_OffloadList.push_back (aid);
-          NS_LOG_UNCOND ("m_OffloadList =" << m_OffloadList.size ());
+          NS_LOG_DEBUG ("m_OffloadList =" << m_OffloadList.size ());
         }
     }
 Addheader:
@@ -861,21 +859,17 @@ ApWifiMac::SendOneBeacon (void)
 
     Mac48Address stasleepAddr;
     for (auto i=m_AidToMacAddr.begin(); i != m_AidToMacAddr.end() ; ++i)
-       {  
-      // assume all station sleep, then change some to awake state based on downlink data
-      //This implementation is temporary, should be removed if ps-poll is supported
+    {
+    	// assume all station sleep, then change some to awake state based on downlink data
+    	//This implementation is temporary, should be removed if ps-poll is supported
 
-				/*if (i->second != NULL)
-				{*/
-					stasleepAddr = i->second;
-					if (m_stationManager->IsAssociated (stasleepAddr))
-					{
-						m_sleepList[stasleepAddr]=true;
-					}
-				//}
+    	stasleepAddr = i->second;
+    	if (m_stationManager->IsAssociated (stasleepAddr))
+    	{
+    		m_sleepList[stasleepAddr]=true;
+    	}
+    }
 
-       }
-      
     if (m_DTIMCount == 0 && GetPageSlicingActivated ()) // TODO filter when GetPageSlicingActivated() is false
       {
     	NS_LOG_DEBUG ("***DTIM*** starts at " << Simulator::Now().GetSeconds() << " s");
@@ -900,11 +894,9 @@ ApWifiMac::SendOneBeacon (void)
       beacon.SetRPS (m_rps); */
       
 
-    //NS_ASSERT (m_DTIMCount + m_DTIMOffset == m_DTIMPeriod -1);
     m_DTIMPeriod = m_TIM.GetDTIMPeriod ();
     m_TIM.SetDTIMCount (m_DTIMCount);
     NS_ASSERT (m_pageslice.GetTIMOffset () +  m_pageslice.GetPageSliceCount() <= m_DTIMPeriod);
-    //m_TIM.SetDTIMPeriod (m_DTIMPeriod); //from users
     m_TrafficIndicator = 0; //for group addressed MSDU/MMPDU, not supported.
     m_TIM.SetTafficIndicator (m_TrafficIndicator); //from page slice
 
@@ -930,7 +922,7 @@ ApWifiMac::SendOneBeacon (void)
     	if (m_stationManager->IsAssociated (it->first) && HasPacketsInQueueTo(it->first) )
     	{
     		pagedStaExists = true;
-    		if (pagedStaExists) NS_LOG_DEBUG ("Paged STA exists, MAC: " << it->first);
+    		if (pagedStaExists) NS_LOG_DEBUG ("Paged STAs exist.");
     		break;
     	}
     }
@@ -963,7 +955,6 @@ ApWifiMac::SendOneBeacon (void)
         NumEncodedBlock = 0x1f & (8 * 4 - (m_pageslice.GetPageSliceCount() - 1) * m_pageslice.GetPageSliceLen());
          //As page bitmap of page slice element is fixed to 4 bytes for now, "m_pageslice.GetInformationFieldSize ()" is alwawys 8.
          //Section 9.4.2.193 oage slice element, Draft 802.11ah_D9.0
-        std::cout << "m_pageslice.GetPageBitmapLength()=" << (int)m_pageslice.GetPageBitmapLength() << ", m_pageslice.GetPageSliceCount()=" << (int)m_pageslice.GetPageSliceCount() << ", m_pageslice.GetPageSliceLen()=" << (int)m_pageslice.GetPageSliceLen() << std::endl;
         NS_LOG_DEBUG ("Last page slice has " << (int)NumEncodedBlock << " blocks.");
       }
     m_TIM.SetPageSliceNum (m_PageSliceNum); //from page slice
@@ -996,7 +987,9 @@ ApWifiMac::SendOneBeacon (void)
                 m_subblock++;
              }
           }
-        m_encodedBlock->SetEncodedInfo(--m_subblock, subblocklength);
+        for (uint32_t j = 0; j < subblocklength; j++)
+        	m_subblock--;
+        m_encodedBlock->SetEncodedInfo(m_subblock, subblocklength);
              
         m_blockoffset++; //actually block id
         NS_ASSERT (m_blockoffset <= m_pageslice.GetBlockOffset () + m_pageslice.GetInformationFieldSize () * 8);

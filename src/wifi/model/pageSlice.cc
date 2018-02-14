@@ -55,6 +55,7 @@ pageSlice::SetPageSliceControl (uint32_t count)
 void
 pageSlice::SetPageindex (uint8_t count)
 {
+  NS_ASSERT ((count & 0x03) < 4);
   m_Pageindex = count;
 }
 
@@ -112,7 +113,7 @@ pageSlice::SetPageBitmap (uint32_t control)
       m_PageBitmaparry[i] = (control >> i*8) & 0x000000ff ;
    }
  
-  m_PageSliceControl = (m_Pageindex & 0x3)  | ((m_PageSliceLen & 0x1f ) << 2 )| ( (m_PageSliceCount & 0x1f) << 7 )
+  m_PageSliceControl = this->GetPageindex()  | ((m_PageSliceLen & 0x1f ) << 2 )| ( (m_PageSliceCount & 0x1f) << 7 )
          | ((m_BlockOffset & 0x1f )<< 12 ) | ( (m_TIMOffset & 0x0f) << 17 );
   
   m_PageBitmap = m_PageBitmaparry;
@@ -225,7 +226,7 @@ pageSlice::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
   
   m_PageSliceControl = (uint32_t)m_PageSliceControl_l | (uint32_t)m_PageSliceControl_m << 8 | (uint32_t) m_PageSliceControl_h << 16;
 
-   m_Pageindex = m_PageSliceControl & 0x00000003;
+   this->SetPageindex (m_PageSliceControl & 0x00000003);
    m_PageSliceLen = (m_PageSliceControl >> 2) & 0x0000001f;
    m_PageSliceCount = (m_PageSliceControl >> 7) & 0x0000001f;
    m_BlockOffset = (m_PageSliceControl >> 12) & 0x0000001f;

@@ -218,7 +218,7 @@ private:
   bool Is(uint8_t blockbitmap, uint8_t j);
   void InsideBackoff (void);
   void RawSlotStartBackoff (void);
-
+  uint32_t GetSelfPageSliceNum (void);
 
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
@@ -280,7 +280,7 @@ private:
   uint8_t m_PageBitmapLen;
   uint8_t m_TIMSeq;  // 0 for DTIM ???
 
-  bool m_receivedDtim;
+  bool m_pagedInDtim;
 
 
   uint8_t m_selfBlock;

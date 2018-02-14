@@ -126,7 +126,7 @@ uint32_t ApStopTime = 0;
 std::map<uint16_t, float> traffic_sta;
 Ipv4InterfaceContainer staNodeInterface;
 
-/*int getStaAidFromAddress (Ipv4Address address)
+int getStaAidFromAddress (Ipv4Address address)
 {
 	int staAid = -1;
 	for (uint32_t i = 0; i < staNodeInterface.GetN(); i++){
@@ -136,13 +136,22 @@ Ipv4InterfaceContainer staNodeInterface;
 		}
 	}
 	return staAid;
-}*/
+}
+
+std::vector<uint32_t> clientSentList;
+std::vector<uint32_t> clientReceivedList;
+std::vector<uint32_t> serverReceivedList;
 uint32_t clientSent = 0;
-uint32_t clientReceived = 0;
 uint32_t serverReceived = 0;
+uint32_t clientReceived = 0;
 void udpPacketReceivedAtServer (Ptr<const Packet> packet, Address from)
 {
 	serverReceived++;
+	int id = getStaAidFromAddress(InetSocketAddress::ConvertFrom(from).GetIpv4());
+	if (id != -1)
+		serverReceivedList[--id]++;
+	else
+		std::cout << "Packet not included in final statistics. Node could not be determined from address" << std::endl;
 }
 
 void udpPacketSentByClient (Ptr<const Packet> packet)
@@ -399,18 +408,18 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+  /*LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
   LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-
+*/
   //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_ALL);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
-  double simulationTime = 10;
+  double simulationTime = 100;
   uint32_t seed = 1;
   uint32_t  payloadSize = 100;//256
-  uint32_t Nsta = 1;
+  uint32_t Nsta = 23;
   uint32_t NRawSta = Nsta;
-  uint32_t BeaconInterval = 102400;
+  uint32_t BeaconInterval = 100000;
   bool OutputPosition = true;
   string DataMode = "OfdmRate7_8MbpsBW2MHz";
   double datarate = 7.8;
@@ -444,7 +453,7 @@ int main (int argc, char *argv[])
 
 
   cmd.Parse (argc,argv);
-
+  serverReceivedList.assign(Nsta,0);
   RngSeedManager::SetSeed (seed);
 
   NodeContainer wifiStaNode;
@@ -600,6 +609,15 @@ int main (int argc, char *argv[])
       throughput = a * payloadSize * 8 / (simulationTime * 1000000.0);
       std::cout << "datarate" << "\t" << "throughput" << std::endl;
       std::cout << datarate << "\t" << throughput << " Mbit/s" << std::endl;
-    
+
+      std::cout << "total sent packets = " << clientSent << std::endl;
+      std::cout << "total received packets at AP = " << serverReceived << std::endl;
+      std::cout << "total succesfully echoed packets by AP = " << clientReceived << std::endl;
+
+    /*
+      for (int i=0; i< Nsta; i++){
+      std::cout << "[sta=" << i+1 << "] successfully sent packets = " << serverReceivedList[i] << std::endl;
+      std::cout << "[sta=" << i+1 << "] successfully received packets = " << clientReceivedList[i] << std::endl;
+      }*/
 return 0;
 }
