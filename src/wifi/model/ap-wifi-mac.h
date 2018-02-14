@@ -230,6 +230,8 @@ private:
   uint32_t GetSlotCrossBoundary (void) const;
   uint32_t GetSlotDurationCount (void) const;
   uint32_t GetSlotNum (void) const;
+
+  Time GetSlotStartTimeFromAid (uint16_t aid) const;
   void SetPageSlicingActivated (bool activate);
   bool GetPageSlicingActivated (void) const;
 
@@ -253,7 +255,6 @@ private:
   uint32_t m_slotNum;
   
   //TIM
-  uint8_t m_DTIMOffset; //!< DTIM Count
   uint8_t m_DTIMCount; //!< DTIM Count
   uint8_t m_DTIMPeriod; //!< DTIM Period
   uint8_t m_TrafficIndicator;
@@ -285,6 +286,8 @@ private:
   bool m_enableBeaconJitter;                 //!< Flag if the first beacon should be generated at random time
   std::string  m_outputpath;
   bool m_pageSlicingActivated;
+  Time m_lastBeaconTime;
+  static uint16_t RpsIndex;
 };
 
 } //namespace ns3

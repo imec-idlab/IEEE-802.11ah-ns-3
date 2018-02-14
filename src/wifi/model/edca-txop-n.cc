@@ -281,6 +281,7 @@ EdcaTxopN::EdcaTxopN ()
   m_baManager->SetMaxPacketDelay (m_queue->GetMaxDelay ());
   m_baManager->SetTxOkCallback (MakeCallback (&EdcaTxopN::BaTxOk, this));
   m_baManager->SetTxFailedCallback (MakeCallback (&EdcaTxopN::BaTxFailed, this));
+  m_rawDuration = Time::Max();
 }
 
 EdcaTxopN::~EdcaTxopN ()
@@ -488,6 +489,7 @@ void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+  Time remainingRawTime = m_rawDuration - (Simulator::Now() - m_rawStartedAt);
   if (!AccessIfRaw)
     {
         return;
@@ -523,21 +525,20 @@ EdcaTxopN::NotifyAccessGranted (void)
             {
               return;
             }
-          
+
           //temporary, should be removed when ps-poll is suported
-          Ptr<const Packet> PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
+          //Ptr<const Packet> PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
           
-          while (1)
-            {
-              PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);     
-              if (! m_sleepList.find(m_currentHdr.GetAddr1())->second || m_sleepList.size ()== 0) // "m_sleepList.size ()== 0" for non-ap stations
+          //while (1)
+           // {
+              if (!(! m_sleepList.find(m_currentHdr.GetAddr1())->second || m_sleepList.size ()== 0)) // "m_sleepList.size ()== 0" for non-ap stations
               // no sleep 
                 {
-                    goto Transmission;
+            	  return;
                 }
-             }
-          return;
-        Transmission:  
+
+             //}
+          // TODO implement restrictions regarding non-Cross slot boundary
           m_currentPacket = m_queue->DequeueFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
           NS_ASSERT (m_currentPacket != 0);
 
@@ -563,6 +564,12 @@ EdcaTxopN::NotifyAccessGranted (void)
       params.DisableRts ();
       params.DisableAck ();
       params.DisableNextData ();
+
+      /*Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
+      if (txDuration > remainingRawTime)
+      {
+
+      }*/
       m_low->StartTransmission (m_currentPacket,
                                 &m_currentHdr,
                                 params,
@@ -1024,10 +1031,10 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
 }
 
 void
-EdcaTxopN::RawStart (void)
+EdcaTxopN::RawStart (void) //(Time duration)
 {
   NS_LOG_FUNCTION (this);
-
+  //m_rawDuration = duration;
   int newdata=66;
   m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
 

@@ -385,7 +385,6 @@ StaWifiMac::S1gTIMReceived (S1gBeaconHeader beacon)
 		if (m_selfBlock < m_BlockOffset)
 		  {
 			// My block is not included in this Page Slice element
-			GoToSleepCurrentTIM (beacon); // schedule wakeup for next DTIM
       	    NS_LOG_DEBUG ("STA with AID = " << GetAID() << " belongs to a block " <<  (int)m_selfBlock << " which is not included in current page (" << (int)m_selfPage
       			  << ") because block offset in Page Slice element is " << (int)m_BlockOffset);
       	  	NS_LOG_DEBUG ("Scheduling sleep until the next DTIM beacon.");
@@ -471,15 +470,17 @@ StaWifiMac::S1gTIMReceived (S1gBeaconHeader beacon)
     //length =  m_TIM.GetInformationFieldSize ();
     NS_ASSERT (m_TIM.GetInformationFieldSize () >=5);
     //NS_ASSERT (m_TIM.GetInformationFieldSize () >= 2);
-    for (uint8_t i = 0; i <  m_TIM.GetInformationFieldSize () -3;) //exclude DTIM COUNT,DTIM period. bitmap control
+    uint8_t pos = 0;
+    do
         {
     		uint8_t blockind = ((*partialVBitmap) >> 3) & 0x1f;
-            partialVBitmap++;
-            uint8_t m_blockbitmap = *partialVBitmap;
-                
+    		std::cout << "STA block index = " << (int)blockind << std::endl;
+            partialVBitmap++; pos++;
+            uint8_t blockbitmap = *partialVBitmap;
+            std::cout << "STA block bitmap = " << (int)blockbitmap << std::endl;
             if (blockind == m_selfBlock) 
              {
-                if ( (m_blockbitmap & (1 << m_selfSubBlock)) == 0) //no packets in subblock
+                if ( (blockbitmap & (1 << m_selfSubBlock)) == 0) //no packets in subblock
                   {
                      //if not included in the page slice element, wake up for DTIM
                     GoToSleepCurrentTIM (beacon);
@@ -489,19 +490,21 @@ StaWifiMac::S1gTIMReceived (S1gBeaconHeader beacon)
                  {
                     for (uint8_t j=0; j <= m_selfSubBlock; j++)
                       {
-                        if ((m_blockbitmap & (1 << j)) == 1)
+                        if ((blockbitmap & (1 << j)) == 1)
                           {
-                        	partialVBitmap++;
+                        	partialVBitmap++; pos++;
                           }   
                       }
                     uint8_t subblockind = *partialVBitmap;
-                    if ((subblockind & (1 < m_selfAid) ) == 0) //no packet for me
+                    if ((subblockind & (1 << (m_selfAid & 0x0007)) ) == 0) //no packet for me
                      {
                         GoToSleepCurrentTIM (beacon);
                         return;
                      }
                     else // if has packet, set station to sleep after this beacon
                      {
+                    	NS_LOG_DEBUG ("[AID: " << this->GetAID() << "]" << "Downlink packet indicated for me.");
+                    	m_receivedDtim = false;
                         GoToSleepNextTIM (beacon);
                         return;
                      }
@@ -511,13 +514,13 @@ StaWifiMac::S1gTIMReceived (S1gBeaconHeader beacon)
              {
                 for (uint8_t k=0; k <= 7; k++)
                  {
-                    if ((m_blockbitmap & (1 << k)) == 1)
+                    if ((blockbitmap & (1 << k)) == 1)
                     {
-                    	partialVBitmap++;
+                    	partialVBitmap++; pos++;
                     }
                  }
              } 
-        }  
+        }  while (pos <  m_TIM.GetInformationFieldSize () - 3); //only partialVBitmap; exclude DTIM COUNT,DTIM period and bitmap control
     GoToSleepCurrentTIM (beacon);
 }
 
@@ -527,14 +530,17 @@ StaWifiMac::GoToSleepNextTIM (S1gBeaconHeader beacon) //to do, merge with GoToSl
    uint8_t BeaconNumForTIM;
    if (m_selfBlock < m_BlockOffset) //not included in the page slice element
      {
-        BeaconNumForTIM = m_DTIMPeriod - m_DTIMCount - 1;
+        BeaconNumForTIM = m_DTIMPeriod - m_DTIMCount -1;
      }
    else
     //if included in the page slice element, wake up for after last page slice, not sure that's the correct way.    
     {
        BeaconNumForTIM = m_PagePeriod - m_PageSliceNum -1 ;
     }
-  GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM)); 
+   //NS_LOG_DEBUG ("GoToSleepNextTIM wake after " << (int)BeaconNumForTIM << " BIs");
+   Time sleepTime = MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM);
+   Simulator::Schedule(MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval ()), &StaWifiMac::GoToSleep, this, sleepTime);
+   //GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM));
 }
 
 void
@@ -553,13 +559,27 @@ StaWifiMac::GoToSleepCurrentTIM (S1gBeaconHeader beacon)
   GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM)); 
 }
 
-    
+Time
+StaWifiMac::GetEarlyWakeTime (void) const
+{
+	NS_LOG_FUNCTION (this << 2500); //allow station to switch states
+	return MicroSeconds (2500);
+}
 
 void
 StaWifiMac::GoToSleep(Time  sleeptime) 
 {
-    if (!m_low->GetPhy()->IsStateSleep() && (sleeptime.GetMicroSeconds() != 0))
+	// beacon latency is 2.36ms and station needs to be in sync with AP so reduce sleeptime
+	if (sleeptime < GetEarlyWakeTime ())
+	{
+		NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " CANNOT SLEEP because sleeptime " << sleeptime.GetSeconds() << " s < EarlyWakeTime.");
+		return;
+	}
+		std::cout << "SLEEPTIME = " << sleeptime << std::endl;
+	sleeptime -= GetEarlyWakeTime ();
+    if (!m_low->GetPhy()->IsStateSleep() && (sleeptime.GetMicroSeconds() > 0))
       {
+    	NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetSeconds() << " s.");
         m_low->GetPhy()->SetSleepMode();
         Simulator::Schedule(sleeptime, &StaWifiMac::WakeUp, this);
       }
@@ -570,6 +590,7 @@ StaWifiMac::WakeUp (void)
 { 
     if (m_low->GetPhy()->IsStateSleep())
       {
+    	NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to AWAKE");
         m_low->GetPhy()->ResumeFromSleep();
       }
 }
@@ -581,7 +602,7 @@ StaWifiMac::IsInPagebitmap (uint8_t block)
     bool inPage;
     Ind = block/8;
     offset = block % 8;
-    inPage = m_PageBitmap[Ind] & (1 < offset);
+    inPage = m_PageBitmap[Ind] & (1 << offset);
     return inPage;
 }
 
@@ -1519,8 +1540,8 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
           if (assocResp.GetStatusCode ().IsSuccess ())
             {
               SetState (ASSOCIATED);
-              NS_LOG_DEBUG ("assoc completed");
               SetAID (assocResp.GetAID ());
+              NS_LOG_DEBUG ("[" << this->GetAddress() <<"] is associated and has AID = " << this->GetAID());
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
                 {

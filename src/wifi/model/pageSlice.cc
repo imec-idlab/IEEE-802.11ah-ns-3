@@ -116,8 +116,8 @@ pageSlice::SetPageBitmap (uint32_t control)
          | ((m_BlockOffset & 0x1f )<< 12 ) | ( (m_TIMOffset & 0x0f) << 17 );
   
   m_PageBitmap = m_PageBitmaparry;
-  printf("     ---pageSlice::SetPageBitmap -- m_PageBitmap = %x\n", *m_PageBitmap);
-  printf("     ---pageSlice::SetPageBitmap -- m_length = %d\n", m_length);
+  //printf("     ---pageSlice::SetPageBitmap -- m_PageBitmap = %x\n", *m_PageBitmap);
+  //printf("     ---pageSlice::SetPageBitmap -- m_length = %d\n", m_length);
 
 }
 

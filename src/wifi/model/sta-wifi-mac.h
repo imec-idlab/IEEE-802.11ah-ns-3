@@ -207,7 +207,7 @@ private:
   uint32_t GetAID (void) const;
   void SetRawDuration (Time interval);
   Time GetRawDuration (void) const;
-
+  Time GetEarlyWakeTime (void) const;
   void SendPspoll (void);
   void SendPspollIfnecessary (void);
   void S1gBeaconReceived (S1gBeaconHeader beacon);

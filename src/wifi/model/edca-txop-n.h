@@ -100,6 +100,10 @@ public:
   void DoDispose ();
     
     bool AccessIfRaw;
+
+    Time m_rawDuration;
+    Time m_rawStartedAt;
+
   /**
    * Set MacLow associated with this EdcaTxopN.
    *

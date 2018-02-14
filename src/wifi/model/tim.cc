@@ -201,6 +201,10 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
   m_encodeblock = block;
   uint8_t offset = m_encodeblock.GetBlockOffset ();
   uint8_t control = m_encodeblock.GetBlockControl ();
+  std::cout << "-------------------------------------------------------- " << std::endl;
+  std::cout << "Block offset = " << (int)offset << std::endl;
+  std::cout << "Block control = " << (int)control << std::endl;
+
 
   uint8_t offcont = ((offset << 3) & 0xf8) | (control & 0x07);
   m_partialVBitmap_arrary[m_length] = offcont;
@@ -208,22 +212,27 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
   
   m_partialVBitmap_arrary[m_length] = m_encodeblock.GetBlockBitmap ();
   m_length++;
+  std::cout << "Block Bitmap = " << (int)m_encodeblock.GetBlockBitmap () << std::endl;
 
   subblock = m_encodeblock.GetSubblock ();
   uint8_t len = m_encodeblock.GetSize ();  //size of EncodedBlock
   uint8_t i=0;
   while (i < len-2) //blockcotrol, blockoffset has already been added into m_partialVBitmap
   {
+	  std::cout << "Subblock " << (int)i << " = " << (int)subblock[i] << std::endl;
+
     m_partialVBitmap_arrary[m_length] = *subblock;
     m_length++;
     subblock++;
     i++;
   }
+  std::cout << "Total length of PVB = " << (int)m_length << std::endl;
   m_partialVBitmap = m_partialVBitmap_arrary;
   NS_ASSERT ( m_length < 252);
   //NS_ASSERT ( m_length > 0);
 }
-    
+
+
 uint8_t
 TIM::GetDTIMCount (void) const
 {
@@ -287,13 +296,11 @@ TIM::SerializeInformationField (Buffer::Iterator start) const
  start.WriteU8 (m_DTIMCount);
  start.WriteU8 (m_DTIMPeriod);
 
- if (m_BitmapControl)
+ if (m_BitmapControl || m_length != 0)
    {
      start.WriteU8 (m_BitmapControl);
      NS_LOG_DEBUG ("Bitmap Control field is " << m_BitmapControl);
    }
- else
-     NS_LOG_DEBUG ("Bitmap Control field contains all zeros and IS NOT ENCODED in TIM element.");
  start.Write (m_partialVBitmap, m_length);
 }
 
@@ -309,6 +316,7 @@ TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 	  start.Read (m_partialVBitmap_arrary, (length-3));
 	  m_length = length-3;
 	  m_partialVBitmap = m_partialVBitmap_arrary;
+
     }
   return length;
 }

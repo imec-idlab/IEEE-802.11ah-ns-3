@@ -49,7 +49,6 @@ public:
     SINGAL_AID = 1,
     // to do
   };
-    
   class EncodedBlock
    {
       public:
@@ -69,7 +68,7 @@ public:
         uint8_t GetSize (void) const;
         //void Serialize (Buffer::Iterator start) const;
         //uint8_t Deserialize (Buffer::Iterator start);
-      
+
       private:
         bool Is (uint8_t info, uint8_t n);
       
