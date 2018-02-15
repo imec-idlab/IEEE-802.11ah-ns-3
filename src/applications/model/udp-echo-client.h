@@ -24,6 +24,7 @@
 #include "ns3/ptr.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/traced-callback.h"
+#include "ns3/random-variable-stream.h"
 
 namespace ns3 {
 
@@ -183,6 +184,8 @@ private:
   TracedCallback<Ptr<const Packet> > m_txTrace;
 
   TracedCallback<Ptr<const Packet>, Address> m_packetReceived;
+  Time m_intervalDeviation; //!< Maximum +/- deviation from packet inter-send time
+  Ptr<UniformRandomVariable> m_rv;
 };
 
 } // namespace ns3

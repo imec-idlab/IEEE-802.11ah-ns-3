@@ -29,6 +29,8 @@
 #include "ns3/nstime.h"
 #include "ns3/object.h"
 #include "wifi-mac-header.h"
+#include "ns3/traced-callback.h"
+#include "drop-reason.h"
 
 namespace ns3 {
 class QosBlockedDestinations;
@@ -51,6 +53,9 @@ class QosBlockedDestinations;
 class WifiMacQueue : public Object
 {
 public:
+	  typedef void (* PacketDroppedCallback)
+	                  (Ptr<const Packet> packet, DropReason reason);
+
   static TypeId GetTypeId (void);
   WifiMacQueue ();
   ~WifiMacQueue ();
@@ -272,6 +277,8 @@ protected:
   uint32_t m_size;     //!< Current queue size
   uint32_t m_maxSize;  //!< Queue capacity
   Time m_maxDelay;     //!< Time to live for packets in the queue
+
+  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
 };
 
 } //namespace ns3

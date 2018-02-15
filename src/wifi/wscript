@@ -171,6 +171,7 @@ def build(bld):
         'model/s1g-raw-control.h',
         'model/s1g-capabilities.h',
         'model/authentication-control.h',
+        'model/drop-reason.h',
         'helper/s1g-wifi-mac-helper.h',
         'helper/ht-wifi-mac-helper.h',
         'helper/athstats-helper.h',

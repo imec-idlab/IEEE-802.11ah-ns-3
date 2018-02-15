@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 #include "ns3/log.h"
+#include "ns3/ipv4.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/nstime.h"
@@ -73,6 +74,11 @@ UdpEchoClient::GetTypeId (void)
 	.AddTraceSource ("Rx", "An echo packet is received",
 					 MakeTraceSourceAccessor (&UdpEchoClient::m_packetReceived),
 					 "ns3::UdpEchoClient::PacketReceivedCallback")
+	.AddAttribute ("IntervalDeviation",
+				   "The deviation from the interval to send the packets",
+					TimeValue (Seconds (0)),
+					 MakeTimeAccessor (&UdpEchoClient::m_intervalDeviation),
+					 MakeTimeChecker ())
   ;
   return tid;
 }
@@ -319,7 +325,10 @@ UdpEchoClient::Send (void)
 
   if (Ipv4Address::IsMatchingType (m_peerAddress))
     {
-      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << m_size << " bytes to " <<
+	  Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+	  std::stringstream myaddr;
+	  myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client=" << myaddr.str() << " sent " << m_size << " bytes to " <<
                    Ipv4Address::ConvertFrom (m_peerAddress) << " port " << m_peerPort);
     }
   else if (Ipv6Address::IsMatchingType (m_peerAddress))
@@ -330,7 +339,8 @@ UdpEchoClient::Send (void)
 
   if (m_sent < m_count) 
     {
-      ScheduleTransmit (m_interval);
+      double deviation = m_rv->GetValue(-m_intervalDeviation.GetMicroSeconds(), m_intervalDeviation.GetMicroSeconds());
+      ScheduleTransmit (m_interval + MicroSeconds(deviation));
     }
 }
 
@@ -345,7 +355,10 @@ UdpEchoClient::HandleRead (Ptr<Socket> socket)
 	  m_packetReceived (packet, from);
       if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client received " << packet->GetSize () << " bytes from " <<
+    	  Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+    	  std::stringstream myaddr;
+    	  myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client=" << myaddr.str() << " received " << packet->GetSize () << " bytes from " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }

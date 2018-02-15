@@ -218,7 +218,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
 
                   echoClient.SetAttribute ("Interval", TimeValue (Time (intervalsta)));
                   //myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
-                  randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000000));
+                  randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000));
                   ApplicationContainer clientApps = echoClient.Install (wifiStaNode.Get(it->first));
                   clientApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&udpPacketSentByClient));
                   clientApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtClient));
@@ -397,27 +397,36 @@ TIM configureTIM (TIM m_TIM)
     // 8 pages between two DTIM
     return m_TIM;
 }
-
-
+uint64_t numDropped(0);
+void packetDropped (string context, Ptr<const Packet> packet, DropReason reason)
+{
+	numDropped++;
+	std::cout << "drop reason=" << reason << std::endl;
+}
+uint64_t numCollisions(0);
+void onCollision (std::string context, uint32_t numBackoffSlots)
+{
+	// trace not tested, not sure if it works correctly
+	std::cout << "COLLISION SENSED" << std::endl;
+	numCollisions++;
+}
 
 int main (int argc, char *argv[])
 {
-  /*LogComponentEnable ("pageSlice", LOG_DEBUG);
-  LogComponentEnable ("ApWifiMac", LOG_FUNCTION);
-  LogComponentEnable ("StaWifiMac", LOG_FUNCTION);*/
+
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  /*LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-  LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
-*/
+  //LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+  //LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+
   //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_ALL);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
-  double simulationTime = 100;
+  double simulationTime = 200;
   uint32_t seed = 1;
-  uint32_t  payloadSize = 100;//256
-  uint32_t Nsta = 23;
+  uint32_t  payloadSize = 200;//256
+  uint32_t Nsta = 70;
   uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 100000;
   bool OutputPosition = true;
@@ -528,7 +537,10 @@ int main (int argc, char *argv[])
 
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxPacketNumber", UintegerValue(10));
   Config::Set ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxDelay", TimeValue (NanoSeconds (6000000000000)));
- 
+  Config::Connect ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/PacketDropped", MakeCallback (&packetDropped));
+  Config::Connect ("/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Collision", MakeCallback (&onCollision));
+
+
   // mobility.
   MobilityHelper mobility;
   mobility.SetPositionAllocator ("ns3::UniformDiscPositionAllocator",
@@ -571,6 +583,7 @@ int main (int argc, char *argv[])
       m_assocrecord->setstaid (kk);
       Config::Connect ("/NodeList/"+strSTA+"/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback (&assoc_record::SetAssoc, m_assocrecord));
       Config::Connect ("/NodeList/"+strSTA+"/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback (&assoc_record::UnsetAssoc, m_assocrecord));
+
       assoc_vector.push_back (m_assocrecord);
     }
 
@@ -613,6 +626,7 @@ int main (int argc, char *argv[])
       std::cout << "total sent packets = " << clientSent << std::endl;
       std::cout << "total received packets at AP = " << serverReceived << std::endl;
       std::cout << "total succesfully echoed packets by AP = " << clientReceived << std::endl;
+      std::cout << "dropped from wifi mac queue = " << numDropped << std::endl;
 
     /*
       for (int i=0; i< Nsta; i++){

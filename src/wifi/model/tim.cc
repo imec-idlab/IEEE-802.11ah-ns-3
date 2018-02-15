@@ -201,8 +201,6 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
   m_encodeblock = block;
   uint8_t offset = m_encodeblock.GetBlockOffset ();
   uint8_t control = m_encodeblock.GetBlockControl ();
-  std::cout << "-------------------------------------------------------- " << std::endl;
-
 
   uint8_t offcont = ((offset << 3) & 0xf8) | (control & 0x07);
   m_partialVBitmap_arrary[m_length] = offcont;
@@ -210,14 +208,14 @@ TIM::SetPartialVBitmap (TIM::EncodedBlock block)
   
   m_partialVBitmap_arrary[m_length] = m_encodeblock.GetBlockBitmap ();
   m_length++;
-  std::cout << "Block Bitmap = " << (int)m_encodeblock.GetBlockBitmap () << std::endl;
+  NS_LOG_DEBUG ("Block Bitmap = " << (int)m_encodeblock.GetBlockBitmap ());
 
   subblock = m_encodeblock.GetSubblock ();
   uint8_t len = m_encodeblock.GetSize ();  //size of EncodedBlock
   uint8_t i=0;
   while (i < len-2) //blockcotrol, blockoffset has already been added into m_partialVBitmap
   {
-	std::cout << "Subblock " << (int)i << " = " << (int)(*subblock) << std::endl;
+	NS_LOG_DEBUG ("Subblock " << (int)i << " = " << (int)(*subblock));
 
     m_partialVBitmap_arrary[m_length] = *subblock;
     m_length++;

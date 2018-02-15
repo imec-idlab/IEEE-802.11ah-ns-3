@@ -882,7 +882,9 @@ ApWifiMac::SendOneBeacon (void)
         beacon.SetpageSlice (m_pageslice);
       }
     else if (m_DTIMCount != 0 && GetPageSlicingActivated ())
+    {
     	NS_LOG_DEBUG ("***TIM" << (int)m_DTIMCount << "*** starts at " << Simulator::Now().GetSeconds() << " s");
+    }
     
       /*
       RPS m_rps;
@@ -917,17 +919,15 @@ ApWifiMac::SendOneBeacon (void)
     
     m_PageIndex = m_pageslice.GetPageindex();
     // m_TIM.SetPageIndex (m_PageIndex); 
-    bool pagedStaExists (false);
+    uint64_t numPagedStas (0);
     for (auto it = m_supportPageSlicingList.begin(); it != m_supportPageSlicingList.end(); ++it){
     	if (m_stationManager->IsAssociated (it->first) && HasPacketsInQueueTo(it->first) )
     	{
-    		pagedStaExists = true;
-    		if (pagedStaExists) NS_LOG_DEBUG ("Paged STAs exist.");
-    		break;
+    		numPagedStas++;
     	}
     }
-    
-	if (m_pageslice.GetPageSliceCount() == 0 && pagedStaExists)// special case
+    if (!m_DTIMCount && numPagedStas) NS_LOG_UNCOND ("Paged stations: " << (int)numPagedStas);
+	if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
 	{
 		if (m_pageslice.GetPageSliceLen() > 1)
 		{
@@ -1375,6 +1375,11 @@ ApWifiMac::DoInitialize (void)
           m_beaconEvent = Simulator::ScheduleNow (&ApWifiMac::SendOneBeacon, this);
         }
     }
+  m_edca.find(AC_VO)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+  m_edca.find(AC_VI)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+  m_edca.find(AC_BE)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+  m_edca.find(AC_BK)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+
   RegularWifiMac::DoInitialize ();
 }
 
