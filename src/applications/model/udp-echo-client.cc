@@ -91,6 +91,8 @@ UdpEchoClient::UdpEchoClient ()
   m_sendEvent = EventId ();
   m_data = 0;
   m_dataSize = 0;
+
+  m_rv = CreateObject<UniformRandomVariable> ();
 }
 
 UdpEchoClient::~UdpEchoClient()

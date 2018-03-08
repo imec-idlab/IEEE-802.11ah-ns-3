@@ -180,7 +180,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         serverApp.Start (Seconds (0));
 
         UdpEchoClientHelper echoClient (apNodeInterface.GetAddress (0), 9);
-         echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
+         echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
          echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
 
         /*UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
@@ -417,16 +417,16 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  //LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
-  //LogComponentEnable ("ApWifiMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("ApWifiMac", LOG_LEVEL_INFO);
 
-  //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_ALL);
+  LogComponentEnable ("EdcaTxopN", LOG_LEVEL_INFO);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
   double simulationTime = 200;
   uint32_t seed = 1;
   uint32_t  payloadSize = 200;//256
-  uint32_t Nsta = 70;
+  uint32_t Nsta = 2;
   uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 100000;
   bool OutputPosition = true;

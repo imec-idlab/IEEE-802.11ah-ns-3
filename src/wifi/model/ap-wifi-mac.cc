@@ -527,7 +527,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 		if (raw_start <= aid && aid <= raw_end) {
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
-			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW#" << (int)raw_index << " in slot " << statRawSlot);
+			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index << " in slot " << statRawSlot << ". RAW slot start time relative to the beacon = " << start.GetMilliSeconds() << " ms.");
 			return start;
 		}
 	}
