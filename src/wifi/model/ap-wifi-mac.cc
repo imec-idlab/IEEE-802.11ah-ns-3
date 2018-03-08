@@ -525,7 +525,6 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 		Time slotDuration = MicroSeconds(500 + slotDurationCount * 120);
 		lastRawDurationus += slotDuration * slotNum;
 
-		std::cout << (int)raw_start << "  " << (int)raw_end << std::endl;
 		if (raw_start <= aid && aid <= raw_end) {
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);

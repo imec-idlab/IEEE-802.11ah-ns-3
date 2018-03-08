@@ -173,9 +173,9 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         //Application start time
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
         //UDP flow
-        UdpEchoServerHelper myServer (9);
+        /*UdpEchoServerHelper myServer (9);
         //ApplicationContainer serverApp;
-        serverApp = myServer.Install (wifiApNode);
+        serverApp = myServer.Install (wifiStaNode.Get(0));
         serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
         serverApp.Start (Seconds (0));
 
@@ -183,7 +183,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
          echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
          echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
 
-        /*UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
+        UdpClientHelper myClient (apNodeInterface.GetAddress (0), 9); //address of remote node
         myClient.SetAttribute ("MaxPackets", UintegerValue (4294967295u));
         myClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));*/
 
@@ -216,6 +216,16 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                   intervalstr << (payloadLength*8)/(it->second * 1000000);
                   std::string intervalsta = intervalstr.str();
 
+                  UdpEchoServerHelper myServer (9);
+                          //ApplicationContainer serverApp;
+                          serverApp = myServer.Install (wifiStaNode.Get(it->first));
+                          serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
+                          serverApp.Start (Seconds (0));
+
+                          UdpEchoClientHelper echoClient (staNodeInterface.GetAddress (it->first), 9);
+                           echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+                           echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
+                  it++;
                   echoClient.SetAttribute ("Interval", TimeValue (Time (intervalsta)));
                   //myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
                   randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000));
@@ -426,7 +436,7 @@ int main (int argc, char *argv[])
   double simulationTime = 200;
   uint32_t seed = 1;
   uint32_t  payloadSize = 200;//256
-  uint32_t Nsta = 2;
+  uint32_t Nsta = 10;
   uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 100000;
   bool OutputPosition = true;
@@ -624,8 +634,8 @@ int main (int argc, char *argv[])
       std::cout << datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
       std::cout << "total sent packets = " << clientSent << std::endl;
-      std::cout << "total received packets at AP = " << serverReceived << std::endl;
-      std::cout << "total succesfully echoed packets by AP = " << clientReceived << std::endl;
+      std::cout << "total received packets at server = " << serverReceived << std::endl;
+      std::cout << "total succesfully echoed packets by server = " << clientReceived << std::endl;
       std::cout << "dropped from wifi mac queue = " << numDropped << std::endl;
 
     /*
