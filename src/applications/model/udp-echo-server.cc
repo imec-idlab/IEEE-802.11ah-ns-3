@@ -17,6 +17,7 @@
  */
 
 #include "ns3/log.h"
+#include "ns3/ipv4.h"
 #include "ns3/ipv4-address.h"
 #include "ns3/ipv6-address.h"
 #include "ns3/address-utils.h"
@@ -155,9 +156,12 @@ UdpEchoServer::HandleRead (Ptr<Socket> socket)
   while ((packet = socket->RecvFrom (from)))
     {
 	  m_packetReceived (packet, from);
-      if (InetSocketAddress::IsMatchingType (from))
+	  Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+	  std::stringstream myaddr;
+	  myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+	  if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packet->GetSize () << " bytes from " <<
+          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server=" << myaddr.str() << " received " << packet->GetSize () << " bytes from " <<
                        InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }
@@ -176,8 +180,8 @@ UdpEchoServer::HandleRead (Ptr<Socket> socket)
 
       if (InetSocketAddress::IsMatchingType (from))
         {
-          NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << packet->GetSize () << " bytes to " <<
-                       InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
+    	  NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server=" << myaddr.str() << " sent " << packet->GetSize () << " bytes to " <<
+    			  InetSocketAddress::ConvertFrom (from).GetIpv4 () << " port " <<
                        InetSocketAddress::ConvertFrom (from).GetPort ());
         }
       else if (Inet6SocketAddress::IsMatchingType (from))

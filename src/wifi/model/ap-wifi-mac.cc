@@ -434,11 +434,22 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
   hdr.SetDsFrom ();
   hdr.SetDsNotTo ();
 
-  uint16_t aid = 0;
+  int aid = 0;
   if (!to.IsBroadcast ())
   {
-	  while (m_AidToMacAddr.find(aid)->second != to) aid++; //TODO optimize search
-	  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: Data for [aid=" << aid << "]");
+	  /*for (auto it=m_AidToMacAddr.begin(); it != m_AidToMacAddr.end(); ++it){
+		  if (m_AidToMacAddr.find(aid)->second == to)
+			  break;
+		  else if (it == m_AidToMacAddr.end())
+			  aid = -1;
+	  }
+	  if (aid == -1)
+		  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP cannot forward down data because There is no RAW for this MAC address.");
+	  */
+	  do {aid++;}
+	  while (m_AidToMacAddr.find(aid)->second != to); //TODO optimize search
+
+	  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP to forward data for [aid=" << aid << "]");
 
 	  uint8_t block = (aid >> 6 ) & 0x001f;
 	  uint8_t page = (aid >> 11 ) & 0x0003;
@@ -454,6 +465,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  // deduce the offset from the last beacon until now
 	  wait -= Simulator::Now() - this->m_lastBeaconTime;
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
+
 	  wait += GetSlotStartTimeFromAid (aid);
 	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s scheduling transmission for [aid=" << aid << "] " << wait.GetMilliSeconds() << " ms from now.");
 	  /*
@@ -479,9 +491,14 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 Time
 ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 {
-	uint8_t * rawassign;
-	uint16_t raw_len;
-    if (RpsIndex < m_rpsset.rpsset.size())
+	uint8_t block = (aid >> 6 ) & 0x001f;
+	NS_ASSERT (block >= m_pageslice.GetBlockOffset());
+	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();
+	std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
+	uint8_t * rawassign = (*m_rpsset.rpsset.at(toTim)).GetRawAssignment();
+	uint16_t raw_len = (*m_rpsset.rpsset.at(toTim)).GetInformationFieldSize();
+
+	/*if (RpsIndex < m_rpsset.rpsset.size())
        {
     	  rawassign = (*m_rpsset.rpsset.at(RpsIndex)).GetRawAssignment();
     	  raw_len = (*m_rpsset.rpsset.at(RpsIndex)).GetInformationFieldSize();
@@ -490,7 +507,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
        {
     	  rawassign = (*m_rpsset.rpsset.at(0)).GetRawAssignment();
     	  raw_len = (*m_rpsset.rpsset.at(0)).GetInformationFieldSize();
-        }
+        }*/
 	uint16_t rawAssignment_len = 6;
 	if (raw_len % rawAssignment_len !=0)
 	{
@@ -524,7 +541,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 		}
 		Time slotDuration = MicroSeconds(500 + slotDurationCount * 120);
 		lastRawDurationus += slotDuration * slotNum;
-
+std::cout << "aidStart=" << (int)raw_start << ", aidEnd=" << raw_end << std::endl;
 		if (raw_start <= aid && aid <= raw_end) {
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
@@ -532,7 +549,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 			x=1;
 			return start;
 		}
-		else x=0;
+		//else x=0;
 	}
 	NS_ASSERT (x);
 }

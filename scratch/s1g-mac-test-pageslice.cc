@@ -225,7 +225,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
                    serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
                    serverApp.Start (Seconds (0));
                    UdpEchoClientHelper echoClient (staNodeInterface.GetAddress(it->first), 9);
-                   echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+                   echoClient.SetAttribute ("MaxPackets", UintegerValue (1));
                    echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
                    ++it;
 
@@ -433,18 +433,18 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("StaWifiMac", LOG_LEVEL_ALL);
+  LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
   LogComponentEnable ("ApWifiMac", LOG_LEVEL_INFO);
 
   LogComponentEnable ("EdcaTxopN", LOG_LEVEL_INFO);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
-  double simulationTime = 200;
+  double simulationTime = 20;
   uint32_t seed = 1;
   uint32_t  payloadSize = 200;//256
-  uint32_t Nsta = 10;
+  uint32_t Nsta = 2;
   uint32_t NRawSta = Nsta;
-  uint32_t BeaconInterval = 100000;
+  uint32_t BeaconInterval = 102400;
   bool OutputPosition = true;
   string DataMode = "OfdmRate7_8MbpsBW2MHz";
   double datarate = 7.8;

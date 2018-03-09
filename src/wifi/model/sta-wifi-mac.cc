@@ -562,16 +562,24 @@ namespace ns3
 		{
 			BeaconNumForTIM = m_PagePeriod - m_TIM.GetPageSliceNum();
 		}
-		GoToSleep(
-				MicroSeconds(
-						beacon.GetBeaconCompatibility().GetBeaconInterval()
-								* BeaconNumForTIM));
+		//std::cout << "BEACON NUM FOR TIM=" << (int)BeaconNumForTIM << std::endl;
+		//std::cout << "BEACON Interval=" << (int)beacon.GetBeaconCompatibility().GetBeaconInterval() << std::endl;
+		Time sleepTime = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval() * BeaconNumForTIM);
+		//std::cout << "At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleepCurrentTIM:" << sleepTime.GetMicroSeconds() << " FULL" << std::endl;
+
+		//reducing the sleep time fot the time elapsed since last beacon until now
+		sleepTime -= MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
+		//std::cout << sleepTime.GetMicroSeconds() << " DEDUCTED until my next beacon" << std::endl;
+
+		//Time timeUntilNextTim = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval()) - MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
+		//std::cout << "At " << MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval()) << " us OFFSET" << std::endl;
+		GoToSleep(sleepTime);
 	}
 
 	Time StaWifiMac::GetEarlyWakeTime(void) const
 	{
-		NS_LOG_FUNCTION(this << 2500); //allow station to switch states
-		return MicroSeconds(2500);
+		NS_LOG_FUNCTION(this << 0); //allow station to switch states 2500
+		return MicroSeconds(0);
 	}
 
 	void StaWifiMac::GoToSleep(Time sleeptime)
