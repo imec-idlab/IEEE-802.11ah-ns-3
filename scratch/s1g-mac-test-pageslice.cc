@@ -173,7 +173,7 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
         //Application start time
         Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
         //UDP flow
-        /*UdpEchoServerHelper myServer (9);
+        UdpEchoServerHelper myServer (9);/*
         //ApplicationContainer serverApp;
         serverApp = myServer.Install (wifiStaNode.Get(0));
         serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
@@ -208,46 +208,52 @@ void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode,
            else cout << "Unable to open traffic file \n";
 
           
-          double randomStart = 0.0;
-          
-          for (std::map<uint16_t,float>::iterator it=traffic_sta.begin(); it!=traffic_sta.end(); ++it)
-              {
-                  std::ostringstream intervalstr;
-                  intervalstr << (payloadLength*8)/(it->second * 1000000);
-                  std::string intervalsta = intervalstr.str();
+           double randomStart = 0.0;
+           // klijenti su parni aid-evi
+           //for (std::map<uint16_t,float>::iterator it=--traffic_sta.end(); it!=traffic_sta.begin(); --it)
+           for (std::map<uint16_t,float>::iterator it=traffic_sta.begin(); it!=traffic_sta.end(); ++it)
+               {
+                   std::ostringstream intervalstr;
+                   double interval = (payloadLength*8)/(it->second * 1000000);
+                   intervalstr << interval;
+                   std::string intervalsta = intervalstr.str();
+                   std::ostringstream intervaldeviationstr;
+                   intervaldeviationstr << (interval/10);
+                   std::string intervaldeviation = intervaldeviationstr.str();
 
-                  UdpEchoServerHelper myServer (9);
-                          //ApplicationContainer serverApp;
-                          serverApp = myServer.Install (wifiStaNode.Get(it->first));
-                          serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
-                          serverApp.Start (Seconds (0));
+                   serverApp = myServer.Install (wifiStaNode.Get(it->first));
+                   serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtServer));
+                   serverApp.Start (Seconds (0));
+                   UdpEchoClientHelper echoClient (staNodeInterface.GetAddress(it->first), 9);
+                   echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
+                   echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
+                   ++it;
 
-                          UdpEchoClientHelper echoClient (staNodeInterface.GetAddress (it->first), 9);
-                           echoClient.SetAttribute ("MaxPackets", UintegerValue (10));
-                           echoClient.SetAttribute ("PacketSize", UintegerValue (payloadLength));
-                  it++;
-                  echoClient.SetAttribute ("Interval", TimeValue (Time (intervalsta)));
-                  //myClient.SetAttribute ("Interval", TimeValue (Time (intervalsta))); //packets/s
-                  randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 1000));
-                  ApplicationContainer clientApps = echoClient.Install (wifiStaNode.Get(it->first));
-                  clientApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&udpPacketSentByClient));
-                  clientApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtClient));
+                   echoClient.SetAttribute ("Interval", TimeValue (Time (intervalsta)));
+                   echoClient.SetAttribute ("IntervalDeviation", TimeValue (Time (intervaldeviation))); //packets/s
+                   randomStart = m_rv->GetValue (0, (payloadLength*8)/(it->second * 10000));//1000000
+                   ApplicationContainer clientApps = echoClient.Install (wifiStaNode.Get(it->first));
+                   clientApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&udpPacketSentByClient));
+                   clientApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&udpPacketReceivedAtClient));
+                   //clientApps.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
+                   //clientApps.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnUdpEchoPacketReceived, nodes[it->first]));
 
-                  clientApps.Start (Seconds (1 + randomStart));
-                  clientApps.Stop (Seconds (simulationTime+1));
-                  /*ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
+                   clientApps.Start (Seconds (1 + randomStart));
+                   clientApps.Stop (Seconds (simulationTime+1));
+                   /*ApplicationContainer clientApp = myClient.Install (wifiStaNode.Get(it->first));
 
-                  clientApp.Start (Seconds (1 + randomStart));
-                  clientApp.Stop (Seconds (simulationTime+1)); //*/
-               }
-          
-              AppStartTime=Simulator::Now ().GetSeconds () + 1;
-              Simulator::Stop (Seconds (simulationTime+1));
-      }
-    else
-      {
-        Simulator::Schedule(Seconds(1.0), &CheckAssoc, Nsta, simulationTime, wifiApNode, wifiStaNode, apNodeInterface);
-      }
+                   clientApp.Start (Seconds (1 + randomStart));
+                   clientApp.Stop (Seconds (simulationTime+1)); //*/
+                }
+
+               AppStartTime=Simulator::Now ().GetSeconds () + 1;
+               Simulator::Stop (Seconds (simulationTime+1));
+       }
+     else
+       {
+         Simulator::Schedule(Seconds(1.0), &CheckAssoc, Nsta, simulationTime, wifiApNode, wifiStaNode, apNodeInterface);
+       }
+
 
 }
 
