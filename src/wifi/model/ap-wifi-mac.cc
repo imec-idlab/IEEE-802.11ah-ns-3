@@ -493,7 +493,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 {
 	uint8_t block = (aid >> 6 ) & 0x001f;
 	NS_ASSERT (block >= m_pageslice.GetBlockOffset());
-	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();
+	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();//TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
 	std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
 	uint8_t * rawassign = (*m_rpsset.rpsset.at(toTim)).GetRawAssignment();
 	uint16_t raw_len = (*m_rpsset.rpsset.at(toTim)).GetInformationFieldSize();
@@ -541,7 +541,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 		}
 		Time slotDuration = MicroSeconds(500 + slotDurationCount * 120);
 		lastRawDurationus += slotDuration * slotNum;
-std::cout << "aidStart=" << (int)raw_start << ", aidEnd=" << raw_end << std::endl;
+//std::cout << "aidStart=" << (int)raw_start << ", aidEnd=" << raw_end << std::endl;
 		if (raw_start <= aid && aid <= raw_end) {
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);

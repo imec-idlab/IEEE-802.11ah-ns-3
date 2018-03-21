@@ -386,17 +386,21 @@ A Page slice element only support one page
  
  When station wake up at that block, it check whether AP has data for itself. If has, keep awake to receive packets and go to sleep in the next beacon.
  */
+uint32_t pagePeriod;  	 //  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+uint8_t pageIndex = 0;
+uint32_t pageSliceLength; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
+uint32_t pageSliceCount;  //  Number of TIMs in a single page period (1-31)
+uint8_t blockOffset = 0; //  The 1st page slice starts with the block with blockOffset number
+uint8_t timOffset = 0;   //  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
 pageSlice configurePageSlice (pageSlice m_page)
 {
-    m_page.SetPageindex (0);
-    
-    m_page.SetPagePeriod (4); //2 TIM groups between DTIMs
-    
-    m_page.SetPageSliceLen (7); //each TIM group has 1 block (2 blocks in 2 TIM groups)
-    m_page.SetPageSliceCount (4); //
-    m_page.SetBlockOffset (0); //
-    m_page.SetTIMOffset (0);
-    
+    m_page.SetPageindex (pageIndex);
+    m_page.SetPagePeriod (pagePeriod); //2 TIM groups between DTIMs
+    m_page.SetPageSliceLen (pageSliceLength); //each TIM group has 1 block (2 blocks in 2 TIM groups)
+    m_page.SetPageSliceCount (pageSliceCount);
+    m_page.SetBlockOffset (blockOffset);
+    m_page.SetTIMOffset (timOffset);
+    std::cout << "pageIndex=" << (int)pageIndex << ", pagePeriod=" << (int)pagePeriod << ", pageSliceLength=" << (int)pageSliceLength << ", pageSliceCount=" << (int)pageSliceCount << ", blockOffset=" << (int)blockOffset << ", timOffset=" << (int)timOffset << std::endl;
     return m_page;
     // page 0
     // 8 TIM(page slice) for one page
@@ -407,9 +411,10 @@ pageSlice configurePageSlice (pageSlice m_page)
 
 TIM configureTIM (TIM m_TIM)
 {
-    m_TIM.SetPageIndex (0);
-    
-    m_TIM.SetDTIMPeriod (4);
+    m_TIM.SetPageIndex (pageIndex);
+    m_TIM.SetDTIMPeriod (pageSliceCount); // not necessarily the same
+
+    std::cout << "DTIM period=" << (int)pagePeriod << std::endl;
     // 8 pages between two DTIM
     return m_TIM;
 }
@@ -433,16 +438,16 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
-  LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
+  //LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
   LogComponentEnable ("ApWifiMac", LOG_LEVEL_INFO);
 
-  LogComponentEnable ("EdcaTxopN", LOG_LEVEL_INFO);
+  //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_INFO);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
   double simulationTime = 20;
   uint32_t seed = 1;
   uint32_t  payloadSize = 200;//256
-  uint32_t Nsta = 2;
+  uint32_t Nsta = 14;
   uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 102400;
   bool OutputPosition = true;
@@ -475,7 +480,12 @@ int main (int argc, char *argv[])
   cmd.AddValue ("TrafficPath", "files path of traffic file", TrafficPath);
   cmd.AddValue ("S1g1MfieldEnabled", "S1g1MfieldEnabled", S1g1MfieldEnabled);
   cmd.AddValue ("RAWConfigFile", "RAW Config file Path", RAWConfigFile);
-
+  cmd.AddValue ("pagePeriod", "Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page", pagePeriod);
+  cmd.AddValue ("pageIndex", "Index of the starting page, default is 0.", pageIndex);
+  cmd.AddValue ("pageSliceLength", "Number of blocks in each TIM for the associated page except for the last TIM (1-31)", pageSliceLength);
+  cmd.AddValue ("pageSliceCount", "Number of TIMs in a single page period (1-31)", pageSliceCount);
+  cmd.AddValue ("blockOffset", "The 1st page slice starts with the block with blockOffset number.", blockOffset);
+  cmd.AddValue ("timOffset", "Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page.", timOffset);
 
   cmd.Parse (argc,argv);
   serverReceivedList.assign(Nsta,0);
