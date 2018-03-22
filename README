@@ -57,3 +57,22 @@ Notes:
 * seed:               Seed of RandomVariableStream.
 * TrafficPath:        Include traffic of each stations, packet sending interval can be automatically calcualted based on payloadSize. The above TrafficPath "./OptimalRawGroup/traffic/data-32-0.82.txt" contains traffic of 32 stations, and the total traffic is 0.82 Mbps.
 * S1g1MfieldEnabled:     Packet using 1 Mhz bandwidth if set to "true".
+
+
+### TIM and page slice parameters ###
+* pagePeriod:       Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+* pageIndex:        Index of the page (0-3) whose slices are served during beacon intervals within a page period, default value is 0
+* pageSliceLength:  Number of blocks in each TIM for the associated page except for the last TIM (1-31)
+* pageSliceCount:   Number of TIMs in a single page period (0-31), value 0 has special meaning
+* blockOffset:      The 1st page slice starts with the block with blockOffset number, default value is 0
+* timOffset:        Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page, default value is 0
+
+    Example run: ./waf --run "s1g-mac-test-pageslice --pagePeriod=4 --pageSliceLength=8 --pageSliceCount=4"
+                 --pagePeriod=4: every 4th beacon is DTIM beacon that carries Page Slice element for pageIndex=0
+                 --pageSliceLength=8: each page slice cosists of 8 blocks, meaning that each page slice (PS) accomodates up to 512 stations (8 blocks * 8 subblocks * 8 stations)
+                                      (TIM0: 1-512, TIM1: 513-1024, TIM2: 1025-1536, TIM3: 1537-2048)
+                                      The last page slice can have different length.
+                 --pageSliceCount=4: 4 TIMs are scheduled in one page period.
+    
+    Note: RAW configuration must be in line with TIM and page configuration. If a RAW group is reserved for a station in beacon interval that does not correspond to its TIM, station will be asleep during that RAW.
+
