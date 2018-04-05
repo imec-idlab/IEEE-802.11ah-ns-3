@@ -3,6 +3,7 @@
 
 #include "ns3/core-module.h"
 #include "ns3/drop-reason.h"
+#include <numeric>
 
 using namespace std;
 using namespace ns3;

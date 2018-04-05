@@ -41,8 +41,8 @@
 
 #include "extension-headers.h"
 
-#undef NS_LOG_APPEND_CONTEXT
-#define NS_LOG_APPEND_CONTEXT std::clog << "[mac=" << m_self << "] "
+//#undef NS_LOG_APPEND_CONTEXT
+//#define NS_LOG_APPEND_CONTEXT std::clog << "[mac=" << m_self << "] "
 
 
 namespace ns3 {
@@ -312,39 +312,53 @@ public:
    * Create a PhyMacLowListener for the given MacLow.
    *
    * \param macLow
-   */
+   */      
+    Mac48Address listeneraddress;
   PhyMacLowListener (ns3::MacLow *macLow)
     : m_macLow (macLow)
   {
   }
-  virtual ~PhyMacLowListener ()
-  {
-  }
   virtual void NotifyRxStart (Time duration)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state RX," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state RX," << Simulator::Now().GetSeconds());
   }
   virtual void NotifyRxEndOk (void)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state RXENDOK," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state RXENDOK," << Simulator::Now().GetSeconds());
   }
   virtual void NotifyRxEndError (void)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state RXERROR," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state RXERROR," << Simulator::Now().GetSeconds());
   }
   virtual void NotifyTxStart (Time duration, double txPowerDbm)
   {
+     NS_LOG_DEBUG (listeneraddress << ",state TX," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND (listeneraddress << ",state TX," << Simulator::Now().GetSeconds());
   }
   virtual void NotifyMaybeCcaBusyStart (Time duration)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state CCAABUSY," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state CCAABUSY," << Simulator::Now().GetSeconds());
   }
   virtual void NotifySwitchingStart (Time duration)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state SWITCHING," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state SWITCHING," << Simulator::Now().GetSeconds());
     m_macLow->NotifySwitchingStartNow (duration);
   }
   virtual void NotifySleep (void)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state SLEEP," << Simulator::Now().GetSeconds());
+      //NS_LOG_UNCOND(listeneraddress << ",state SLEEP," << Simulator::Now().GetSeconds());
     m_macLow->NotifySleepNow ();
   }
   virtual void NotifyWakeup (void)
   {
+      NS_LOG_DEBUG(listeneraddress << ",state WAKEUP," << Simulator::Now().GetSeconds());
+     // NS_LOG_UNCOND(listeneraddress << ",state WAKEUP," << Simulator::Now().GetSeconds());
   }
 private:
   ns3::MacLow *m_macLow;

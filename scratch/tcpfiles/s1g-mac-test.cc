@@ -26,6 +26,7 @@ uint32_t StaNum=0;
 //string traffic_filepath;
 //uint32_t payloadLength;
 NetDeviceContainer staDeviceCont;
+const int MaxSta = 8000;
 
 Configuration config;
 Statistics stats;
@@ -350,6 +351,7 @@ void onSTAAssociated(int i) {
 			configureTCPPingPongClients();
     	}
     	else if(config.trafficType == "tcpipcamera") {
+<<<<<<< HEAD
     		config.ipcameraMotionPercentage = 1;// = 1; //0.1
     		config.ipcameraMotionDuration = 10;// = 10; //60
     		config.ipcameraDataRate = 128;// = 128; //20
@@ -369,6 +371,27 @@ void onSTAAssociated(int i) {
     		config.firmwareCorruptionProbability = 0.01;
     		config.firmwareVersionCheckInterval = 1000;
 
+=======
+                        config.ipcameraMotionPercentage = 1;// = 1; //0.1
+                        config.ipcameraMotionDuration = 10;// = 10; //60
+                        config.ipcameraDataRate = 128;// = 128; //20
+                        config.MinRTO = 81920000;// 81920000; //819200
+                        config.TCPConnectionTimeout = 6000000;
+                        config.TCPSegmentSize = 3216;//  = 3216; //536
+                        config.TCPInitialSlowStartThreshold = 0xffff;
+                        config.TCPInitialCwnd = 1;
+			configureTCPIPCameraServer();
+			configureTCPIPCameraClients();
+		}
+    	else if(config.trafficType == "tcpfirmware") {
+            
+            config.firmwareSize = 1024 * 500;
+     		config.firmwareBlockSize = 1024;
+     		config.firmwareNewUpdateProbability = 0.01;
+     		config.firmwareCorruptionProbability = 0.01;
+     		config.firmwareVersionCheckInterval = 1000;
+ 
+>>>>>>> f99c30f782d98efadd2becc0a07dc4789d179fdf
 			configureTCPFirmwareServer();
 			configureTCPFirmwareClients();
 		}
@@ -413,7 +436,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 
         n->SetAssociatedCallback([ = ]{onSTAAssociated(i);});
         n->SetDeassociatedCallback([ = ]{onSTADeassociated(i);});
-
+        
         nodes.push_back(n);
         // hook up Associated and Deassociated events
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
@@ -974,6 +997,56 @@ void configureUDPEchoClients() {
 	}
 }
 
+
+Time timeTx;
+Time timeRx;
+Time timeIdle;
+Time timeSleep;
+
+//ns3::int64x64_t throughouputArray [MaxSta];
+Time timeIdleArray [MaxSta];
+Time timeRxArray [MaxSta];
+Time timeTxArray [MaxSta];
+Time timeSleepArray [MaxSta];
+double dist[MaxSta];
+
+//it prints the information regarding the state of the device
+void 
+PhyStateTrace (std::string context, Time start, Time duration, enum WifiPhy::State state)
+{   
+    /*Get the number of the node from the context*/
+    /*context = "/NodeList/"+strSTA+"/DeviceList/'*'/Phy/$ns3::YansWifiPhy/State/State"*/
+    unsigned first = context.find("t/");
+    unsigned last = context.find("/D");
+    string strNew = context.substr ((first+2),(last-first-2));
+    
+    int node = std::stoi(strNew);
+        
+    //start calculating energy after complete association
+    if  (GetAssocNum () == StaNum)
+    {
+        switch (state)
+        {
+            case WifiPhy::State::IDLE: //Idle
+                timeIdle = timeIdle + duration;
+                timeIdleArray[node] = timeIdleArray[node] + duration;
+                break;
+            case WifiPhy::State::RX: //Rx
+                timeRx = timeRx + duration;
+                timeRxArray[node] = timeRxArray[node] + duration;
+                break;
+            case WifiPhy::State::TX: //Tx
+                timeTx = timeTx + duration;
+                timeTxArray[node] = timeTxArray[node] + duration;
+                break;
+            case WifiPhy::State::SLEEP: //Sleep  
+                timeSleep = timeSleep + duration;
+                timeSleepArray[node] = timeSleepArray[node] + duration;
+                break;        
+        }
+    }
+}
+
 int main (int argc, char *argv[])
 {
   //LogComponentEnable ("UdpServer", LOG_INFO);
@@ -1188,9 +1261,20 @@ int main (int argc, char *argv[])
                nodes[i]->x = position.x;
                nodes[i]->y = position.y;
                std::cout << "Sta node#" << i << ", " << "position = " << position << std::endl;
+               dist[i] = mobility -> GetDistanceFrom (wifiApNode.Get (0)->GetObject<MobilityModel>());
                i++;
             }
           std::cout << "AP node, position = " << apposition << std::endl;
+        }
+    
+     /*Print of the state of the stations*/
+        for (uint32_t i=0; i< config.Nsta; i++)
+        {
+            std::ostringstream STA;
+            STA << i;
+            std::string strSTA = STA.str();
+
+            Config::Connect ("/NodeList/"+strSTA+"/DeviceList/*/Phy/$ns3::YansWifiPhy/State/State", MakeCallback(&PhyStateTrace));
         }
 
       eventManager.onStartHeader();
@@ -1202,16 +1286,26 @@ int main (int argc, char *argv[])
 
       for (uint32_t i = 0; i < config.Nsta; i++)
       	eventManager.onSTANodeCreated(*nodes[i]);
-
+          
       eventManager.onAPNodeCreated(apposition.x, apposition.y);
       eventManager.onStatisticsHeader();
 
       sendStatistics(true);
-
+      
       Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
       Simulator::Run ();
+<<<<<<< HEAD
 
 
+=======
+      Simulator::Destroy ();
+      
+      double throughput = 0;
+      //UDP
+      //uint32_t totalPacketsThrough = DynamicCast<UdpServer> (serverApp.Get (0))->GetReceived ();
+      //throughput = totalPacketsThrough * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+/*
+>>>>>>> f99c30f782d98efadd2becc0a07dc4789d179fdf
       // Visualizer throughput
       int pay=0, totalSuccessfulPackets=0, totalSentPackets=0;
       for (int i=0; i < config.Nsta; i++){
@@ -1234,5 +1328,38 @@ int main (int argc, char *argv[])
       cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       Simulator::Destroy ();
 
+<<<<<<< HEAD
+=======
+        //Energy consumption per station
+      timeRx = timeRx/config.Nsta;
+      timeIdle = timeIdle/config.Nsta;
+      timeTx = timeTx/config.Nsta;
+      timeSleep = timeSleep/config.Nsta;  
+      
+    
+        ofstream risultati;    
+        //string addressresults = Outputpath + "/moreinfo.txt";
+        string addressresults = config.OutputPath + "moreinfo.txt";
+        risultati.open (addressresults.c_str(), ios::out | ios::trunc); 
+
+        risultati << "Sta node#      distance        timerx      timeidle        timetx      timesleep      totenergy" << std::endl;           
+        int i = 0;
+        ns3::int64x64_t totenergycons = 0;
+        string spazio = "         ";
+        
+          while (i < config.Nsta)
+            {
+              totenergycons = (timeRxArray[i].GetSeconds() * 4.4) + (timeIdleArray[i].GetSeconds() * 4.4) + (timeTxArray[i].GetSeconds() * 7.2);
+               risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << spazio << timeIdleArray[i].GetSeconds() << spazio << timeTxArray[i].GetSeconds() << spazio << timeSleepArray[i].GetSeconds() << spazio << totenergycons << std::endl;
+               totenergycons = 0;
+               i++;
+            }
+
+          risultati.close();
+
+		//Le's throughput
+      std::cout << "datarate" << "\t" << "throughput" << std::endl;
+      std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
+>>>>>>> f99c30f782d98efadd2becc0a07dc4789d179fdf
       return 0;
 }

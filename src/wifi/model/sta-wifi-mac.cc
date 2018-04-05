@@ -153,6 +153,26 @@ StaWifiMac::StaWifiMac ()
   fastAssocThreshold = 0; // allow some station to associate at the begining
     Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
   assocVaule = m_rv->GetValue (0, 999);
+  
+  firstBeacon = true;
+  receivingBeacon = false;
+  timeDifferenceBeacon = 0;
+  timeBeacon = 0;
+  outsideraw = false;
+  stationrawslot = false;
+  waitingack = false;
+
+  //if (m_qosSupported)
+  
+      //m_edca->SetTxOkCallback(MakeCallback(StaWifiMac::SleepIfQueueIsEmpty), this);
+        m_edca.find (AC_VO)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
+        m_edca.find (AC_VI)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
+        m_edca.find (AC_BE)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
+        m_edca.find (AC_BK)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
+  
+  
+  //else
+  //    m_dca->SetTxOkCallback(MakeCallback(StaWifiMac::SleepIfQueueIsEmpty), this);
 
   //Let the lower layers know that we are acting as a non-AP STA in
   //an infrastructure BSS.
@@ -327,6 +347,9 @@ StaWifiMac::SendPspollIfnecessary (void)
 void
 StaWifiMac::S1gBeaconReceived (void)
 {
+    //NS_LOG_UNCOND ( GetAddress () << " WILL Wake Up for slot " << m_statSlotStart);
+    //in case station is receiving beacon, it does not go to sleep
+    receivingBeacon = false;
     if (m_outsideRawEvent.IsRunning ())
      {
         m_outsideRawEvent.Cancel ();          //avoid error when actual beacon interval become shorter, otherwise, AccessAllowedIfRaw will set again after raw starting
@@ -381,19 +404,45 @@ StaWifiMac::S1gBeaconReceived (void)
 
 void
 StaWifiMac::RawSlotStartBackoff (void)
-{
+{    
     if (m_insideBackoffEvent.IsRunning ())
      {
         m_insideBackoffEvent.Cancel ();
      } //a bug is fixed, prevent previous RAW from disabling current RAW.
+    Time os = Simulator::Now() + m_currentslotDuration;
+    //NS_LOG_UNCOND ( m_low->GetAddress () << " Inside backoff scheduled " << Simulator::Now() << m_currentslotDuration);
+    
     m_insideBackoffEvent = Simulator::Schedule(m_currentslotDuration, &StaWifiMac::InsideBackoff, this);
-    m_pspollDca->AccessAllowedIfRaw (true);
-    m_dca->AccessAllowedIfRaw (true);
-    m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
-    m_edca.find (AC_VI)->second->AccessAllowedIfRaw (true);
-    m_edca.find (AC_BE)->second->AccessAllowedIfRaw (true);
-    m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
-    StartRawbackoff();
+    //m_pspollDca->AccessAllowedIfRaw (true);
+    //m_dca->AccessAllowedIfRaw (true);
+    //m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
+    //m_edca.find (AC_VI)->second->AccessAllowedIfRaw (true);
+    //m_edca.find (AC_BE)->second->AccessAllowedIfRaw (true);
+    //m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
+    Simulator::Schedule(MicroSeconds(160), &StaWifiMac::RawSlotStartBackoffPostpone, this);
+
+    //during its slot, the station wakes up, checking if it has packets before
+    stationrawslot = true;
+    if(m_low->GetPhy()->IsStateSleep() && HasPacketsInQueue())
+    {
+       //NS_LOG_UNCOND ( m_low->GetAddress () << " Wake Up for my slot " << Simulator::Now().GetSeconds());
+       WakeUp();
+    }
+    //stationrawslot = true;
+    //StartRawbackoff();
+    Simulator::Schedule(MicroSeconds(160), &StaWifiMac::StartRawbackoff, this);
+}
+
+void
+StaWifiMac::RawSlotStartBackoffPostpone (void)
+{
+     m_pspollDca->AccessAllowedIfRaw (true);
+     m_dca->AccessAllowedIfRaw (true);
+     m_edca.find (AC_VO)->second->AccessAllowedIfRaw (true);
+     m_edca.find (AC_VI)->second->AccessAllowedIfRaw (true);
+     m_edca.find (AC_BE)->second->AccessAllowedIfRaw (true);
+     m_edca.find (AC_BK)->second->AccessAllowedIfRaw (true);
+
 }
 
 void
@@ -405,7 +454,10 @@ StaWifiMac::InsideBackoff (void)
    m_edca.find (AC_VI)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BE)->second->AccessAllowedIfRaw (false);
    m_edca.find (AC_BK)->second->AccessAllowedIfRaw (false);
-
+   //go to sleep at the end of raw slot
+   stationrawslot = false;
+   //NS_LOG_UNCOND ( m_low->GetAddress () << " Go to sleep at end of RAW slot " << Simulator::Now().GetSeconds());
+   GoToSleep(0);
 }
 
 
@@ -429,18 +481,27 @@ StaWifiMac::OutsideRawStartBackoff (void)
      {
        m_insideBackoffEvent.Cancel ();
      }
+   //stationrawslot = false;
+   outsideraw = true;
   /*Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_pspollDca);
   Simulator::ScheduleNow(&DcaTxop::OutsideRawStart, StaWifiMac::m_dca);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VO)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_VI)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BE)->second);
   Simulator::ScheduleNow(&EdcaTxopN::OutsideRawStart, StaWifiMac::m_edca.find (AC_BK)->second);*/
+  //wake up for shared slot
+   if(m_low->GetPhy()->IsStateSleep() && HasPacketsInQueue())
+    {
+      //NS_LOG_UNCOND ( m_low->GetAddress () << " Wake Up for slot outside raw " << Simulator::Now().GetSeconds());
+      WakeUp();
+    }
+  Simulator::Schedule(MicroSeconds(160), &StaWifiMac::RawSlotStartBackoffPostpone, this);
   StaWifiMac::m_pspollDca->OutsideRawStart ();
-  m_dca->OutsideRawStart ();
-  m_edca.find (AC_VO)->second->OutsideRawStart ();
-  m_edca.find (AC_VI)->second->OutsideRawStart ();
-  m_edca.find (AC_BE)->second->OutsideRawStart ();
-  m_edca.find (AC_BK)->second->OutsideRawStart ();
+  m_dca->OutsideRawStart();
+  m_edca.find (AC_VO)->second->OutsideRawStart();
+  m_edca.find (AC_VI)->second->OutsideRawStart();
+  m_edca.find (AC_BE)->second->OutsideRawStart();
+  m_edca.find (AC_BK)->second->OutsideRawStart();
   /*
   It seems Simulator::ScheduleNow take longer time to execuate than without schedule.
 
@@ -470,6 +531,133 @@ StaWifiMac::OutsideRawStartBackoff (void)
     EdcaTxopN::AccessAllowedIfRaw, +42302720123.0ns, 1, 00:00:00:00:00:14
     EdcaTxopN::OutsideRawStart, 00:00:00:00:00:14
   */
+}
+
+//before wake up, check if the station has packets, or continue sleeping
+void
+StaWifiMac::WakeUp (void)
+{
+    m_low->GetPhy()->ResumeFromSleep();
+}
+
+/*void
+StaWifiMac::GoToSleep (int value)
+{
+    if (IsAssociated() && !receivingBeacon)
+    {
+        if (value == 1)
+        {
+            //called finish raw slot, after receiving beacon 
+            if(!waitingack)
+            {
+                m_low->GetPhy()->SetSleepMode();
+                NS_LOG_UNCOND (m_low->GetAddress() << " sleepok, not waiting ack");
+            }        
+            else if (waitingack && (outsideraw || stationrawslot))
+            {
+                NS_LOG_UNCOND (m_low->GetAddress() << " no sleep, waiting ack and in my slot");
+            }
+            else 
+            {
+                NS_LOG_UNCOND (m_low->GetAddress() << " no sleep, waiting ack ");
+            }
+        }
+        else if (value == 0)
+        {
+            m_low->GetPhy()->SetSleepMode();
+            NS_LOG_UNCOND (m_low->GetAddress() << " goes to sleep after beacon");
+        }
+    }
+}*/
+
+void
+StaWifiMac::GoToSleep (int value)
+{
+     if (IsAssociated() && !receivingBeacon)
+     {
+        if ( value == 0)
+        {
+            //called finish raw slot, after receiving beacon also if it's not my slot
+            //if(!outsideraw && !stationrawslot && !waitingack)
+            if(!waitingack)
+            {
+                m_low->GetPhy()->SetSleepMode();
+                //NS_LOG_UNCOND (m_low->GetAddress() << " sleepok. not wating ack");
+            }
+            else if (waitingack && (outsideraw || stationrawslot))
+            {
+                //NS_LOG_UNCOND (m_low->GetAddress() << " no sleep, wating ack and my slot");
+            }
+            else
+            {
+                //NS_LOG_UNCOND (m_low->GetAddress() << " no sleep, wating ack..");
+            }
+        }
+        else if ( value == 1)
+         {
+             m_low->GetPhy()->SetSleepMode();
+            //NS_LOG_UNCOND (m_low->GetAddress() << " go to sleep after beacon received");
+         }
+     }
+ }
+
+void
+StaWifiMac::SleepIfQueueIsEmpty(bool value)
+{
+   waitingack = !value;
+   
+   if (IsAssociated() && !receivingBeacon)
+     {
+         if(!HasPacketsInQueue() && !waitingack)
+
+            {
+                m_low->GetPhy()->SetSleepMode();
+            }
+            
+         if(HasPacketsInQueue() && !waitingack && !outsideraw && !stationrawslot)
+
+            {
+                m_low->GetPhy()->SetSleepMode();
+            }
+            
+         //if (waitingack && !outsideraw && !stationrawslot)
+         if (!outsideraw && !stationrawslot)
+            {
+                m_low->GetPhy()->SetSleepMode();
+            }
+            
+         if (waitingack && (outsideraw || stationrawslot))
+
+            {
+                //WakeUp();
+                //NS_LOG_UNCOND (m_low->GetAddress() << " ack waiting and my slot, I’m awake");
+            }
+    }
+}
+
+
+bool StaWifiMac::HasPacketsInQueue() 
+{           
+    //NS_LOG_UNCOND ( GetAddress () << " Check packets in queue ");
+    //check also if ack received
+    return (m_edca.find(AC_VO)->second->GetEdcaQueue()->GetSize() > 0 || 
+            m_edca.find (AC_VI)->second->GetEdcaQueue()->GetSize() > 0 || 
+            m_edca.find (AC_BE)->second->GetEdcaQueue()->GetSize() > 0 ||
+            m_edca.find (AC_BK)->second->GetEdcaQueue()->GetSize() > 0);    
+}
+
+
+//actions to do when station wakes up for beacon
+void
+StaWifiMac::BeaconWakeUp (void)
+{
+    //to be changed when finish shared slot is different to beginning raw interval
+    //outsideraw = false;
+    receivingBeacon = true;
+    m_low->GetPhy()->ResumeFromSleep();
+    m_beaconWakeUpEvent = Simulator::Schedule (beaconInterval, &StaWifiMac::BeaconWakeUp, this);
+    //NS_LOG_UNCOND ( GetAddress () << ",Wake Up for beacon," << Simulator::Now().GetSeconds() << ",beacon interval," << beaconInterval.GetSeconds());
+    //NS_LOG_UNCOND ( GetAddress () << ",Wake Up for beacon," << Simulator::Now().GetSeconds());
 }
 
 void
@@ -799,8 +987,25 @@ StaWifiMac::IsWaitDisAssocTxOk (void) const
 
 void
 StaWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
-{
+{    
   NS_LOG_FUNCTION (this << packet << to);
+    
+    //in case a packet is added in the queue, it is check if the station should be awake in that slot
+    //in case of shared or own slot, the station wakes up
+    NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue," << Simulator::Now().GetSeconds() << "," << m_low->GetPhy()->IsStateSleep());
+    
+    //code RAW
+    if (m_low->GetPhy()->IsStateSleep() && stationrawslot)
+    {
+        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue sleep e mi sveglio," << Simulator::Now().GetSeconds());
+        WakeUp();
+    }
+    if (m_low->GetPhy()->IsStateSleep() && outsideraw)
+    {
+        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue sleep e mi sveglio," << Simulator::Now().GetSeconds());
+        WakeUp();
+    }
+    
   if (!IsAssociated ())
     {
       NotifyTxDrop (packet);
@@ -994,6 +1199,24 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
      }
     if (goodBeacon)
      {
+        timeDifferenceBeacon = Simulator::Now().GetMicroSeconds() - timeBeacon;        
+        timeBeacon = Simulator::Now().GetMicroSeconds();
+        if(firstBeacon)
+        {
+            beaconInterval = MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval ());
+            int64x64_t intervallo = static_cast<int64x64_t> (beaconInterval);
+            intervallo = intervallo / 10000000;
+            intervallo = (intervallo).GetHigh();
+            intervallo = intervallo * 1000;
+            //Time intervallobeacon = static_cast<Time> (intervallo*10000);
+            Time intervallobeacon = MicroSeconds (98920);
+            m_beaconWakeUpEvent = Simulator::Schedule (intervallobeacon, &StaWifiMac::BeaconWakeUp, this);
+            //m_beaconWakeUpEvent = Simulator::Schedule (Time(100000), &StaWifiMac::BeaconWakeUp, this);
+            firstBeacon = false;
+        }
+        //
+        NS_LOG_DEBUG (m_low->GetAddress() << ",beacon:," << Simulator::Now().GetSeconds());
+        
         UnsetInRAWgroup ();
         uint8_t * rawassign;
         rawassign = beacon.GetRPS().GetRawAssignment();
@@ -1064,6 +1287,12 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
            }
      }
     S1gBeaconReceived ();
+    waitingack = false;
+    outsideraw = false;
+    //set when the station has to wake up again (next beacon, own slot, shared slot)
+    //Simulator::Schedule((m_lastRawDurationus), &StaWifiMac::WakeUp, this);
+    GoToSleep(1);
+    
     return;
    }
   else if (hdr->IsProbeResp ())
