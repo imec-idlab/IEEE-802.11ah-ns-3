@@ -40,10 +40,10 @@ struct Configuration {
 	/*
 	 * Common configuration parameters
 	 * */
-	  double simulationTime = 20; //60
+	  double simulationTime = 100; //60
 	  uint32_t seed = 1;
-	  int NRawSta = 0;
-	  uint32_t Nsta = 0;
+	  int NRawSta = 3;
+	  uint32_t Nsta = 3;
 	  uint32_t BeaconInterval = 100000;
 
 	  double datarate = 7.8;
@@ -54,7 +54,7 @@ struct Configuration {
 
 
 
-	  string visualizerIP = "127.0.0.1"; // empty string if no visualization TODO
+	  string visualizerIP = "localhost"; // empty string if no visualization TODO
 	  int visualizerPort = 7707;
 	  double visualizerSamplingInterval = 1;
 
@@ -89,8 +89,8 @@ struct Configuration {
 	uint32_t NRawSlotNum=0;
 	uint32_t NGroup=0;
     
-    uint32_t tcpipcameraStart;
-    uint32_t tcpipcameraEnd;
+    //uint32_t tcpipcameraStart;
+    //uint32_t tcpipcameraEnd;
     uint32_t udpStart;
     uint32_t udpEnd;
  	/*

@@ -272,7 +272,7 @@ RPSVector configureRAW (RPSVector rpslist, string RAWConfigFile)
         myfile.close();
         config.NRawSta = rpslist.rpsset[rpslist.rpsset.size()-1]->GetRawAssigmentObj(NRAWPERBEACON-1).GetRawGroupAIDEnd();
     }
-    else cout << "Unable to open file \n";
+    else cout << "Unable to open RAW configuration file \n";
 
     return rpslist;
 }
@@ -339,7 +339,7 @@ void onSTAAssociated(int i) {
     	if(config.trafficType == "udp") {
     		configureUDPServer();
     		configureUDPClients();
-
+    		/*
     		config.trafficType = "tcpipcamera";
     		config.ipcameraMotionPercentage = 0.5;// = 1; //0.1
     		config.ipcameraMotionDuration = 2;// = 10; //60
@@ -353,6 +353,7 @@ void onSTAAssociated(int i) {
     		configureTCPIPCameraServer();
     		configureTCPIPCameraClients();
     		config.trafficType = "udp";
+    		*/
 
     	}
     	else if(config.trafficType == "udpecho") {
@@ -433,6 +434,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
         n->SetAssociatedCallback([ = ]{onSTAAssociated(i);});
         n->SetDeassociatedCallback([ = ]{onSTADeassociated(i);});
         
+
         nodes.push_back(n);
         // hook up Associated and Deassociated events
         Config::Connect("/NodeList/" + std::to_string(i) + "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback(&NodeEntry::SetAssociation, n));
@@ -771,7 +773,7 @@ void configureTCPIPCameraClients() {
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
-	for (uint16_t i = config.tcpipcameraStart; i <= config.tcpipcameraEnd; i++) {
+	for (uint16_t i = 0; i < config.Nsta; i++) {
 
 		Ptr<Application> tcpClient = factory.Create<TCPIPCameraClient>();
 		wifiStaNode.Get(i)->AddApplication(tcpClient);
@@ -942,7 +944,7 @@ void configureUDPClients() {
 	                 {
 	                  uint16_t sta_id;
 	                  float  sta_traffic;
-	                  for (uint16_t kk=config.udpStart; kk<= config.udpEnd; kk++)
+	                  for (uint16_t kk=0; kk< config.Nsta; kk++)
 	                    {
 	                      trafficfile >> sta_id;
 	                      trafficfile >> sta_traffic;
@@ -951,7 +953,7 @@ void configureUDPClients() {
 	                    }
 	                  trafficfile.close();
 	                }
-	           else cout << "Unable to open file \n";
+	           else cout << "Unable to open traffic file \n";
 
 	          double randomStart = 0.0;
 	          for (std::map<uint16_t,float>::iterator it=traffic_sta.begin(); it!=traffic_sta.end(); ++it)
@@ -1149,7 +1151,7 @@ int main (int argc, char *argv[])
     
     string DataModeCamera = "OfdmRate650KbpsBW2MHz";
     StringValue aa=StringValue(DataModeCamera);
-    for (uint16_t k=config.udpStart; k <= config.udpEnd; k++)
+    for (uint16_t k=0; k < config.Nsta; k++)
     {
         std::ostringstream APSTA;
         APSTA << k;
@@ -1188,7 +1190,7 @@ int main (int argc, char *argv[])
   mobilityAp.Install(wifiApNode);
     
     
-    
+  /*
     
      MobilityHelper mobilityApCamera;
      Ptr<ListPositionAllocator> positionAllocAp = CreateObject<ListPositionAllocator> ();
@@ -1222,7 +1224,7 @@ int main (int argc, char *argv[])
      angle += deltaAngle;
      }
 
-
+*/
 
    /* Internet stack*/
   InternetStackHelper stack;
@@ -1377,14 +1379,14 @@ int main (int argc, char *argv[])
           std::cout << config.datarate << "\t" << throughput << " Mbit/s" << std::endl;
 
       } */
-    
+    /*
     for (uint16_t kk=config.tcpipcameraStart; kk<= config.tcpipcameraEnd; kk++)
     {
         uint32_t Receiverate;
         Receiverate = stats.get(kk).getIPCameraAPReceivingRate();
         std::cout << "sta " << kk << ", Receiverate " << Receiverate << " Kbit/s" << std::endl;
         
-    }
+    }*/
       cout << "total packet loss " << 100 - 100. * totalSuccessfulPackets/totalSentPackets<<  endl;
       Simulator::Destroy ();
 

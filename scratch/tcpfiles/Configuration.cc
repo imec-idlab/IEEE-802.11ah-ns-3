@@ -29,8 +29,8 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
     cmd.AddValue("NGroup", "number of RAW groups", NGroup);
     cmd.AddValue("NRawSlotNum", "number of slots per RAW", NRawSlotNum);
-    cmd.AddValue("tcpipcameraStart", "start aid using tcpipcamera", tcpipcameraStart);
-    cmd.AddValue("tcpipcameraEnd", "end aid using tcpipcamera", tcpipcameraEnd);
+    //cmd.AddValue("tcpipcameraStart", "start aid using tcpipcamera", tcpipcameraStart);
+    //cmd.AddValue("tcpipcameraEnd", "end aid using tcpipcamera", tcpipcameraEnd);
     cmd.AddValue("udpStart", "start aid using udp", udpStart);
     cmd.AddValue("udpEnd", "end aid using udp", udpEnd);
 
