@@ -32,7 +32,7 @@ struct Configuration {
 
   	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
   	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
-  
+
 	  //vector<uint16_t> nRawGroupsPerRpsList;
 	//uint32_t nTotalRps;					// Total number of different RPS elements assigned to beacons
 	//uint32_t nRawGroups;				// Number of RAW groups within this RPS
