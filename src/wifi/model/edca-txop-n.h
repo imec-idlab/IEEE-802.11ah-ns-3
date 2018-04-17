@@ -108,10 +108,13 @@ public:
   void DoDispose ();
     
     bool AccessIfRaw;
-    Time rawDuration;
-    Time rawStartedAt;
+
     uint16_t nrOfTransmissionsDuringRaw = 0;
     bool m_crossSlotBoundaryAllowed;
+
+    Time m_rawDuration;
+    Time m_rawStartedAt;
+
   /**
    * Set MacLow associated with this EdcaTxopN.
    *
@@ -492,6 +495,7 @@ public:
   void OutsideRawStart (void);
   
   void SetaccessList (std::map<Mac48Address, bool> list);
+  void SetsleepList (std::map<Mac48Address, bool> list);
 
 
 private:
@@ -597,6 +601,7 @@ private:
   TracedCallback<uint32_t> m_collisionTrace;
   TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
 
+  std::map<Mac48Address, bool> m_sleepList;
 };
 
 } //namespace ns3

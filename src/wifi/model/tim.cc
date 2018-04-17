@@ -24,7 +24,8 @@
 
 namespace ns3 {
     
-/*
+	NS_LOG_COMPONENT_DEFINE ("TIM");
+
 TIM::EncodedBlock::EncodedBlock ()
 {
 }
@@ -47,24 +48,27 @@ TIM::EncodedBlock::SetBlockOffset (uint8_t offset)
 }
 
 void
+TIM::EncodedBlock::SetBlockBitmap (uint8_t encodedInfo)
+{
+  m_blockbitmap = encodedInfo;
+}
+
+void
 TIM::EncodedBlock::SetEncodedInfo (uint8_t * encodedInfo, uint8_t subblocklength)
 {
   //NS_ASSERT (1 <= subblocklength <= 8);
-  uint8_t * blockbitmap = encodedInfo;
   uint8_t i = 0;
   uint8_t len = 0;
-  uint8_t info = *blockbitmap;
   while (i <= 7)
   {
-    if (Is (info, i))
+    if (Is (m_blockbitmap, i))
       {
        len++;
       }
     i++;
   }
   NS_ASSERT (len == subblocklength);
-  blockbitmap++;
-  m_subblock = blockbitmap;
+  m_subblock = encodedInfo;
   subb_length = subblocklength;
 }
 
@@ -130,7 +134,7 @@ TIM::EncodedBlock::Deserialize (Buffer::Iterator start)
   start.Read (m_subblock, subb_length);
   return (subb_length + 2);
 }
-
+*/
 
 bool
 TIM::EncodedBlock::Is (uint8_t info, uint8_t n)
@@ -138,10 +142,10 @@ TIM::EncodedBlock::Is (uint8_t info, uint8_t n)
   uint8_t mask = 1 << n;
   return (info & mask) == mask;
 }
-*/
 
 TIM::TIM ()
 {
+  m_length = 0;
 }
 
 TIM::~TIM ()
@@ -160,46 +164,71 @@ TIM::SetDTIMPeriod (uint8_t count)
   m_DTIMPeriod = count;
 }
 
-//to be implemented, should divided into traffic indicator, page slice and page index
 void
 TIM::SetBitmapControl (uint8_t control)
 {
-  //to be implemented
+  this->SetTafficIndicator(control & 0x01);
+  this->SetPageSliceNum((control >> 1) & 0x1f);
+  this->SetPageIndex((control >> 6) & 0x03);
   m_BitmapControl = control;
 }
-    
-void
-TIM::SetPartialVBitmap (uint32_t val)
-{
-	this->m_partialVBitmap = val;
-	/*
-  m_encodeblock = block;
-  m_length = 0;
-  uint8_t offset = m_encodeblock.GetBlockOffset ();
-  uint8_t control = m_encodeblock.GetBlockBitmap ();
-  uint8_t offcont = ((offset << 3) & 0xf8) | ((control << 0) & 0x07);
-  m_partialVBitmap[m_length] = offcont;
-  m_length++;
-  m_partialVBitmap[m_length] = m_encodeblock.GetBlockBitmap ();
-  m_length++;
 
-  uint8_t * subblock = m_encodeblock.GetSubblock ();
+
+void 
+TIM::SetTafficIndicator (uint8_t control)
+{
+   NS_ASSERT (control <= 1);
+   m_TrafficIndicator = control;
+}
+
+void
+TIM::SetPageSliceNum (uint8_t control)
+{
+   NS_ASSERT (control <= 31);
+   m_PageSliceNum = control; 
+}
+
+void 
+TIM::SetPageIndex (uint8_t control)
+{
+   NS_ASSERT (control <= 3);
+   m_PageIndex = control;
+}
+  
+void
+TIM::SetPartialVBitmap (TIM::EncodedBlock block)
+{
+  m_encodeblock = block;
+  uint8_t offset = m_encodeblock.GetBlockOffset ();
+  uint8_t control = m_encodeblock.GetBlockControl ();
+
+  uint8_t offcont = ((offset << 3) & 0xf8) | (control & 0x07);
+  m_partialVBitmap_arrary[m_length] = offcont;
+  m_length++;
+  
+  m_partialVBitmap_arrary[m_length] = m_encodeblock.GetBlockBitmap ();
+  m_length++;
+  NS_LOG_DEBUG ("Block Bitmap = " << (int)m_encodeblock.GetBlockBitmap ());
+
+  subblock = m_encodeblock.GetSubblock ();
   uint8_t len = m_encodeblock.GetSize ();  //size of EncodedBlock
   uint8_t i=0;
   while (i < len-2) //blockcotrol, blockoffset has already been added into m_partialVBitmap
   {
-    m_partialVBitmap[m_length] = *subblock;
+	NS_LOG_DEBUG ("Subblock " << (int)i << " = " << (int)(*subblock));
+
+    m_partialVBitmap_arrary[m_length] = *subblock;
     m_length++;
     subblock++;
     i++;
   }
-  //NS_ASSERT ( 1 <= m_length <= 251);
-
-   */
+  m_partialVBitmap = m_partialVBitmap_arrary;
+  NS_ASSERT ( m_length < 252);
 }
-    
+
+
 uint8_t
-TIM::GetTIMCount (void) const
+TIM::GetDTIMCount (void) const
 {
   return m_DTIMCount;
 }
@@ -209,15 +238,32 @@ TIM::GetDTIMPeriod (void) const
 {
   return m_DTIMPeriod;
 }
-
+/*
 uint8_t
 TIM::GetBitmapControl (void) const
 {
   return m_BitmapControl;
+} */
+
+uint8_t
+TIM::GetTrafficIndicator  (void) const
+{
+    return m_TrafficIndicator; 
+}
+uint8_t
+TIM::GetPageSliceNum  (void) const
+{
+    return m_PageSliceNum; 
 }
 
-uint32_t
-TIM::GetPartialVBitmap(void) const
+uint8_t
+TIM::GetPageIndex(void) const
+{
+    return m_PageIndex;
+}
+
+uint8_t *
+TIM::GetPartialVBitmap (void) const
 {
   return m_partialVBitmap;
 }
@@ -231,43 +277,60 @@ TIM::ElementId () const
 uint8_t
 TIM::GetInformationFieldSize () const
 {
-  return (4 + 3);
+  if (!m_BitmapControl && !m_length)
+	return 2;
+  else
+    return (m_length + 3);
 }
 
 void
 TIM::SerializeInformationField (Buffer::Iterator start) const
 {
+ NS_LOG_FUNCTION (this);
  start.WriteU8 (m_DTIMCount);
  start.WriteU8 (m_DTIMPeriod);
- start.WriteU8 (m_BitmapControl);
- start.WriteU32(m_partialVBitmap);
+
+ if (m_BitmapControl || m_length != 0)
+   {
+     start.WriteU8 (m_BitmapControl);
+     NS_LOG_DEBUG ("Bitmap Control field is " << m_BitmapControl);
+   }
+ start.Write (m_partialVBitmap, m_length);
 }
 
 uint8_t
 TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 {
+  NS_LOG_FUNCTION (this << length);
   m_DTIMCount = start.ReadU8 ();
   m_DTIMPeriod = start.ReadU8 ();
-  m_BitmapControl = start.ReadU8 ();
-  m_partialVBitmap = start.ReadU32();
-  //start.Read (m_partialVBitmap, (length-3));
-//    m_length = length-3;
+  if (length > 2)
+    {
+	  SetBitmapControl (start.ReadU8 ());
+	  start.Read (m_partialVBitmap_arrary, (length-3));
+	  m_length = length-3;
+	  m_partialVBitmap = m_partialVBitmap_arrary;
+
+    }
   return length;
 }
 
-void 
-TIM::Print(std::ostream& os) const {
-    os << "DTIM Count: " << std::to_string(m_DTIMCount) << std::endl;
-    os << "DTIM Period: " << std::to_string(m_DTIMPeriod) << std::endl;
-    os << "Bitmap Control: " << std::to_string(m_BitmapControl) << std::endl;
-    
-    
-    os << "Partial VBitmap" << "):";
+ATTRIBUTE_HELPER_CPP (TIM);
 
-    os << std::endl;
-}
+   std::ostream &
+    operator << (std::ostream &os, const TIM &rpsv)
+    {
+        os <<  "|" ;
+        return os;
+    }
 
-//ATTRIBUTE_HELPER_CPP (TIM);
+
+    std::istream &
+    operator >> (std::istream &is, TIM &rpsv)
+    {
+        is >> rpsv.m_length;
+        return is;
+    }
 
 } //namespace ns3
 

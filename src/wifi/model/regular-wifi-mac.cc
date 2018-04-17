@@ -65,6 +65,7 @@ RegularWifiMac::RegularWifiMac ()
 
   m_dca->TraceConnect("TransmissionWillCrossRAWBoundary", "", MakeCallback(&RegularWifiMac::OnTransmissionWillCrossRAWBoundary, this));
 
+
   //Construct the EDCAFs. The ordering is important - highest
   //priority (Table 9-1 UP-to-AC mapping; IEEE 802.11-2012) must be created
   //first.
@@ -176,6 +177,7 @@ RegularWifiMac::SetupEdcaQueue (enum AcIndex ac)
   edca->SetAccessCategory (ac);
   edca->CompleteConfig ();
   m_edca.insert (std::make_pair (ac, edca));
+
   edca->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&RegularWifiMac::OnQueuePacketDropped, this));
   edca->TraceConnect("Collision", "", MakeCallback(&RegularWifiMac::OnCollision, this));
   edca->TraceConnect("TransmissionWillCrossRAWBoundary", "", MakeCallback(&RegularWifiMac::OnTransmissionWillCrossRAWBoundary, this));
@@ -772,10 +774,13 @@ RegularWifiMac::GetTypeId (void)
 					 "ns3::RegularWifiMac::PacketDroppedCallback")
 
 	.AddTraceSource("Collision", "Fired when a collision occurred",
-					 MakeTraceSourceAccessor(&RegularWifiMac::m_collisionTrace), "ns3::RegularWifiMac::CollisionCallback")
+					MakeTraceSourceAccessor(&RegularWifiMac::m_collisionTrace),
+					"ns3::RegularWifiMac::CollisionCallback")
+	.AddTraceSource("TransmissionWillCrossRAWBoundary",
+					"Fired when a transmission is held off because it won't fit inside the RAW slot",
+					 MakeTraceSourceAccessor(&RegularWifiMac::m_transmissionWillCrossRAWBoundary),
+					 "ns3::RegularWifiMac::TransmissionWillCrossRAWBoundaryCallback")
 
-	.AddTraceSource("TransmissionWillCrossRAWBoundary", "Fired when a transmission is held off because it won't fit inside the RAW slot",
-					 MakeTraceSourceAccessor(&RegularWifiMac::m_transmissionWillCrossRAWBoundary), "ns3::RegularWifiMac::TransmissionWillCrossRAWBoundaryCallback")
   ;
   return tid;
 }

@@ -29,6 +29,8 @@
 #include "supported-rates.h"
 #include "ns3/random-variable-stream.h"
 #include "rps.h"
+#include "tim.h"
+#include "pageSlice.h"
 #include "s1g-raw-control.h"
 #include "ns3/string.h"
 #include "extension-headers.h"
@@ -127,6 +129,16 @@ public:
    */
   int64_t AssignStreams (int64_t stream);
   void SetaccessList (std::map<Mac48Address, bool> list);
+
+  uint8_t GetDTIMPeriod (void) const;
+  void SetDTIMPeriod (uint8_t period);
+  bool HasPacketsInQueueTo(Mac48Address dest);
+  uint8_t HasPacketsToSubBlock (uint16_t subblockInd, uint16_t blockInd , uint16_t PageInd);
+  uint8_t HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd);
+  uint32_t HasPacketsToPage (uint8_t blockstart , uint8_t Page);
+
+
+
 
 private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);
@@ -236,8 +248,14 @@ private:
   uint32_t GetSlotCrossBoundary (void) const;
   uint32_t GetSlotDurationCount (void) const;
   uint32_t GetSlotNum (void) const;
-    
+
+  Time GetSlotStartTimeFromAid (uint16_t aid) const;
+  void SetPageSlicingActivated (bool activate);
+  bool GetPageSlicingActivated (void) const;
+
   RPSVector m_rpsset;
+  pageSlice m_pageslice;
+  TIM m_TIM;
   void SetTotalStaNum (uint32_t num);
   uint32_t GetTotalStaNum (void) const;
     
@@ -259,7 +277,23 @@ private:
   uint32_t m_SlotFormat;
   uint32_t m_slotCrossBoundary;
   uint32_t m_slotDurationCount;
-  uint32_t  m_slotNum;
+  uint32_t m_slotNum;
+  
+  //TIM
+  uint8_t m_DTIMCount; //!< DTIM Count
+  uint8_t m_DTIMPeriod; //!< DTIM Period
+  uint8_t m_TrafficIndicator;
+  uint8_t m_PageSliceNum;
+  uint8_t m_PageIndex;
+  //Encoded block subfield of TIM
+  uint8_t m_blockcontrol ;
+  uint8_t m_blockoffset;
+  uint8_t m_blockbitmap1 ;
+  //uint8_t m_subblock = 0 ;
+  uint8_t subblocklength ;
+  uint8_t m_blockbitmap_trail;
+  //Page slice
+  uint32_t m_pagebitmap;
     
   std::vector<uint16_t> m_sensorList; //stations allowed to transmit in last beacon
   std::vector<uint16_t> m_OffloadList;
@@ -267,6 +301,9 @@ private:
   std::map<uint16_t, Mac48Address> m_AidToMacAddr;
   std::map<Mac48Address, bool> m_accessList;
     
+  std::map<Mac48Address, bool> m_sleepList;
+  std::map<Mac48Address, bool> m_supportPageSlicingList;
+
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons
   Time m_beaconInterval;                     //!< Interval between beacons
@@ -275,6 +312,9 @@ private:
   Ptr<UniformRandomVariable> m_beaconJitter; //!< UniformRandomVariable used to randomize the time of the first beacon
   bool m_enableBeaconJitter;                 //!< Flag if the first beacon should be generated at random time
   std::string  m_outputpath;
+  bool m_pageSlicingActivated;
+  Time m_lastBeaconTime;
+  static uint16_t RpsIndex;
 };
 
 } //namespace ns3

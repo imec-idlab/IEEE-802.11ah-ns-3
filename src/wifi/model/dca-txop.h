@@ -31,6 +31,7 @@
 #include "ns3/wifi-mode.h"
 #include "ns3/wifi-remote-station-manager.h"
 #include "ns3/dcf.h"
+#include "ns3/wifi-mac-queue.h"
 
 namespace ns3 {
 

@@ -102,6 +102,7 @@ WifiMacQueue::Enqueue (Ptr<const Packet> packet, const WifiMacHeader &hdr)
   Cleanup ();
   if (m_size == m_maxSize)
     {
+	  std::cout << "DROPPING PACKET FROM WIFI MAC QUEUE " << std::endl;
 	  m_packetdropped(packet->Copy(), DropReason::MacQueueSizeExceeded);
       return;
     }
@@ -212,6 +213,24 @@ WifiMacQueue::PeekByTidAndAddress (WifiMacHeader *hdr, uint8_t tid,
                   return it->packet;
                 }
             }
+        }
+    }
+  return 0;
+}
+
+Ptr<const Packet>
+WifiMacQueue::PeekByAddress (WifiMacHeader::AddressType type, Mac48Address dest)
+{
+  Cleanup ();
+  if (!m_queue.empty ())
+    {
+      PacketQueueI it;
+      for (it = m_queue.begin (); it != m_queue.end (); ++it)
+        {
+              if (GetAddressForPacket (type, it) == dest)
+                {
+                  return it->packet;
+                }
         }
     }
   return 0;

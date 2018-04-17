@@ -53,6 +53,9 @@ class QosBlockedDestinations;
 class WifiMacQueue : public Object
 {
 public:
+	  typedef void (* PacketDroppedCallback)
+	                  (Ptr<const Packet> packet, DropReason reason);
+
   static TypeId GetTypeId (void);
   WifiMacQueue ();
   ~WifiMacQueue ();
@@ -148,6 +151,7 @@ public:
    *
    * \return packet
    */
+  Ptr<const Packet> PeekByAddress (WifiMacHeader::AddressType type, Mac48Address dest);
   Ptr<const Packet> PeekByTidAndAddress (WifiMacHeader *hdr,
                                          uint8_t tid,
                                          WifiMacHeader::AddressType type,
@@ -281,6 +285,8 @@ protected:
   uint32_t m_size;     //!< Current queue size
   uint32_t m_maxSize;  //!< Queue capacity
   Time m_maxDelay;     //!< Time to live for packets in the queue
+
+  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
 };
 
 } //namespace ns3

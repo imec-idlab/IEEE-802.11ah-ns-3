@@ -30,6 +30,7 @@
 #include "amsdu-subframe-header.h"
 #include "s1g-capabilities.h"
 #include "ns3/traced-value.h"
+#include "extension-headers.h"
 
 namespace ns3  {
 
@@ -96,10 +97,14 @@ public:
     void SetStaType (uint32_t statype);
     void SendDisAssociationRequest (void);
     void SendAssociationRequest (void);
+
   /**
    * Get Station AID.
    */
   uint32_t GetAID (void) const;
+
+    /*void SetPageSlicingSupported (uint8_t support);
+    uint8_t GetPageSlicingSupported (void) const;*/
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;
@@ -214,17 +219,19 @@ private:
 
   void SetRawDuration (Time interval);
   Time GetRawDuration (void) const;
-
+  Time GetEarlyWakeTime (void) const;
   void SendPspoll (void);
   void SendPspollIfnecessary (void);
-  void S1gBeaconReceived (void);
+  void S1gBeaconReceived (S1gBeaconHeader beacon);
+  void S1gTIMReceived (S1gBeaconHeader beacon);
+
   void StartRawbackoff (void);
   void OutsideRawStartBackoff (void);
   bool Is(uint8_t blockbitmap, uint8_t j);
   void InsideBackoff (void);
   void RawSlotStartBackoff (void);  
   void RawSlotStartBackoffPostpone (void);
-
+  uint32_t GetSelfPageSliceNum (void);
 
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
@@ -241,6 +248,11 @@ private:
   void GoToSleep (int value);
 
   TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
+  bool IsInPagebitmap (uint8_t block);
+  
+  void GoToSleepNextTIM (S1gBeaconHeader beacon);
+  void GoToSleepCurrentTIM (S1gBeaconHeader beacon);
+  void GoToSleep(Time  sleeptime); 
 
   Time m_lastRawDurationus;
   Time m_lastRawStart;
@@ -280,6 +292,35 @@ private:
   bool m_activeProbing;
   Ptr<DcaTxop> m_pspollDca;  //!< Dedicated DcaTxop for beacons
   virtual void DoDispose (void);
+  
+  TIM m_TIM;
+  uint8_t m_DTIMCount; //!< DTIM Count
+  uint8_t m_DTIMPeriod; //!< DTIM Period
+  uint8_t m_TrafficIndicator;
+  uint8_t m_PageSliceNum;
+  uint8_t m_PageIndex;
+          
+  pageSlice m_pageSlice;   
+  uint8_t m_PagePeriod;
+  uint8_t m_Pageindex_slice; // page index from page slice element, different from page index in TIM element
+  uint8_t m_Pageindex;
+  uint8_t m_PageSliceLen;
+  uint8_t m_PageSliceCount;
+  uint8_t m_BlockOffset;
+  uint8_t m_TIMOffset;  
+  uint8_t m_PageBitmap[4];
+  uint8_t m_PageBitmapLen;
+  uint8_t m_TIMSeq;  // 0 for DTIM ???
+
+  bool m_pagedInDtim;
+
+
+  uint8_t m_selfBlock;
+  uint8_t m_selfPage;
+  uint8_t m_selfSubBlock;
+  uint8_t m_selfAid;
+  
+  uint8_t m_supportsPageSlicing;
 
   Time m_maxTimeInQueue;
   bool m_crossSlotBoundaryAllowed;

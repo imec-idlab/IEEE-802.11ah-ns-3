@@ -91,6 +91,12 @@ S1gBeaconHeader::SetRPS (RPS rps)
 {
   m_rps = rps;
 }
+
+void
+S1gBeaconHeader::SetpageSlice (pageSlice page)
+{
+  m_pageSlice = page;
+}
     
 void
 S1gBeaconHeader::SetAuthCtrl (AuthenticationCtrl auth)
@@ -146,6 +152,12 @@ S1gBeaconHeader::GetTIM (void) const
 {
   return m_tim;
 }
+
+pageSlice
+S1gBeaconHeader::GetpageSlice (void) const
+{
+  return m_pageSlice;
+}
     
 RPS
 S1gBeaconHeader::GetRPS (void) const
@@ -196,6 +208,8 @@ S1gBeaconHeader::GetSerializedSize (void) const
   size += m_beaconcompatibility.GetSerializedSize ();
   size += m_tim.GetSerializedSize ();
   size += m_rps.GetSerializedSize ();
+  if (!m_tim.GetDTIMCount())
+	  size += m_pageSlice.GetSerializedSize ();
   size += m_auth.GetSerializedSize ();
   
   return size;
@@ -219,6 +233,8 @@ S1gBeaconHeader::Serialize (Buffer::Iterator start) const
     i = m_beaconcompatibility.Serialize (i);
     i = m_tim.Serialize (i);
     i = m_rps.Serialize (i);
+    if (!m_tim.GetDTIMCount())
+    	i = m_pageSlice.Serialize (i);
     i = m_auth.Serialize (i);
 }
 
@@ -239,6 +255,8 @@ S1gBeaconHeader::Deserialize (Buffer::Iterator start)
     i = m_beaconcompatibility.Deserialize (i);
     i = m_tim.Deserialize (i);
     i = m_rps.Deserialize (i);
+    if (!m_tim.GetDTIMCount())
+    	i = m_pageSlice.Deserialize (i);
     i = m_auth.DeserializeIfPresent (i);
 
     return i.GetDistanceFrom (start);

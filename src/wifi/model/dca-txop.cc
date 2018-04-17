@@ -289,7 +289,7 @@ void
 DcaTxop::Queue (Ptr<const Packet> packet, const WifiMacHeader &hdr)
 {
   NS_LOG_FUNCTION (this << packet << &hdr);
-  //NS_LOG_UNCOND("DcaTxop::Queue " << Simulator::Now () << "\t" << m_low->GetAddress () << "\t" << packet->GetSize ());
+  NS_LOG_DEBUG("DcaTxop::Queue " << Simulator::Now () << "\t" << m_low->GetAddress () << "\t" << packet->GetSize ());
   WifiMacTrailer fcs;
   uint32_t fullPacketSize = hdr.GetSerializedSize () + packet->GetSize () + fcs.GetSerializedSize ();
   m_stationManager->PrepareForQueue (hdr.GetAddr1 (), &hdr,
@@ -334,7 +334,7 @@ DcaTxop::StartAccessIfNeeded (void)
       && !m_dcf->IsAccessRequested ()
       && AccessIfRaw)      // always TRUE outside RAW
     {
-      //NS_LOG_UNCOND("DcaTxop::StartAccessIfNeeded " << Simulator::Now () << "\t" << m_low->GetAddress ());
+      NS_LOG_DEBUG("DcaTxop::StartAccessIfNeeded " << Simulator::Now () << "\t" << m_low->GetAddress ());
       m_manager->RequestAccess (m_dcf);
     }
 }
@@ -502,12 +502,12 @@ DcaTxop::NotifyAccessGranted (void)
   Time remainingRawTime =  rawDuration -  (Simulator::Now() - rawStartedAt);
   if(DEBUG_TRACK_PACKETS) std::cout << "Access  granted (raw access: " << AccessIfRaw << ")" << std::endl;
 
-  //NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted " << Simulator::Now () << "\t" << m_low->GetAddress ());
+  NS_LOG_DEBUG("DcaTxop::NotifyAccessGranted " << Simulator::Now () << "\t" << m_low->GetAddress ());
   if (!AccessIfRaw) 
     {
         return;
     }
-  //NS_LOG_UNCOND("DcaTxop::NotifyAccessGranted--- " << Simulator::Now () << "\t" << m_low->GetAddress ());
+  NS_LOG_DEBUG("DcaTxop::NotifyAccessGranted--- " << Simulator::Now () << "\t" << m_low->GetAddress ());
   if (m_currentPacket == 0)
     {
       if (m_queue->IsEmpty ())
@@ -535,19 +535,19 @@ DcaTxop::NotifyAccessGranted (void)
       params.DisableAck ();
       params.DisableNextData ();
       if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-
+      /*
       Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
 
 	  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
 		  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 		  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 		  return;
-	  }
+	  }*/
       Low ()->StartTransmission (m_currentPacket,
                                  &m_currentHdr,
                                  params,
                                  m_transmissionListener);
-      nrOfTransmissionsDuringRaw++;
+      //nrOfTransmissionsDuringRaw++;
       NS_LOG_DEBUG ("tx broadcast");
     }
   else
@@ -577,16 +577,16 @@ DcaTxop::NotifyAccessGranted (void)
               params.EnableNextData (GetNextFragmentSize ());
             }
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-
+/*
           Time txDuration = Low()->CalculateTransmissionTime(fragment, &hdr, params);
 		  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
 			  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 			  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 			  return;
-		  }
+		  }*/
           Low ()->StartTransmission (fragment, &hdr, params,
                                      m_transmissionListener);
-          nrOfTransmissionsDuringRaw++;
+          //nrOfTransmissionsDuringRaw++;
         }
       else
         {
@@ -602,16 +602,16 @@ DcaTxop::NotifyAccessGranted (void)
             }
           params.DisableNextData ();
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-
+/*
           Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
           if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {
         	  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
         	  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
         	  return;
-          }
+          }*/
           Low ()->StartTransmission (m_currentPacket, &m_currentHdr,
                                      params, m_transmissionListener);
-          nrOfTransmissionsDuringRaw++;
+          //nrOfTransmissionsDuringRaw++;
         }
     }
 }
@@ -752,7 +752,7 @@ void
 DcaTxop::StartNext (void)
 {
   NS_LOG_FUNCTION (this);
-  if(!AccessIfRaw)
+  if(!AccessIfRaw) //TODO MIGHT BE ERROR
 	return;
   NS_LOG_DEBUG ("start next packet fragment");
   /* this callback is used only for fragments. */
@@ -772,7 +772,7 @@ DcaTxop::StartNext (void)
       params.EnableNextData (GetNextFragmentSize ());
     }
   Low ()->StartTransmission (fragment, &hdr, params, m_transmissionListener);
-  nrOfTransmissionsDuringRaw++;
+  //nrOfTransmissionsDuringRaw++;
 }
 
 void

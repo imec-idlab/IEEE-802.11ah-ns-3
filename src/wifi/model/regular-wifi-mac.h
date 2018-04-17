@@ -54,6 +54,7 @@ public:
   static TypeId GetTypeId (void);
   typedef void (* PacketDroppedCallback)
                     (Ptr<const Packet> packet, DropReason reason);
+
   typedef void (* CollisionCallback)(uint32_t nrOfSlotsToBackOff);
   typedef void (* TransmissionWillCrossRAWBoundaryCallback)(Time txDuration, Time remainingRawTime);
   RegularWifiMac ();
@@ -439,11 +440,6 @@ protected:
   bool m_s1gSupported;
  
   uint8_t m_s1gStaType;
-
-  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
-  TracedCallback<uint32_t> m_collisionTrace;
-  TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
-
   /**
    * Enable or disable HT support for the device.
    *
@@ -473,6 +469,9 @@ protected:
   void SetS1gStaType (uint8_t type);
   uint8_t GetS1gStaType (void) const;
 
+  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
+  TracedCallback<uint32_t> m_collisionTrace;
+  TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
 
 private:
   RegularWifiMac (const RegularWifiMac &);
