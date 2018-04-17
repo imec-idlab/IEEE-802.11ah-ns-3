@@ -276,6 +276,7 @@ EdcaTxopN::EdcaTxopN ()
 {
   NS_LOG_FUNCTION (this);
   AccessAllowedIfRaw (true);
+  rawDuration = Time::Max(); // no limit on raw
   m_crossSlotBoundaryAllowed = true;
   m_transmissionListener = new EdcaTxopN::TransmissionListener (this);
   m_blockAckListener = new EdcaTxopN::AggregationCapableTransmissionListener (this);
@@ -497,22 +498,26 @@ EdcaTxopN::RemoveRetransmitPacket (uint8_t tid, Mac48Address recipient, uint16_t
 }
 
 void
+<<<<<<< HEAD
 EdcaTxopN::SetaccessList (std::map<Mac48Address, bool> list)
 {
     m_accessList = list;
-}
-
-void
+=======
 EdcaTxopN::SetsleepList (std::map<Mac48Address, bool> list)
 {
     m_sleepList = list;
+>>>>>>> origin/TIM_LE
 }
 
 void
 EdcaTxopN::NotifyAccessGranted (void)
 {
   NS_LOG_FUNCTION (this);
+<<<<<<< HEAD
+  Time remainingRawTime = rawDuration - (Simulator::Now() - rawStartedAt);
+=======
   Time remainingRawTime = m_rawDuration - (Simulator::Now() - m_rawStartedAt);
+>>>>>>> origin/TIM_LE
   if (!AccessIfRaw)
     {
         return;
@@ -548,6 +553,30 @@ EdcaTxopN::NotifyAccessGranted (void)
             {
               return;
             }
+<<<<<<< HEAD
+          
+          //temporary, should be removed when ps-poll is suported
+          Ptr<const Packet> PacketTest;
+          uint16_t count = 0;
+          while (1)
+            {
+              PacketTest = m_queue->PeekAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations, count); 
+              count++;
+              if (m_accessList.size ()== 0 || PacketTest==0)
+                {
+                   goto Transmission;
+                }
+              //NS_LOG_UNCOND (m_low->GetAddress() << "m_currentHdr.GetAddr1())->second " << m_currentHdr.GetAddr1() << ", m_accessList.size () " << m_accessList.size ());
+              if (m_accessList.find(m_currentHdr.GetAddr1())->second) // "m_accessList.size ()== 0" for non-ap stations
+              // no sleep 
+                {
+                    goto Transmission;
+                }
+             }
+          return;
+        Transmission:  
+          
+=======
 
           //temporary, should be removed when ps-poll is suported
           //Ptr<const Packet> PacketTest = m_queue->PeekFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
@@ -562,6 +591,7 @@ EdcaTxopN::NotifyAccessGranted (void)
 
              //}
           // TODO implement restrictions regarding non-Cross slot boundary
+>>>>>>> origin/TIM_LE
           m_currentPacket = m_queue->DequeueFirstAvailable (&m_currentHdr, m_currentPacketTimestamp, m_qosBlockedDestinations);
           NS_ASSERT (m_currentPacket != 0);
 
@@ -588,6 +618,7 @@ EdcaTxopN::NotifyAccessGranted (void)
       params.DisableAck ();
       params.DisableNextData ();
 
+<<<<<<< HEAD
       Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
      			&m_currentHdr, params);
       NS_LOG_UNCOND ("m_crossSlotBoundaryAllowed " << m_crossSlotBoundaryAllowed);
@@ -600,6 +631,13 @@ EdcaTxopN::NotifyAccessGranted (void)
      		NS_LOG_DEBUG("TX can be done (" << txDuration << ") before the RAW expires (" << remainingRawTime << " remaining)");
      	}
 
+=======
+      /*Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
+      if (txDuration > remainingRawTime)
+      {
+
+      }*/
+>>>>>>> origin/TIM_LE
       m_low->StartTransmission (m_currentPacket,
                                 &m_currentHdr,
                                 params,
@@ -1150,16 +1188,23 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
 }
 
 void
+<<<<<<< HEAD
 EdcaTxopN::RawStart (Time duration, bool crossSlotBoundaryAllowed)
 {
   NS_LOG_FUNCTION (this);
-  this->m_rawDuration = duration;
+  this->rawDuration = duration;
   this->m_crossSlotBoundaryAllowed = crossSlotBoundaryAllowed;
   nrOfTransmissionsDuringRaw = 0;
-  m_rawStartedAt = Simulator::Now();
+  rawStartedAt = Simulator::Now();
 
   NS_LOG_DEBUG("RAW START, duration is " << duration);
 
+=======
+EdcaTxopN::RawStart (void) //(Time duration)
+{
+  NS_LOG_FUNCTION (this);
+  //m_rawDuration = duration;
+>>>>>>> origin/TIM_LE
   int newdata=66;
   m_AccessQuest_record (Simulator::Now ().GetMicroSeconds (), newdata);
 
@@ -1571,7 +1616,7 @@ EdcaTxopN::SendBlockAckRequest (const struct Bar &bar)
       params.EnableAck ();
     }
   Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
-  Time remainingRawTime =  m_rawDuration -  (Simulator::Now() - m_rawStartedAt);
+  Time remainingRawTime =  rawDuration -  (Simulator::Now() - rawStartedAt);
   // Non-cross-slot boundary should be used with bidirectional
   // Don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
   if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {
@@ -1675,7 +1720,7 @@ EdcaTxopN::SendAddBaRequest (Mac48Address dest, uint8_t tid, uint16_t startSeq,
 
 	Time txDuration = m_low->CalculateTransmissionTime(m_currentPacket,
 			&m_currentHdr, params);
-	Time remainingRawTime = m_rawDuration - (Simulator::Now() - m_rawStartedAt);
+	Time remainingRawTime = rawDuration - (Simulator::Now() - rawStartedAt);
 	if (!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) { // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
 		NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 		m_transmissionWillCrossRAWBoundary(txDuration,remainingRawTime);

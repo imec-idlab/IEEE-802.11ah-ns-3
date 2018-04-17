@@ -53,9 +53,6 @@ class QosBlockedDestinations;
 class WifiMacQueue : public Object
 {
 public:
-	  typedef void (* PacketDroppedCallback)
-	                  (Ptr<const Packet> packet, DropReason reason);
-
   static TypeId GetTypeId (void);
   WifiMacQueue ();
   ~WifiMacQueue ();
@@ -278,8 +275,6 @@ protected:
    * \return the address
    */
   Mac48Address GetAddressForPacket (enum WifiMacHeader::AddressType type, PacketQueueI it);
-
-  TracedCallback<Ptr<const Packet>, DropReason> m_packetdropped;
 
   PacketQueue m_queue; //!< Packet (struct Item) queue
   uint32_t m_size;     //!< Current queue size

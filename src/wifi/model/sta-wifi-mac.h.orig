@@ -29,8 +29,12 @@
 #include "supported-rates.h"
 #include "amsdu-subframe-header.h"
 #include "s1g-capabilities.h"
+<<<<<<< HEAD
 #include "ns3/traced-value.h"
+=======
 #include "extension-headers.h"
+
+>>>>>>> origin/TIM_LE
 
 namespace ns3  {
 
@@ -97,14 +101,15 @@ public:
     void SetStaType (uint32_t statype);
     void SendDisAssociationRequest (void);
     void SendAssociationRequest (void);
-
+<<<<<<< HEAD
   /**
    * Get Station AID.
    */
   uint32_t GetAID (void) const;
-
+=======
     /*void SetPageSlicingSupported (uint8_t support);
     uint8_t GetPageSlicingSupported (void) const;*/
+>>>>>>> origin/TIM_LE
 private:
     uint32_t m_staType;
     Time m_currentslotDuration;
@@ -229,15 +234,21 @@ private:
   void OutsideRawStartBackoff (void);
   bool Is(uint8_t blockbitmap, uint8_t j);
   void InsideBackoff (void);
+<<<<<<< HEAD
   void RawSlotStartBackoff (void);  
   void RawSlotStartBackoffPostpone (void);
+
+=======
+  void RawSlotStartBackoff (void);
   uint32_t GetSelfPageSliceNum (void);
+>>>>>>> origin/TIM_LE
 
   void SetDataBuffered (void);
   void ClearDataBuffered (void);
   void SetInRAWgroup(void);
   void UnsetInRAWgroup(void);
   
+<<<<<<< HEAD
    /**
    * wake up operation
    */
@@ -245,14 +256,17 @@ private:
   void SleepIfQueueIsEmpty(bool);
   bool HasPacketsInQueue();
   void BeaconWakeUp (void);
-  void GoToSleepBinary (int value);
+  void GoToSleep (int value);
 
   TracedValue<uint16_t> nrOfTransmissionsDuringRAWSlot = 0;
+=======
   bool IsInPagebitmap (uint8_t block);
   
   void GoToSleepNextTIM (S1gBeaconHeader beacon);
   void GoToSleepCurrentTIM (S1gBeaconHeader beacon);
   void GoToSleep(Time  sleeptime); 
+  void WakeUp (void);
+>>>>>>> origin/TIM_LE
 
   Time m_lastRawDurationus;
   Time m_lastRawStart;

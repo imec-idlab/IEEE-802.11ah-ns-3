@@ -660,7 +660,7 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 	}
 
 void
-StaWifiMac::GoToSleep (int value)
+StaWifiMac::GoToSleepBinary (int value)
 {
      if (IsAssociated() && !receivingBeacon)
      {
@@ -828,7 +828,7 @@ StaWifiMac::InsideBackoff (void)
    //go to sleep at the end of raw slot
    stationrawslot = false;
    //NS_LOG_UNCOND ( m_low->GetAddress () << " Go to sleep at end of RAW slot " << Simulator::Now().GetSeconds());
-   GoToSleep(0);
+   GoToSleepBinary(0);
 }
 
 void
@@ -1537,7 +1537,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
     outsideraw = false;
     //set when the station has to wake up again (next beacon, own slot, shared slot)
     //Simulator::Schedule((m_lastRawDurationus), &StaWifiMac::WakeUp, this);
-    /*GoToSleep(1);*/
+    /*GoToSleepBinary(1);*/
     return;
    }
   else if (hdr->IsProbeResp ())
