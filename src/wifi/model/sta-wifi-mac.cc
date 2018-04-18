@@ -163,14 +163,14 @@ StaWifiMac::StaWifiMac ()
   waitingack = false;
 
   //if (m_qosSupported)
-  
+
       //m_edca->SetTxOkCallback(MakeCallback(StaWifiMac::SleepIfQueueIsEmpty), this);
         m_edca.find (AC_VO)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
         m_edca.find (AC_VI)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
         m_edca.find (AC_BE)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
         m_edca.find (AC_BK)->second->SetsleepCallback (MakeCallback (&StaWifiMac::SleepIfQueueIsEmpty,this));
   
-  
+
   //else
   //    m_dca->SetTxOkCallback(MakeCallback(StaWifiMac::SleepIfQueueIsEmpty), this);
 
@@ -752,6 +752,7 @@ StaWifiMac::OnAssociated() {
 	m_assocLogger(GetBssid());
 	// start only allowing transmissions during specific slot periods
 	//DenyDCAAccess();
+	std::cout << "+++++++++++++++++++++++ ASSOCIATED aid=" << this->GetAID() << std::endl;
 }
 
 void
@@ -760,6 +761,8 @@ StaWifiMac::OnDeassociated() {
     // allow tranmissions until reassociated
     //GrantDCAAccess();
     TryToEnsureAssociated();
+	std::cout << "+++++++++++++++++++++++ DE-ASSOCIATED aid=" << this->GetAID() << std::endl;
+
 }
 
 	bool StaWifiMac::IsInPagebitmap(uint8_t block)
@@ -1441,7 +1444,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
      }
     if (goodBeacon)
      {
-        /*timeDifferenceBeacon = Simulator::Now().GetMicroSeconds() - timeBeacon;        
+        timeDifferenceBeacon = Simulator::Now().GetMicroSeconds() - timeBeacon;
         timeBeacon = Simulator::Now().GetMicroSeconds();
         if(firstBeacon)
         {
@@ -1458,7 +1461,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
         //
         NS_LOG_DEBUG (m_low->GetAddress() << ",beacon:," << Simulator::Now().GetSeconds());
-*/
+
         
         UnsetInRAWgroup ();
         uint8_t * rawassign;
@@ -1584,8 +1587,8 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             }
           if (assocResp.GetStatusCode ().IsSuccess ())
             {
+        	  SetAID (assocResp.GetAID ());
               SetState (ASSOCIATED);
-              SetAID (assocResp.GetAID ());
 	      NS_LOG_DEBUG("[" << this->GetAddress() <<"] is associated and has AID = " << this->GetAID());
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
@@ -1688,12 +1691,13 @@ StaWifiMac::SetState (MacState value)
 {
 		if (value == ASSOCIATED && m_state != ASSOCIATED)
 		{
-			m_assocLogger(GetBssid());
+			OnAssociated();
+
 		}
 		else if (value != ASSOCIATED && m_state == ASSOCIATED)
 		{
-			m_deAssocLogger(GetBssid());
-            TryToEnsureAssociated();
+			OnDeassociated();
+
 		}
   m_state = value;
 }

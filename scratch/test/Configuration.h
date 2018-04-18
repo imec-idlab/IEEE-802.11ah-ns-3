@@ -74,7 +74,7 @@ struct Configuration {
 	uint32_t nControlLoops = 0;//  = 100;
 	uint32_t coapPayloadSize = 0;//  = 15;
 
-	uint32_t trafficInterval = 1; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
+	uint32_t trafficInterval = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
 	uint32_t trafficIntervalDeviation = 100; //1000 discuss with Jeroen
 
 	int SlotFormat=0; //0;

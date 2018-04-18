@@ -102,3 +102,6 @@ int getSTAIdFromAddress(Ipv4Address from);
 int main(int argc, char** argv);
 
 void sendStatistics(bool schedule);
+
+pageSlice configurePageSlice (pageSlice m_page);
+TIM configureTIM (TIM m_TIM);

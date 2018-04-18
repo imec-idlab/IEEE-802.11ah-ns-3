@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "s1g-mac-test.h"
+#include "s1g-test-tim-raw.h"
 
-NS_LOG_COMPONENT_DEFINE("s1g-wifi-network-le");
+NS_LOG_COMPONENT_DEFINE("s1g-wifi-network-tim-raw");
 
 uint32_t AssocNum = 0;
 int64_t AssocTime = 0;
@@ -180,6 +180,65 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 	return rpslist;
 }
 
+/*
+pageslice element and TIM(DTIM) together accomplish page slicing.
+
+Prior knowledge:
+802.11ah support up to 8192 stations, they are constructed into: page, block,
+ subblock, sta.
+there are 13 bit represent the AID of stations.
+ AID[11-12] represent page.
+ AID[6-10] represent block.
+ AID[3-5] represent subblock.
+ AID[0-2] represent sta.
+
+A TIM(DTIM) element only support one page
+A Page slice element only support one page
+
+ Concept of page slicing:
+ Between two DTIM beacon, there are many TIM beacons, only allow a TIM beacon include some blocks of one page is called page slice. One TIM beacon is called a page slice.
+ Page slcie element specify number of page slice between two DTIM, number of blocks in each
+ page slice.
+ Page slice element only appears together with DTIM.
+
+ Details:
+ Page slice element also indicates AP has buffered data for which block, if a station is in that block, the station should first sleep, then wake up at coresponding page slice(TIM beacon) which includes that block.
+
+ When station wake up at that block, it check whether AP has data for itself. If has, keep awake to receive packets and go to sleep in the next beacon.
+ */
+uint32_t pagePeriod=4;  	  //  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+uint8_t pageIndex = 0;
+uint32_t pageSliceLength=7; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
+uint32_t pageSliceCount=4;  //  Number of TIMs in a single page period (1-31)
+uint8_t blockOffset = 0;  //  The 1st page slice starts with the block with blockOffset number
+uint8_t timOffset = 0;    //  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
+pageSlice configurePageSlice (pageSlice m_page)
+{
+    m_page.SetPageindex (pageIndex);
+    m_page.SetPagePeriod (pagePeriod); //2 TIM groups between DTIMs
+    m_page.SetPageSliceLen (pageSliceLength); //each TIM group has 1 block (2 blocks in 2 TIM groups)
+    m_page.SetPageSliceCount (pageSliceCount);
+    m_page.SetBlockOffset (blockOffset);
+    m_page.SetTIMOffset (timOffset);
+    std::cout << "pageIndex=" << (int)pageIndex << ", pagePeriod=" << (int)pagePeriod << ", pageSliceLength=" << (int)pageSliceLength << ", pageSliceCount=" << (int)pageSliceCount << ", blockOffset=" << (int)blockOffset << ", timOffset=" << (int)timOffset << std::endl;
+    return m_page;
+    // page 0
+    // 8 TIM(page slice) for one page
+    // 4 block (each page)
+    // 8 page slice
+    // both offset are 0
+}
+
+TIM configureTIM (TIM m_TIM)
+{
+    m_TIM.SetPageIndex (pageIndex);
+    m_TIM.SetDTIMPeriod (pageSliceCount); // not necessarily the same
+
+    std::cout << "DTIM period=" << (int)pagePeriod << std::endl;
+    // 8 pages between two DTIM
+    return m_TIM;
+}
+
 void sendStatistics(bool schedule) {
 	eventManager.onUpdateStatistics(stats);
 	eventManager.onUpdateSlotStatistics(
@@ -236,7 +295,8 @@ void onSTAAssociated(int i) {
 	// RPS, Raw group and RAW slot assignment
 
 	if (GetAssocNum() == config.Nsta) {
-		cout << "All stations associated, configuring clients & server" << endl;
+		cout << "All " << AssocNum << " stations associated at " << Simulator::Now ().GetMicroSeconds () <<", configuring clients & server" << endl;
+
 		// association complete, start sending packets
 		stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
@@ -1026,6 +1086,11 @@ int main(int argc, char *argv[]) {
 	config.rps = configureRAW(config.rps, config.RAWConfigFile);
 	config.Nsta = config.NRawSta;
 
+	  pageSlice pageS;
+	  pageS = configurePageSlice (pageS);
+	  TIM m_TIM;
+	  m_TIM = configureTIM (m_TIM);
+
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
 			+ std::to_string(config.NRawSlotNum) + "slots_"
@@ -1101,10 +1166,14 @@ int main(int argc, char *argv[]) {
 	NetDeviceContainer staDevice;
 	staDevice = wifi.Install(phy, mac, wifiStaNode);
 
-	mac.SetType("ns3::ApWifiMac", "Ssid", SsidValue(ssid), "BeaconInterval",
-			TimeValue(MicroSeconds(config.BeaconInterval)), "NRawStations",
-			UintegerValue(config.NRawSta), "RPSsetup",
-			RPSVectorValue(config.rps));
+	mac.SetType ("ns3::ApWifiMac",
+	                 "Ssid", SsidValue (ssid),
+	                 "BeaconInterval", TimeValue (MicroSeconds(config.BeaconInterval)),
+	                 "NRawStations", UintegerValue (config.NRawSta),
+	                 "RPSsetup", RPSVectorValue (config.rps),
+	                 "PageSliceSet", pageSliceValue (pageS),
+	                 "TIMSet", TIMValue (m_TIM)
+	               );
 
 	phy.Set("TxGain", DoubleValue(3.0));
 	phy.Set("RxGain", DoubleValue(3.0));
@@ -1121,7 +1190,7 @@ int main(int argc, char *argv[]) {
 	Config::Set(
 			"/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxDelay",
 			TimeValue(NanoSeconds(6000000000000)));
-
+/*
 	string DataModeCamera = "OfdmRate650KbpsBW2MHz";
 	StringValue aa = StringValue(DataModeCamera);
 	for (uint16_t k = 0; k < config.Nsta; k++) {
@@ -1141,7 +1210,7 @@ int main(int argc, char *argv[]) {
 						+ "/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/ChannelWidth",
 				UintegerValue(2));
 	}
-
+*/
 	std::ostringstream oss;
 	oss << "/NodeList/" << wifiApNode.Get(0)->GetId()
 			<< "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/";

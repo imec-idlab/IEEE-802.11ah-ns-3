@@ -165,8 +165,7 @@ void udpPacketReceivedAtClient (Ptr<const Packet> packet, Address from)
 
 void CheckAssoc (uint32_t Nsta, double simulationTime, NodeContainer wifiApNode, NodeContainer  wifiStaNode, Ipv4InterfaceContainer apNodeInterface)
 {
-
-
+	std::cout << "****************************** CheckAssoc" << std::endl;
     if  (GetAssocNum () == Nsta)
       {
         std::cout << "Assoc Finished, AssocNum=" << AssocNum << ", time = " << Simulator::Now ().GetMicroSeconds () << std::endl;
@@ -386,12 +385,12 @@ A Page slice element only support one page
  
  When station wake up at that block, it check whether AP has data for itself. If has, keep awake to receive packets and go to sleep in the next beacon.
  */
-uint32_t pagePeriod;  	 //  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+uint32_t pagePeriod=4;  	  //  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
 uint8_t pageIndex = 0;
-uint32_t pageSliceLength; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
-uint32_t pageSliceCount;  //  Number of TIMs in a single page period (1-31)
-uint8_t blockOffset = 0; //  The 1st page slice starts with the block with blockOffset number
-uint8_t timOffset = 0;   //  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
+uint32_t pageSliceLength=7; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
+uint32_t pageSliceCount=4;  //  Number of TIMs in a single page period (1-31)
+uint8_t blockOffset = 0;  //  The 1st page slice starts with the block with blockOffset number
+uint8_t timOffset = 0;    //  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
 pageSlice configurePageSlice (pageSlice m_page)
 {
     m_page.SetPageindex (pageIndex);
@@ -439,22 +438,22 @@ int main (int argc, char *argv[])
   LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
   //LogComponentEnable ("TIM", LOG_LEVEL_DEBUG);
   //LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
-  LogComponentEnable ("ApWifiMac", LOG_LEVEL_INFO);
+  LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
 
   //LogComponentEnable ("EdcaTxopN", LOG_LEVEL_INFO);
 
   //LogComponentEnable ("DcaTxop", LOG_LEVEL_ALL);
   double simulationTime = 20;
   uint32_t seed = 1;
-  uint32_t  payloadSize = 200;//256
-  uint32_t Nsta = 14;
+  uint32_t  payloadSize = 100;//256
+  uint32_t Nsta = 10;
   uint32_t NRawSta = Nsta;
   uint32_t BeaconInterval = 102400;
   bool OutputPosition = true;
   string DataMode = "OfdmRate7_8MbpsBW2MHz";
   double datarate = 7.8;
   double bandWidth = 2;
-  string rho="50.0";
+  string rho="100.0";
   string folder="./scratch/";
   string file="./scratch/mac-sta.txt";
   string TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt";
@@ -606,7 +605,7 @@ int main (int argc, char *argv[])
       std::string strSTA = STA.str();
 
       assoc_record *m_assocrecord=new assoc_record;
-      m_assocrecord->setstaid (kk);
+      m_assocrecord->setstaid (kk+1);
       Config::Connect ("/NodeList/"+strSTA+"/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Assoc", MakeCallback (&assoc_record::SetAssoc, m_assocrecord));
       Config::Connect ("/NodeList/"+strSTA+"/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/DeAssoc", MakeCallback (&assoc_record::UnsetAssoc, m_assocrecord));
 
@@ -637,7 +636,6 @@ int main (int argc, char *argv[])
           Vector position = mobility1->GetPosition();
           std::cout << "AP node, position = " << position << std::endl;
         }
-
       Simulator::Run ();
       Simulator::Destroy ();
 
