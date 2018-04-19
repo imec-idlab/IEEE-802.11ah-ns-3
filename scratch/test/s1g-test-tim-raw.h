@@ -103,5 +103,7 @@ int main(int argc, char** argv);
 
 void sendStatistics(bool schedule);
 
-pageSlice configurePageSlice (pageSlice m_page);
-TIM configureTIM (TIM m_TIM);
+void configurePageSlice (void);
+void configureTIM (void);
+void checkRawAndTimConfiguration (void);
+bool check (uint16_t aid, uint32_t index);

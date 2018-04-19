@@ -136,14 +136,14 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 	//2. define RPS
 	if (myfile.is_open()) {
 		myfile >> NRPS;
-
+		int totalNumSta = 0;
 		for (uint16_t kk = 0; kk < NRPS; kk++) // number of beacons covering all raw groups
-				{
+		{
 			RPS *m_rps = new RPS;
 			myfile >> NRAWPERBEACON;
 			ngroup = NRAWPERBEACON;
 			for (uint16_t i = 0; i < NRAWPERBEACON; i++) // raw groups in one beacon
-					{
+			{
 				//RPS *m_rps = new RPS;
 				RPS::RawAssignment *m_raw = new RPS::RawAssignment;
 
@@ -163,7 +163,7 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 				myfile >> aid_end;
 				rawinfo = (aid_end << 13) | (aid_start << 2) | page;
 				m_raw->SetRawGroup(rawinfo);
-
+				totalNumSta += aid_end - aid_start + 1;
 				m_rps->SetRawAssignment(*m_raw);
 				delete m_raw;
 			}
@@ -171,9 +171,9 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 			//config.nRawGroupsPerRpsList.push_back(NRAWPERBEACON);
 		}
 		myfile.close();
-		config.NRawSta =
-				rpslist.rpsset[rpslist.rpsset.size() - 1]->GetRawAssigmentObj(
-						NRAWPERBEACON - 1).GetRawGroupAIDEnd();
+		config.NRawSta = totalNumSta;
+				/*rpslist.rpsset[rpslist.rpsset.size() - 1]->GetRawAssigmentObj(
+						NRAWPERBEACON - 1).GetRawGroupAIDEnd();*/
 	} else
 		cout << "Unable to open RAW configuration file \n";
 
@@ -207,16 +207,15 @@ A Page slice element only support one page
  When station wake up at that block, it check whether AP has data for itself. If has, keep awake to receive packets and go to sleep in the next beacon.
  */
 
-pageSlice configurePageSlice (pageSlice m_page)
+void configurePageSlice (void)
 {
-    m_page.SetPageindex (config.pageIndex);
-    m_page.SetPagePeriod (config.pagePeriod); //2 TIM groups between DTIMs
-    m_page.SetPageSliceLen (config.pageSliceLength); //each TIM group has 1 block (2 blocks in 2 TIM groups)
-    m_page.SetPageSliceCount (config.pageSliceCount);
-    m_page.SetBlockOffset (config.blockOffset);
-    m_page.SetTIMOffset (config.timOffset);
+    config.pageS.SetPageindex (config.pageIndex);
+    config.pageS.SetPagePeriod (config.pagePeriod); //2 TIM groups between DTIMs
+    config.pageS.SetPageSliceLen (config.pageSliceLength); //each TIM group has 1 block (2 blocks in 2 TIM groups)
+    config.pageS.SetPageSliceCount (config.pageSliceCount);
+    config.pageS.SetBlockOffset (config.blockOffset);
+    config.pageS.SetTIMOffset (config.timOffset);
     std::cout << "pageIndex=" << (int)config.pageIndex << ", pagePeriod=" << (int)config.pagePeriod << ", pageSliceLength=" << (int)config.pageSliceLength << ", pageSliceCount=" << (int)config.pageSliceCount << ", blockOffset=" << (int)config.blockOffset << ", timOffset=" << (int)config.timOffset << std::endl;
-    return m_page;
     // page 0
     // 8 TIM(page slice) for one page
     // 4 block (each page)
@@ -224,15 +223,45 @@ pageSlice configurePageSlice (pageSlice m_page)
     // both offset are 0
 }
 
-TIM configureTIM (TIM m_TIM)
+void configureTIM (void)
 {
-    m_TIM.SetPageIndex (config.pageIndex);
-    m_TIM.SetDTIMPeriod (config.pageSliceCount); // not necessarily the same
+    config.tim.SetPageIndex (config.pageIndex);
+    config.tim.SetDTIMPeriod (config.pageSliceCount); // not necessarily the same
 
     std::cout << "DTIM period=" << (int)config.pagePeriod << std::endl;
-    // 8 pages between two DTIM
-    return m_TIM;
 }
+
+void checkRawAndTimConfiguration (void)
+{
+	std::cout << "Checking RAW and TIM configuration..." << std::endl;
+	bool configIsCorrect = true;
+	NS_ASSERT (config.rps.rpsset.size());
+	for (uint32_t j = 0; j < config.rps.rpsset.size(); j++)
+	{
+		uint32_t totalRawTime = 0;
+		for (uint32_t i = 0; i < config.rps.rpsset[j]->GetNumberOfRawGroups(); i++)
+		{
+			totalRawTime += (120 * config.rps.rpsset[j]->GetRawAssigmentObj(i).GetSlotDurationCount() + 500) * config.rps.rpsset[j]->GetRawAssigmentObj(i).GetSlotNum();
+			auto aidStart = config.rps.rpsset[j]->GetRawAssigmentObj(i).GetRawGroupAIDStart();
+			auto aidEnd = config.rps.rpsset[j]->GetRawAssigmentObj(i).GetRawGroupAIDEnd();
+			configIsCorrect = check (aidStart, j) && check (aidEnd, j);
+			// AIDs in each RPS must comply with TIM in a following way:
+			// TIM0: 1-63; TIM1: 64-127; TIM2: 128-191; ...; TIM32: 1983-2047
+			// If RPS that belongs to TIM0 includes other AIDs (other than range [1-63]) configuration is incorrect
+			NS_ASSERT (configIsCorrect);
+		}
+		NS_ASSERT (totalRawTime <= config.BeaconInterval);
+	}
+}
+
+bool check (uint16_t aid, uint32_t index)
+{
+	uint8_t block = (aid >> 6 ) & 0x001f;
+	NS_ASSERT (config.pageS.GetPageSliceLen() > 0);
+	uint8_t toTim = (block - config.pageS.GetBlockOffset()) % config.pageS.GetPageSliceLen();
+	return toTim == index;
+}
+
 
 void sendStatistics(bool schedule) {
 	eventManager.onUpdateStatistics(stats);
@@ -1081,10 +1110,9 @@ int main(int argc, char *argv[]) {
 	config.rps = configureRAW(config.rps, config.RAWConfigFile);
 	config.Nsta = config.NRawSta;
 
-	  pageSlice pageS;
-	  pageS = configurePageSlice (pageS);
-	  TIM m_TIM;
-	  m_TIM = configureTIM (m_TIM);
+	configurePageSlice ();
+	configureTIM ();
+	checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
@@ -1166,8 +1194,8 @@ int main(int argc, char *argv[]) {
 	                 "BeaconInterval", TimeValue (MicroSeconds(config.BeaconInterval)),
 	                 "NRawStations", UintegerValue (config.NRawSta),
 	                 "RPSsetup", RPSVectorValue (config.rps),
-	                 "PageSliceSet", pageSliceValue (pageS),
-	                 "TIMSet", TIMValue (m_TIM)
+	                 "PageSliceSet", pageSliceValue (config.pageS),
+	                 "TIMSet", TIMValue (config.tim)
 	               );
 
 	phy.Set("TxGain", DoubleValue(3.0));
@@ -1301,10 +1329,13 @@ int main(int argc, char *argv[]) {
 		assoc_vector.push_back(m_assocrecord);
 	}
 
+	std::cout << "Populating routing tables..." << std::endl;
 	Ipv4GlobalRoutingHelper::PopulateRoutingTables();
+	std::cout << "Populating ARP cache..." << std::endl;
 	PopulateArpCache();
 
 	// configure tracing for associations & other metrics
+	std::cout << "Configuring trace sinks for nodes..." << std::endl;
 	configureNodes(wifiStaNode, staDevice);
 
 	Config::Connect(
@@ -1369,17 +1400,22 @@ int main(int argc, char *argv[]) {
 	Simulator::Run();
 
 	// Visualizer throughput
-	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0;
-	for (int i = 0; i < config.Nsta; i++) {
+	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0, totalPacketsEchoed = 0;
+	for (int i = 0; i < config.Nsta; i++)
+	{
 		totalSuccessfulPackets += stats.get(i).NumberOfSuccessfulPackets;
 		totalSentPackets += stats.get(i).NumberOfSentPackets;
+		totalPacketsEchoed += stats.get(i).NumberOfSuccessfulRoundtripPackets;
 		pay += stats.get(i).TotalPacketPayloadSize;
 		cout << i << " sent: " << stats.get(i).NumberOfSentPackets
-				<< " ;succesfull: " << stats.get(i).NumberOfSuccessfulPackets
+				<< " ; delivered: " << stats.get(i).NumberOfSuccessfulPackets
+				<< " ; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
 				<< "; packetloss: "
 				<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
 	}
-	if (config.trafficType == "udp") {
+
+	if (config.trafficType == "udp")
+	{
 		double throughput = 0;
 		uint32_t totalPacketsThrough =
 				DynamicCast<UdpServer>(serverApp.Get(0))->GetReceived();
@@ -1394,8 +1430,28 @@ int main(int argc, char *argv[]) {
 				<< std::endl;
 
 	}
-	cout << "total packet loss "
-			<< 100 - 100. * totalSuccessfulPackets / totalSentPackets << endl;
+	else if (config.trafficType == "udpecho")
+	{
+		double ulThroughput = 0, dlThroughput = 0;
+		ulThroughput = totalSuccessfulPackets * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+		dlThroughput = totalPacketsEchoed * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+		cout << "totalPacketsSent " << totalSentPackets << endl;
+		cout << "totalPacketsDelivered " << totalSuccessfulPackets << endl;
+		cout << "totalPacketsEchoed " << totalPacketsEchoed << endl;
+		cout << "UL packets lost " << totalSentPackets - totalSuccessfulPackets << endl;
+		cout << "DL packets lost " << totalSuccessfulPackets - totalPacketsEchoed << endl;
+		cout << "Total packets lost " << totalSentPackets - totalPacketsEchoed << endl;
+
+		cout << "uplink throughput Mbit/s " << ulThroughput << endl;
+		cout << "downlink throughput Mbit/s " << dlThroughput << endl;
+
+		cout << "total throughput Mbit/s " << ulThroughput + dlThroughput << endl;
+
+		std::cout << "datarate" << "\t" << "UL throughput" << std::endl;
+		std::cout << config.datarate << "\t" << ulThroughput << " Mbit/s" << std::endl;
+	}
+	cout << "total packet loss % "
+			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
 	Simulator::Destroy();
 
 	//Energy consumption per station

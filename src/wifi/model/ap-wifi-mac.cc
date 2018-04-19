@@ -521,21 +521,11 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 {
 	uint8_t block = (aid >> 6 ) & 0x001f;
 	NS_ASSERT (block >= m_pageslice.GetBlockOffset());
-	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();//TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+
 	std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
-	uint8_t * rawassign = (*m_rpsset.rpsset.at(toTim)).GetRawAssignment();
 	uint16_t raw_len = (*m_rpsset.rpsset.at(toTim)).GetInformationFieldSize();
 
-	/*if (RpsIndex < m_rpsset.rpsset.size())
-       {
-    	  rawassign = (*m_rpsset.rpsset.at(RpsIndex)).GetRawAssignment();
-    	  raw_len = (*m_rpsset.rpsset.at(RpsIndex)).GetInformationFieldSize();
-        }
-    else
-       {
-    	  rawassign = (*m_rpsset.rpsset.at(0)).GetRawAssignment();
-    	  raw_len = (*m_rpsset.rpsset.at(0)).GetInformationFieldSize();
-        }*/
 	uint16_t rawAssignment_len = 6;
 	if (raw_len % rawAssignment_len !=0)
 	{
@@ -548,36 +538,21 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
     uint64_t currentRAW_start=0;
     Time lastRawDurationus = MicroSeconds(0);
     int x = 0;
+
 	for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
 	{
+		RPS::RawAssignment ass = m_rpsset.rpsset.at(toTim)->GetRawAssigmentObj(raw_index);
 		currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
-		uint32_t rawgroup = (uint32_t(rawassign[raw_index*rawAssignment_len+5]) << 16) | (uint32_t(rawassign[raw_index*rawAssignment_len+4]) << 8) | uint32_t(rawassign[raw_index*rawAssignment_len+3]);
-		uint16_t raw_start = (rawgroup >> 2) & 0x000003ff;
-		uint16_t raw_end = (rawgroup >> 13) & 0x000003ff;
-		uint16_t rawslot = (uint16_t(rawassign[raw_index*rawAssignment_len+2]) << 8) | (uint16_t(rawassign[raw_index*rawAssignment_len+1]));
-		uint8_t slotFormat = uint8_t (rawslot >> 15) & 0x0001;
-		uint8_t m_slotCrossBoundary = uint8_t (rawslot >> 14) & 0x0002;
-		if (slotFormat == 0)
-		{
-			slotDurationCount = (rawslot >> 6) & 0x00ff;
-			slotNum = rawslot & 0x003f;
-		}
-		else if (slotFormat == 1)
-		{
-			slotDurationCount = (rawslot >> 3) & 0x07ff;
-			slotNum = rawslot & 0x0007;
-		}
-		Time slotDuration = MicroSeconds(500 + slotDurationCount * 120);
+
+		Time slotDuration = MicroSeconds(500 + ass.GetSlotDurationCount() * 120);
 		lastRawDurationus += slotDuration * slotNum;
-//std::cout << "aidStart=" << (int)raw_start << ", aidEnd=" << raw_end << std::endl;
-		if (raw_start <= aid && aid <= raw_end) {
-			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
-			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
+		if (ass.GetRawGroupAIDStart() <= aid && aid <= ass.GetRawGroupAIDEnd()) {
+			uint16_t statRawSlot = (aid & 0x03ff) % ass.GetSlotNum();
+			Time start = MicroSeconds((500 + ass.GetSlotDurationCount() * 120) * statRawSlot + currentRAW_start);
 			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index << " in slot " << statRawSlot << ". RAW slot start time relative to the beacon = " << start.GetMilliSeconds() << " ms.");
 			x=1;
 			return start;
 		}
-		//else x=0;
 	}
 	NS_ASSERT (x);
 }
