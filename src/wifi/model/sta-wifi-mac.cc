@@ -752,7 +752,6 @@ StaWifiMac::OnAssociated() {
 	m_assocLogger(GetBssid());
 	// start only allowing transmissions during specific slot periods
 	//DenyDCAAccess();
-	std::cout << "+++++++++++++++++++++++ ASSOCIATED aid=" << this->GetAID() << std::endl;
 }
 
 void
@@ -761,7 +760,6 @@ StaWifiMac::OnDeassociated() {
     // allow tranmissions until reassociated
     //GrantDCAAccess();
     TryToEnsureAssociated();
-	std::cout << "+++++++++++++++++++++++ DE-ASSOCIATED aid=" << this->GetAID() << std::endl;
 
 }
 
