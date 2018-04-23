@@ -495,7 +495,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
 
 	  wait += GetSlotStartTimeFromAid (aid);
-	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s scheduling transmission for [aid=" << aid << "] " << wait.GetMilliSeconds() << " ms from now.");
+	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMilliSeconds() << " ms from now.");
 	  /*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
 	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
@@ -543,13 +543,14 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 	{
 		RPS::RawAssignment ass = m_rpsset.rpsset.at(toTim)->GetRawAssigmentObj(raw_index);
 		currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
-
-		Time slotDuration = MicroSeconds(500 + ass.GetSlotDurationCount() * 120);
+		slotDurationCount = ass.GetSlotDurationCount();
+		slotNum = ass.GetSlotNum();
+		Time slotDuration = MicroSeconds(500 + slotDurationCount * 120);
 		lastRawDurationus += slotDuration * slotNum;
 		if (ass.GetRawGroupAIDStart() <= aid && aid <= ass.GetRawGroupAIDEnd()) {
-			uint16_t statRawSlot = (aid & 0x03ff) % ass.GetSlotNum();
-			Time start = MicroSeconds((500 + ass.GetSlotDurationCount() * 120) * statRawSlot + currentRAW_start);
-			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index << " in slot " << statRawSlot << ". RAW slot start time relative to the beacon = " << start.GetMilliSeconds() << " ms.");
+			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
+			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
+			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index << " in slot " << statRawSlot << ". RAW slot start time relative to the beacon = " << start.GetMicroSeconds() << " us.");
 			x=1;
 			return start;
 		}
