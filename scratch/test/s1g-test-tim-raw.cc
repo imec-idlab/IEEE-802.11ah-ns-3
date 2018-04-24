@@ -245,7 +245,7 @@ void checkRawAndTimConfiguration (void)
 			auto aidStart = config.rps.rpsset[j]->GetRawAssigmentObj(i).GetRawGroupAIDStart();
 			auto aidEnd = config.rps.rpsset[j]->GetRawAssigmentObj(i).GetRawGroupAIDEnd();
 			configIsCorrect = check (aidStart, j) && check (aidEnd, j);
-			// AIDs in each RPS must comply with TIM in a following way:
+			// AIDs in each RPS must comply with TIM in the following way:
 			// TIM0: 1-63; TIM1: 64-127; TIM2: 128-191; ...; TIM32: 1983-2047
 			// If RPS that belongs to TIM0 includes other AIDs (other than range [1-63]) configuration is incorrect
 			NS_ASSERT (configIsCorrect);
@@ -1104,6 +1104,9 @@ int main(int argc, char *argv[]) {
 	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 	 */
+	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
+	LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
 

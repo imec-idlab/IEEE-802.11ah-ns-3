@@ -590,10 +590,15 @@ StaWifiMac::SendPspollIfnecessary (void)
 		Time sleepTime = MicroSeconds(
 				beacon.GetBeaconCompatibility().GetBeaconInterval()
 						* BeaconNumForTIM);
-		Simulator::Schedule(
-				MicroSeconds(
-						beacon.GetBeaconCompatibility().GetBeaconInterval()),
-				&StaWifiMac::GoToSleep, this, sleepTime);
+		Time timeUntilNextTim = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval()) - MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
+		Simulator::Schedule(timeUntilNextTim, &StaWifiMac::GoToSleep, this, sleepTime);
+		//std::cout << "BEACON NUM FOR TIM=" << (int)BeaconNumForTIM << std::endl;
+		//std::cout << "BEACON Interval=" << (int)beacon.GetBeaconCompatibility().GetBeaconInterval() << std::endl;
+		//std::cout << "+++At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleepNextTIM:" << sleepTime.GetMicroSeconds() << " FULL" << std::endl;
+		//std::cout << "At " << MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval()) << " us OFFSET" << std::endl;
+		std::cout << "-*-*-*-*-*-*-*-*-TIME UNTIL NEXT TIM=" << timeUntilNextTim.GetMicroSeconds() << "us" << " --NOW: " << Simulator::Now().GetMicroSeconds() << std::endl;
+		std::cout << "-*-*-*-*-*-*-*-*-SLEEP TIME=" << sleepTime.GetMicroSeconds() << "us" << std::endl;
+
 		//GoToSleep (MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval () * BeaconNumForTIM));
 	}
 
@@ -612,14 +617,15 @@ StaWifiMac::SendPspollIfnecessary (void)
 		//std::cout << "BEACON NUM FOR TIM=" << (int)BeaconNumForTIM << std::endl;
 		//std::cout << "BEACON Interval=" << (int)beacon.GetBeaconCompatibility().GetBeaconInterval() << std::endl;
 		Time sleepTime = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval() * BeaconNumForTIM);
-		//std::cout << "At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleepCurrentTIM:" << sleepTime.GetMicroSeconds() << " FULL" << std::endl;
+		//std::cout << "+++At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleepCurrentTIM:" << sleepTime.GetMicroSeconds() << " FULL" << std::endl;
 
 		//reducing the sleep time fot the time elapsed since last beacon until now
 		sleepTime -= MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
 		//std::cout << sleepTime.GetMicroSeconds() << " DEDUCTED until my next beacon" << std::endl;
 
-		//Time timeUntilNextTim = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval()) - MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
+		Time timeUntilNextTim = MicroSeconds(beacon.GetBeaconCompatibility().GetBeaconInterval()) - MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval());
 		//std::cout << "At " << MicroSeconds(Simulator::Now().GetMicroSeconds() % beacon.GetBeaconCompatibility().GetBeaconInterval()) << " us OFFSET" << std::endl;
+		//std::cout << "TIME UNTIL NEXT TIM=" << timeUntilNextTim.GetMicroSeconds() << "us" << std::endl;
 		GoToSleep(sleepTime);
 	}
 
@@ -643,9 +649,11 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 				&& (sleeptime.GetMicroSeconds() > 0))
 		{
 			NS_LOG_DEBUG(
-					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetSeconds() << " s.");
+					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetMicroSeconds() << " us.");
 			m_low->GetPhy()->SetSleepMode();
 			Simulator::Schedule(sleeptime, &StaWifiMac::WakeUp, this);
+			//std::cout << "+++At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleep:" << sleeptime.GetMicroSeconds() << " FULL" << std::endl;
+
 		}
 	}
 
@@ -1181,12 +1189,12 @@ StaWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
     //code RAW
     if (m_low->GetPhy()->IsStateSleep() && stationrawslot)
     {
-        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue sleep e mi sveglio," << Simulator::Now().GetSeconds());
+        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue in stationrawslot," << Simulator::Now().GetSeconds());
         WakeUp();
     }
     if (m_low->GetPhy()->IsStateSleep() && outsideraw)
     {
-        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue sleep e mi sveglio," << Simulator::Now().GetSeconds());
+        NS_LOG_DEBUG (m_low->GetAddress () << ",enqueue outsideraw," << Simulator::Now().GetSeconds());
         WakeUp();
     }
     
@@ -1355,6 +1363,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
       if (hdr->IsQosData ())
         {
+    	  NS_LOG_DEBUG (GetAddress () << " received qos data from " << hdr->GetAddr3 () << " @ " << Simulator::Now().GetMicroSeconds());
           if (hdr->IsQosAmsdu ())
             {
               NS_ASSERT (hdr->GetAddr3 () == GetBssid ());
@@ -1368,8 +1377,10 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
       else
         {
+    	  NS_LOG_DEBUG (GetAddress () << " received data from " << hdr->GetAddr3 () << " @ " << Simulator::Now().GetMicroSeconds());
           ForwardUp (packet, hdr->GetAddr3 (), hdr->GetAddr1 ());
         }
+      //this->GoToSleepNextTIM(beacon);
       return;
     }
   else if (hdr->IsProbeReq ()
@@ -1447,13 +1458,14 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         if(firstBeacon)
         {
             beaconInterval = MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval ());
-            int64x64_t intervallo = static_cast<int64x64_t> (beaconInterval);
-            intervallo = intervallo / 10000000;
-            intervallo = (intervallo).GetHigh();
-            intervallo = intervallo * 1000;
-            //Time intervallobeacon = static_cast<Time> (intervallo*10000);
-            Time intervallobeacon = MicroSeconds (98920);
-            m_beaconWakeUpEvent = Simulator::Schedule (intervallobeacon, &StaWifiMac::BeaconWakeUp, this);
+            int64x64_t interval = static_cast<int64x64_t> (beaconInterval);
+            interval = interval / 10000000;
+            interval = (interval).GetHigh();
+            interval = interval * 10000000;
+            Time intervalFirstBeacon = static_cast<Time> (interval);
+            //std::cout << "++++++++++++++++++us beaconInterval = " << beaconInterval << "; Now=" << Simulator::Now().GetMicroSeconds() << std::endl;
+            //Time intervallobeacon = MicroSeconds (98920);
+            m_beaconWakeUpEvent = Simulator::Schedule (intervalFirstBeacon, &StaWifiMac::BeaconWakeUp, this);
             //m_beaconWakeUpEvent = Simulator::Schedule (Time(100000), &StaWifiMac::BeaconWakeUp, this);
             firstBeacon = false;
         }
@@ -1523,7 +1535,6 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
          m_rawStart = true; //?
          if (this->IsAssociated())
                 S1gTIMReceived(beacon);
-
 
          AuthenticationCtrl AuthenCtrl;
          AuthenCtrl = beacon.GetAuthCtrl ();

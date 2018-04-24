@@ -46,7 +46,7 @@ struct Configuration {
 	/*
 	 * Common configuration parameters
 	 * */
-	double simulationTime = 100; //60
+	double simulationTime = 50; //60
 	uint32_t seed = 1;
 	int NRawSta;
 	uint32_t Nsta;
