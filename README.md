@@ -1,9 +1,102 @@
-### IEEE 802.11ah ns-3
+### IEEE 802.11ah ns-3 
+> alpha version
 
-# Coming soon...
+This repository hosts an implementation of the IEEE802.11ah (Wi-Fi HaLow) protocol for the NS-3 network simulator. It comes pre-packaged with NS-3 version 3.23 but multiple modules are updated to the latest 3.25 version to incorporate congestion control fixes for TCP traffic.
 
-Includes support for:
+This module includes support for:
 * Restricted Access Window (RAW) with interface for dynamic configuration
 * Traffic Indication Map (TIM) segmentation 
 * Energy consumption model
 * Adaptive Modulation and Coding Scheme (MCS)
+
+### Installation and usage instructions ###
+* Download source code from our repository.
+* Change into ./IEEE-802.11ah-ns-3/ns-3 directory.  
+* Build and run:
+
+    ./waf --run "test --seed=1 --simulationTime=60 --payloadSize=256 --pagePeriod=2 --pageSliceLength=8 --pageSliceCount=2"
+
+Note: if errors related to nullptr arise when compiling, CXXFLAGS should be included into the "./waf configure" command,as follows:   
+
+  `CXXFLAGS="-std=c++11" ./waf configure --disable-examples --disable-tests`
+  
+### RAW related parameters: ###
+* NRawSta:             Number of stations supporting RAW. NRawSta equals the largest AID specified in RAWConfigFile.
+* RAWConfigFile:       RAW configuration is stored in this file.
+
+The default RAWConfigFile "./OptimalRawGroup/RawConfig-32-2-2.txt" sets 2 RPSs (RAW Parameter Sets) to be broadcasted with beacons in cycles (e.g. Beacon1: RPS1, Beacon2: RPS2, Beacon3: RPS1, Beacon4: RPS2, ...). The first RPS contains 2 RAW groups for 63 stations, each RAW group contains 2 RAW slots. The second RPS contains 1 RAW group for 4 stations (64-67), where the RAW group contains 3 slots. This file consists of 6 lines:
+
+```
+2
+2
+0	  1	  1	  200	  2	  0	  1	29
+0	  1	  1	  200	  2	  0	  30	63
+1
+0	  1	  1	  220	  3	  0	  64	67
+```
+line 1: NRPS = number of RPS elements
+
+line x: NRAW_k = number of RAW Groups in the RPS k; x = (NRAW_0 + NRAW_1 + ... + NRAW_(k-1)) + 1 + k; NRAW_0 = 0 
+
+        for RPS number k=1, line x=0+1+1=2 contains information on number of RAW groups in the RPS
+        
+        for RPS number k=2 and NRAW_1=2 (from line 2), line x=0+2+1+2=5 contains information on number of RAW groups in the RPS
+        
+line 3, line 4 and line 6: configuration of each individual RAW group, including
+
+          * RawControl           Whether RAW can be accessed by any stations within the RAW group or only the paged stations within the RAW group.  
+          * CrossSlotBoundary    Whether STAs are allowed to transmit after the assigned RAW slot boundary.
+          * SlotFormat           Format of RAW slot count.                 
+          * NRawSlotCount        Used to calculate number of RAW slot duration.   
+          * NRawSlotNum          Number of slots per RAW group.                     
+          * Page                 Page index of the subset of AIDs.
+          * Aid_start            Station with the lowest AID allocated in the RAW.
+          * Aid_end              Station with the highest AID allocated in the RAW.
+
+
+Notes:   
+          1. RawControl, currently set to 0, RAW can be accessed by any stations within the RAW group.            
+          2. CrossSlotBoundary, currenty set to 1, only cross slot boundary are supported.                    
+          3. RAW slot duration = 500 us + NRawSlotCount * 120 us, NRawSlotCount is y = 11(8) bits   length when SlotFormat is set to 1(0), and NRawSlotNum is (14 - y) bits length.                                     
+          4. The above  RAWConfigFile assumes BeaconInterval is 102400 us. Users can adjust the parameters based on their own needs.                       
+
+
+### Wi-Fi mode parameters ###
+* DataMode:           Data mode.  
+* datarate:           Data rate of data mode.  
+* bandWidth:          BandWidth of data mode.  
+
+Note: Relation between the above 3 parameters and MCS is described in file "MCStoWifiMode".       
+
+### Other parameters ###
+* SimulationTime:     Simulatiom time in seconds after all stations get associated with AP.  
+* payloadSize:        Size of payload.                   
+* BeaconInterval:     Beacon interval time in us.    
+* UdpInterval:        Traffic mode, station send one packet every UdpInterval seconds.  
+* Nsta:               Number of total stations.  
+* rho:                Maximal distance between AP and stations.   
+* seed:               Seed of RandomVariableStream.
+* TrafficPath:        Include traffic of each stations, packet sending interval can be automatically calcualted based on payloadSize. The above TrafficPath "./OptimalRawGroup/traffic/data-32-0.82.txt" contains traffic of 32 stations, and the total traffic is 0.82 Mbps.
+* S1g1MfieldEnabled:     Packet using 1 Mhz bandwidth if set to "true".
+
+
+### TIM and page slice parameters ###
+* pagePeriod:       Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+* pageIndex:        Index of the page (0-3) whose slices are served during beacon intervals within a page period, default value is 0
+* pageSliceLength:  Number of blocks in each TIM for the associated page except for the last TIM (1-31)
+* pageSliceCount:   Number of TIMs in a single page period (0-31), value 0 has special meaning
+* blockOffset:      The 1st page slice starts with the block with blockOffset number, default value is 0
+* timOffset:        Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page, default value is 0
+
+    Example run: ./waf --run "test --pagePeriod=4 --pageSliceLength=8 --pageSliceCount=4"
+    
+    * pagePeriod=4: every 4th beacon is DTIM beacon that carries Page Slice element for pageIndex=0
+    * pageSliceLength=8: each page slice cosists of 8 blocks, meaning that each page slice (PS) accomodates up to 512 stations (8 blocks * 8 subblocks * 8 stations)
+      * (slice0: 1-512, slice1: 513-1024, slice2: 1025-1536, slice3: 1537-2048)
+      * The last page slice can have different length.
+   * pageSliceCount=4: 4 TIMs are scheduled in one page period.
+    
+    Note: RAW configuration must be in line with TIM and page configuration. If a RAW group is reserved for a station in beacon interval that does not correspond to its TIM, station will be asleep during that RAW.
+    
+    To configure a single page slice (whole page encoded in a single page slice), it is neccessary to set pageSliceCount to 0 and pageSliceLength to 1.
+
