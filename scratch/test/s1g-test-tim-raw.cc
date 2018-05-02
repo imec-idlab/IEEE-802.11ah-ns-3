@@ -215,7 +215,7 @@ void configurePageSlice (void)
     config.pageS.SetPageSliceCount (config.pageSliceCount);
     config.pageS.SetBlockOffset (config.blockOffset);
     config.pageS.SetTIMOffset (config.timOffset);
-    std::cout << "pageIndex=" << (int)config.pageIndex << ", pagePeriod=" << (int)config.pagePeriod << ", pageSliceLength=" << (int)config.pageSliceLength << ", pageSliceCount=" << (int)config.pageSliceCount << ", blockOffset=" << (int)config.blockOffset << ", timOffset=" << (int)config.timOffset << std::endl;
+    //std::cout << "pageIndex=" << (int)config.pageIndex << ", pagePeriod=" << (int)config.pagePeriod << ", pageSliceLength=" << (int)config.pageSliceLength << ", pageSliceCount=" << (int)config.pageSliceCount << ", blockOffset=" << (int)config.blockOffset << ", timOffset=" << (int)config.timOffset << std::endl;
     // page 0
     // 8 TIM(page slice) for one page
     // 4 block (each page)
@@ -231,7 +231,7 @@ void configureTIM (void)
     else
     	config.tim.SetDTIMPeriod (1);
 
-    std::cout << "DTIM period=" << (int)config.pagePeriod << std::endl;
+    //std::cout << "DTIM period=" << (int)config.pagePeriod << std::endl;
 }
 
 void checkRawAndTimConfiguration (void)
@@ -372,7 +372,7 @@ void RawSlotTrace(uint8_t oldValue, uint8_t newValue) {
 }
 
 void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
-	cout << "Configuring STA Node trace sources" << endl;
+	cout << "Configuring STA Node trace sources..." << endl;
 
 	for (uint32_t i = 0; i < config.Nsta; i++) {
 
@@ -1113,9 +1113,9 @@ int main(int argc, char *argv[]) {
 	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
+	//LogComponentEnable ("ApWifiMac", LOG_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
-	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
+	//LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);

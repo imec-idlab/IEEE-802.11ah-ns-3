@@ -523,7 +523,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 	NS_ASSERT (block >= m_pageslice.GetBlockOffset());
 	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
 
-	std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
+	//std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
 	uint16_t raw_len = (*m_rpsset.rpsset.at(toTim)).GetInformationFieldSize();
 
 	uint16_t rawAssignment_len = 6;
@@ -975,7 +975,7 @@ ApWifiMac::SendOneBeacon (void)
     		numPagedStas++;
     	}
     }
-    if (!m_DTIMCount && numPagedStas) NS_LOG_UNCOND ("Paged stations: " << (int)numPagedStas);
+    //if (!m_DTIMCount && numPagedStas) NS_LOG_UNCOND ("Paged stations: " << (int)numPagedStas);
 	if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
 	{
 		if (m_pageslice.GetPageSliceLen() > 1)
@@ -1144,7 +1144,7 @@ ApWifiMac::SendOneBeacon (void)
     		  m_accessList[stasAddr]=false;
     	  }
      }
-      NS_LOG_UNCOND ("m_accessList.size " << m_accessList.size ());
+      //NS_LOG_UNCOND ("m_accessList.size " << m_accessList.size ());
 
 
       // schedule the slot start
@@ -1202,7 +1202,7 @@ ApWifiMac::SendOneBeacon (void)
     		  }
     	  }
       }
-      NS_LOG_UNCOND(GetAddress () << ", " << startaid << "\t" << endaid << ", at " << Simulator::Now () << ", bufferTimeToAllowBeaconToBeReceived " << bufferTimeToAllowBeaconToBeReceived);
+      //NS_LOG_UNCOND(GetAddress () << ", " << startaid << "\t" << endaid << ", at " << Simulator::Now () << ", bufferTimeToAllowBeaconToBeReceived " << bufferTimeToAllowBeaconToBeReceived);
      }
     else
      {
