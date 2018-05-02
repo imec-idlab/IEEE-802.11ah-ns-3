@@ -29,7 +29,8 @@ NS_LOG_COMPONENT_DEFINE ("S1gCapabilities");
 S1gCapabilities::S1gCapabilities ()
   :  m_staType (0),
     m_s1gSupported (0),
-	m_pageSlicingImplemented (0)
+	m_pageSlicingImplemented (0),
+	m_ndpPsPollSupported (0)
 {
 }
 
@@ -62,6 +63,18 @@ uint8_t
 S1gCapabilities::GetPageSlicingSupport (void) const
 {
 	return m_pageSlicingImplemented;
+}
+
+void
+S1gCapabilities::SetNdpPsPollSupport (uint8_t psPollingSupported)
+{
+	NS_ASSERT (psPollingSupported <= 1);
+	m_ndpPsPollSupported = psPollingSupported;
+}
+uint8_t
+S1gCapabilities::GetNdpPsPollSupport (void) const
+{
+	return m_ndpPsPollSupported;
 }
 
 uint8_t
@@ -103,6 +116,7 @@ S1gCapabilities::GetS1gCapabilitiesInfoL64 (void) const
 {
   uint64_t val = 0;
   val |= ((uint64_t(m_staType) << 38) & (uint64_t(0x03) << 38)) | ((uint64_t(m_pageSlicingImplemented) << 52) & (uint64_t(0x01) << 52));
+  val |= ((uint64_t(m_ndpPsPollSupported) << 50) & (uint64_t(0x01) << 50));
   return val;
 }
     
@@ -131,6 +145,7 @@ void
 S1gCapabilities::SetS1gCapabilitiesInfoL64 (uint64_t info)
 {
   m_staType = (info >> 38) & 0x03;
+  m_ndpPsPollSupported = (info >> 50) & 0x01;
   m_pageSlicingImplemented = (info >> 52) & 0x01;
 }
     

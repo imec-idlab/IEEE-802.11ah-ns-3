@@ -73,6 +73,7 @@ WifiMacHeader::WifiMacHeader ()
   : m_ctrlMoreData (0),
     m_ctrlWep (0),
     m_ctrlOrder (1),
+    m_ctrlPowerManagement (0),
     m_amsduPresent (0)
 {
 }
@@ -1110,6 +1111,7 @@ WifiMacHeader::GetFrameControl (void) const
       val |= (m_ctrlFromDs << 9) & (0x1 << 9);
       val |= (m_ctrlMoreFrag << 10) & (0x1 << 10);
       val |= (m_ctrlRetry << 11) & (0x1 << 11);
+      val |= (m_ctrlPowerManagement << 12) & (0x1 << 12);
       val |= (m_ctrlMoreData << 13) & (0x1 << 13);
       val |= (m_ctrlWep << 14) & (0x1 << 14);
       val |= (m_ctrlOrder << 15) & (0x1 << 15);
@@ -1154,6 +1156,7 @@ WifiMacHeader::SetFrameControl (bool S1gBeacon, uint16_t ctrl)
       m_ctrlFromDs = (ctrl >> 9) & 0x01;
       m_ctrlMoreFrag = (ctrl >> 10) & 0x01;
       m_ctrlRetry = (ctrl >> 11) & 0x01;
+      m_ctrlPowerManagement = (ctrl >> 12) & 0x01;
       m_ctrlMoreData = (ctrl >> 13) & 0x01;
       m_ctrlWep = (ctrl >> 14) & 0x01;
       m_ctrlOrder = (ctrl >> 15) & 0x01;
@@ -1318,6 +1321,7 @@ WifiMacHeader::PrintFrameControl (std::ostream &os) const  //to do, support S1G 
 {
   os << "ToDS=" << std::hex << (int) m_ctrlToDs << ", FromDS=" << std::hex << (int) m_ctrlFromDs
      << ", MoreFrag=" <<  std::hex << (int) m_ctrlMoreFrag << ", Retry=" << std::hex << (int) m_ctrlRetry
+     << ", PowerManagement=" << std::hex << (int)m_ctrlPowerManagement
      << ", MoreData=" <<  std::hex << (int) m_ctrlMoreData << std::dec
   ;
 }
@@ -1344,6 +1348,8 @@ WifiMacHeader::Print (std::ostream &os) const  //to do, support S1G beacon frame
     case WIFI_MAC_CTL_CTLWRAPPER:
       break;
     case WIFI_MAC_CTL_PSPOLL:
+    	os << "Duration/ID=" << m_duration << "us"
+    	<< ", RA=" << m_addr1 << ", TA=" << m_addr2;
       break;
 
     case WIFI_MAC_MGT_BEACON:

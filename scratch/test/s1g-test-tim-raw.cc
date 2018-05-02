@@ -226,7 +226,10 @@ void configurePageSlice (void)
 void configureTIM (void)
 {
     config.tim.SetPageIndex (config.pageIndex);
-    config.tim.SetDTIMPeriod (config.pageSliceCount); // not necessarily the same
+    if (config.pageSliceCount)
+    	config.tim.SetDTIMPeriod (config.pageSliceCount); // not necessarily the same
+    else
+    	config.tim.SetDTIMPeriod (1);
 
     std::cout << "DTIM period=" << (int)config.pagePeriod << std::endl;
 }
@@ -236,6 +239,10 @@ void checkRawAndTimConfiguration (void)
 	std::cout << "Checking RAW and TIM configuration..." << std::endl;
 	bool configIsCorrect = true;
 	NS_ASSERT (config.rps.rpsset.size());
+	// Number of TIM groups in a single page has to equal number of different RPS elements because
+	// If #TIM > #RPS, the same RPS will be used in more than 1 TIM and that is wrong because
+	// each TIM can accommodate different AIDs (same RPS means same stations in RAWs)
+	NS_ASSERT (config.pageSliceCount == config.rps.rpsset.size());
 	for (uint32_t j = 0; j < config.rps.rpsset.size(); j++)
 	{
 		uint32_t totalRawTime = 0;
@@ -275,8 +282,7 @@ void sendStatistics(bool schedule) {
 			transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval.end(), 0);
 
 	if (schedule)
-		Simulator::Schedule(Seconds(config.visualizerSamplingInterval),
-				&sendStatistics, true);
+		Simulator::Schedule(Seconds(config.visualizerSamplingInterval),	&sendStatistics, true);
 }
 
 void onSTADeassociated(int i) {
@@ -614,27 +620,31 @@ void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet) {
 	uint64_t iSlot = slotIndex;
 	if (rpsIndex > 0)
 		for (int r = rpsIndex - 1; r >= 0; r--)
-			for (int g = 0; g < config.rps.rpsset[r]->GetNumberOfRawGroups();
-					g++)
-				iSlot +=
-						config.rps.rpsset[r]->GetRawAssigmentObj(g).GetSlotNum();
+			for (int g = 0; g < config.rps.rpsset[r]->GetNumberOfRawGroups(); g++)
+				iSlot += config.rps.rpsset[r]->GetRawAssigmentObj(g).GetSlotNum();
 
 	if (rawGroup > 0)
 		for (int i = rawGroup - 1; i >= 0; i--)
-			iSlot +=
-					config.rps.rpsset[rpsIndex]->GetRawAssigmentObj(i).GetSlotNum();
+			iSlot += config.rps.rpsset[rpsIndex]->GetRawAssigmentObj(i).GetSlotNum();
 
 	if (rpsIndex >= 0 && rawGroup >= 0 && slotIndex >= 0)
-		if (senderDevice->GetAddress() == apDevice.Get(0)->GetAddress()) {
+	{
+		if (senderDevice->GetAddress() == apDevice.Get(0)->GetAddress())
+		{
 			// from AP
-			transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[iSlot] +=
-					packet->GetSerializedSize();
-		} else {
+			transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[iSlot] += packet->GetSerializedSize();
+		}
+		else
+		{
 			// from STA
-			transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[iSlot] +=
-					packet->GetSerializedSize();
+			transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[iSlot] += packet->GetSerializedSize();
 
 		}
+	}
+	//std::cout << "------------- packetSerializedSize = " << packet->GetSerializedSize() << std::endl;
+	//std::cout << "------------- txAP[" << iSlot <<"] = " << transmissionsPerTIMGroupAndSlotFromAPSinceLastInterval[iSlot] << std::endl;
+	//std::cout << "------------- txSTA[" << iSlot <<"] = " << transmissionsPerTIMGroupAndSlotFromSTASinceLastInterval[iSlot] << std::endl;
+
 }
 
 int getSTAIdFromAddress(Ipv4Address from) {
@@ -1031,8 +1041,7 @@ void configureUDPClients() {
 void configureUDPEchoClients() {
 	UdpEchoClientHelper clientHelper(apNodeInterface.GetAddress(0), 9); //address of remote node
 	clientHelper.SetAttribute("MaxPackets", UintegerValue(4294967295u));
-	clientHelper.SetAttribute("Interval",
-			TimeValue(MilliSeconds(config.trafficInterval)));
+	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
 	//clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
 	clientHelper.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
 
@@ -1100,12 +1109,13 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 }
 
 int main(int argc, char *argv[]) {
-	/*LogComponentEnable ("UdpServer", LOG_INFO);
+	//LogComponentEnable ("UdpServer", LOG_INFO);
 	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
-	 */
+
 	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
@@ -1133,8 +1143,7 @@ int main(int argc, char *argv[]) {
 		totalRawGroups += nRaw;
 		//cout << "Total raw groups after rps " << i << " is " << totalRawGroups << endl;
 		for (int j = 0; j < nRaw; j++) {
-			config.totalRawSlots +=
-					config.rps.rpsset[i]->GetRawAssigmentObj(j).GetSlotNum();
+			config.totalRawSlots += config.rps.rpsset[i]->GetRawAssigmentObj(j).GetSlotNum();
 			//cout << "Total slots after group " << j << " is " << totalRawSlots << endl;
 		}
 
@@ -1240,12 +1249,9 @@ int main(int argc, char *argv[]) {
 	std::ostringstream oss;
 	oss << "/NodeList/" << wifiApNode.Get(0)->GetId()
 			<< "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/";
-	Config::ConnectWithoutContext(oss.str() + "RpsIndex",
-			MakeCallback(&RpsIndexTrace));
-	Config::ConnectWithoutContext(oss.str() + "RawGroup",
-			MakeCallback(&RawGroupTrace));
-	Config::ConnectWithoutContext(oss.str() + "RawSlot",
-			MakeCallback(&RawSlotTrace));
+	Config::ConnectWithoutContext(oss.str() + "RpsIndex", MakeCallback(&RpsIndexTrace));
+	Config::ConnectWithoutContext(oss.str() + "RawGroup", MakeCallback(&RawGroupTrace));
+	Config::ConnectWithoutContext(oss.str() + "RawSlot", MakeCallback(&RawSlotTrace));
 
 	// mobility.
 	MobilityHelper mobility;
@@ -1445,13 +1451,14 @@ int main(int argc, char *argv[]) {
 		cout << "DL packets lost " << totalSuccessfulPackets - totalPacketsEchoed << endl;
 		cout << "Total packets lost " << totalSentPackets - totalPacketsEchoed << endl;
 
-		cout << "uplink throughput Mbit/s " << ulThroughput << endl;
-		cout << "downlink throughput Mbit/s " << dlThroughput << endl;
+		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
+		cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
-		cout << "total throughput Mbit/s " << ulThroughput + dlThroughput << endl;
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
 
-		std::cout << "datarate" << "\t" << "UL throughput" << std::endl;
-		std::cout << config.datarate << "\t" << ulThroughput << " Mbit/s" << std::endl;
+		std::cout << "datarate" << "\t" << "throughput" << std::endl;
+		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
 	}
 	cout << "total packet loss % "
 			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
