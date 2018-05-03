@@ -29,11 +29,11 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("TrafficType", "Kind of traffic (udp, -udpecho, -tcpecho, tcpipcamera, -tcpfirmware, -tcpsensor, -coap)", trafficType);
     cmd.AddValue("NGroup", "number of RAW groups", NGroup);
     cmd.AddValue("NRawSlotNum", "number of slots per RAW", NRawSlotNum);
-    //cmd.AddValue("tcpipcameraStart", "start aid using tcpipcamera", tcpipcameraStart);
-    //cmd.AddValue("tcpipcameraEnd", "end aid using tcpipcamera", tcpipcameraEnd);
-    //cmd.AddValue("udpStart", "start aid using udp", udpStart);
-    //cmd.AddValue("udpEnd", "end aid using udp", udpEnd);
-
+    cmd.AddValue("pagePeriod", "Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page", pagePeriod);
+    cmd.AddValue("pageSliceLength", "Number of blocks in each TIM for the associated page except for the last TIM (1-31)", pageSliceLength);
+    cmd.AddValue("pageSliceCount", "Number of TIMs in a single page period (0-31; value 0 for whole page to be encoded in a single (only) TIM)", pageSliceCount);
+    cmd.AddValue("blockOffset", "The 1st page slice starts with the block with blockOffset", blockOffset);
+    cmd.AddValue("timOffset", "Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page", timOffset);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
