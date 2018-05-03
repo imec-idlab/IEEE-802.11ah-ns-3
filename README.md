@@ -26,7 +26,7 @@ This module includes support for:
 `./waf --run test`
     * Pass the arguments for desired setup e.g.:
     
-    `./waf --run "test --seed=1 --simulationTime=60 --payloadSize=256 --pagePeriod=2 --pageSliceLength=8 --pageSliceCount=2"`
+    `./waf --run "test --seed=1 --simulationTime=60 --payloadSize=256"`
   
   
 ### RAW related parameters: ###
