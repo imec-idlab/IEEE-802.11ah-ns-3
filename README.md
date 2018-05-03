@@ -15,15 +15,19 @@ This module includes support for:
 * Adaptive Modulation and Coding Scheme (MCS)
 
 ### Installation and usage instructions ###
-* Download source code from our repository.
-* Change into ./IEEE-802.11ah-ns-3/ns-3 directory.  
-* Build and run:
-
-    ./waf --run "test --seed=1 --simulationTime=60 --payloadSize=256 --pagePeriod=2 --pageSliceLength=8 --pageSliceCount=2"
-
-Note: if errors related to nullptr arise when compiling, CXXFLAGS should be included into the "./waf configure" command,as follows:   
-
-  `CXXFLAGS="-std=c++11" ./waf configure --disable-examples --disable-tests`
+* Clone the project from git
+* Follow the instructions on https://www.nsnam.org/wiki/Installation to prepare all dependencies
+* Change into IEEE-802.11ah-ns-3 directory.  
+* Configure waf:
+`CXXFLAGS="-std=c++11" ./waf configure --disable-examples --disable-tests`
+* Build:
+`./waf`
+* Run the simulation (if you use [ahVisualizer](https://github.com/imec-idlab/ahVisualizer) start it first):
+`./waf --run test`
+    * Pass the arguments for desired setup e.g.:
+    
+    `./waf --run "test --seed=1 --simulationTime=60 --payloadSize=256"`
+  
   
 ### RAW related parameters: ###
 * NRawSta:             Number of stations supporting RAW. NRawSta equals the largest AID specified in RAWConfigFile.
