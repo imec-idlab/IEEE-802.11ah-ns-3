@@ -103,3 +103,5 @@ Note: Relation between the above 3 parameters and MCS is described in file "MCSt
     
     To configure a single page slice (whole page encoded in a single page slice), it is neccessary to set pageSliceCount to 0 and pageSliceLength to 1.
 
+### Further reading
+For more information on the implementation of the IEEE 802.11ah module for ns-3, check our [recent WNS3 paper on ResearchGate](https://www.researchgate.net/publication/324910418_Extension_of_the_IEEE_80211ah_ns-3_Simulation_Module).
