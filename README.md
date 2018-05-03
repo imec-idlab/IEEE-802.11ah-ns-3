@@ -1,3 +1,6 @@
+If you use our work, you can use the following citation to refer to it:
+> Le Tian, Amina Sljivo, Serena Santi, Eli De Poorter, Jeroen Hoebeke, Jeroen Famaey. **Extension of the IEEE 802.11ah NS-3 Simulation Module.** Workshop on ns-3 (WNS3), 2018.
+
 ### IEEE 802.11ah ns-3 
 > alpha version
 
