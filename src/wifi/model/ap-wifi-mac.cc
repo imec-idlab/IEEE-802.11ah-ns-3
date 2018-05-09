@@ -967,7 +967,7 @@ ApWifiMac::SendOneBeacon (void)
 
     
     m_PageIndex = m_pageslice.GetPageindex();
-    // m_TIM.SetPageIndex (m_PageIndex); 
+    //m_TIM.SetPageIndex (m_PageIndex);
     uint64_t numPagedStas (0);
     for (auto it = m_supportPageSlicingList.begin(); it != m_supportPageSlicingList.end(); ++it){
     	if (m_stationManager->IsAssociated (it->first) && HasPacketsInQueueTo(it->first) )
@@ -1045,13 +1045,13 @@ ApWifiMac::SendOneBeacon (void)
         m_blockoffset++; //actually block id
         NS_ASSERT (m_blockoffset <= m_pageslice.GetBlockOffset () + m_pageslice.GetInformationFieldSize () * 8);
         //block id cannot exceeds the max defined in the page slice  element
-        
         m_TIM.SetPartialVBitmap (*m_encodedBlock);
         if (m_encodedBlock)
         	delete m_encodedBlock;
       }
 
     }
+
     beacon.SetTIM (m_TIM);
    /* if (m_DTIMOffset == m_DTIMPeriod - 1)
       {
