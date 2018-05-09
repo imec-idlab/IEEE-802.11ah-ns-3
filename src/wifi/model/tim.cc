@@ -293,9 +293,10 @@ TIM::SerializeInformationField (Buffer::Iterator start) const
  if (m_BitmapControl || m_length != 0)
    {
      start.WriteU8 (m_BitmapControl);
-     NS_LOG_DEBUG ("Bitmap Control field is " << m_BitmapControl);
+     start.Write (m_partialVBitmap, m_length);
+     NS_LOG_DEBUG ("Bitmap Control field is " << (int)m_BitmapControl);
+     NS_LOG_DEBUG ("Length of Partial Virtual Bitmap is " << (int)m_length);
    }
- start.Write (m_partialVBitmap, m_length);
 }
 
 uint8_t
@@ -311,6 +312,11 @@ TIM::DeserializeInformationField (Buffer::Iterator start, uint8_t length)
 	  m_length = length-3;
 	  m_partialVBitmap = m_partialVBitmap_arrary;
 
+    }
+  else
+    {
+	  SetBitmapControl (0);
+	  m_length = 0;
     }
   return length;
 }
