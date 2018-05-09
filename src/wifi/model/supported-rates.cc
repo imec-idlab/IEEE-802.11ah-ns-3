@@ -61,11 +61,13 @@ SupportedRates::AddSupportedRate (uint32_t bs)
   m_rates[m_nRates] = bs / 500000;
   m_nRates++;
   NS_LOG_DEBUG ("add rate=" << bs << ", n rates=" << (uint32_t)m_nRates);
+  NS_LOG_UNCOND("add rate=" << bs << ", n rates=" << (uint32_t)m_nRates);
 }
 
 void
 SupportedRates::SetBasicRate (uint32_t bs)
 {
+  NS_LOG_UNCOND ("SetBasicRate " << bs);  
   uint8_t rate = bs / 500000;
   for (uint8_t i = 0; i < m_nRates; i++)
     {
@@ -80,6 +82,7 @@ SupportedRates::SetBasicRate (uint32_t bs)
           return;
         }
     }
+  NS_LOG_UNCOND ("AddSupportedRate " << bs);
   AddSupportedRate (bs);
   SetBasicRate (bs);
 }

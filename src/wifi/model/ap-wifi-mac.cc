@@ -81,6 +81,11 @@ ApWifiMac::GetTypeId (void)
                    MakeBooleanAccessor (&ApWifiMac::SetBeaconGeneration,
                                         &ApWifiMac::GetBeaconGeneration),
                    MakeBooleanChecker ())
+    .AddAttribute ("ChannelWidth", "Channel width of the stations ",
+                    UintegerValue (0),
+                     MakeUintegerAccessor (&ApWifiMac::GetChannelWidth,
+                                           &ApWifiMac::SetChannelWidth),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("NRawGroupStas", "Number of stations in one Raw Group",
                    UintegerValue (6000),
                    MakeUintegerAccessor (&ApWifiMac::GetRawGroupInterval,
@@ -381,6 +386,18 @@ ApWifiMac::SetSlotNum (uint32_t count)
     m_slotNum = count;
 }
 
+void
+ApWifiMac::SetChannelWidth (uint32_t width)
+{
+   m_channelWidth = width;
+}
+
+uint32_t
+ApWifiMac::GetChannelWidth (void) const
+{
+    NS_LOG_UNCOND (GetAddress () << ", GetChannelWidth " << m_channelWidth );
+   return m_channelWidth;
+}
 
 void
 ApWifiMac::StartBeaconing (void)
@@ -598,7 +615,8 @@ ApWifiMac::GetSupportedRates (void) const
     {
       for (uint32_t i = 0; i < m_phy->GetNBssMembershipSelectors (); i++)
         {
-          rates.SetBasicRate (m_phy->GetBssMembershipSelector (i));
+          NS_LOG_UNCOND (GetAddress () << " GetSupportedRates ");
+          rates.SetBasicRate (m_phy->GetBssMembershipSelector (i)); //not sure it's needed
         }
     }
   //Send the set of supported rates and make sure that we indicate
@@ -640,6 +658,17 @@ ApWifiMac::GetHtCapabilities (void) const
     {
       capabilities.SetRxMcsBitmask (m_phy->GetMcs (i));
     }
+  return capabilities;
+}
+
+S1gCapabilities
+ApWifiMac::GetS1gCapabilities (void) const
+{
+  S1gCapabilities capabilities;
+  capabilities.SetS1gSupported (1);
+  //capabilities.SetStaType (GetStaType ()); //do not need for AP
+  capabilities.SetChannelWidth (GetChannelWidth ());
+
   return capabilities;
 }
 
@@ -717,6 +746,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
    
   if (m_s1gSupported && success)
     {
+      assoc.SetS1gCapabilities (GetS1gCapabilities ());
       //assign AID based on station type, to do.
        if (staType == 1)
         {
@@ -1445,6 +1475,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                   if (m_s1gSupported)
                     {
                       S1gCapabilities s1gcapabilities = assocReq.GetS1gCapabilities ();
+                      m_stationManager->AddStationS1gCapabilities (from,s1gcapabilities);
                       uint8_t sta_type = s1gcapabilities.GetStaType ();
                       bool pageSlicingSupported = s1gcapabilities.GetPageSlicingSupport() != 0;
                       m_supportPageSlicingList[hdr->GetAddr2 ()] = pageSlicingSupported;

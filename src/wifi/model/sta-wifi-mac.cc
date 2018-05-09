@@ -102,6 +102,12 @@ StaWifiMac::GetTypeId (void)
                    MakeUintegerAccessor (&StaWifiMac::GetStaType,
                                          &StaWifiMac::SetStaType),
                    MakeUintegerChecker<uint32_t> ())
+    .AddAttribute ("ChannelWidth",
+                   "Channel width of the stations ",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&StaWifiMac::GetChannelWidth,
+                                         &StaWifiMac::SetChannelWidth),
+                   MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("ActiveProbing",
                    "If true, we send probe requests. If false, we don't."
                    "NOTE: if more than one STA in your simulation is using active probing, "
@@ -203,6 +209,19 @@ void
 StaWifiMac::SetStaType (uint32_t statype)
 {
    m_staType = statype;
+}
+
+void
+StaWifiMac::SetChannelWidth (uint32_t width)
+{
+   m_channelWidth = width;
+}
+
+uint32_t
+StaWifiMac::GetChannelWidth (void) const
+{
+    NS_LOG_UNCOND (GetAddress () << ", GetChannelWidth " << m_channelWidth );
+   return m_channelWidth;
 }
 
 uint32_t
@@ -1603,10 +1622,29 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                   HtCapabilities htcapabilities = assocResp.GetHtCapabilities ();
                   m_stationManager->AddStationHtCapabilities (hdr->GetAddr2 (),htcapabilities);
                 }
+              
+              if (m_s1gSupported)
+                {
+                  S1gCapabilities s1gcapabilities = assocResp.GetS1gCapabilities ();
+                  NS_LOG_UNCOND (GetAddress () << ", receive " << uint16_t( s1gcapabilities.GetChannelWidth ()));
+                  m_stationManager->AddStationS1gCapabilities (hdr->GetAddr2 (),s1gcapabilities);
+                }
 
               for (uint32_t i = 0; i < m_phy->GetNModes (); i++)
                 {
                   WifiMode mode = m_phy->GetMode (i);
+                  for (uint32_t j = 0; j < m_phy->m_deviceRateSet.size (); j++)
+                   {
+                    if (m_phy->m_deviceRateSet[j] == mode )
+                    {
+                       NS_LOG_UNCOND (GetAddress () << ", AddSupportedMode " << hdr->GetAddr2 () << ", " << mode);                        
+                        m_stationManager->AddSupportedMode (hdr->GetAddr2 (), mode);
+                        if (rates.IsBasicRate (mode.GetDataRate ()))
+                        {
+                            m_stationManager->AddBasicMode (mode);
+                        }
+                    }
+                  }
                   if (rates.IsSupportedRate (mode.GetDataRate ()))
                     {
                       m_stationManager->AddSupportedMode (hdr->GetAddr2 (), mode);
@@ -1689,6 +1727,7 @@ StaWifiMac::GetS1gCapabilities (void) const
   S1gCapabilities capabilities;
   capabilities.SetS1gSupported (1);
   capabilities.SetStaType (GetStaType ()); //need to define/change
+  capabilities.SetChannelWidth (GetChannelWidth ());
   capabilities.SetPageSlicingSupport(1);
   return capabilities;
 }

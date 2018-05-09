@@ -651,6 +651,18 @@ MgtAssocResponseHeader::GetHtCapabilities (void) const
   return m_htCapability;
 }
 
+void
+MgtAssocResponseHeader::SetS1gCapabilities (S1gCapabilities s1gcapabilities)
+{
+  m_s1gCapability = s1gcapabilities;
+}
+
+S1gCapabilities
+MgtAssocResponseHeader::GetS1gCapabilities (void) const
+{
+  return m_s1gCapability;
+}
+
 TypeId
 MgtAssocResponseHeader::GetTypeId (void)
 {

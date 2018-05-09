@@ -1192,8 +1192,9 @@ int main(int argc, char *argv[]) {
 	StringValue DataRate;
 	DataRate = StringValue(getWifiMode(config.DataMode)); // changed
 
-	wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",
-			DataRate, "ControlMode", DataRate);
+	wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",DataRate, "ControlMode", DataRate);
+    //wifi.SetRemoteStationManager("ns3::ArfWifiManager");
+
 
 	mac.SetType("ns3::StaWifiMac", "Ssid", SsidValue(ssid), "ActiveProbing",
 			BooleanValue(false));
