@@ -242,7 +242,10 @@ void checkRawAndTimConfiguration (void)
 	// Number of TIM groups in a single page has to equal number of different RPS elements because
 	// If #TIM > #RPS, the same RPS will be used in more than 1 TIM and that is wrong because
 	// each TIM can accommodate different AIDs (same RPS means same stations in RAWs)
+    if(config.pageSliceCount)
+    {
 	NS_ASSERT (config.pageSliceCount == config.rps.rpsset.size());
+    }
 	for (uint32_t j = 0; j < config.rps.rpsset.size(); j++)
 	{
 		uint32_t totalRawTime = 0;

@@ -1021,6 +1021,10 @@ ApWifiMac::SendOneBeacon (void)
 			// Standard 10.47 page 325-326
 		}
 	}
+  else if (m_pageslice.GetPageSliceCount () == 0 && numPagedStas == 0)
+   {
+      m_PageSliceNum = 0;
+   }
 
     uint8_t NumEncodedBlock;
     if (m_PageSliceNum != (m_pageslice.GetPageSliceCount() - 1) && m_PageSliceNum != 31) // convenient overflow if count==0
