@@ -482,7 +482,29 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  uint8_t block = (aid >> 6 ) & 0x001f;
 	  uint8_t page = (aid >> 11 ) & 0x0003;
 	  NS_ASSERT (block >= m_pageslice.GetBlockOffset());
-	  uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();
+	  uint8_t toTim = 0;
+	  	//= (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+
+	  	for (uint32_t i = 0; i < m_pageslice.GetPageSliceCount(); i++)
+	  	{
+	  		if (i == m_pageslice.GetPageSliceCount() - 1)
+	  		{
+	  			//last page slice
+	  			if ( i * m_pageslice.GetPageSliceLen() <= block && block <= 31)
+	  				toTim = i;
+	  		}
+	  		else
+	  		{
+	  			if (i * m_pageslice.GetPageSliceLen() <= block && block < (i + 1) * m_pageslice.GetPageSliceLen())
+	  			{
+	  				if (i == 0)
+	  					continue;
+	  				toTim++;
+	  			}
+	  		}
+	  		//if (i * m_pageslice.GetPageSliceLen() <= block && block <= )
+	  	}
+	  //uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();
 	  Time wait;
 	  // station needs to receive DTIM beacon with indication there is downlink data first
 	  if (toTim >= m_TIM.GetDTIMCount())
@@ -495,7 +517,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
 
 	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
-	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now.");
+	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
 	  /*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
 	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
@@ -558,7 +580,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
     uint16_t slotNum=0;
     uint64_t currentRAW_start=0;
     Time lastRawDurationus = MicroSeconds(0);
-
+    int x = 0;
 	for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
 	{
 		RPS::RawAssignment ass = m_rpsset.rpsset.at(toTim)->GetRawAssigmentObj(raw_index);
@@ -571,13 +593,15 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
 			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index + 1 << " in slot " << statRawSlot + 1 << ". RAW slot start time relative to the beacon = " << start.GetMicroSeconds() << " us.");
+			x = 1;
 			return start;
 		}
 	}
 	// AIDs that are not assigned to any RAW group can sleep through all the RAW groups
 	// For station that does not belong to anz RAW group, return the time after all RAW groups
-	currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
-	NS_LOG_DEBUG ("[aid=" << aid << "] is located outside all RAWs. It can start contending " << currentRAW_start << " us after the beacon.");
+	/*currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
+	NS_LOG_DEBUG ("[aid=" << aid << "] is located outside all RAWs. It can start contending " << currentRAW_start << " us after the beacon.");*/
+	NS_ASSERT (x);
 	return MicroSeconds (currentRAW_start);
 }
 

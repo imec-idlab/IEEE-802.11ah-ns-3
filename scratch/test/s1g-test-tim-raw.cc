@@ -1122,11 +1122,11 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 
 int main(int argc, char *argv[]) {
 	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
-	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
 	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
 	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
 
 	bool OutputPosition = true;
@@ -1137,7 +1137,7 @@ int main(int argc, char *argv[]) {
 
 	configurePageSlice ();
 	configureTIM ();
-	//checkRawAndTimConfiguration ();
+	checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
