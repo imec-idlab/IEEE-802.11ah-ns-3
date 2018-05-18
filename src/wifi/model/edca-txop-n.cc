@@ -554,7 +554,7 @@ EdcaTxopN::NotifyAccessGranted (void)
           
           //while (1)
            // {
-              if (!(! m_sleepList.find(m_currentHdr.GetAddr1())->second || m_sleepList.size ()== 0)) // "m_sleepList.size ()== 0" for non-ap stations
+              if (!(!m_sleepList.find(m_currentHdr.GetAddr1())->second || m_sleepList.size ()== 0)) // "m_sleepList.size ()== 0" for non-ap stations
               // no sleep 
                 {
             	  return;

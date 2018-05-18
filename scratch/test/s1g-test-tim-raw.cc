@@ -239,12 +239,12 @@ void checkRawAndTimConfiguration (void)
 	std::cout << "Checking RAW and TIM configuration..." << std::endl;
 	bool configIsCorrect = true;
 	NS_ASSERT (config.rps.rpsset.size());
-	// Number of TIM groups in a single page has to equal number of different RPS elements because
-	// If #TIM > #RPS, the same RPS will be used in more than 1 TIM and that is wrong because
-	// each TIM can accommodate different AIDs (same RPS means same stations in RAWs)
+	// Number of page slices in a single page has to equal number of different RPS elements because
+	// If #PS > #RPS, the same RPS will be used in more than 1 PS and that is wrong because
+	// each PS can accommodate different AIDs (same RPS means same stations in RAWs)
     if(config.pageSliceCount)
     {
-	NS_ASSERT (config.pageSliceCount == config.rps.rpsset.size());
+	//NS_ASSERT (config.pagePeriod == config.rps.rpsset.size());
     }
 	for (uint32_t j = 0; j < config.rps.rpsset.size(); j++)
 	{
@@ -263,13 +263,21 @@ void checkRawAndTimConfiguration (void)
 		NS_ASSERT (totalRawTime <= config.BeaconInterval);
 	}
 }
-
+// assumes each TIM has its own beacon - doesn't need to be the case as there has to be only PageSliceCount beacons between DTIMs
 bool check (uint16_t aid, uint32_t index)
 {
 	uint8_t block = (aid >> 6 ) & 0x001f;
 	NS_ASSERT (config.pageS.GetPageSliceLen() > 0);
-	uint8_t toTim = (block - config.pageS.GetBlockOffset()) % config.pageS.GetPageSliceLen();
-	return toTim == index;
+	//uint8_t toTim = (block - config.pageS.GetBlockOffset()) % config.pageS.GetPageSliceLen();
+	if (index == config.pageS.GetPageSliceCount() - 1 && config.pageS.GetPageSliceCount() != 0)
+	{
+		// the last page slice has 32 - the rest blocks
+		return (block <= 31) && (block >= index * config.pageS.GetPageSliceLen());
+	}
+	else if (config.pageS.GetPageSliceCount() == 0)
+		return true;
+
+	return (block >= index * config.pageS.GetPageSliceLen()) && (block < (index + 1) * config.pageS.GetPageSliceLen());
 }
 
 
@@ -334,6 +342,7 @@ void onSTAAssociated(int i) {
 		stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
 		if (config.trafficType == "udp") {
+			std::cout << "UDP" << std::endl;
 			configureUDPServer();
 			configureUDPClients();
 		} else if (config.trafficType == "udpecho") {
@@ -1113,12 +1122,12 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 
 int main(int argc, char *argv[]) {
 	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
-	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-	//LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
-	//LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
+	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
+	LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
@@ -1128,7 +1137,7 @@ int main(int argc, char *argv[]) {
 
 	configurePageSlice ();
 	configureTIM ();
-	checkRawAndTimConfiguration ();
+	//checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
@@ -1323,6 +1332,7 @@ int main(int argc, char *argv[]) {
 	apNodeInterface = address.Assign(apDevice);
 
 	//trace association
+	std::cout << "Configuring trace sources..." << std::endl;
 	for (uint16_t kk = 0; kk < config.Nsta; kk++) {
 		std::ostringstream STA;
 		STA << kk;

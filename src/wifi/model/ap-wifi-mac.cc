@@ -494,7 +494,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  wait -= Simulator::Now() - this->m_lastBeaconTime;
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
 
-	  wait += GetSlotStartTimeFromAid (aid);
+	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
 	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now.");
 	  /*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
@@ -521,7 +521,28 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 {
 	uint8_t block = (aid >> 6 ) & 0x001f;
 	NS_ASSERT (block >= m_pageslice.GetBlockOffset());
-	uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+	uint8_t toTim = 0;
+	//= (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+
+	for (uint32_t i = 0; i < m_pageslice.GetPageSliceCount(); i++)
+	{
+		if (i == m_pageslice.GetPageSliceCount() - 1)
+		{
+			//last page slice
+			if ( i * m_pageslice.GetPageSliceLen() <= block && block <= 31)
+				toTim = i;
+		}
+		else
+		{
+			if (i * m_pageslice.GetPageSliceLen() <= block && block < (i + 1) * m_pageslice.GetPageSliceLen())
+			{
+				if (i == 0)
+					continue;
+				toTim++;
+			}
+		}
+		//if (i * m_pageslice.GetPageSliceLen() <= block && block <= )
+	}
 
 	//std::cout << "aid=" << (int)aid << ", toTim=" << (int)toTim << std::endl;
 	uint16_t raw_len = (*m_rpsset.rpsset.at(toTim)).GetInformationFieldSize();
@@ -537,7 +558,6 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
     uint16_t slotNum=0;
     uint64_t currentRAW_start=0;
     Time lastRawDurationus = MicroSeconds(0);
-    int x = 0;
 
 	for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
 	{
@@ -551,11 +571,14 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 			uint16_t statRawSlot = (aid & 0x03ff) % slotNum;
 			Time start = MicroSeconds((500 + slotDurationCount * 120) * statRawSlot + currentRAW_start);
 			NS_LOG_DEBUG ("[aid=" << aid << "] is located in RAW " << (int)raw_index + 1 << " in slot " << statRawSlot + 1 << ". RAW slot start time relative to the beacon = " << start.GetMicroSeconds() << " us.");
-			x=1;
 			return start;
 		}
 	}
-	NS_ASSERT (x);
+	// AIDs that are not assigned to any RAW group can sleep through all the RAW groups
+	// For station that does not belong to anz RAW group, return the time after all RAW groups
+	currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
+	NS_LOG_DEBUG ("[aid=" << aid << "] is located outside all RAWs. It can start contending " << currentRAW_start << " us after the beacon.");
+	return MicroSeconds (currentRAW_start);
 }
 
 void
@@ -726,7 +749,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                  goto Addheader;
             }
           m_sensorList.push_back (aid);
-          NS_LOG_DEBUG ("m_sensorList =" << m_sensorList.size ());
+          NS_LOG_INFO ("m_sensorList =" << m_sensorList.size ());
   
         }
        else if (staType == 2)
@@ -737,7 +760,7 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
                   goto Addheader;
             }
           m_OffloadList.push_back (aid);
-          NS_LOG_DEBUG ("m_OffloadList =" << m_OffloadList.size ());
+          NS_LOG_INFO ("m_OffloadList =" << m_OffloadList.size ());
         }
     }
 Addheader:
@@ -792,6 +815,7 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
            if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
             {
         	   blockBitmap = blockBitmap | (1 << i);
+        	   NS_LOG_UNCOND ("[aid=" << sta_aid << "] " << "paged");
         	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
         	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
         		   m_PageSliceNum = 31;
@@ -896,13 +920,13 @@ ApWifiMac::SendOneBeacon (void)
       if (RpsIndex < m_rpsset.rpsset.size())
          {
             m_rps = m_rpsset.rpsset.at(RpsIndex);
-            NS_LOG_DEBUG ("< RpsIndex =" << RpsIndex);
+            NS_LOG_INFO ("< RpsIndex =" << RpsIndex);
             RpsIndex++;
           }
       else
          {
             m_rps = m_rpsset.rpsset.at(0);
-            NS_LOG_DEBUG ("RpsIndex =" << RpsIndex);
+            NS_LOG_INFO ("RpsIndex =" << RpsIndex);
             RpsIndex = 1;
           }
       beacon.SetRPS (*m_rps);
@@ -1119,7 +1143,7 @@ ApWifiMac::SendOneBeacon (void)
       NS_LOG_DEBUG(
     		  "Transmission of beacon will take " << txTime << ", delaying RAW start for that amount");
       Time bufferTimeToAllowBeaconToBeReceived = txTime;
-      //bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
+      bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
       auto nRaw = m_rps->GetNumberOfRawGroups();
       currentRawGroup = (currentRawGroup + 1) % nRaw;
 
@@ -1236,8 +1260,7 @@ ApWifiMac::SendOneBeacon (void)
 
 void ApWifiMac::OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
-	LOG_TRAFFIC(
-			"AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
+	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << rawGroup << " SLOT " << slot);
 	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
 	m_rawSlotTrace = slot;

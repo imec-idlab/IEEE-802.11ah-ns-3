@@ -713,6 +713,8 @@ WifiRemoteStationManager::ReportRtsFailed (Mac48Address address, const WifiMacHe
 void
 WifiRemoteStationManager::ReportDataFailed (Mac48Address address, const WifiMacHeader *header)
 {
+	NS_LOG_UNCOND ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ReportDataFailed" << address << *header);
+
   NS_LOG_FUNCTION (this << address << *header);
   NS_ASSERT (!address.IsGroup ());
   WifiRemoteStation *station = Lookup (address, header);
@@ -760,6 +762,7 @@ WifiRemoteStationManager::ReportFinalRtsFailed (Mac48Address address, const Wifi
 void
 WifiRemoteStationManager::ReportFinalDataFailed (Mac48Address address, const WifiMacHeader *header)
 {
+NS_LOG_UNCOND ("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!ReportFinalDataFailed" << address << *header);
   NS_LOG_FUNCTION (this << address << *header);
   NS_ASSERT (!address.IsGroup ());
   WifiRemoteStation *station = Lookup (address, header);

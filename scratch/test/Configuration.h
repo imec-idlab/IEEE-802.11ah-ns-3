@@ -85,7 +85,7 @@ struct Configuration {
 	string TrafficPath="./OptimalRawGroup/traffic/data-32-0.82.txt";
 	bool S1g1MfieldEnabled=false;
 	string RAWConfigFile = "./OptimalRawGroup/RawConfig-32-2-2.txt";
-	string DataMode = "MCS2_0"; //TODO copy this from Dwight, OfdmRate7_8MbpsBW2MHz MCS2
+	string DataMode = "MCS2_0";
 	string OutputPath = "./OptimalRawGroup/resultsenergyconsumption/";
 	/*
 	 * Amina's configuration parameters
