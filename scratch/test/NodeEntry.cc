@@ -81,7 +81,7 @@ void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
-	if(showLog) cout << "[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
+	/*if(showLog)*/ cout << "+++++++++++++++++++[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
 					<< endl;
 
 	if (txMap.find(packet->GetUid()) != txMap.end()) {
@@ -590,8 +590,7 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 
 		//cout << "[" << this->id << "] " << "UDP packet received at AP after "
 		//	<< std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
-		if (this->id == 90)
-			cout << "++++++++++++++++++++++++++++++++++++++++++++++ RX at " << Simulator::Now() << "seq " << seqTs.GetSeq() << endl;
+		//cout << "+++++++++++udpPacketReceivedAtServer" << endl;
 		stats->get(this->id).NumberOfSuccessfulPackets++;
 		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
 		stats->get(this->id).latency = timeDiff;

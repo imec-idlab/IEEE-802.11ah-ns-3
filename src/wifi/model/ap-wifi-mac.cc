@@ -197,6 +197,14 @@ ApWifiMac::DoDispose ()
   m_beaconDca = 0;
   m_enableBeaconGeneration = false;
   m_beaconEvent.Cancel ();
+  for (uint32_t i = 0; i < m_rawSlotsDca.size(); i++)
+  {
+	  m_rawSlotsDca[i]->Dispose();
+	  for (EdcaQueues::iterator it = m_rawSlotsEdca[i].begin (); it != m_rawSlotsEdca[i].end (); ++it)
+	    {
+	      it->second = 0;
+	    }
+  }
   RegularWifiMac::DoDispose ();
 }
 
@@ -1589,6 +1597,53 @@ ApWifiMac::DoInitialize (void)
   m_edca.find(AC_VI)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
   m_edca.find(AC_BE)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
   m_edca.find(AC_BK)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+
+  uint32_t numTim = 0;
+  if (m_pageslice.GetPageSliceCount() == 0)
+	  numTim = 1;
+  else
+	  numTim = m_pageslice.GetPageSliceCount();
+
+  uint32_t totalSlots = 0;
+  for (uint32_t i = 0; i < numTim; i++)
+  {
+	  for (uint32_t j = 0; j < m_rpsset.rpsset.at(i)->GetNumberOfRawGroups(); j++)
+	  {
+		  RPS::RawAssignment ass = m_rpsset.rpsset.at(i)->GetRawAssigmentObj(j);
+		  totalSlots += ass.GetSlotNum();
+	  }
+  }
+
+
+  m_rawSlotsDca = std::vector<Ptr<DcaTxop>>();
+  for (uint32_t i = 0; i < totalSlots; i++) {
+
+	  Ptr<DcaTxop> dca = CreateObject<DcaTxop>();
+	  dca->SetLow(m_low);
+	  dca->SetManager(m_dcfManager);
+	  dca->SetTxMiddle(m_txMiddle);
+	  dca->SetTxOkCallback(MakeCallback(&ApWifiMac::TxOk, this));
+	  dca->SetTxFailedCallback(MakeCallback(&ApWifiMac::TxFailed, this));
+
+	  dca->SetWifiRemoteStationManager(m_stationManager);
+
+	  dca->GetQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+
+	  dca->TraceConnect("Collision", "", MakeCallback(&ApWifiMac::OnCollision, this));
+
+	  // ensure queues don't expire too fast
+	  dca->GetQueue()->SetMaxDelay(MilliSeconds(10000));//todo hardcoded value
+	  dca->Initialize();
+	  ConfigureDcf(dca, 15, 1023, AC_BE_NQOS);
+	  m_rawSlotsDca.push_back(dca);
+
+	  EdcaQueues edca;
+	  for (EdcaQueues::iterator i = edca.begin (); i != edca.end (); ++i)
+	    {
+	      i->second->Initialize ();
+	    }
+	  m_rawSlotsEdca.push_back(edca);
+  }
 
   RegularWifiMac::DoInitialize ();
 }

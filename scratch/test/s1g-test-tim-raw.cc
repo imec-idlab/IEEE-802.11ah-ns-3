@@ -342,7 +342,6 @@ void onSTAAssociated(int i) {
 		stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
 		if (config.trafficType == "udp") {
-			std::cout << "UDP" << std::endl;
 			configureUDPServer();
 			configureUDPClients();
 		} else if (config.trafficType == "udpecho") {
@@ -418,7 +417,7 @@ void configureNodes(NodeContainer& wifiStaNode, NetDeviceContainer& staDevice) {
 		Config::Connect(
 				"/NodeList/" + std::to_string(i)
 						+ "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/PacketDropped",
-				MakeCallback(&NodeEntry::OnMacPacketDropped, n));
+				MakeCallback(&NodeEntry::OnMacPacketDropped, n)); //works
 		Config::Connect(
 				"/NodeList/" + std::to_string(i)
 						+ "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::StaWifiMac/Collision",
@@ -549,6 +548,7 @@ string getWifiMode(string dataMode) {
 
 void OnAPPhyRxDrop(std::string context, Ptr<const Packet> packet,
 		DropReason reason) {
+	//std::cout << "+++++++++++++++++ AP DROP REASON" << reason << endl;
 	// THIS REQUIRES PACKET METADATA ENABLE!
 	auto pCopy = packet->Copy();
 	auto it = pCopy->BeginItem();
@@ -1121,12 +1121,14 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 }
 
 int main(int argc, char *argv[]) {
+	PacketMetadata::Enable();
+
 	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
-	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
 	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
+	/*LogComponentEnable ("StaWifiMac", LOG_DEBUG);*/
 	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
 
 	bool OutputPosition = true;
@@ -1137,7 +1139,7 @@ int main(int argc, char *argv[]) {
 
 	configurePageSlice ();
 	configureTIM ();
-	checkRawAndTimConfiguration ();
+	//checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"

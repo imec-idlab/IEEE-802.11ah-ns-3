@@ -303,6 +303,11 @@ private:
     
   std::map<Mac48Address, bool> m_sleepList;
   std::map<Mac48Address, bool> m_supportPageSlicingList;
+  std::vector<Ptr<DcaTxop>> m_rawSlotsDca;
+  std::vector<EdcaQueues> m_rawSlotsEdca;
+
+  std::vector<int> pendingDataSizeForStations;
+  std::vector<bool> staIsActiveDuringCurrentCycle;
 
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons

@@ -65,7 +65,7 @@ namespace ns3 {
 NS_LOG_COMPONENT_DEFINE ("StaWifiMac");
 
 NS_OBJECT_ENSURE_REGISTERED (StaWifiMac);
-
+bool trackSleep = false;
 TypeId
 StaWifiMac::GetTypeId (void)
 {
@@ -378,8 +378,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 		if (m_TIM.GetDTIMCount() == 0)
 		{
 			m_pagedInDtim = false;
-			NS_LOG_DEBUG(
-					"[aid=" << GetAID() << "] received DTIM beacon.");
+			NS_LOG_DEBUG("[aid=" << GetAID() << "] received DTIM beacon.");
 			m_pageSlice = beacon.GetpageSlice();
 			// TIM element length is 2 when both Partial Virtual Bitmap and Bitmap Control fields are 0 - they are not present in TIM
 			// TIM element length is 3 when Partial Virtual Bitmap is 0 - it is not present in TIM
@@ -396,10 +395,10 @@ StaWifiMac::SendPspollIfnecessary (void)
 			// This cannot happen in TIM beacons because station will never wake up for TIM that is not in its page
 			if (m_selfPage != m_pageSlice.GetPageindex())
 			{
-				NS_LOG_DEBUG(
-						"[aid=" << GetAID() << "] is not located in page " << (int)m_Pageindex << ", but in page " << (int)m_selfPage << ". Scheduling sleep until the next DTIM beacon.");
+				NS_LOG_DEBUG("[aid=" << GetAID() << "] is not located in page " << (int)m_Pageindex << ", but in page " << (int)m_selfPage << ". Scheduling sleep until the next DTIM beacon.");
 				m_pagedInDtim = false;
 				GoToSleepCurrentTIM(beacon); // schedule wakeup for next DTIM
+				if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L401" << std::endl;
 				return;
 			}
 
@@ -415,6 +414,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 						"[aid=" << GetAID() << "] belongs to a block " << (int)m_selfBlock << " which is not included in current page (" << (int)m_selfPage << ") because block offset in Page Slice element is " << (int)m_BlockOffset << " Scheduling sleep until the next DTIM beacon.");
 				m_pagedInDtim = false;
 				GoToSleepCurrentTIM(beacon);
+				if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L417" << std::endl;
 				return;
 			}
 
@@ -437,6 +437,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 				m_pagedInDtim = false;
 				NS_LOG_DEBUG("[aid=" << GetAID() << "] Page bitmap did not indicate traffic for me. Scheduling sleep until the next DTIM beacon.");
 				GoToSleepCurrentTIM(beacon); // schedule wakeup for next DTIM
+				if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L440" << std::endl;
 				return;
 			}
 			NS_ASSERT(m_dataBuffered);
@@ -448,7 +449,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 				selfPageSliceNumber--;
 			}
 
-			if (selfPageSliceNumber != m_TIM.GetPageSliceNum())
+			if (selfPageSliceNumber != m_TIM.GetPageSliceNum() && m_TIM.GetPageSliceNum() != 31)
 			{
 
 				NS_LOG_DEBUG(
@@ -456,17 +457,14 @@ StaWifiMac::SendPspollIfnecessary (void)
 				// sleep until my TIM
 				NS_LOG_DEBUG(
 						"Sleep until my TIM for " << selfPageSliceNumber + m_pageSlice.GetTIMOffset () << " * BI");
-				GoToSleep(
-						MicroSeconds(
-								(selfPageSliceNumber
-										+ m_pageSlice.GetTIMOffset())
-										* beacon.GetBeaconCompatibility().GetBeaconInterval()));
+				GoToSleep(MicroSeconds((selfPageSliceNumber + m_pageSlice.GetTIMOffset()) * beacon.GetBeaconCompatibility().GetBeaconInterval()));
+				if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L460" << std::endl;
 				return;
 			}
-			/*if (m_TIM.GetPageSliceNum() == 31)
+			if (m_TIM.GetPageSliceNum() == 31)
 			{
 				// whole page is encoded here
-			}*/
+			}
 		}
 		else
 		{
@@ -645,7 +643,8 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 		if (!m_low->GetPhy()->IsStateSleep()
 				&& (sleeptime.GetMicroSeconds() > 0))
 		{
-			NS_LOG_DEBUG(
+			if (GetAID() == 69)
+				NS_LOG_UNCOND(
 					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetMicroSeconds() << " us.");
 			m_low->GetPhy()->SetSleepMode();
 			Simulator::Schedule(sleeptime, &StaWifiMac::WakeUp, this);
@@ -658,7 +657,8 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 	{
 		if (m_low->GetPhy()->IsStateSleep())
 		{
-			NS_LOG_DEBUG(
+			if (GetAID() == 69)
+			NS_LOG_UNCOND(
 					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to AWAKE");
 			m_low->GetPhy()->ResumeFromSleep();
 		}
@@ -689,8 +689,9 @@ StaWifiMac::GoToSleepBinary (int value)
         }
         else if ( value == 1)
          {
+
              m_low->GetPhy()->SetSleepMode();
-            //NS_LOG_UNCOND (m_low->GetAddress() << " go to sleep after beacon received");
+             if (GetAID() == 69) NS_LOG_UNCOND (m_low->GetAddress() << " go to sleep after beacon received");
          }
      }
  }
@@ -1252,6 +1253,12 @@ StaWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
   hdr.SetDsNotFrom ();
   hdr.SetDsTo ();
 
+  /*MacLowTransmissionParameters params;
+  params.DisableRts();
+  params.DisableAck();
+  params.DisableNextData();
+  Time txTime = m_low->CalculateOverallTxTime(packet, &hdr, params);
+  std::cout << "Sta aid=" << this->GetAID() << " TX time=" << txTime.GetMicroSeconds() << " us, " << packet->GetSize() << std::endl;*/
   if (m_qosSupported)
     {
       //Sanity check that the TID is valid
