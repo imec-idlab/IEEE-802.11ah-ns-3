@@ -29,6 +29,7 @@
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"
 #include "udp-echo-client.h"
+#include "seq-ts-header.h"
 
 namespace ns3 {
 
@@ -316,8 +317,13 @@ UdpEchoClient::Send (void)
       // this case, we don't worry about it either.  But we do allow m_size
       // to have a value different from the (zero) m_dataSize.
       //
-      p = Create<Packet> (m_size);
+      p = Create<Packet> (m_size - 12);
     }
+  // add sequence header to the packet
+  SeqTsHeader seqTs;
+  seqTs.SetSeq (m_sent);
+  p->AddHeader (seqTs);
+
   // call to the trace sinks before the packet is actually sent,
   // so that tags added to the packet can be sent as well
   m_txTrace (p);

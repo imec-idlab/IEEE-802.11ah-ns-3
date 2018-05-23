@@ -50,9 +50,9 @@ long double NodeStatistics::GetInterPacketDelayDeviation(std::vector<Time>& dela
 //try whole net when testing max nr of control loops
 float NodeStatistics::GetPacketLoss (std::string trafficType)
 {
-	if (NumberOfSuccessfulRoundtripPackets > 0)
-		return 100 - 100 * (float)NumberOfSuccessfulRoundtripPackets / NumberOfSentPackets;
-	else if (NumberOfSuccessfulPackets > 0)
+	if (NumberOfSentPackets + NumberOfSuccessfulPackets > 0 && (trafficType == "udpecho" || trafficType == "coap"))
+		return 100 * ((float)(NumberOfSentPackets - NumberOfSuccessfulRoundtripPackets) / (NumberOfSentPackets + NumberOfSuccessfulPackets));
+	else if (NumberOfSentPackets > 0 && NumberOfSuccessfulRoundtripPackets == 0)
 		return 100 - 100 * (float)NumberOfSuccessfulPackets / NumberOfSentPackets;
 	else return -1;
 }
@@ -60,7 +60,7 @@ float NodeStatistics::GetPacketLoss (std::string trafficType)
 long double NodeStatistics::GetInterPacketDelayDeviationPercentage(std::vector<Time>& delayVector){
 	int64_t avg = GetAverageInterPacketDelay(delayVector).GetMicroSeconds();
 	if (avg != 0)
-		return (100*GetInterPacketDelayDeviation(delayVector)/avg);
+		return (100 * GetInterPacketDelayDeviation(delayVector)/avg);
 	else
 		return -1;
 }
@@ -70,7 +70,7 @@ long double NodeStatistics::getAveragePacketRoundTripTime (std::string trafficTy
 	if(NumberOfSuccessfulRoundtripPackets > 0)
 	{
 		if (trafficType != "coap")
-			return static_cast<long double>(TotalPacketRoundtripTime.GetMilliSeconds()) / NumberOfSuccessfulRoundtripPacketsWithSeqHeader;
+			return static_cast<long double>(TotalPacketRoundtripTime.GetMilliSeconds()) / NumberOfSuccessfulRoundtripPackets;
 		else
 			return static_cast<long double>((TotalPacketRoundtripTime.GetMilliSeconds() + TotalPacketSentReceiveTime.GetMilliSeconds())) / NumberOfSuccessfulRoundtripPacketsWithSeqHeader;
 		// In coap case TotalPacketRoundtripTime is not RTT but total time between the moment server sends a reply and a moment client receives it
@@ -79,7 +79,7 @@ long double NodeStatistics::getAveragePacketRoundTripTime (std::string trafficTy
 		// basically, true Total RTT = TotalPacketRoundtripTime + TotalPacketSentReceiveTime
 	}
 	else
-		return -1;
+		return 0;
 }
 
 long NodeStatistics::getNumberOfDroppedPackets() {

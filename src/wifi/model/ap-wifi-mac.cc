@@ -517,7 +517,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
 
 	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
-	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
+	  NS_LOG_UNCOND ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
 	  /*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
 	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
@@ -839,7 +839,7 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
            if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
             {
         	   blockBitmap = blockBitmap | (1 << i);
-        	   NS_LOG_UNCOND ("[aid=" << sta_aid << "] " << "paged");
+        	   NS_LOG_DEBUG ("[aid=" << sta_aid << "] " << "paged");
         	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
         	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
         		   m_PageSliceNum = 31;
@@ -1023,7 +1023,7 @@ ApWifiMac::SendOneBeacon (void)
     		numPagedStas++;
     	}
     }
-    //if (!m_DTIMCount && numPagedStas) NS_LOG_UNCOND ("Paged stations: " << (int)numPagedStas);
+    //if (!m_DTIMCount && numPagedStas) NS_LOG_DEBUG ("Paged stations: " << (int)numPagedStas);
 	if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
 	{
 		if (m_pageslice.GetPageSliceLen() > 1)
@@ -1284,7 +1284,7 @@ ApWifiMac::SendOneBeacon (void)
 
 void ApWifiMac::OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
-	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << rawGroup << " SLOT " << slot);
+	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << (int)rawGroup << " SLOT " << (int)slot);
 	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
 	m_rawSlotTrace = slot;
@@ -1395,13 +1395,13 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         {
           //this is an AP-to-AP frame
           //we ignore for now.
-          NotifyRxDrop (packet);
+          NotifyRxDrop (packet, DropReason::MacAPToAPFrame);
         }
       else
         {
           //we can ignore these frames since
           //they are not targeted at the AP
-          NotifyRxDrop (packet);
+          NotifyRxDrop (packet, DropReason::MacNotForAP);
           NS_LOG_UNCOND ("not assciate, drop, from=" << from );
         }
       return;

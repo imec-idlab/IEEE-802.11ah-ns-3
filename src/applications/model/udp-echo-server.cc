@@ -171,7 +171,6 @@ UdpEchoServer::HandleRead (Ptr<Socket> socket)
                        Inet6SocketAddress::ConvertFrom (from).GetIpv6 () << " port " <<
                        Inet6SocketAddress::ConvertFrom (from).GetPort ());
         }
-
       packet->RemoveAllPacketTags ();
       packet->RemoveAllByteTags ();
 
