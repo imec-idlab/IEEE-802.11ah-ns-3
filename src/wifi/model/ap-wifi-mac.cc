@@ -317,6 +317,14 @@ ApWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stationMan
 {
   NS_LOG_FUNCTION (this << stationManager);
   m_beaconDca->SetWifiRemoteStationManager (stationManager);
+  for (uint32_t i = 0; i < m_rawSlotsDca.size(); i++) //auto& p : m_rawSlotsDca
+  {
+	  m_rawSlotsDca[i]->SetWifiRemoteStationManager(stationManager);
+	  for (EdcaQueues::iterator it = m_rawSlotsEdca[i].begin (); it != m_rawSlotsEdca[i].end (); ++it)
+	  {
+		  it->second->SetWifiRemoteStationManager (stationManager);
+	  }
+  }
   RegularWifiMac::SetWifiRemoteStationManager (stationManager);
 }
 
@@ -471,14 +479,14 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
   hdr.SetDsNotTo ();
 
   int aid = 0;
-  if (!to.IsBroadcast ())
-  {
+  /*if (!to.IsBroadcast ())
+  {*/
 	  /*for (auto it=m_AidToMacAddr.begin(); it != m_AidToMacAddr.end(); ++it){
 		  if (m_AidToMacAddr.find(aid)->second == to)
 			  break;
 		  else if (it == m_AidToMacAddr.end())
 			  aid = -1;
-	  }
+	  } THIS WAS UNDER COMMENT. DO NOT UNCOMMENT
 	  if (aid == -1)
 		  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP cannot forward down data because There is no RAW for this MAC address.");
 	  */
@@ -486,7 +494,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  while (m_AidToMacAddr.find(aid)->second != to); //TODO optimize search
 
 	  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP to forward data for [aid=" << aid << "]");
-
+	  /*
 	  uint8_t block = (aid >> 6 ) & 0x001f;
 	  uint8_t page = (aid >> 11 ) & 0x0003;
 	  NS_ASSERT (block >= m_pageslice.GetBlockOffset());
@@ -526,24 +534,79 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 
 	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
 	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
-	  /*
+	  *//*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
 	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
 
-	  Simulator::Schedule(wait, &EdcaTxopN::StartAccessIfNeeded, m_edca[QosUtilsMapTidToAc (tid)]);
-  }
+	  /*Simulator::Schedule(wait, &EdcaTxopN::StartAccessIfNeeded, m_edca[QosUtilsMapTidToAc (tid)]);
+  }*/
+
 
   if (m_qosSupported)
     {
       //Sanity check that the TID is valid
       NS_ASSERT (tid < 8);
-      m_edca[QosUtilsMapTidToAc (tid)]->Queue (packet, hdr);
+      //m_rawSlotsEdca[GetSlotNumFromAid (aid)].find(QosUtilsMapTidToAc (tid))->second->Queue(packet, hdr);
+      m_rawSlotsEdca[GetSlotNumFromAid (aid)][QosUtilsMapTidToAc (tid)]->Queue(packet, hdr);
+      //m_edca[QosUtilsMapTidToAc (tid)]->Queue (packet, hdr);
     }
   else
     {
-      m_dca->Queue (packet, hdr);
+	  // queue the packet in the specific raw slot period DCA
+	  m_rawSlotsDca[GetSlotNumFromAid(aid)]->Queue(packet, hdr);
+      //m_dca->Queue (packet, hdr);
     }
 
+}
+
+uint32_t
+ApWifiMac::GetSlotNumFromAid (uint16_t aid) const
+{
+	uint32_t numTim = 0;
+	  if (m_pageslice.GetPageSliceCount() == 0)
+		  numTim = 1;
+	  else
+		  numTim = m_pageslice.GetPageSliceCount();
+
+	uint32_t myslot = 0;
+	for (uint32_t i = 0; i < numTim; i++)
+	{
+		for (uint32_t j = 0; j < m_rpsset.rpsset.at(i)->GetNumberOfRawGroups(); j++)
+		{
+			RPS::RawAssignment ass = m_rpsset.rpsset.at(i)->GetRawAssigmentObj(j);
+			if (ass.GetRawGroupAIDStart() <= aid && aid <= ass.GetRawGroupAIDEnd())
+			{
+				myslot += aid % ass.GetSlotNum();
+				break;
+			}
+			else
+				myslot += ass.GetSlotNum();
+		}
+	}
+	return myslot;
+}
+
+uint32_t
+ApWifiMac::GetSlotNumFromRpsRawSlot (uint16_t rps, uint8_t rawg, uint8_t slot) const
+{
+	uint32_t myslot = 0;
+	for (uint32_t i = 0; i < rps; i++)
+		{
+			for (uint32_t j = 0; j < m_rpsset.rpsset.at(i)->GetNumberOfRawGroups(); j++)
+			{
+				RPS::RawAssignment ass = m_rpsset.rpsset.at(i)->GetRawAssigmentObj(j);
+				if (j == rawg - 1 && i == rps - 1)
+				{
+					//my raw group
+					myslot += slot - 1;
+					break;
+				}
+				else
+					myslot += ass.GetSlotNum();
+			}
+		}
+		return myslot;
+	return GetSlotNumFromAid (m_rpsset.rpsset.at(rps)->GetRawAssigmentObj(rawg).GetSlotNum()) + slot;
 }
 
 Time
@@ -812,7 +875,12 @@ ApWifiMac::HasPacketsToPage (uint8_t blockstart , uint8_t Page)
    uint8_t blockBitmap;
    uint32_t PageBitmap;
    PageBitmap = 0;
-   uint32_t numBlocks = m_pageslice.GetPageSliceLen();
+   uint32_t numBlocks;
+   if (m_pageslice.GetPageSliceCount() == 0)
+	   numBlocks = 31;
+   else
+	   numBlocks = m_pageslice.GetPageSliceLen();
+
    //printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap includes blocks from %d to %d\n", blockstart, blockstart + numBlocks - 1);
    for (uint32_t i=blockstart; i< blockstart + numBlocks ; i++ )
     {
@@ -847,7 +915,7 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
            if (m_stationManager->IsAssociated (m_AidToMacAddr.find(sta_aid)->second) && HasPacketsInQueueTo(m_AidToMacAddr.find(sta_aid)->second) )
             {
         	   blockBitmap = blockBitmap | (1 << i);
-        	   NS_LOG_UNCOND ("[aid=" << sta_aid << "] " << "paged");
+        	   NS_LOG_UNCOND ("[aid=" << sta_aid << "] paged");
         	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
         	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
         		   m_PageSliceNum = 31;
@@ -887,12 +955,20 @@ ApWifiMac::HasPacketsInQueueTo(Mac48Address dest)
     Ptr<const Packet> peekedPacket_VO, peekedPacket_VI, peekedPacket_BE, peekedPacket_BK;
     WifiMacHeader peekedHdr;
     Time tstamp;
-        
-    peekedPacket_VO = m_edca.find(AC_VO)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+
+    uint32_t aid = 0;
+    do {aid++;}
+    	  while (m_AidToMacAddr.find(aid)->second != dest); //TODO optimize search
+
+    peekedPacket_VO = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_VO)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_VI = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_VI)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_BE = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_BE)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    peekedPacket_BK = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_BK)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
+    /*peekedPacket_VO = m_edca.find(AC_VO)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
     peekedPacket_VI = m_edca.find(AC_VI)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
     peekedPacket_BE = m_edca.find(AC_BE)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
     peekedPacket_BK = m_edca.find(AC_BK)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
-        
+      */
     if (peekedPacket_VO != 0 || peekedPacket_VI != 0 || peekedPacket_BE != 0 || peekedPacket_BK != 0 )
        {
          return true;
@@ -914,17 +990,22 @@ ApWifiMac::SetaccessList (std::map<Mac48Address, bool> list)
          {
             return;
          }
-              
+        uint32_t aid;
         for (uint32_t k = 1; k <= m_totalStaNum; k++)
           {   
             stasAddr = m_AidToMacAddr.find(k)->second;
+            aid = m_AidToMacAddr.find(k)->first;
             //NS_LOG_UNCOND ( "aid "  << k << ", send " << list.find(stasAddr)->second << ", at " << Simulator::Now () << ", size " << list.size ());
           }     
-               
-        m_edca.find (AC_VO)->second->SetaccessList (list);
+        uint32_t targetSlot = GetSlotNumFromAid(aid);
+        m_rawSlotsEdca[targetSlot].find (AC_VO)->second->SetaccessList (list);
+        m_rawSlotsEdca[targetSlot].find (AC_VI)->second->SetaccessList (list);
+        m_rawSlotsEdca[targetSlot].find (AC_BE)->second->SetaccessList (list);
+        m_rawSlotsEdca[targetSlot].find (AC_BK)->second->SetaccessList (list);
+        /*m_edca.find (AC_VO)->second->SetaccessList (list);
         m_edca.find (AC_VI)->second->SetaccessList (list);
         m_edca.find (AC_BE)->second->SetaccessList (list);
-        m_edca.find (AC_BK)->second->SetaccessList (list);
+        m_edca.find (AC_BK)->second->SetaccessList (list);*/
 }
 
   
@@ -981,9 +1062,9 @@ ApWifiMac::SendOneBeacon (void)
     	NS_LOG_DEBUG ("***DTIM*** starts at " << Simulator::Now().GetSeconds() << " s");
         m_pagebitmap = HasPacketsToPage (m_pageslice.GetBlockOffset (), m_pageslice.GetPageindex()); //TODO check set m_PageSliceNum = 31
         if (m_pagebitmap)//for now, only configure Page Bit map based on real-time traffic, other parameters configured beforehand.
-        	NS_LOG_DEBUG("	Page bitmap (0-4 bytes): " << m_pagebitmap);
+        	NS_LOG_DEBUG("m_pagebitmap (0-4 bytes) = " << m_pagebitmap);
         m_pageslice.SetPageBitmap (m_pagebitmap);
-        NS_LOG_DEBUG("	Page bitmap is " << (int)m_pageslice.GetPageBitmapLength() << " bytes long.");
+        //NS_LOG_DEBUG("	Page bitmap is " << (int)m_pageslice.GetPageBitmapLength() << " bytes long.");
         //For now, page bitmap is always 4 bytes
         beacon.SetpageSlice (m_pageslice);
       }
@@ -1133,10 +1214,18 @@ ApWifiMac::SendOneBeacon (void)
     //NS_ASSERT (m_DTIMPeriod - m_DTIMCount + m_DTIMOffset == m_DTIMPeriod || (m_DTIMCount == 0 && m_DTIMOffset == 0));
     
     //set sleep list, temporary, removed if ps-poll supported 
-    m_edca.find (AC_VO)->second->SetsleepList (m_sleepList);
+
+    for (auto &it : m_rawSlotsEdca)
+    {
+    	it.find (AC_VO)->second->SetsleepList (m_sleepList);
+    	it.find (AC_VI)->second->SetsleepList (m_sleepList);
+    	it.find (AC_BE)->second->SetsleepList (m_sleepList);
+    	it.find (AC_BK)->second->SetsleepList (m_sleepList);
+    }
+    /*m_edca.find (AC_VO)->second->SetsleepList (m_sleepList);
     m_edca.find (AC_VI)->second->SetsleepList (m_sleepList);
     m_edca.find (AC_BE)->second->SetsleepList (m_sleepList);
-    m_edca.find (AC_BK)->second->SetsleepList (m_sleepList);
+    m_edca.find (AC_BK)->second->SetsleepList (m_sleepList);*/
     
     
    
@@ -1171,11 +1260,11 @@ ApWifiMac::SendOneBeacon (void)
       params.DisableRts();
       params.DisableAck();
       params.DisableNextData();
-      Time txTime = m_low->CalculateOverallTxTime(packet, &hdr, params);
+      Time bufferTimeToAllowBeaconToBeReceived = m_low->CalculateOverallTxTime(packet, &hdr, params);
+      //bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
       NS_LOG_DEBUG(
-    		  "Transmission of beacon will take " << txTime << ", delaying RAW start for that amount");
-      Time bufferTimeToAllowBeaconToBeReceived = txTime;
-      bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
+    		  "Transmission of beacon will take " << bufferTimeToAllowBeaconToBeReceived << ", delaying RAW start for that amount");
+
       auto nRaw = m_rps->GetNumberOfRawGroups();
       currentRawGroup = (currentRawGroup + 1) % nRaw;
 
@@ -1249,6 +1338,11 @@ ApWifiMac::SendOneBeacon (void)
     		  Simulator::Schedule(
     				  bufferTimeToAllowBeaconToBeReceived + timeToSlotStart,
     				  &ApWifiMac::OnRAWSlotStart, this, RpsIndex, g + 1, i + 1);
+
+    		  Time totalTimeToRawEnd = bufferTimeToAllowBeaconToBeReceived + timeToSlotStart + MicroSeconds (m_rpsset.rpsset.at(RpsIndex - 1)->GetRawAssigmentObj(g).GetSlotDurationCount() * 120 + 500);
+    		  Simulator::Schedule(
+    				  totalTimeToRawEnd,
+    		      				  &ApWifiMac::OnRAWSlotEnd, this, RpsIndex, g + 1, i + 1);
     		  timeToSlotStart += MicroSeconds(500 + m_rps->GetRawAssigmentObj(g).GetSlotDurationCount() * 120);
 
     		  for (uint16_t i=1; i<= m_totalStaNum;i++)
@@ -1290,14 +1384,68 @@ ApWifiMac::SendOneBeacon (void)
   m_beaconEvent = Simulator::Schedule (m_beaconInterval, &ApWifiMac::SendOneBeacon, this);
 }
 
-void ApWifiMac::OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot)
+void
+ApWifiMac::OnRAWSlotEnd (uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
-	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << rawGroup << " SLOT " << slot);
+	LOG_TRAFFIC(
+			"AP RAW SLOT END FOR TIM GROUP " << int(rawGroup) << " SLOT " << int(slot));
+	uint32_t targetSlot = this->GetSlotNumFromRpsRawSlot(rps, rawGroup, slot);
+	//Time slotDuration = MicroSeconds(m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotDurationCount() * 120 + 500);
+	std::cout << "OnRAWSlotEnd Access DENIED to targetSlot=" << targetSlot << std::endl;
+
+	if (m_qosSupported)
+	{
+		m_rawSlotsEdca[targetSlot].find(AC_VO)->second->AccessAllowedIfRaw(false);
+		m_rawSlotsEdca[targetSlot].find(AC_VI)->second->AccessAllowedIfRaw(false);
+		m_rawSlotsEdca[targetSlot].find(AC_BE)->second->AccessAllowedIfRaw(false);
+		m_rawSlotsEdca[targetSlot].find(AC_BK)->second->AccessAllowedIfRaw(false);
+		m_rawSlotsEdca[targetSlot].find(AC_VO)->second->OutsideRawStart();
+		m_rawSlotsEdca[targetSlot].find(AC_VI)->second->OutsideRawStart();
+		m_rawSlotsEdca[targetSlot].find(AC_BE)->second->OutsideRawStart();
+		m_rawSlotsEdca[targetSlot].find(AC_BK)->second->OutsideRawStart();
+		//m_rawSlotsEdca[targetSlot][AC_BE]->AccessAllowedIfRaw(false);
+		//m_rawSlotsEdca[targetSlot][AC_BE]->OutsideRawStart();
+	}
+	else
+	{
+		m_rawSlotsDca[targetSlot]->AccessAllowedIfRaw(false);
+		m_rawSlotsDca[targetSlot]->OutsideRawStart();
+	}
+}
+
+void ApWifiMac::OnRAWSlotStart (uint16_t rps, uint8_t rawGroup, uint8_t slot)
+{
+	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << (int)rawGroup << " SLOT " << (int)slot);
 	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
 	m_rawSlotTrace = slot;
 
-        //NS_LOG_UNCOND("AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
+	m_rawSlotStarted(rawGroup - 1, slot);
+
+	uint32_t targetSlot = this->GetSlotNumFromRpsRawSlot(rps, rawGroup, slot);
+	Time slotDuration = MicroSeconds(m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotDurationCount() * 120 + 500);
+	bool csb = m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotCrossBoundary() == 0x01;
+	std::cout << "OnRawStart Access allowed to targetSlot=" << targetSlot << ", duration=" << slotDuration.GetMicroSeconds() << " us, csb=" << csb << std::endl;
+	//std::cout << "rps=" << (int)rps-1 << ", rawGroup=" << (int)rawGroup-1 << ", slot=" << (int)slot-1 << std::endl;
+	if (m_qosSupported)
+	{
+		//m_rawSlotsEdca[targetSlot][AC_BE]->AccessAllowedIfRaw(true);
+		m_rawSlotsEdca[targetSlot].find(AC_VO)->second->AccessAllowedIfRaw(true);
+		m_rawSlotsEdca[targetSlot].find(AC_VI)->second->AccessAllowedIfRaw(true);
+		m_rawSlotsEdca[targetSlot].find(AC_BE)->second->AccessAllowedIfRaw(true);
+		m_rawSlotsEdca[targetSlot].find(AC_BK)->second->AccessAllowedIfRaw(true);
+		m_rawSlotsEdca[targetSlot].find(AC_VO)->second->RawStart(slotDuration, csb);
+		m_rawSlotsEdca[targetSlot].find(AC_VI)->second->RawStart(slotDuration, csb);
+		m_rawSlotsEdca[targetSlot].find(AC_BE)->second->RawStart(slotDuration, csb);
+		m_rawSlotsEdca[targetSlot].find(AC_BK)->second->RawStart(slotDuration, csb);
+		//m_rawSlotsEdca[targetSlot][AC_BE]->RawStart(slotDuration, m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotCrossBoundary());
+	}
+	else
+	{
+		m_rawSlotsDca[targetSlot]->AccessAllowedIfRaw(true);
+		m_rawSlotsDca[targetSlot]->RawStart(slotDuration, m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotCrossBoundary());
+	}
+	 //NS_LOG_UNCOND("AP RAW SLOT START FOR RAW GROUP " << std::to_string(rawGroup) << " SLOT " << std::to_string(slot));
 }
 
 
@@ -1574,6 +1722,33 @@ ApWifiMac::DeaggregateAmsduAndForward (Ptr<Packet> aggregatedPacket,
 }
 
 void
+ApWifiMac::SetupEdcaQueue (enum AcIndex ac, EdcaQueues& edcaqueues)
+{
+  NS_LOG_FUNCTION (this << ac);
+
+  //Our caller shouldn't be attempting to setup a queue that is
+  //already configured.
+  NS_ASSERT (edcaqueues.find (ac) == edcaqueues.end ());
+
+  Ptr<EdcaTxopN> edca = CreateObject<EdcaTxopN> ();
+  edca->SetLow (m_low);
+  edca->SetManager (m_dcfManager);
+  edca->SetTxMiddle (m_txMiddle);
+  edca->SetTxOkCallback (MakeCallback (&ApWifiMac::TxOk, this));
+  edca->SetTxFailedCallback (MakeCallback (&ApWifiMac::TxFailed, this));
+  edca->SetAccessCategory (ac);
+
+  edca->SetWifiRemoteStationManager(m_stationManager);
+
+  edca->CompleteConfig ();
+  edcaqueues.insert (std::make_pair (ac, edca));
+
+  edca->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+  edca->TraceConnect("Collision", "", MakeCallback(&ApWifiMac::OnCollision, this));
+  edca->TraceConnect("TransmissionWillCrossRAWBoundary", "", MakeCallback(&ApWifiMac::OnTransmissionWillCrossRAWBoundary, this));
+}
+
+void
 ApWifiMac::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
@@ -1593,11 +1768,11 @@ ApWifiMac::DoInitialize (void)
           m_beaconEvent = Simulator::ScheduleNow (&ApWifiMac::SendOneBeacon, this);
         }
     }
-  m_edca.find(AC_VO)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
+  /*m_edca.find(AC_VO)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
   m_edca.find(AC_VI)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
   m_edca.find(AC_BE)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
   m_edca.find(AC_BK)->second->GetEdcaQueue()->TraceConnect("PacketDropped", "", MakeCallback(&ApWifiMac::OnQueuePacketDropped, this));
-
+*/
   uint32_t numTim = 0;
   if (m_pageslice.GetPageSliceCount() == 0)
 	  numTim = 1;
@@ -1638,6 +1813,10 @@ ApWifiMac::DoInitialize (void)
 	  m_rawSlotsDca.push_back(dca);
 
 	  EdcaQueues edca;
+	  SetupEdcaQueue (AC_VO, edca);
+	  SetupEdcaQueue (AC_VI, edca);
+	  SetupEdcaQueue (AC_BE, edca);
+	  SetupEdcaQueue (AC_BK, edca);
 	  for (EdcaQueues::iterator i = edca.begin (); i != edca.end (); ++i)
 	    {
 	      i->second->Initialize ();

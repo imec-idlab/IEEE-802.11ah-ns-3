@@ -727,6 +727,9 @@ EdcaTxopN::NotifyAccessGranted (void)
             {
               params.DisableRts ();
               NS_LOG_DEBUG ("tx unicast");
+              /*NS_LOG_DEBUG (" size=" << m_currentPacket->GetSize () <<
+                                      ", to=" << m_currentHdr.GetAddr1 () <<
+                                      ", seq=" << m_currentHdr.GetSequenceControl ());*/
             }
           params.DisableNextData ();
           

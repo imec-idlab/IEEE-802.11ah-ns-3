@@ -253,6 +253,7 @@ private:
   void GoToSleepNextTIM (S1gBeaconHeader beacon);
   void GoToSleepCurrentTIM (S1gBeaconHeader beacon);
   void GoToSleep(Time  sleeptime); 
+  void SleepUntilMySlot ();
 
   Time m_lastRawDurationus;
   Time m_lastRawStart;

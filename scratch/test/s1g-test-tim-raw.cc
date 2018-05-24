@@ -1069,7 +1069,7 @@ void configureUDPEchoClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		//clientApp.Stop(Seconds(simulationTime + 1));
+		clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1127,9 +1127,9 @@ int main(int argc, char *argv[]) {
 	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-	LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	/*LogComponentEnable ("StaWifiMac", LOG_DEBUG);*/
-	LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
+	LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_DEBUG);
+	LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
