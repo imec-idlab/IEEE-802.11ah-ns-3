@@ -221,12 +221,14 @@ ApWifiMac::SetAddress (Mac48Address address)
 void
 ApWifiMac::SetPageSlicingActivated (bool activate)
 {
+	NS_LOG_FUNCTION (this);
 	m_pageSlicingActivated = activate;
 }
 
 bool
 ApWifiMac::GetPageSlicingActivated (void) const
 {
+	NS_LOG_FUNCTION (this);
 	return m_pageSlicingActivated;
 }
 
@@ -950,7 +952,8 @@ ApWifiMac::HasPacketsToSubBlock (uint16_t subblockInd, uint16_t blockInd , uint1
 
 bool 
 ApWifiMac::HasPacketsInQueueTo(Mac48Address dest) 
-{           
+{
+	NS_LOG_FUNCTION (this);
     //check also if ack received
     Ptr<const Packet> peekedPacket_VO, peekedPacket_VI, peekedPacket_BE, peekedPacket_BK;
     WifiMacHeader peekedHdr;
@@ -983,6 +986,7 @@ uint16_t ApWifiMac::RpsIndex = 0;
 void
 ApWifiMac::SetaccessList (std::map<Mac48Address, bool> list)
 {
+	NS_LOG_FUNCTION (this);
         Mac48Address stasAddr;
 
             
@@ -1089,7 +1093,12 @@ ApWifiMac::SendOneBeacon (void)
     m_TrafficIndicator = 0; //for group addressed MSDU/MMPDU, not supported.
     m_TIM.SetTafficIndicator (m_TrafficIndicator); //from page slice
 
-    if (m_PageSliceNum != 31 && m_pageslice.GetPageSliceCount() != 0)
+    m_PageSliceNum = 0;
+    if (m_pageslice.GetPageSliceCount() == 0)
+      {
+    	m_PageSliceNum = 31;
+      }
+    else
       {
 		if (m_DTIMCount == m_pageslice.GetTIMOffset ()) //first page slice start at TIM offset
 		  {
@@ -1262,7 +1271,7 @@ ApWifiMac::SendOneBeacon (void)
       params.DisableNextData();
       Time bufferTimeToAllowBeaconToBeReceived = m_low->CalculateOverallTxTime(packet, &hdr, params);
       //bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
-      NS_LOG_DEBUG(
+      NS_LOG_UNCOND(
     		  "Transmission of beacon will take " << bufferTimeToAllowBeaconToBeReceived << ", delaying RAW start for that amount");
 
       auto nRaw = m_rps->GetNumberOfRawGroups();
@@ -1387,11 +1396,12 @@ ApWifiMac::SendOneBeacon (void)
 void
 ApWifiMac::OnRAWSlotEnd (uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
+	NS_LOG_FUNCTION (this);
 	LOG_TRAFFIC(
 			"AP RAW SLOT END FOR TIM GROUP " << int(rawGroup) << " SLOT " << int(slot));
 	uint32_t targetSlot = this->GetSlotNumFromRpsRawSlot(rps, rawGroup, slot);
 	//Time slotDuration = MicroSeconds(m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotDurationCount() * 120 + 500);
-	std::cout << "OnRAWSlotEnd Access DENIED to targetSlot=" << targetSlot << std::endl;
+	//std::cout << "OnRAWSlotEnd Access DENIED to targetSlot=" << targetSlot << std::endl;
 
 	if (m_qosSupported)
 	{
@@ -1415,6 +1425,7 @@ ApWifiMac::OnRAWSlotEnd (uint16_t rps, uint8_t rawGroup, uint8_t slot)
 
 void ApWifiMac::OnRAWSlotStart (uint16_t rps, uint8_t rawGroup, uint8_t slot)
 {
+	NS_LOG_FUNCTION (this);
 	LOG_TRAFFIC("AP RAW SLOT START FOR RAW GROUP " << (int)rawGroup << " SLOT " << (int)slot);
 	m_rpsIndexTrace = rps;
 	m_rawGroupTrace = rawGroup;
@@ -1425,7 +1436,7 @@ void ApWifiMac::OnRAWSlotStart (uint16_t rps, uint8_t rawGroup, uint8_t slot)
 	uint32_t targetSlot = this->GetSlotNumFromRpsRawSlot(rps, rawGroup, slot);
 	Time slotDuration = MicroSeconds(m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotDurationCount() * 120 + 500);
 	bool csb = m_rpsset.rpsset.at(rps - 1)->GetRawAssigmentObj(rawGroup - 1).GetSlotCrossBoundary() == 0x01;
-	std::cout << "OnRawStart Access allowed to targetSlot=" << targetSlot << ", duration=" << slotDuration.GetMicroSeconds() << " us, csb=" << csb << std::endl;
+	//std::cout << "OnRawStart Access allowed to targetSlot=" << targetSlot << ", duration=" << slotDuration.GetMicroSeconds() << " us, csb=" << csb << std::endl;
 	//std::cout << "rps=" << (int)rps-1 << ", rawGroup=" << (int)rawGroup-1 << ", slot=" << (int)slot-1 << std::endl;
 	if (m_qosSupported)
 	{

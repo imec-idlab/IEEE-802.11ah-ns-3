@@ -1128,8 +1128,8 @@ int main(int argc, char *argv[]) {
 	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
 	LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
-	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_DEBUG);
-	LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
+	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_FUNCTION);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);

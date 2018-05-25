@@ -327,6 +327,8 @@ private:
   bool m_crossSlotBoundaryAllowed;
   TracedCallback<bool> m_beaconMissed;
 
+  bool testtrackit = false;
+
   TracedCallback<Mac48Address> m_assocLogger;
   TracedCallback<Mac48Address> m_deAssocLogger;
 };
