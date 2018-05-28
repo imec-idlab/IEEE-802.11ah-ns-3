@@ -564,6 +564,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 uint32_t
 ApWifiMac::GetSlotNumFromAid (uint16_t aid) const
 {
+	NS_ASSERT (aid > 0 && aid < 8192);
 	uint32_t numTim = 0;
 	  if (m_pageslice.GetPageSliceCount() == 0)
 		  numTim = 1;
@@ -994,18 +995,31 @@ ApWifiMac::SetaccessList (std::map<Mac48Address, bool> list)
          {
             return;
          }
-        uint32_t aid;
-        for (uint32_t k = 1; k <= m_totalStaNum; k++)
+
+        uint32_t aid = 0;
+        for (auto& pair : list)
           {   
-            stasAddr = m_AidToMacAddr.find(k)->second;
-            aid = m_AidToMacAddr.find(k)->first;
+            stasAddr = pair.first;
+            for (int k = 1; k <= m_totalStaNum; k++)
+            {
+            	if (stasAddr == m_AidToMacAddr.find(k)->second)
+            	{
+            		aid = m_AidToMacAddr.find(k)->first;
+            		//NS_LOG_UNCOND ("aid " << aid << " stasAddr " << stasAddr);
+            	}
+            }
+            uint32_t targetSlot = GetSlotNumFromAid(aid);
+            //std::cout << "________________aid=" << (int)aid << ", targetslot=" << targetSlot << std::endl;
+
+            m_rawSlotsEdca[targetSlot].find (AC_VO)->second->SetaccessList (list);
+            m_rawSlotsEdca[targetSlot].find (AC_VI)->second->SetaccessList (list);
+            m_rawSlotsEdca[targetSlot].find (AC_BE)->second->SetaccessList (list);
+            m_rawSlotsEdca[targetSlot].find (AC_BK)->second->SetaccessList (list);            //NS_LOG_UNCOND ("aid " << aid << "stasAddr " << stasAddr);
             //NS_LOG_UNCOND ( "aid "  << k << ", send " << list.find(stasAddr)->second << ", at " << Simulator::Now () << ", size " << list.size ());
+
           }     
-        uint32_t targetSlot = GetSlotNumFromAid(aid);
-        m_rawSlotsEdca[targetSlot].find (AC_VO)->second->SetaccessList (list);
-        m_rawSlotsEdca[targetSlot].find (AC_VI)->second->SetaccessList (list);
-        m_rawSlotsEdca[targetSlot].find (AC_BE)->second->SetaccessList (list);
-        m_rawSlotsEdca[targetSlot].find (AC_BK)->second->SetaccessList (list);
+
+
         /*m_edca.find (AC_VO)->second->SetaccessList (list);
         m_edca.find (AC_VI)->second->SetaccessList (list);
         m_edca.find (AC_BE)->second->SetaccessList (list);
@@ -1063,7 +1077,7 @@ ApWifiMac::SendOneBeacon (void)
 
     if (m_DTIMCount == 0 && GetPageSlicingActivated ()) // TODO filter when GetPageSlicingActivated() is false
       {
-    	NS_LOG_DEBUG ("***DTIM*** starts at " << Simulator::Now().GetSeconds() << " s");
+    	NS_LOG_UNCOND ("***DTIM*** starts at " << Simulator::Now().GetSeconds() << " s");
         m_pagebitmap = HasPacketsToPage (m_pageslice.GetBlockOffset (), m_pageslice.GetPageindex()); //TODO check set m_PageSliceNum = 31
         if (m_pagebitmap)//for now, only configure Page Bit map based on real-time traffic, other parameters configured beforehand.
         	NS_LOG_DEBUG("m_pagebitmap (0-4 bytes) = " << m_pagebitmap);
@@ -1122,7 +1136,7 @@ ApWifiMac::SendOneBeacon (void)
     	}
     }
     //if (!m_DTIMCount && numPagedStas) NS_LOG_UNCOND ("Paged stations: " << (int)numPagedStas);
-	if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
+	/*if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
 	{
 		if (m_pageslice.GetPageSliceLen() > 1)
 		{
@@ -1140,7 +1154,7 @@ ApWifiMac::SendOneBeacon (void)
   else if (m_pageslice.GetPageSliceCount () == 0 && numPagedStas == 0)
    {
       m_PageSliceNum = 0;
-   }
+   }*/
 
     uint8_t NumEncodedBlock;
     if (m_PageSliceNum != (m_pageslice.GetPageSliceCount() - 1) && m_PageSliceNum != 31) // convenient overflow if count==0
