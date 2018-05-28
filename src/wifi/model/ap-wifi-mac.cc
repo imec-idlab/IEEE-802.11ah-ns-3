@@ -517,7 +517,7 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
 	  // downlink data needs to be scheduled in corresponding RAW slot for the station
 
 	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
-	  NS_LOG_UNCOND ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
+	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
 	  /*
 	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
 	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
