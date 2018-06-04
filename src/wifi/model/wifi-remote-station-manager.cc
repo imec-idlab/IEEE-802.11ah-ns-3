@@ -995,7 +995,15 @@ WifiRemoteStationManager::GetControlAnswerMode (Mac48Address address, WifiMode r
   NS_LOG_FUNCTION (this << address << reqMode);
   WifiMode mode = GetDefaultMode ();
   bool found = false;
-
+  if (reqMode.GetBandwidth() == 2)
+    {
+        mode = WifiPhy::GetOfdmRate650KbpsBW2MHz ();
+    }
+  else
+    {
+        mode = GetDefaultMode ();
+    }
+  return mode;
   //First, search the BSS Basic Rate set
   for (WifiModeListIterator i = m_bssBasicRateSet.begin (); i != m_bssBasicRateSet.end (); i++)
     {
