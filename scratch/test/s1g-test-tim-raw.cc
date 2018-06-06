@@ -1437,7 +1437,7 @@ int main(int argc, char *argv[]) {
 				<< "\t" << "; delivered: " << stats.get(i).NumberOfSuccessfulPackets
 				<< "\t" << "; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
 				<< "\t" << "; packetloss: " << stats.get(i).GetPacketLoss(config.trafficType)
-				<< "\t" << "; remaining TX queue len: " << nodes[i]->queueLength
+				//<< "\t" << "; remaining TX queue len: " << nodes[i]->queueLength
 				<< endl;
 	}
 
