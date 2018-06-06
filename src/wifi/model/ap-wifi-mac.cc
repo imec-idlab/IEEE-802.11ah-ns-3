@@ -481,79 +481,25 @@ ApWifiMac::ForwardDown (Ptr<const Packet> packet, Mac48Address from,
   hdr.SetDsNotTo ();
 
   int aid = 0;
-  /*if (!to.IsBroadcast ())
-  {*/
-	  /*for (auto it=m_AidToMacAddr.begin(); it != m_AidToMacAddr.end(); ++it){
-		  if (m_AidToMacAddr.find(aid)->second == to)
-			  break;
-		  else if (it == m_AidToMacAddr.end())
-			  aid = -1;
-	  } THIS WAS UNDER COMMENT. DO NOT UNCOMMENT
-	  if (aid == -1)
-		  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP cannot forward down data because There is no RAW for this MAC address.");
-	  */
-	  do {aid++;}
-	  while (m_AidToMacAddr.find(aid)->second != to); //TODO optimize search
 
-	  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP to forward data for [aid=" << aid << "]");
-	  /*
-	  uint8_t block = (aid >> 6 ) & 0x001f;
-	  uint8_t page = (aid >> 11 ) & 0x0003;
-	  NS_ASSERT (block >= m_pageslice.GetBlockOffset());
-	  uint8_t toTim = 0;
-	  	//= (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen(); //TODO make config alignment between TIM and RAW e.g. if AID belongs to TIM0 it cannot belong to RAW located in TIM3
+  do {aid++;}
+  while (m_AidToMacAddr.find(aid)->second != to); //TODO optimize search
 
-	  	for (uint32_t i = 0; i < m_pageslice.GetPageSliceCount(); i++)
-	  	{
-	  		if (i == m_pageslice.GetPageSliceCount() - 1)
-	  		{
-	  			//last page slice
-	  			if ( i * m_pageslice.GetPageSliceLen() <= block && block <= 31)
-	  				toTim = i;
-	  		}
-	  		else
-	  		{
-	  			if (i * m_pageslice.GetPageSliceLen() <= block && block < (i + 1) * m_pageslice.GetPageSliceLen())
-	  			{
-	  				if (i == 0)
-	  					continue;
-	  				toTim++;
-	  			}
-	  		}
-	  		//if (i * m_pageslice.GetPageSliceLen() <= block && block <= )
-	  	}
-	  //uint8_t toTim = (block - m_pageslice.GetBlockOffset()) % m_pageslice.GetPageSliceLen();
-	  Time wait;
-	  // station needs to receive DTIM beacon with indication there is downlink data first
-	  if (toTim >= m_TIM.GetDTIMCount())
-		 wait = (m_TIM.GetDTIMPeriod() + toTim - m_TIM.GetDTIMCount ()) * this->GetBeaconInterval();
-	  else
-		 wait = (m_TIM.GetDTIMPeriod() - m_TIM.GetDTIMCount () + toTim) * this->GetBeaconInterval();
-
-	  // deduce the offset from the last beacon until now
-	  wait -= Simulator::Now() - this->m_lastBeaconTime;
-	  // downlink data needs to be scheduled in corresponding RAW slot for the station
-
-	  wait += GetSlotStartTimeFromAid (aid) + MicroSeconds(5600);
-	  NS_LOG_DEBUG ("At " << Simulator::Now().GetSeconds() << " s AP scheduling transmission for [aid=" << aid << "] " << wait.GetMicroSeconds() << " us from now, at " << Simulator::Now().GetSeconds() + wait.GetSeconds() << ".");
-	  *//*
-	  void (ApWifiMac::*fp) (Ptr<const Packet>, Mac48Address, Mac48Address) = &ApWifiMac::ForwardDown;
-	  Simulator::Schedule(wait, fp, this, packet, from, to);*/
-
-	  /*Simulator::Schedule(wait, &EdcaTxopN::StartAccessIfNeeded, m_edca[QosUtilsMapTidToAc (tid)]);
-  }*/
+  NS_LOG_INFO (Simulator::Now().GetMicroSeconds() << " ms: AP to forward data for [aid=" << aid << "]");
 
 
   if (m_qosSupported)
     {
-      //Sanity check that the TID is valid
-      NS_ASSERT (tid < 8);
-      //m_rawSlotsEdca[GetSlotNumFromAid (aid)].find(QosUtilsMapTidToAc (tid))->second->Queue(packet, hdr);
-      m_rawSlotsEdca[GetSlotNumFromAid (aid)][QosUtilsMapTidToAc (tid)]->Queue(packet, hdr);
-      //m_edca[QosUtilsMapTidToAc (tid)]->Queue (packet, hdr);
+	  //Sanity check that the TID is valid
+	  NS_ASSERT (tid < 8);
+	  uint32_t targetSlot = GetSlotNumFromAid (aid);
+	  //std::cout << ">>AP enqueues to dst aid=" << (int)aid << "targetSlot=" << targetSlot << std::endl;
+	  //m_rawSlotsEdca[GetSlotNumFromAid (aid)].find(QosUtilsMapTidToAc (tid))->second->Queue(packet, hdr);
+	  m_rawSlotsEdca[targetSlot][QosUtilsMapTidToAc (tid)]->Queue(packet, hdr);
+	  //m_edca[QosUtilsMapTidToAc (tid)]->Queue (packet, hdr);
     }
   else
-    {
+  {
 	  // queue the packet in the specific raw slot period DCA
 	  m_rawSlotsDca[GetSlotNumFromAid(aid)]->Queue(packet, hdr);
       //m_dca->Queue (packet, hdr);
@@ -572,20 +518,27 @@ ApWifiMac::GetSlotNumFromAid (uint16_t aid) const
 		  numTim = m_pageslice.GetPageSliceCount();
 
 	uint32_t myslot = 0;
+	bool found = false;
 	for (uint32_t i = 0; i < numTim; i++)
 	{
+		//std::cout << "i=" << i << " has numRawGrups=" << (int)m_rpsset.rpsset.at(i)->GetNumberOfRawGroups() << std::endl;
 		for (uint32_t j = 0; j < m_rpsset.rpsset.at(i)->GetNumberOfRawGroups(); j++)
 		{
 			RPS::RawAssignment ass = m_rpsset.rpsset.at(i)->GetRawAssigmentObj(j);
+			//std::cout << "    j="<<j<< ", aidStart=" <<(int)ass.GetRawGroupAIDStart() << ", aidEnd=" << (int)ass.GetRawGroupAIDEnd() <<std::endl;
+
 			if (ass.GetRawGroupAIDStart() <= aid && aid <= ass.GetRawGroupAIDEnd())
 			{
 				myslot += aid % ass.GetSlotNum();
+				found = true;
 				break;
 			}
 			else
 				myslot += ass.GetSlotNum();
 		}
+		if (found) break;
 	}
+	//std::cout << "aid=" << (int)aid << ", mzslot=" << myslot<<std::endl;
 	return myslot;
 }
 

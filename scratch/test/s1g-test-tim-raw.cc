@@ -364,6 +364,8 @@ void onSTAAssociated(int i) {
 			configureTCPSensorClients();
 		}
 		updateNodesQueueLength();
+		cout << "Clients & server configured." << endl;
+
 	}
 }
 
@@ -884,7 +886,7 @@ void configureTCPFirmwareClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -926,7 +928,7 @@ void configureTCPSensorClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1069,7 +1071,7 @@ void configureUDPEchoClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1124,12 +1126,12 @@ int main(int argc, char *argv[]) {
 	PacketMetadata::Enable();
 
 	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+	//LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-	LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
-	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_FUNCTION);
+	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
@@ -1420,9 +1422,9 @@ int main(int argc, char *argv[]) {
 
 	sendStatistics(true);
 
-	Simulator::Stop(Seconds(config.simulationTime + config.CoolDownPeriod)); // allow up to a minute after the client & server apps are finished to process the queue
+	Simulator::Stop(Seconds(config.simulationTime)); // allow up to a minute after the client & server apps are finished to process the queue
 	Simulator::Run();
-
+	Simulator::Destroy();
 	// Visualizer throughput
 	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0, totalPacketsEchoed = 0;
 	for (int i = 0; i < config.Nsta; i++)
@@ -1432,10 +1434,11 @@ int main(int argc, char *argv[]) {
 		totalPacketsEchoed += stats.get(i).NumberOfSuccessfulRoundtripPackets;
 		pay += stats.get(i).TotalPacketPayloadSize;
 		cout << i << " sent: " << stats.get(i).NumberOfSentPackets
-				<< " ; delivered: " << stats.get(i).NumberOfSuccessfulPackets
-				<< " ; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
-				<< "; packetloss: "
-				<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
+				<< "\t" << "; delivered: " << stats.get(i).NumberOfSuccessfulPackets
+				<< "\t" << "; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
+				<< "\t" << "; packetloss: " << stats.get(i).GetPacketLoss(config.trafficType)
+				<< "\t" << "; remaining TX queue len: " << nodes[i]->queueLength
+				<< endl;
 	}
 
 	if (config.trafficType == "udp")
