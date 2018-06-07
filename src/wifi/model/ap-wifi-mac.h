@@ -25,6 +25,7 @@
 
 #include "regular-wifi-mac.h"
 #include "ht-capabilities.h"
+#include "s1g-capabilities.h"
 #include "amsdu-subframe-header.h"
 #include "supported-rates.h"
 #include "ns3/random-variable-stream.h"
@@ -117,6 +118,10 @@ public:
    * Start beacon transmission immediately.
    */
   void StartBeaconing (void);
+  
+  uint32_t GetStaType (void) const;
+  uint32_t GetChannelWidth (void) const;
+  void SetChannelWidth (uint32_t width);
 
   /**
    * Assign a fixed random variable stream number to the random variables
@@ -218,6 +223,7 @@ private:
    * \return the HT capability that we support
    */
   HtCapabilities GetHtCapabilities (void) const;
+  S1gCapabilities GetS1gCapabilities (void) const;
   /**
    * Return an instance of SupportedRates that contains all rates that we support
    * including HT rates.
@@ -278,6 +284,7 @@ private:
   uint32_t m_slotCrossBoundary;
   uint32_t m_slotDurationCount;
   uint32_t m_slotNum;
+  uint32_t m_channelWidth;
   
   //TIM
   uint8_t m_DTIMCount; //!< DTIM Count

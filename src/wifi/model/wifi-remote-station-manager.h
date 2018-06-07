@@ -31,6 +31,7 @@
 #include "wifi-mode.h"
 #include "wifi-tx-vector.h"
 #include "ht-capabilities.h"
+#include "s1g-capabilities.h"
 
 namespace ns3 {
 
@@ -163,6 +164,7 @@ public:
    * \param htcapabilities the HT capabilities of the station
    */
   void AddStationHtCapabilities (Mac48Address from, HtCapabilities htcapabilities);
+  void AddStationS1gCapabilities (Mac48Address from, S1gCapabilities s1gcapabilities);
   /**
    * Enable or disable HT capability support.
    *
@@ -1109,6 +1111,7 @@ struct WifiRemoteStationState
   bool m_s1g1mfield;          //!< Flag if green field is used by the remote station
   bool m_s1gshortfield;       //!< Flag if green field is used by the remote station
   bool m_s1glongfield;        //!< Flag if green field is used by the remote station
+  uint32_t m_channelWidth;
 };
 
 /**

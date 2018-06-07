@@ -29,6 +29,7 @@ NS_LOG_COMPONENT_DEFINE ("S1gCapabilities");
 S1gCapabilities::S1gCapabilities ()
   :  m_staType (0),
     m_s1gSupported (0),
+    m_ChannelWidth (0),
 	m_pageSlicingImplemented (0),
 	m_ndpPsPollSupported (0)
 {
@@ -50,6 +51,12 @@ void
 S1gCapabilities::SetStaType (uint8_t type)
 {
   m_staType = type;
+}
+
+void
+S1gCapabilities::SetChannelWidth (uint8_t width)
+{
+  m_ChannelWidth = width;
 }
 
 void
@@ -81,6 +88,12 @@ uint8_t
 S1gCapabilities::GetStaType (void) const
 {
   return m_staType;
+}
+
+uint8_t
+S1gCapabilities::GetChannelWidth (void) const
+{
+  return m_ChannelWidth;
 }
 
 uint8_t
@@ -116,6 +129,7 @@ S1gCapabilities::GetS1gCapabilitiesInfoL64 (void) const
 {
   uint64_t val = 0;
   val |= ((uint64_t(m_staType) << 38) & (uint64_t(0x03) << 38)) | ((uint64_t(m_pageSlicingImplemented) << 52) & (uint64_t(0x01) << 52));
+  val |= (uint64_t(m_ChannelWidth) << 6) & (uint64_t(0x03) << 6);
   val |= ((uint64_t(m_ndpPsPollSupported) << 50) & (uint64_t(0x01) << 50));
   return val;
 }
@@ -145,6 +159,7 @@ void
 S1gCapabilities::SetS1gCapabilitiesInfoL64 (uint64_t info)
 {
   m_staType = (info >> 38) & 0x03;
+  m_ChannelWidth = (info >> 6) & 0x03;
   m_ndpPsPollSupported = (info >> 50) & 0x01;
   m_pageSlicingImplemented = (info >> 52) & 0x01;
 }

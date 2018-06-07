@@ -94,7 +94,9 @@ public:
   void TxOk (const WifiMacHeader &hdr);
 
     uint32_t GetStaType (void) const;
+    uint32_t GetChannelWidth (void) const;
     void SetStaType (uint32_t statype);
+    void SetChannelWidth (uint32_t width);
     void SendDisAssociationRequest (void);
     void SendAssociationRequest (void);
 
@@ -107,6 +109,7 @@ public:
     uint8_t GetPageSlicingSupported (void) const;*/
 private:
     uint32_t m_staType;
+    uint32_t m_channelWidth;
     Time m_currentslotDuration;
   /**
    * The current MAC state of the STA.
@@ -278,6 +281,7 @@ private:
   bool fasTAssocType;
   uint16_t fastAssocThreshold;
     uint16_t assocVaule;
+  uint8_t m_slotCrossBoundary;
     
   bool firstBeacon;
   bool receivingBeacon;  

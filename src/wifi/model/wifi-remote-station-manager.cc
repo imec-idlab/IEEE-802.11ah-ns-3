@@ -32,6 +32,7 @@
 #include "ns3/trace-source-accessor.h"
 #include "wifi-mac-header.h"
 #include "wifi-mac-trailer.h"
+#include "s1g-capabilities.h"
 
 /***************************************************************
  *           Packet Mode Tagger
@@ -475,6 +476,11 @@ WifiRemoteStationManager::AddSupportedMode (Mac48Address address, WifiMode mode)
 {
   NS_LOG_FUNCTION (this << address << mode);
   NS_ASSERT (!address.IsGroup ());
+  if ( !m_wifiPhy->IsModeSupported (mode))
+  { 
+    return;
+  }
+ 
   WifiRemoteStationState *state = LookupState (address);
   for (WifiModeListIterator i = state->m_operationalRateSet.begin (); i != state->m_operationalRateSet.end (); i++)
     {
@@ -990,7 +996,15 @@ WifiRemoteStationManager::GetControlAnswerMode (Mac48Address address, WifiMode r
   NS_LOG_FUNCTION (this << address << reqMode);
   WifiMode mode = GetDefaultMode ();
   bool found = false;
-
+  if (reqMode.GetBandwidth() == 2)
+    {
+        mode = WifiPhy::GetOfdmRate650KbpsBW2MHz ();
+    }
+  else
+    {
+        mode = GetDefaultMode ();
+    }
+  return mode;
   //First, search the BSS Basic Rate set
   for (WifiModeListIterator i = m_bssBasicRateSet.begin (); i != m_bssBasicRateSet.end (); i++)
     {
@@ -1374,6 +1388,57 @@ WifiRemoteStationManager::AddStationHtCapabilities (Mac48Address from, HtCapabil
   // to do
   //state->m_greenfield = s1gcapabilities.GetS1gLongfield ();
 }
+
+void
+WifiRemoteStationManager::AddStationS1gCapabilities (Mac48Address from, S1gCapabilities s1gcapabilities)
+{
+  //Used by all stations to record S1g capabilities of remote stations
+  NS_LOG_FUNCTION (this << from << s1gcapabilities);
+  WifiRemoteStationState *state;
+  state = LookupState (from);
+  
+  switch (s1gcapabilities.GetChannelWidth () )
+        {
+            case 0:
+                state->m_channelWidth = 2;
+                break;
+            case 1:
+                state->m_channelWidth = 4;
+                break;
+            case 2:
+                state->m_channelWidth = 8;
+                break;
+            case 3:
+                state->m_channelWidth = 16;
+                break;
+            default:
+                NS_ASSERT ("error on s1gcapabilities.GetChannelWidth ()");
+    
+        }
+    NS_LOG_UNCOND (",,m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ()<< state->m_channelWidth);
+
+    if (m_wifiPhy->GetChannelWidth () > state->m_channelWidth)
+    {
+        NS_LOG_UNCOND (">>m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
+        m_wifiPhy->SetChannelWidth (state->m_channelWidth); // take the minimal
+    }
+    
+  if (m_wifiPhy->GetChannelWidth () < state->m_channelWidth)
+    {
+        NS_LOG_UNCOND ("..m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
+      state->m_channelWidth = m_wifiPhy->GetChannelWidth (); // take the minimal
+    }
+    
+
+ /*
+ m_channelWidth = 
+ 0, 1/2 MHz bandwidth
+ 1, 1/2/4
+ 2, 1/24/8
+ 3, 1/2/4/8 
+ */
+}
+
 
 bool
 WifiRemoteStationManager::GetGreenfieldSupported (Mac48Address address) const

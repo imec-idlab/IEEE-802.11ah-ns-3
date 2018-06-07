@@ -109,5 +109,13 @@ Note: Relation between the above 3 parameters and MCS is described in file "MCSt
     
     To configure a single page slice (whole page encoded in a single page slice), it is neccessary to set pageSliceCount to 0 and pageSliceLength to 1.
 
+### Rate control Algorithm (RCA) ###
+The 802.11ah nodes can always use the same MCS as specified by "Wi-Fi mode parameters" when "ConstantRateWifiManager" is used. The nodes can also adapt the MCSs dynamically when rata control algorithm is used. Details about Rate control Algorithms can be found on https://www.nsnam.org/docs/models/html/wifi-design.html#rate-control-algorithms.
+
+An example of using MinstrelWifiManager is given in scratch/rca, where one mobile station continuously transmits 64-byte UDP packets to the AP, while moving from -500 m to 500 m relative to the centrally placed AP at the speed of 1 m/s.
+
+`./waf --run "rca --seed=1 --simulationTime=60 --payloadSize=256"`
+
+
 ### Further reading
 For more information on the implementation of the IEEE 802.11ah module for ns-3, check our [recent WNS3 paper on ResearchGate](https://www.researchgate.net/publication/324910418_Extension_of_the_IEEE_80211ah_ns-3_Simulation_Module).
