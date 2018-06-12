@@ -546,6 +546,7 @@ uint32_t
 ApWifiMac::GetSlotNumFromRpsRawSlot (uint16_t rps, uint8_t rawg, uint8_t slot) const
 {
 	uint32_t myslot = 0;
+	bool found=false;
 	for (uint32_t i = 0; i < rps; i++)
 		{
 			for (uint32_t j = 0; j < m_rpsset.rpsset.at(i)->GetNumberOfRawGroups(); j++)
@@ -555,11 +556,14 @@ ApWifiMac::GetSlotNumFromRpsRawSlot (uint16_t rps, uint8_t rawg, uint8_t slot) c
 				{
 					//my raw group
 					myslot += slot - 1;
+					found = true;
 					break;
 				}
 				else
 					myslot += ass.GetSlotNum();
 			}
+        if (found)
+			break;
 		}
 		return myslot;
 	return GetSlotNumFromAid (m_rpsset.rpsset.at(rps)->GetRawAssigmentObj(rawg).GetSlotNum()) + slot;
@@ -861,7 +865,7 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
     
     blockBitmap = 0;
     block = (PageInd << 11) | (blockInd << 6); // TODO check
-   
+    bool found=false;
     for (uint16_t i = 0; i <= 7; i++) //8 subblock in each block.
      {
        subblock = block | (i << 3);
@@ -873,11 +877,14 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
         	   blockBitmap = blockBitmap | (1 << i);
         	   //NS_LOG_UNCOND ("[aid=" << sta_aid << "] paged");
         	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
+               found=true;
         	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
         		   m_PageSliceNum = 31;
         	   break;
             }
         }
+        if (found)
+            break;
      }
   
     return blockBitmap;
@@ -916,7 +923,6 @@ ApWifiMac::HasPacketsInQueueTo(Mac48Address dest)
     uint32_t aid = 0;
     do {aid++;}
     	  while (m_AidToMacAddr.find(aid)->second != dest); //TODO optimize search
-
     peekedPacket_VO = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_VO)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
     peekedPacket_VI = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_VI)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
     peekedPacket_BE = m_rawSlotsEdca[this->GetSlotNumFromAid(aid)].find(AC_BE)->second->GetEdcaQueue()->PeekByAddress (WifiMacHeader::ADDR1, dest);
