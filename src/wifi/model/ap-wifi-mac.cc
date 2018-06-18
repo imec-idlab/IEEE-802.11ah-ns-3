@@ -801,24 +801,28 @@ Addheader:
 uint32_t
 ApWifiMac::HasPacketsToPage (uint8_t blockstart , uint8_t Page)
 {
-   uint8_t blockBitmap;
-   uint32_t PageBitmap;
-   PageBitmap = 0;
-   uint32_t numBlocks = m_pageslice.GetPageSliceLen();
-   //printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap includes blocks from %d to %d\n", blockstart, blockstart + numBlocks - 1);
-   for (uint32_t i=blockstart; i< blockstart + numBlocks ; i++ )
-    {
-       blockBitmap = HasPacketsToBlock (i,  Page);
-       if (blockBitmap != 0)
-         {
-           PageBitmap = PageBitmap | (1 << i);
-         }
-       //printf("		ApWifiMac::HasPacketsToPage --- Block Bitmap = %x\n", blockBitmap);
-    }
-   //printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap before >> blockstart = %x\n", PageBitmap);
-   PageBitmap = PageBitmap >> blockstart;
-   //printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap after >> blockstart = %x\n", PageBitmap);
-   return PageBitmap;
+	uint8_t blockBitmap;
+	uint32_t PageBitmap;
+	PageBitmap = 0;
+	uint32_t numBlocks;
+	if (m_pageslice.GetPageSliceCount() == 0)
+		numBlocks = 31;
+	else
+		numBlocks = m_pageslice.GetPageSliceLen();
+	//printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap includes blocks from %d to %d\n", blockstart, blockstart + numBlocks - 1);
+	for (uint32_t i=blockstart; i< blockstart + numBlocks ; i++ )
+	{
+		blockBitmap = HasPacketsToBlock (i,  Page);
+		if (blockBitmap != 0)
+		{
+			PageBitmap = PageBitmap | (1 << i);
+		}
+		//printf("		ApWifiMac::HasPacketsToPage --- Block Bitmap = %x\n", blockBitmap);
+	}
+	//printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap before >> blockstart = %x\n", PageBitmap);
+	PageBitmap = PageBitmap >> blockstart;
+	//printf("		ApWifiMac::HasPacketsToPage --- Page Bitmap after >> blockstart = %x\n", PageBitmap);
+	return PageBitmap;
 }
 
 uint8_t
@@ -999,7 +1003,12 @@ ApWifiMac::SendOneBeacon (void)
     NS_ASSERT (m_pageslice.GetTIMOffset () +  m_pageslice.GetPageSliceCount() <= m_DTIMPeriod);
     m_TrafficIndicator = 0; //for group addressed MSDU/MMPDU, not supported.
     m_TIM.SetTafficIndicator (m_TrafficIndicator); //from page slice
-
+    m_PageSliceNum = 0;
+    if (m_pageslice.GetPageSliceCount() == 0)
+      {
+       m_PageSliceNum = 31;
+      }
+    else
     if (m_PageSliceNum != 31 && m_pageslice.GetPageSliceCount() != 0)
       {
 		if (m_DTIMCount == m_pageslice.GetTIMOffset ()) //first page slice start at TIM offset
@@ -1024,7 +1033,7 @@ ApWifiMac::SendOneBeacon (void)
     	}
     }
     //if (!m_DTIMCount && numPagedStas) NS_LOG_DEBUG ("Paged stations: " << (int)numPagedStas);
-	if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
+	/*if (m_pageslice.GetPageSliceCount() == 0 && numPagedStas > 0)// special case
 	{
 		if (m_pageslice.GetPageSliceLen() > 1)
 		{
@@ -1042,7 +1051,7 @@ ApWifiMac::SendOneBeacon (void)
   else if (m_pageslice.GetPageSliceCount () == 0 && numPagedStas == 0)
    {
       m_PageSliceNum = 0;
-   }
+   }*/
 
     uint8_t NumEncodedBlock;
     if (m_PageSliceNum != (m_pageslice.GetPageSliceCount() - 1) && m_PageSliceNum != 31) // convenient overflow if count==0
@@ -1054,7 +1063,7 @@ ApWifiMac::SendOneBeacon (void)
     	// PSlast = 8 * PageBitmap_length - (PScount-1) * PSlength
     	if (m_pageslice.GetPageSliceCount() > 0)
     		NumEncodedBlock = 0x1f & (8 * 4 - (m_pageslice.GetPageSliceCount() - 1) * m_pageslice.GetPageSliceLen());
-    	else if (m_pageslice.GetPageSliceCount() == 0 && m_pageslice.GetPageSliceLen() == 1)
+    	else if (m_pageslice.GetPageSliceCount() == 0)
     		NumEncodedBlock = 31;
          //As page bitmap of page slice element is fixed to 4 bytes for now, "m_pageslice.GetInformationFieldSize ()" is alwawys 8.
          //Section 9.4.2.193 oage slice element, Draft 802.11ah_D9.0
@@ -1167,7 +1176,7 @@ ApWifiMac::SendOneBeacon (void)
       NS_LOG_DEBUG(
     		  "Transmission of beacon will take " << txTime << ", delaying RAW start for that amount");
       Time bufferTimeToAllowBeaconToBeReceived = txTime;
-      bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
+      //bufferTimeToAllowBeaconToBeReceived = MicroSeconds (5600);
       auto nRaw = m_rps->GetNumberOfRawGroups();
       currentRawGroup = (currentRawGroup + 1) % nRaw;
 

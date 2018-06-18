@@ -1137,7 +1137,7 @@ int main(int argc, char *argv[]) {
 
 	configurePageSlice ();
 	configureTIM ();
-	checkRawAndTimConfiguration ();
+	//checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
