@@ -134,7 +134,8 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 	//1. get info from config file
 
 	//2. define RPS
-	if (myfile.is_open()) {
+	if (myfile.is_open())
+	{
 		myfile >> NRPS;
 		int totalNumSta = 0;
 		for (uint16_t kk = 0; kk < NRPS; kk++) // number of beacons covering all raw groups
@@ -142,6 +143,7 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 			RPS *m_rps = new RPS;
 			myfile >> NRAWPERBEACON;
 			ngroup = NRAWPERBEACON;
+			config.NGroup = ngroup;
 			for (uint16_t i = 0; i < NRAWPERBEACON; i++) // raw groups in one beacon
 			{
 				//RPS *m_rps = new RPS;
@@ -157,6 +159,7 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 				m_raw->SetSlotDurationCount(Value);
 				myfile >> Value;
 				nslot = Value;
+				config.NRawSlotNum = nslot;
 				m_raw->SetSlotNum(Value);
 				myfile >> page;
 				myfile >> aid_start;
@@ -174,8 +177,13 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 		config.NRawSta = totalNumSta;
 				/*rpslist.rpsset[rpslist.rpsset.size() - 1]->GetRawAssigmentObj(
 						NRAWPERBEACON - 1).GetRawGroupAIDEnd();*/
-	} else
-		cout << "Unable to open RAW configuration file \n";
+	}
+	else
+	{
+		cerr << "Unable to open RAW configuration file \n";
+		NS_ASSERT (false);
+	}
+
 
 	return rpslist;
 }
@@ -306,6 +314,16 @@ void updateNodesQueueLength() {
 		stats.get(i).EDCAQueueLength = nodes[i]->queueLength;
 	}
 	Simulator::Schedule(Seconds(0.5), &updateNodesQueueLength);
+}
+
+void checkBugAck() {
+	int sent (0), succ (0);
+	for (uint32_t i = 0; i < config.Nsta; i++) {
+		sent += stats.get(i).NumberOfSentPackets;
+		succ += stats.get(i).NumberOfSuccessfulPackets;
+	}
+	cout << " total sent=" << sent << ", succ=" << succ << endl;
+	Simulator::Schedule(Seconds(25), &checkBugAck);
 }
 
 void onSTAAssociated(int i) {
@@ -1014,7 +1032,9 @@ void configureUDPClients() {
 	UdpClientHelper myClient(apNodeInterface.GetAddress(0), 9); //address of remote node
 	myClient.SetAttribute("MaxPackets", config.maxNumberOfPackets);
 	myClient.SetAttribute("PacketSize", UintegerValue(config.payloadSize));
+	/*
 	traffic_sta.clear();
+
 	ifstream trafficfile(config.TrafficPath);
 	if (trafficfile.is_open()) {
 		uint16_t sta_id;
@@ -1027,7 +1047,10 @@ void configureUDPClients() {
 		}
 		trafficfile.close();
 	} else
+	{
 		cout << "Unable to open traffic file \n";
+		NS_ASSERT (false);
+	}
 
 	double randomStart = 0.0;
 	for (std::map<uint16_t, float>::iterator it = traffic_sta.begin();
@@ -1036,18 +1059,27 @@ void configureUDPClients() {
 		intervalstr << (config.payloadSize * 8) / (it->second * 1000000);
 		std::string intervalsta = intervalstr.str();
 
-		//config.trafficInterval = UintegerValue (Time (intervalsta));
+		config.trafficInterval = (Time (intervalsta)).GetMilliSeconds();
 
 		myClient.SetAttribute("Interval", TimeValue(Time(intervalsta))); // TODO add to nodeEntry and visualize
-		randomStart = m_rv->GetValue(0,
-				(config.payloadSize * 8) / (it->second * 1000000));
-		ApplicationContainer clientApp = myClient.Install(
-				wifiStaNode.Get(it->first));
-		clientApp.Get(0)->TraceConnectWithoutContext("Tx",
-				MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
+		cout << "it=" << it->first << ", interval=" << config.trafficInterval << endl;
+		randomStart = m_rv->GetValue(0, (config.payloadSize * 8) / (it->second * 1000000));
+		ApplicationContainer clientApp = myClient.Install(wifiStaNode.Get(it->first));
+		clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
 		clientApp.Start(Seconds(1 + randomStart));
 		//clientApp.Stop (Seconds (config.simulationTime+1)); //with this throughput is smaller
-	}
+	}*/
+
+		for (uint16_t i = 0; i < config.Nsta; i++) {
+			ApplicationContainer clientApp = myClient.Install(wifiStaNode.Get(i));
+			clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[i]));
+			clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnUdpEchoPacketReceived, nodes[i]));
+
+			double random = m_rv->GetValue(0, config.trafficInterval);
+			clientApp.Start(MilliSeconds(0 + random));
+			//clientApp.Stop(Seconds(config.simulationTime));
+		}
+
 	AppStartTime = Simulator::Now().GetSeconds() + 1;
 	//Simulator::Stop (Seconds (config.simulationTime+1));
 }
@@ -1137,18 +1169,30 @@ int main(int argc, char *argv[]) {
 	config = Configuration(argc, argv);
 
 	config.rps = configureRAW(config.rps, config.RAWConfigFile);
+
 	config.Nsta = config.NRawSta;
 
 	configurePageSlice ();
 	configureTIM ();
 	//checkRawAndTimConfiguration ();
 
-	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
-			+ "sta_" + std::to_string(config.NGroup) + "Group_"
+	if (config.trafficType == "tcpipcamera")
+	{
+		config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)	+ "sta_"
+					+ std::to_string(config.NGroup) + "Group_"
+					+ std::to_string(config.NRawSlotNum) + "slots_"
+					+ std::to_string(config.ipcameraDataRate) + "Kbps_"
+					+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
+	}
+	else if (config.trafficType == "udp")
+	{
+	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta) + "sta_"
+			+ std::to_string(config.NGroup) + "Group_"
 			+ std::to_string(config.NRawSlotNum) + "slots_"
-			+ std::to_string(config.payloadSize) + "payload_"
-			+ std::to_string(config.totaltraffic) + "Mbps_"
+			+ std::to_string(config.trafficInterval) + "s_"
+			+ std::to_string(config.payloadSize) + "B_"
 			+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
+	}
 
 	stats = Statistics(config.Nsta);
 	eventManager = SimulationEventManager(config.visualizerIP,
@@ -1422,6 +1466,8 @@ int main(int argc, char *argv[]) {
 
 	sendStatistics(true);
 
+	checkBugAck();
+
 	Simulator::Stop(Seconds(config.simulationTime)); // allow up to a minute after the client & server apps are finished to process the queue
 	Simulator::Run();
 	Simulator::Destroy();
@@ -1477,9 +1523,16 @@ int main(int argc, char *argv[]) {
 
 		std::cout << "datarate" << "\t" << "throughput" << std::endl;
 		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
+		cout << "total packet loss % " << 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
 	}
-	cout << "total packet loss % "
-			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
+	else if (config.trafficType == "tcpipcamera")
+	{
+		for (int h=0; h<config.Nsta; h++)
+		{
+			std::cout << "bytes sent=" << stats.get(h).IPCameraTotalDataSent << "\t rec=" << stats.get(h).IPCameraTotalDataReceivedAtAP << "\t seconds=" << stats.get(h).IPCameraTotalTimeSent.GetSeconds() << endl;
+		}
+	}
+
 	Simulator::Destroy();
 
 	//Energy consumption per station

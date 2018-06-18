@@ -35,6 +35,8 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("blockOffset", "The 1st page slice starts with the block with blockOffset", blockOffset);
     cmd.AddValue("timOffset", "Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page", timOffset);
     cmd.AddValue("TrafficInterval", "Traffic interval time in ms", trafficInterval);
+    cmd.AddValue("IpCameraDataRate", "Data rate of the captured stream in kbps", ipcameraDataRate);
+    cmd.AddValue("TCPSegmentSize", "TCP Segment size in bytes", TCPSegmentSize);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
@@ -57,14 +59,12 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("MinRTO", "Minimum retransmission timeout for TCP sockets in microseconds", MinRTO);
     cmd.AddValue("TCPConnectionTimeout", "TCP Connection timeout to use for all Tcp Sockets", TCPConnectionTimeout);
 
-    cmd.AddValue("TCPSegmentSize", "TCP Segment size in bytes", TCPSegmentSize);
     cmd.AddValue("TCPInitialSlowStartThreshold", "TCP Initial slow start threshold in segments", TCPInitialSlowStartThreshold);
     cmd.AddValue("TCPInitialCwnd", "TCP Initial congestion window in segments", TCPInitialCwnd);
 
 
     cmd.AddValue("IpCameraMotionPercentage", "Probability the ip camera detects motion each second [0-1]", ipcameraMotionPercentage);
     cmd.AddValue("IpCameraMotionDuration", "Time in seconds to stream data when motion was detected", ipcameraMotionDuration);
-    cmd.AddValue("IpCameraDataRate", "Data rate of the captured stream in kbps", ipcameraDataRate);
 
     cmd.AddValue("FirmwareSize", "Size of the firmware that will be sent to clients for update", firmwareSize);
     cmd.AddValue("FirmwareBlockSize", "The chunk size of a piece of firmware. The client has to acknowledge each chunk before the next will be sent", firmwareBlockSize);

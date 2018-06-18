@@ -81,7 +81,7 @@ void NodeEntry::OnPhyTxEnd(std::string context, Ptr<const Packet> packet) {
 }
 
 void NodeEntry::OnPhyTxDrop(std::string context, Ptr<const Packet> packet, DropReason reason) {
-	/*if(showLog)*/ cout << "+++++++++++++++++++[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
+	if(showLog) cout << "[" << this->aId << "] " << "Tx Dropped " << packet->GetUid()
 					<< endl;
 
 	if (txMap.find(packet->GetUid()) != txMap.end()) {
@@ -468,14 +468,12 @@ void NodeEntry::OnTcpEstimatedBWChanged(double oldVal, double newVal) {
 }
 
 void NodeEntry::OnUdpPacketSent(Ptr<const Packet> packet) { //works
-	//cout << "[" << this->id << "] " << "UDP packet sent " << endl;
+	//if(showLog) cout << "[" << this->id << "] " << "UDP packet sent " << endl;
 	auto pCopy = packet->Copy();
 
 	SeqTsHeader seqTs;
 	pCopy->RemoveHeader(seqTs);
 	auto timeDiff = (Simulator::Now() - seqTs.GetTs());
-	if (this->id == 90)
-		cout << "++++++++++++++++++++++++++++++++++++++++++++++ TX at " << Simulator::Now() << "seq " << seqTs.GetSeq() << endl;
 	stats->get(this->id).NumberOfSentPackets++;
 
 	/*		cout << "[" << this->id << "] "  << Simulator::Now().GetMicroSeconds() <<
@@ -591,12 +589,21 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 		//cout << "[" << this->id << "] " << "UDP packet received at AP after "
 		//	<< std::to_string(timeDiff.GetMicroSeconds()) << "µs" << endl;
 		//cout << "+++++++++++udpPacketReceivedAtServer" << endl;
+		if (stats->get(this->id).NumberOfSuccessfulPackets >+ stats->get(this->id).NumberOfSentPackets)
+		{
+			cout << "+++++++++++" << Simulator::Now ().GetSeconds() <<": ACK bug" << endl;
+			//stats->get(this->id).NumberOfSuccessfulPackets = stats->get(this->id).NumberOfSentPackets;
+			return;
+		}
+		else
+		{
 		stats->get(this->id).NumberOfSuccessfulPackets++;
 		stats->get(this->id).TotalPacketSentReceiveTime += timeDiff;
 		stats->get(this->id).latency = timeDiff;
 		//cout << "id = " << this->id << " ; latency = " << timeDiff << " ; seq =  " << seqTs.GetSeq() << endl;
 		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 
+		}
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get header
 	}

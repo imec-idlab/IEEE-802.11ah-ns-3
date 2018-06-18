@@ -96,6 +96,7 @@ void onChannelTransmission(Ptr<NetDevice> senderDevice, Ptr<Packet> packet);
 
 void updateNodesQueueLength();
 
+void checkBugAck();
 
 int getSTAIdFromAddress(Ipv4Address from);
 

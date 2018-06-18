@@ -31,7 +31,7 @@ struct Configuration {
 	std::string RawConfigString;    // RPS=2;{RAW=2;[0,1,1,204,2,0,1,16][0,1,1,412,1,0,17,32]}{RAW=1;[0,1,1,180,3,0,33,35]}
 
 	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
-	string trafficType = "udpecho"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
+	string trafficType = "udp"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
 
 	// Page slicing
 	pageSlice pageS;
@@ -47,10 +47,10 @@ struct Configuration {
 	 *
 	 * */
 
-	uint32_t pagePeriod=2;  	//  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
+	uint32_t pagePeriod=1;  	//  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
 	uint8_t pageIndex = 0;
 	uint32_t pageSliceLength=1; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
-	uint32_t pageSliceCount=2;  //  Number of TIMs in a single page period (1-31)
+	uint32_t pageSliceCount=0;  //  Number of TIMs in a single page period (1-31)
 	uint8_t blockOffset = 0;  	//  The 1st page slice starts with the block with blockOffset number
 	uint8_t timOffset = 0;    	//  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
 	/*
@@ -110,7 +110,7 @@ struct Configuration {
 	uint16_t ipcameraDataRate = 128; //20
 	uint32_t MinRTO = 81920000; //819200
 	uint32_t TCPConnectionTimeout = 6000000;
-	uint32_t TCPSegmentSize  = 3216; //536
+	uint32_t TCPSegmentSize  = 2144; //536
 	uint32_t TCPInitialSlowStartThreshold = 0xffff;
 	uint32_t TCPInitialCwnd = 1;
 

@@ -52,8 +52,10 @@ float NodeStatistics::GetPacketLoss (std::string trafficType)
 {
 	if (NumberOfSentPackets > 0 && trafficType == "udpecho")
 		return 100 * (float)(NumberOfSentPackets - NumberOfSuccessfulRoundtripPackets)/ (NumberOfSentPackets + NumberOfSuccessfulPackets);
-	else if (NumberOfSentPackets > 0)
-		return 100 - 100 * (float)NumberOfSuccessfulPackets / NumberOfSentPackets;
+	else if (NumberOfSentPackets >= NumberOfSuccessfulPackets)
+		return (float)(NumberOfSentPackets - NumberOfSuccessfulPackets) / NumberOfSentPackets;
+	else if (NumberOfSentPackets < NumberOfSuccessfulPackets) //TODO this is a bug !!!
+		return 0;
 	else return -1;
 }
 
