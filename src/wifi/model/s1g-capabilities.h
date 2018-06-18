@@ -48,6 +48,7 @@ public:
   S1gCapabilities ();
   void SetS1gSupported (uint8_t s1gsupported);
   void SetStaType (uint8_t type);
+  void SetChannelWidth (uint8_t width);
   void SetPageSlicingSupport (uint8_t pageSlicingImplemented);
   void SetNdpPsPollSupport (uint8_t psPollingSupported);
   //Set the lowest 64bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
@@ -62,6 +63,7 @@ public:
   uint8_t GetPageSlicingSupport (void) const;
   uint8_t GetNdpPsPollSupport (void) const;
   uint8_t GetStaType (void) const;
+  uint8_t GetChannelWidth (void) const;
   //Return the lowest 64bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
   uint64_t GetS1gCapabilitiesInfoL64 (void) const;
   //Return the highest 16bytes of the S1gCapabilitiesInfo in the S1G Capabilities information element
@@ -101,6 +103,7 @@ private:
   uint8_t m_staType;
   //this is used to decide if this element should be added to the frame or not
   uint8_t m_s1gSupported;
+  uint8_t m_ChannelWidth;
   uint8_t m_pageSlicingImplemented;
   uint8_t m_ndpPsPollSupported;
 };

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "s1g-test-tim-raw.h"
+#include "s1g-rca.h"
 
 NS_LOG_COMPONENT_DEFINE("s1g-wifi-network-tim-raw");
 
@@ -75,6 +75,17 @@ uint32_t GetAssocNum() {
 		}
 	}
 	return AssocNum;
+}
+
+void PrintPositions (NodeContainer wifiStaNode)
+{
+  
+    Ptr<ConstantVelocityMobilityModel> mob = wifiStaNode.Get(0)->GetObject<ConstantVelocityMobilityModel>();
+    Vector pos = mob->GetPosition ();
+    std::cout << "POS: x=" << pos.x << ", y=" << pos.y << ", z=" << pos.z << "," << Simulator::Now ().GetSeconds ()<< std::endl;
+    mob->SetVelocity (Vector(1,0,0));
+    
+    Simulator::Schedule(Seconds(1), &PrintPositions, wifiStaNode);
 }
 
 void PopulateArpCache() {
@@ -239,12 +250,12 @@ void checkRawAndTimConfiguration (void)
 	std::cout << "Checking RAW and TIM configuration..." << std::endl;
 	bool configIsCorrect = true;
 	NS_ASSERT (config.rps.rpsset.size());
-	// Number of page slices in a single page has to equal number of different RPS elements because
-	// If #PS > #RPS, the same RPS will be used in more than 1 PS and that is wrong because
-	// each PS can accommodate different AIDs (same RPS means same stations in RAWs)
+	// Number of TIM groups in a single page has to equal number of different RPS elements because
+	// If #TIM > #RPS, the same RPS will be used in more than 1 TIM and that is wrong because
+	// each TIM can accommodate different AIDs (same RPS means same stations in RAWs)
     if(config.pageSliceCount)
     {
-	//NS_ASSERT (config.pagePeriod == config.rps.rpsset.size());
+	NS_ASSERT (config.pageSliceCount == config.rps.rpsset.size());
     }
 	for (uint32_t j = 0; j < config.rps.rpsset.size(); j++)
 	{
@@ -263,21 +274,13 @@ void checkRawAndTimConfiguration (void)
 		NS_ASSERT (totalRawTime <= config.BeaconInterval);
 	}
 }
-// assumes each TIM has its own beacon - doesn't need to be the case as there has to be only PageSliceCount beacons between DTIMs
+
 bool check (uint16_t aid, uint32_t index)
 {
 	uint8_t block = (aid >> 6 ) & 0x001f;
 	NS_ASSERT (config.pageS.GetPageSliceLen() > 0);
-	//uint8_t toTim = (block - config.pageS.GetBlockOffset()) % config.pageS.GetPageSliceLen();
-	if (index == config.pageS.GetPageSliceCount() - 1 && config.pageS.GetPageSliceCount() != 0)
-	{
-		// the last page slice has 32 - the rest blocks
-		return (block <= 31) && (block >= index * config.pageS.GetPageSliceLen());
-	}
-	else if (config.pageS.GetPageSliceCount() == 0)
-		return true;
-
-	return (block >= index * config.pageS.GetPageSliceLen()) && (block < (index + 1) * config.pageS.GetPageSliceLen());
+	uint8_t toTim = (block - config.pageS.GetBlockOffset()) % config.pageS.GetPageSliceLen();
+	return toTim == index;
 }
 
 
@@ -342,7 +345,6 @@ void onSTAAssociated(int i) {
 		stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
 		if (config.trafficType == "udp") {
-			std::cout << "UDP" << std::endl;
 			configureUDPServer();
 			configureUDPClients();
 		} else if (config.trafficType == "udpecho") {
@@ -1021,7 +1023,7 @@ void configureUDPClients() {
 			trafficfile >> sta_id;
 			trafficfile >> sta_traffic;
 			traffic_sta.insert(std::make_pair(sta_id, sta_traffic)); //insert data
-			//cout << "sta_id = " << sta_id << " sta_traffic = " << sta_traffic << "\n";
+			cout << "sta_id = " << sta_id << " sta_traffic = " << sta_traffic << "\n";
 		}
 		trafficfile.close();
 	} else
@@ -1033,7 +1035,7 @@ void configureUDPClients() {
 		std::ostringstream intervalstr;
 		intervalstr << (config.payloadSize * 8) / (it->second * 1000000);
 		std::string intervalsta = intervalstr.str();
-
+        cout << "sta_id = " << it->first << " intervalsta = " << intervalsta << "\n";
 		//config.trafficInterval = UintegerValue (Time (intervalsta));
 
 		myClient.SetAttribute("Interval", TimeValue(Time(intervalsta))); // TODO add to nodeEntry and visualize
@@ -1121,9 +1123,10 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 }
 
 int main(int argc, char *argv[]) {
-	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
-	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+	 LogComponentEnable ("UdpServer", LOG_INFO);
+     //LogComponentEnable ("UdpClient", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
+	 //LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
 	//LogComponentEnable ("ApWifiMac", LOG_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
@@ -1137,7 +1140,7 @@ int main(int argc, char *argv[]) {
 
 	configurePageSlice ();
 	configureTIM ();
-	//checkRawAndTimConfiguration ();
+	checkRawAndTimConfiguration ();
 
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
 			+ "sta_" + std::to_string(config.NGroup) + "Group_"
@@ -1184,7 +1187,7 @@ int main(int argc, char *argv[]) {
 	phy.SetErrorRateModel("ns3::YansErrorRateModel");
 	phy.SetChannel(channel);
 	phy.Set("ShortGuardEnabled", BooleanValue(false));
-	phy.Set("ChannelWidth", UintegerValue(getBandwidth(config.DataMode))); // changed
+	phy.Set("ChannelWidth", UintegerValue(config.bandWidth)); // changed
 	phy.Set("EnergyDetectionThreshold", DoubleValue(-110.0));
 	phy.Set("CcaMode1Threshold", DoubleValue(-113.0));
 	phy.Set("TxGain", DoubleValue(0.0));
@@ -1204,8 +1207,8 @@ int main(int argc, char *argv[]) {
 	StringValue DataRate;
 	DataRate = StringValue(getWifiMode(config.DataMode)); // changed
 
-	wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",DataRate, "ControlMode", DataRate);
-    //wifi.SetRemoteStationManager("ns3::ArfWifiManager");
+	//wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",DataRate, "ControlMode", DataRate);
+    wifi.SetRemoteStationManager("ns3::MinstrelWifiManager");
 
 
 	mac.SetType("ns3::StaWifiMac", "Ssid", SsidValue(ssid), "ActiveProbing",
@@ -1229,6 +1232,7 @@ int main(int argc, char *argv[]) {
 	phy.Set("TxPowerEnd", DoubleValue(30.0));
 	phy.Set("TxPowerStart", DoubleValue(30.0));
 	phy.Set("RxNoiseFigure", DoubleValue(6.8));
+    phy.Set ("ChannelWidth", UintegerValue (4));
 
 	apDevice = wifi.Install(phy, mac, wifiApNode);
 
@@ -1238,27 +1242,7 @@ int main(int argc, char *argv[]) {
 	Config::Set(
 			"/NodeList/*/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/BE_EdcaTxopN/Queue/MaxDelay",
 			TimeValue(NanoSeconds(6000000000000)));
-/*
-	string DataModeCamera = "OfdmRate650KbpsBW2MHz";
-	StringValue aa = StringValue(DataModeCamera);
-	for (uint16_t k = 0; k < config.Nsta; k++) {
-		std::ostringstream APSTA;
-		APSTA << k;
-		std::string strAP = APSTA.str();
-		Config::Set(
-				"/NodeList/" + strAP
-						+ "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/DataMode",
-				aa);
-		Config::Set(
-				"/NodeList/" + strAP
-						+ "/DeviceList/0/$ns3::WifiNetDevice/RemoteStationManager/$ns3::ConstantRateWifiManager/ControlMode",
-				aa);
-		Config::Set(
-				"/NodeList/" + strAP
-						+ "/DeviceList/0/$ns3::WifiNetDevice/Phy/$ns3::YansWifiPhy/ChannelWidth",
-				UintegerValue(2));
-	}
-*/
+
 	std::ostringstream oss;
 	oss << "/NodeList/" << wifiApNode.Get(0)->GetId()
 			<< "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::RegularWifiMac/$ns3::ApWifiMac/";
@@ -1267,6 +1251,7 @@ int main(int argc, char *argv[]) {
 	Config::ConnectWithoutContext(oss.str() + "RawSlot", MakeCallback(&RawSlotTrace));
 
 	// mobility.
+    /*
 	MobilityHelper mobility;
 	double xpos = std::stoi(config.rho, nullptr, 0);
 	double ypos = xpos;
@@ -1275,14 +1260,32 @@ int main(int argc, char *argv[]) {
 			StringValue(std::to_string(ypos)), "rho", StringValue(config.rho));
 	mobility.SetMobilityModel("ns3::ConstantPositionMobilityModel");
 	mobility.Install(wifiStaNode);
+    */
+    
+    MobilityHelper mobility;
+    Ptr<ListPositionAllocator> position = CreateObject<ListPositionAllocator> ();
+    position->Add (Vector (-500, 0, 0));
+    mobility.SetPositionAllocator (position);
+    mobility.SetMobilityModel("ns3::ConstantVelocityMobilityModel");
+    mobility.Install(wifiStaNode);
+    PrintPositions (wifiStaNode);
 
+
+   /*
 	MobilityHelper mobilityAp;
 	Ptr<ListPositionAllocator> positionAlloc = CreateObject<
 			ListPositionAllocator>();
 	positionAlloc->Add(Vector(xpos, ypos, 0.0));
 	mobilityAp.SetPositionAllocator(positionAlloc);
 	mobilityAp.SetMobilityModel("ns3::ConstantPositionMobilityModel");
-	mobilityAp.Install(wifiApNode);
+	mobilityAp.Install(wifiApNode); */
+    
+    MobilityHelper mobilityAp;
+    Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+    positionAlloc->Add (Vector (0, 0, 0));
+    mobilityAp.SetPositionAllocator (positionAlloc);
+    mobilityAp.SetMobilityModel("ns3::ConstantPositionMobilityModel");
+    mobilityAp.Install(wifiApNode);
 
 	/*
 
@@ -1333,7 +1336,6 @@ int main(int argc, char *argv[]) {
 	apNodeInterface = address.Assign(apDevice);
 
 	//trace association
-	std::cout << "Configuring trace sources..." << std::endl;
 	for (uint16_t kk = 0; kk < config.Nsta; kk++) {
 		std::ostringstream STA;
 		STA << kk;

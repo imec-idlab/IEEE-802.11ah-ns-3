@@ -1008,12 +1008,90 @@ YansWifiPhy::Configure80211ah (void)
     m_channelStartingFrequency = 9e2;
     
     // need to check for 802.11ah
-    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6Mbps ());
-    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
-    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
+    //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6Mbps ());
+    //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+    //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
     
     //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate12Mbps ());
     //m_deviceRateSet.push_back (WifiPhy::GetOfdmRate24Mbps ());
+        
+    if (GetChannelWidth () == 2)
+    {
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate600KbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate900KbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_2MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_8MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_4MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_7MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3_6MbpsBW1MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate4MbpsBW1MHz ());
+
+    //supportedmodes.push_back (WifiPhy::GetOfdmRate150KbpsBW1MHz ());
+    //mandatory MCS 0 to 7, 2Mhz
+    
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_3MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_95MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_6MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3_9MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate5_2MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate5_85MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6_5MbpsBW2MHz ());
+    m_deviceRateSet.push_back (WifiPhy::GetOfdmRate7_8MbpsBW2MHz ());
+    }
+   else if (GetChannelWidth () == 1)
+   {
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate600KbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate900KbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_2MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_8MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_4MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_7MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3_6MbpsBW1MHz ());
+     m_deviceRateSet.push_back (WifiPhy::GetOfdmRate4MbpsBW1MHz ());
+   }
+   else if (GetChannelWidth () == 4)
+   {
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate300KbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate600KbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate900KbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_2MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_8MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_4MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_7MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3_6MbpsBW1MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate4MbpsBW1MHz ());
+       
+       //supportedmodes.push_back (WifiPhy::GetOfdmRate150KbpsBW1MHz ());
+       //mandatory MCS 0 to 7, 2Mhz
+       
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate650KbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_3MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_95MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_6MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate3_9MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate5_2MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate5_85MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate6_5MbpsBW2MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate7_8MbpsBW2MHz ());
+       
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate1_35MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate2_7MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate4_05MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate5_4MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate8_1MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate10_8MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate12_15MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate13_5MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate16_2MbpsBW4MHz ());
+       m_deviceRateSet.push_back (WifiPhy::GetOfdmRate18MbpsBW4MHz ());
+   }
+
     m_bssMembershipSelectorSet.push_back(S1G_PHY);
     for (uint8_t i=0; i <11; i++)
     {

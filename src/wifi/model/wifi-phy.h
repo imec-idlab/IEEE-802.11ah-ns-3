@@ -1805,6 +1805,7 @@ static WifiMode GetOfdmRate86_666_7MbpsBW16MHz ();
    *  \param channelwidth channel width
    */
   virtual void SetChannelWidth (uint32_t channelwidth) = 0;
+  WifiModeList m_deviceRateSet;
 
 private:
   /**
