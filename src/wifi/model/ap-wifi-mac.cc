@@ -865,7 +865,7 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
     
     blockBitmap = 0;
     block = (PageInd << 11) | (blockInd << 6); // TODO check
-    bool found=false;
+    //bool found=false;
     for (uint16_t i = 0; i <= 7; i++) //8 subblock in each block.
      {
        subblock = block | (i << 3);
@@ -877,14 +877,14 @@ ApWifiMac::HasPacketsToBlock (uint16_t blockInd , uint16_t PageInd)
         	   blockBitmap = blockBitmap | (1 << i);
         	   //NS_LOG_UNCOND ("[aid=" << sta_aid << "] paged");
         	   // if there is at least one station associated with AP that has FALSE for PageSlicingImplemented within this page then m_PageSliceNum = 31
-               found=true;
+               //found=true;
         	   if (!m_supportPageSlicingList.at(m_AidToMacAddr[sta_aid]))
         		   m_PageSliceNum = 31;
         	   break;
             }
         }
-        if (found)
-            break;
+        //if (found)
+            //break;
      }
   
     return blockBitmap;

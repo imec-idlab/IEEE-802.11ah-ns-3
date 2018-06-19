@@ -1184,7 +1184,7 @@ int main(int argc, char *argv[]) {
 					+ std::to_string(config.ipcameraDataRate) + "Kbps_"
 					+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
 	}
-	else if (config.trafficType == "udp")
+	else if (config.trafficType == "udp" || config.trafficType == "udpecho")
 	{
 	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta) + "sta_"
 			+ std::to_string(config.NGroup) + "Group_"
@@ -1466,7 +1466,7 @@ int main(int argc, char *argv[]) {
 
 	sendStatistics(true);
 
-	checkBugAck();
+	//checkBugAck();
 
 	Simulator::Stop(Seconds(config.simulationTime)); // allow up to a minute after the client & server apps are finished to process the queue
 	Simulator::Run();
