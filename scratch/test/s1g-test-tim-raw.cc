@@ -1135,9 +1135,9 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 int main(int argc, char *argv[]) {
 	PacketMetadata::Enable();
 
-	//LogComponentEnable ("UdpServer", LOG_INFO);
-	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
-	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
+	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
+	 LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+	 LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
 
 	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);

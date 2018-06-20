@@ -92,7 +92,6 @@ UdpEchoClient::UdpEchoClient ()
   m_sendEvent = EventId ();
   m_data = 0;
   m_dataSize = 0;
-
   m_rv = CreateObject<UniformRandomVariable> ();
 }
 
@@ -134,6 +133,7 @@ void
 UdpEchoClient::DoDispose (void)
 {
   NS_LOG_FUNCTION (this);
+  m_rv = 0;
   Application::DoDispose ();
 }
 
@@ -160,7 +160,8 @@ UdpEchoClient::StartApplication (void)
 
   m_socket->SetRecvCallback (MakeCallback (&UdpEchoClient::HandleRead, this));
 
-  ScheduleTransmit (Seconds (0.));
+  double deviation = m_rv->GetValue(-m_intervalDeviation.GetMicroSeconds(), m_intervalDeviation.GetMicroSeconds());
+  ScheduleTransmit (m_interval + MicroSeconds(deviation));
 }
 
 void 
