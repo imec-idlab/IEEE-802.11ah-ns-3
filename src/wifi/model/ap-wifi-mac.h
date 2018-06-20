@@ -149,7 +149,7 @@ private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);
 
   void OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot);
-
+  void OnRAWSlotEnd (uint16_t rps, uint8_t rawGroup, uint8_t slot);
   /**
    * The packet we sent was successfully received by the receiver
    * (i.e. we received an ACK from the receiver).  If the packet
@@ -258,13 +258,14 @@ private:
   Time GetSlotStartTimeFromAid (uint16_t aid) const;
   void SetPageSlicingActivated (bool activate);
   bool GetPageSlicingActivated (void) const;
-
+  uint32_t GetSlotNumFromAid (uint16_t aid) const;
+  uint32_t GetSlotNumFromRpsRawSlot (uint16_t rps, uint8_t rawg, uint8_t slot) const;
   RPSVector m_rpsset;
   pageSlice m_pageslice;
   TIM m_TIM;
   void SetTotalStaNum (uint32_t num);
   uint32_t GetTotalStaNum (void) const;
-    
+  void SetupEdcaQueue (enum AcIndex ac, EdcaQueues& edcaqueues);
   typedef std::vector<ns3::RPS *>::iterator RPSlistCI;
     
   virtual void DoDispose (void);
@@ -310,6 +311,11 @@ private:
     
   std::map<Mac48Address, bool> m_sleepList;
   std::map<Mac48Address, bool> m_supportPageSlicingList;
+  std::vector<Ptr<DcaTxop>> m_rawSlotsDca;
+  std::vector<EdcaQueues> m_rawSlotsEdca;
+
+  std::vector<int> pendingDataSizeForStations;
+  std::vector<bool> staIsActiveDuringCurrentCycle;
 
   S1gRawCtr m_S1gRawCtr;
   Ptr<DcaTxop> m_beaconDca;                  //!< Dedicated DcaTxop for beacons

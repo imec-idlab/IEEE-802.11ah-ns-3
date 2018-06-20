@@ -134,7 +134,8 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 	//1. get info from config file
 
 	//2. define RPS
-	if (myfile.is_open()) {
+	if (myfile.is_open())
+	{
 		myfile >> NRPS;
 		int totalNumSta = 0;
 		for (uint16_t kk = 0; kk < NRPS; kk++) // number of beacons covering all raw groups
@@ -142,6 +143,7 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 			RPS *m_rps = new RPS;
 			myfile >> NRAWPERBEACON;
 			ngroup = NRAWPERBEACON;
+			config.NGroup = ngroup;
 			for (uint16_t i = 0; i < NRAWPERBEACON; i++) // raw groups in one beacon
 			{
 				//RPS *m_rps = new RPS;
@@ -157,6 +159,7 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 				m_raw->SetSlotDurationCount(Value);
 				myfile >> Value;
 				nslot = Value;
+				config.NRawSlotNum = nslot;
 				m_raw->SetSlotNum(Value);
 				myfile >> page;
 				myfile >> aid_start;
@@ -174,8 +177,13 @@ RPSVector configureRAW(RPSVector rpslist, string RAWConfigFile) {
 		config.NRawSta = totalNumSta;
 				/*rpslist.rpsset[rpslist.rpsset.size() - 1]->GetRawAssigmentObj(
 						NRAWPERBEACON - 1).GetRawGroupAIDEnd();*/
-	} else
-		cout << "Unable to open RAW configuration file \n";
+	}
+	else
+	{
+		cerr << "Unable to open RAW configuration file \n";
+		NS_ASSERT (false);
+	}
+
 
 	return rpslist;
 }
@@ -342,7 +350,6 @@ void onSTAAssociated(int i) {
 		stats.TimeWhenEverySTAIsAssociated = Simulator::Now();
 
 		if (config.trafficType == "udp") {
-			std::cout << "UDP" << std::endl;
 			configureUDPServer();
 			configureUDPClients();
 		} else if (config.trafficType == "udpecho") {
@@ -365,6 +372,8 @@ void onSTAAssociated(int i) {
 			configureTCPSensorClients();
 		}
 		updateNodesQueueLength();
+		cout << "Clients & server configured." << endl;
+
 	}
 }
 
@@ -884,7 +893,7 @@ void configureTCPFirmwareClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -926,7 +935,7 @@ void configureTCPSensorClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		clientApp.Stop(Seconds(config.simulationTime));
+		//clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1025,7 +1034,10 @@ void configureUDPClients() {
 		}
 		trafficfile.close();
 	} else
+	{
 		cout << "Unable to open traffic file \n";
+		NS_ASSERT (false);
+	}
 
 	double randomStart = 0.0;
 	for (std::map<uint16_t, float>::iterator it = traffic_sta.begin();
@@ -1121,13 +1133,15 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 }
 
 int main(int argc, char *argv[]) {
+	PacketMetadata::Enable();
+
 	//LogComponentEnable ("UdpServer", LOG_INFO);
 	 LogComponentEnable ("UdpEchoServerApplication", LOG_INFO);
 	 LogComponentEnable ("UdpEchoClientApplication", LOG_INFO);
 
-	//LogComponentEnable ("ApWifiMac", LOG_DEBUG);
-	//LogComponentEnable ("StaWifiMac", LOG_DEBUG);
-	//LogComponentEnable ("EdcaTxopN", LOG_DEBUG);
+	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
+	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
@@ -1139,12 +1153,23 @@ int main(int argc, char *argv[]) {
 	configureTIM ();
 	//checkRawAndTimConfiguration ();
 
-	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)
-			+ "sta_" + std::to_string(config.NGroup) + "Group_"
+	if (config.trafficType == "tcpipcamera")
+	{
+		config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta)	+ "sta_"
+					+ std::to_string(config.NGroup) + "Group_"
+					+ std::to_string(config.NRawSlotNum) + "slots_"
+					+ std::to_string(config.ipcameraDataRate) + "Kbps_"
+					+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
+	}
+	else if (config.trafficType == "udp" || config.trafficType == "udpecho")
+	{
+	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta) + "sta_"
+			+ std::to_string(config.NGroup) + "Group_"
 			+ std::to_string(config.NRawSlotNum) + "slots_"
-			+ std::to_string(config.payloadSize) + "payload_"
-			+ std::to_string(config.totaltraffic) + "Mbps_"
+			+ std::to_string(config.trafficInterval) + "s_"
+			+ std::to_string(config.payloadSize) + "B_"
 			+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
+	}
 
 	stats = Statistics(config.Nsta);
 	eventManager = SimulationEventManager(config.visualizerIP,
@@ -1204,9 +1229,8 @@ int main(int argc, char *argv[]) {
 	StringValue DataRate;
 	DataRate = StringValue(getWifiMode(config.DataMode)); // changed
 
-	wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",DataRate, "ControlMode", DataRate);
-    //wifi.SetRemoteStationManager("ns3::ArfWifiManager");
-
+	wifi.SetRemoteStationManager("ns3::ConstantRateWifiManager", "DataMode",
+			DataRate, "ControlMode", DataRate);
 
 	mac.SetType("ns3::StaWifiMac", "Ssid", SsidValue(ssid), "ActiveProbing",
 			BooleanValue(false));
@@ -1431,10 +1455,11 @@ int main(int argc, char *argv[]) {
 		totalPacketsEchoed += stats.get(i).NumberOfSuccessfulRoundtripPackets;
 		pay += stats.get(i).TotalPacketPayloadSize;
 		cout << i << " sent: " << stats.get(i).NumberOfSentPackets
-				<< " ; delivered: " << stats.get(i).NumberOfSuccessfulPackets
-				<< " ; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
-				<< "; packetloss: "
-				<< stats.get(i).GetPacketLoss(config.trafficType) << endl;
+				<< "\t" << "; delivered: " << stats.get(i).NumberOfSuccessfulPackets
+				<< "\t" << "; echoed: " << stats.get(i).NumberOfSuccessfulRoundtripPackets
+				<< "\t" << "; packetloss: " << stats.get(i).GetPacketLoss(config.trafficType)
+				//<< "\t" << "; remaining TX queue len: " << nodes[i]->queueLength
+				<< endl;
 	}
 
 	if (config.trafficType == "udp")

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $# -ne 6 ]
+if [ $# -ne 4 ]
 then
 echo "parameters missing"
 exit 1
@@ -10,8 +10,8 @@ NumSta=$1
 NRawGroups=$2
 NumSlot=$3
 beaconinterval=$4
-pageSliceCount=$5
-pageSliceLen=$6
+pageSliceCount=0
+pageSliceLen=31
 
 
 

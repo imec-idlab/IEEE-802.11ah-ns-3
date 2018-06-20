@@ -89,7 +89,7 @@ void RAWGroupping (uint16_t Numsta, uint16_t NGroups, uint16_t NumSlot, uint16_t
     newfile.open (filepath, ios::out | ios::trunc);
     if (pageSliceCount == 0)
     {
-     	newfile << 1 << "\n" << 1 << "\n";
+     	newfile << 1 << "\n" << NRawGroups << "\n";;
      	//newfile.close();
      	//grouping
      	aid_start = 1;

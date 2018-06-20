@@ -35,6 +35,8 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("blockOffset", "The 1st page slice starts with the block with blockOffset", blockOffset);
     cmd.AddValue("timOffset", "Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page", timOffset);
     cmd.AddValue("TrafficInterval", "Traffic interval time in ms", trafficInterval);
+    cmd.AddValue("IpCameraDataRate", "Data rate of the captured stream in kbps", ipcameraDataRate);
+    cmd.AddValue("TCPSegmentSize", "TCP Segment size in bytes", TCPSegmentSize);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
