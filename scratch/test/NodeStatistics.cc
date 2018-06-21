@@ -50,12 +50,13 @@ long double NodeStatistics::GetInterPacketDelayDeviation(std::vector<Time>& dela
 //try whole net when testing max nr of control loops
 float NodeStatistics::GetPacketLoss (std::string trafficType)
 {
-	if (NumberOfSentPackets > 0 && trafficType == "udpecho")
-		return 100 * (float)(NumberOfSentPackets - NumberOfSuccessfulRoundtripPackets)/ (NumberOfSentPackets + NumberOfSuccessfulPackets);
-	else if (NumberOfSentPackets >= NumberOfSuccessfulPackets)
-		return (float)(NumberOfSentPackets - NumberOfSuccessfulPackets) / NumberOfSentPackets;
-	else if (NumberOfSentPackets < NumberOfSuccessfulPackets) //TODO this is a bug !!!
-		return 0;
+	if (NumberOfSuccessfulRoundtripPackets > 0 && (trafficType == "coap" || trafficType == "tcpipcamera" || trafficType == "tcpecho" || trafficType == "udpecho"))
+	{
+		float pl = (NumberOfSentPackets - NumberOfSuccessfulRoundtripPackets) / (float)(NumberOfSentPackets + NumberOfSuccessfulPackets);
+		return 100 * pl;
+	}
+	else if (NumberOfSuccessfulPackets > 0 && (trafficType == "udp"))
+		return 100 - 100 * (float)NumberOfSuccessfulPackets / NumberOfSentPackets;
 	else return -1;
 }
 

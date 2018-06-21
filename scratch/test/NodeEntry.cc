@@ -571,7 +571,7 @@ void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
 		}
 		stats->get(this->id).m_prevPacketSeqClient = currentSequenceNumber;
 		stats->get(this->id).m_prevPacketTimeClient = newNow;
-
+		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize();
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get the header from fragements
 	}

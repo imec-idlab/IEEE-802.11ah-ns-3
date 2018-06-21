@@ -240,7 +240,7 @@ void CoapServer::HndPutControlValue(coap_context_t *ctx UNUSED_PARAM,
 			dataStringStream << data[i];
 		}
 		CoapServer::m_controlValue = std::stod(dataStringStream.str());
-		NS_LOG_INFO("Successfull PUT request. New control value is " << CoapServer::m_controlValue);//TODO m_controlValue doesnt need to be static
+		//NS_LOG_DEBUG("Successfull PUT request. New control value is " << CoapServer::m_controlValue);//TODO m_controlValue doesnt need to be static
 	}
 
 	// Reply with a sensor reading
@@ -410,7 +410,7 @@ ssize_t CoapServer::CoapHandleMessage(/*Ptr<Packet> packet*/){
 	NS_ASSERT(node->pdu);
 	if (coap_pdu_parse(msg, msg_len, node->pdu))
 	{
-		coap_show_pdu(node->pdu);
+		//coap_show_pdu(node->pdu);
 	}
 	else {
 		NS_LOG_ERROR("Coap server cannot parse CoAP packet. Abort.");

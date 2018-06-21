@@ -483,7 +483,7 @@ ssize_t CoapClient::CoapHandleMessage(Address from, Ptr<Packet> packet){ //coap_
 	coap_pdu_t* sent (m_coapMsg.GetPdu());
 	coap_pdu_t* received (node->pdu);
 	if (coap_pdu_parse(msg, msg_len, node->pdu)){
-		coap_show_pdu(node->pdu);
+		//coap_show_pdu(node->pdu);
 		if (COAP_RESPONSE_CLASS(node->pdu->hdr->code) == 2)	{
 			// set observation timer TODO
 		}
