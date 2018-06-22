@@ -212,7 +212,7 @@ private:
    * \param to the address of the STA we are sending an association response to
    * \param success indicates whether the association was successful or not
    */
-  void SendAssocResp (Mac48Address to, bool success, uint8_t staType);
+  void SendAssocResp (Mac48Address to, bool success, uint8_t staType, bool makeAdditionalAid);
   /**
    * Forward a beacon packet to the beacon special DCF.
    */

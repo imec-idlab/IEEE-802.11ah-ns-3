@@ -694,7 +694,7 @@ ApWifiMac::GetSupportedRates (void) const
     {
       for (uint32_t i = 0; i < m_phy->GetNBssMembershipSelectors (); i++)
         {
-          NS_LOG_UNCOND (GetAddress () << " GetSupportedRates ");
+          //NS_LOG_UNCOND (GetAddress () << " GetSupportedRates ");
           rates.SetBasicRate (m_phy->GetBssMembershipSelector (i)); //not sure it's needed
         }
     }
@@ -782,7 +782,7 @@ ApWifiMac::SendProbeResp (Mac48Address to)
 }
 
 void
-ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
+ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType, bool makeAdditionalAid)
 {
   NS_LOG_FUNCTION (this << to << success);
   WifiMacHeader hdr;
@@ -797,11 +797,20 @@ ApWifiMac::SendAssocResp (Mac48Address to, bool success, uint8_t staType)
   
   uint8_t mac[6];
   to.CopyTo (mac);
+  uint16_t aid;
+  if (!makeAdditionalAid)
+  {
   uint8_t aid_l = mac[5];
   uint8_t aid_h = mac[4] & 0x1f;
-  uint16_t aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
+	  aid = (aid_h << 8) | (aid_l << 0); //assign mac address as AID
   assoc.SetAID(aid); //
-  m_AidToMacAddr[aid]=to;
+  }
+  else
+  {
+	  aid = (m_AidToMacAddr.end())->first + 1;
+	  assoc.SetAID(aid);
+  }
+  m_AidToMacAddr.insert(std::pair<uint16_t, Mac48Address>(aid, to));
 
   StatusCode code;
   if (success)
@@ -1593,9 +1602,20 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         {
           if (hdr->IsAssocReq ())
             {
+              std::vector<uint16_t> aidList;
+              bool makeAdditionalAid (false);
               if (m_stationManager->IsAssociated (from))
                 {
-                  return;  //test, avoid repeate assoc
+
+            	  for (auto it = m_AidToMacAddr.begin(); it != m_AidToMacAddr.end(); it++)
+            	  {
+            		  if (it->second == from)
+            			  aidList.push_back(it->first);
+            	  }
+            	  if (aidList.size() > 2)
+                  	return;  //test, avoid repeate assoc
+            	  else
+            		makeAdditionalAid = true;
                  }
                //NS_LOG_LOGIC ("Received AssocReq "); // for test
               //first, verify that the the station's supported
@@ -1638,7 +1658,7 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                   //One of the Basic Rate set mode is not
                   //supported by the station. So, we return an assoc
                   //response with an error status.
-                  SendAssocResp (hdr->GetAddr2 (), false, 0);
+                  SendAssocResp (hdr->GetAddr2 (), false, 0, makeAdditionalAid);
                 }
               else
                 {
@@ -1675,12 +1695,12 @@ ApWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                       uint8_t sta_type = s1gcapabilities.GetStaType ();
                       bool pageSlicingSupported = s1gcapabilities.GetPageSlicingSupport() != 0;
                       m_supportPageSlicingList[hdr->GetAddr2 ()] = pageSlicingSupported;
-                      SendAssocResp (hdr->GetAddr2 (), true, sta_type);
+                      SendAssocResp (hdr->GetAddr2 (), true, sta_type, makeAdditionalAid);
                     }
                   else
                     {
                       //send assoc response with success status.
-                      SendAssocResp (hdr->GetAddr2 (), true, 0);
+                      SendAssocResp (hdr->GetAddr2 (), true, 0, makeAdditionalAid);
                     }
 
                 }

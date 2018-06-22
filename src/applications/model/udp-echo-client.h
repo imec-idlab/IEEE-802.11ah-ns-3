@@ -137,9 +137,9 @@ public:
    * \param dataSize The desired size of the final echo data.
    */
   void SetFill (uint8_t *fill, uint32_t fillSize, uint32_t dataSize);
-
   typedef void (* PacketReceivedCallback)
 		  (Ptr<const Packet>, Address from);
+
 protected:
   virtual void DoDispose (void);
 

@@ -41,7 +41,7 @@
 
 #include "random-stream.h"
 
-#define LOG_SLEEP(msg)	if(true) NS_LOG_DEBUG("[" << (GetAID()) << "] " << msg << std::endl);
+#define LOG_SLEEP(msg)	if(true) NS_LOG_DEBUG("[" << (GetAID (0)) << "] " << msg << std::endl);
 
 
 /*
@@ -146,7 +146,8 @@ StaWifiMac::StaWifiMac ()
   NS_LOG_FUNCTION (this);
   m_rawStart = false;
   m_dataBuffered = false;
-  m_aid = 8192;
+  //m_aids.assign(1, 8192);
+  //m_aid = 8192;
   uint32_t cwmin = 15;
   uint32_t cwmax = 1023;
   m_pspollDca = CreateObject<DcaTxop> ();
@@ -221,18 +222,27 @@ StaWifiMac::SetChannelWidth (uint32_t width)
 uint32_t
 StaWifiMac::GetChannelWidth (void) const
 {
-    NS_LOG_UNCOND (GetAddress () << ", GetChannelWidth " << m_channelWidth );
+   NS_LOG_UNCOND (GetAddress () << ", GetChannelWidth " << m_channelWidth );
    return m_channelWidth;
 }
 
-uint32_t
-StaWifiMac::GetAID (void) const
+uint32_t 
+StaWifiMac::GetAID(uint32_t i) const
 {
-  NS_ASSERT ((1 <= m_aid) && (m_aid<= 8191) || (m_aid == 8192));
-  return m_aid;
+  NS_ASSERT (i < m_aids.size());
+  NS_ASSERT(((1 <= m_aids[i]) && (m_aids[i] <= 8191)) || (m_aids[i] == 8192));
+  return m_aids[i];
 }
 
-Time
+std::vector<uint32_t> 
+StaWifiMac::GetAids (void) const
+{
+  for (auto&& aid : m_aids)
+      NS_ASSERT(((1 <= aid) && (aid <= 8191)) || (aid == 8192));
+  return m_aids;
+}
+
+Time 
 StaWifiMac::GetRawDuration (void) const
 {
   NS_LOG_FUNCTION (this);
@@ -246,14 +256,22 @@ StaWifiMac::Is(uint8_t blockbitmap, uint8_t j)
 }
 
 void
-StaWifiMac::SetAID (uint32_t aid)
+StaWifiMac::SetAID (uint32_t aid, uint32_t i)
 {
+  NS_ASSERT (i < m_aids.size());
   NS_ASSERT ((1 <= aid) && (aid <= 8191));
-  m_aid = aid;
+  m_aids[i] = aid;
+}
+
+void 
+StaWifiMac::AddAID (uint32_t aid)
+{
+  NS_ASSERT((1 <= aid) && (aid <= 8191));
+  m_aids.push_back(aid);
 }
 
 void
-StaWifiMac::SetRawDuration (Time interval)
+StaWifiMac::SetRawDuration(Time interval)
 {
   NS_LOG_FUNCTION (this << interval);
   m_rawDuration = interval;
@@ -337,7 +355,7 @@ StaWifiMac::SendPspoll (void)
   NS_LOG_FUNCTION (this);
   WifiMacHeader hdr;
   hdr.SetType (WIFI_MAC_CTL_PSPOLL);
-  hdr.SetId (GetAID());
+  hdr.SetId(GetAID(0));
   hdr.SetAddr1 (GetBssid());
   hdr.SetAddr2 (GetAddress ());
 
@@ -380,10 +398,10 @@ StaWifiMac::SendPspollIfnecessary (void)
 
 		m_pageSlice = beacon.GetpageSlice();
 
-		m_selfAid = GetAID() & 0x07;
-		m_selfSubBlock = (GetAID() >> 3) & 0x07;
-		m_selfBlock = (GetAID() >> 6) & 0x1f;
-		m_selfPage = GetAID() >> 11;
+		m_selfAid = GetAID(0) & 0x07;
+		m_selfSubBlock = (GetAID(0) >> 3) & 0x07;
+		m_selfBlock = (GetAID(0) >> 6) & 0x1f;
+		m_selfPage = GetAID(0) >> 11;
 		//Encoded block subfield
 
 		m_PagePeriod = m_pageSlice.GetPagePeriod();
@@ -399,7 +417,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 		{
 			m_pagedInDtim = false;
 			if (testtrackit)
-			NS_LOG_DEBUG("[aid=" << GetAID() << "] received DTIM beacon.");
+			NS_LOG_DEBUG("[aid=" << GetAID(0) << "] received DTIM beacon.");
 			m_pageSlice = beacon.GetpageSlice();
 			// TIM element length is 2 when both Partial Virtual Bitmap and Bitmap Control fields are 0 - they are not present in TIM
 			// TIM element length is 3 when Partial Virtual Bitmap is 0 - it is not present in TIM
@@ -417,7 +435,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 			if (m_selfPage != m_pageSlice.GetPageindex())
 			{
 				if (testtrackit)
-				NS_LOG_DEBUG("[aid=" << GetAID() << "] is not located in page " << (int)m_Pageindex << ", but in page " << (int)m_selfPage << ". Scheduling sleep until the next DTIM beacon.");
+				NS_LOG_DEBUG("[aid=" << GetAID(0) << "] is not located in page " << (int)m_Pageindex << ", but in page " << (int)m_selfPage << ". Scheduling sleep until the next DTIM beacon.");
 				m_pagedInDtim = false;
 				GoToSleepCurrentTIM(beacon); // schedule wakeup for next DTIM
 				return;
@@ -433,10 +451,10 @@ StaWifiMac::SendPspollIfnecessary (void)
 				// My block is not included in this Page Slice element
 				if (testtrackit)
 				NS_LOG_DEBUG(
-						"[aid=" << GetAID() << "] belongs to a block " << (int)m_selfBlock << " which is not included in current page (" << (int)m_selfPage << ") because block offset in Page Slice element is " << (int)m_BlockOffset << " Scheduling sleep until the next DTIM beacon.");
+						"[aid=" << GetAID(0) << "] belongs to a block " << (int)m_selfBlock << " which is not included in current page (" << (int)m_selfPage << ") because block offset in Page Slice element is " << (int)m_BlockOffset << " Scheduling sleep until the next DTIM beacon.");
 				m_pagedInDtim = false;
 				GoToSleepCurrentTIM(beacon);
-				//if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L417" << std::endl;
+				//if (trackSleep && GetAID(0) > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L417" << std::endl;
 				return;
 			}
 
@@ -458,9 +476,9 @@ StaWifiMac::SendPspollIfnecessary (void)
 				ClearDataBuffered();
 				m_pagedInDtim = false;
 				if (testtrackit)
-				NS_LOG_DEBUG("[aid=" << GetAID() << "] Page bitmap did not indicate traffic for me. Scheduling sleep until the next DTIM beacon.");
+				NS_LOG_DEBUG("[aid=" << GetAID(0) << "] Page bitmap did not indicate traffic for me. Scheduling sleep until the next DTIM beacon.");
 				GoToSleepCurrentTIM(beacon); // schedule wakeup for next DTIM
-				//if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L440" << std::endl;
+				//if (trackSleep && GetAID(0) > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L440" << std::endl;
 				return;
 			}
 			NS_ASSERT(m_dataBuffered);
@@ -476,13 +494,13 @@ StaWifiMac::SendPspollIfnecessary (void)
 			{
 				if (testtrackit)
 				NS_LOG_DEBUG(
-						"[AID: " << GetAID() << "]: This page slice (" << (int)m_TIM.GetPageSliceNum () << ") is not my page slice. My page slice number is " << selfPageSliceNumber);
+						"[AID: " << GetAID(0) << "]: This page slice (" << (int)m_TIM.GetPageSliceNum () << ") is not my page slice. My page slice number is " << selfPageSliceNumber);
 				// sleep until my TIM
 				if (testtrackit)
 				NS_LOG_DEBUG(
 						"Sleep until my TIM for " << selfPageSliceNumber + m_pageSlice.GetTIMOffset () << " * BI");
 				GoToSleep(MicroSeconds((selfPageSliceNumber + m_pageSlice.GetTIMOffset()) * beacon.GetBeaconCompatibility().GetBeaconInterval()));
-				//if (trackSleep && GetAID() > 62) std::cout << "aid=" << GetAID () << ", GoToSleepCurrentTIM from L460" << std::endl;
+				//if (trackSleep && GetAID(0) > 62) std::cout << "aid=" << GetAID (0) << ", GoToSleepCurrentTIM from L460" << std::endl;
 				return;
 			}
 			if (m_TIM.GetPageSliceNum() == 31)
@@ -494,7 +512,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 		{
 			if (testtrackit)
 			NS_LOG_DEBUG(
-					"[aid=" << this->GetAID() << "] received TIM" << (int)m_TIM.GetDTIMCount () << " beacon.");
+					"[aid=" << this->GetAID(0) << "] received TIM" << (int)m_TIM.GetDTIMCount () << " beacon.");
 
 
 		}
@@ -538,8 +556,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 			partialVBitmap++;
 			pos++;
 			uint8_t blockbitmap = *partialVBitmap;
-			if (this->GetAID() == 5 || GetAID() == 9)
-			this->GetSelfPageSliceNum();
+
 			if (blockind == m_selfBlock)
 			{
 				if ((blockbitmap & (1 << m_selfSubBlock)) == 0) //no packets in subblock
@@ -571,7 +588,7 @@ StaWifiMac::SendPspollIfnecessary (void)
 					{
 						if (testtrackit)
 						NS_LOG_DEBUG(
-								"[aid=" << this->GetAID() << "]" << "Downlink packet indicated for me.");
+								"[aid=" << this->GetAID(0) << "]" << "Downlink packet indicated for me.");
 						// reset m_pagedInDtim;
 						// Go to sleep next TIM if next TIM is not DTIM
 						if (m_TIM.GetDTIMCount() + 1 < m_TIM.GetDTIMPeriod()) //todo check
@@ -680,7 +697,7 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 		{
 			if (testtrackit)
 			NS_LOG_DEBUG(
-					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " CANNOT SLEEP because sleeptime " << sleeptime.GetSeconds() << " s < EarlyWakeTime.");
+					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID(0) << " CANNOT SLEEP because sleeptime " << sleeptime.GetSeconds() << " s < EarlyWakeTime.");
 			return;
 		}
 		sleeptime -= GetEarlyWakeTime();
@@ -689,7 +706,7 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 		{
 			if (testtrackit)
 				NS_LOG_DEBUG(
-					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetMicroSeconds() << " us at " << sleeptime + Simulator::Now ());
+					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID(0) << " switches to SLEEP. Schedule wake-up after " << sleeptime.GetSeconds() << " s.");
 			m_low->GetPhy()->SetSleepMode();
 			Simulator::Schedule(sleeptime, &StaWifiMac::WakeUp, this);
 			//std::cout << "+++At " << Simulator::Now().GetMicroSeconds() << "us: GoToSleep:" << sleeptime.GetMicroSeconds() << " FULL" << std::endl;
@@ -703,7 +720,7 @@ void StaWifiMac::GoToSleep (Time sleeptime)
 		{
 			if (testtrackit)
 				NS_LOG_DEBUG(
-					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID() << " switches to AWAKE");
+					"At " << Simulator::Now().GetSeconds() << " s AID " << this->GetAID(0) << " switches to AWAKE");
 			m_low->GetPhy()->ResumeFromSleep();
 		}
 	}
@@ -803,7 +820,7 @@ StaWifiMac::BeaconWakeUp (void)
 void
 StaWifiMac::OnAssociated() {
 	for (auto i : trackit)
-		if (GetAID() == i)
+		if (GetAID(0) == i)
 			testtrackit = true;
 	m_assocLogger(GetBssid());
 	// start only allowing transmissions during specific slot periods
@@ -1046,7 +1063,8 @@ StaWifiMac::SendDisAssociationRequest (void)
     }
 
     SetState (WAIT_DISASSOC_ACK);  // temporary used, should create another state
-    m_aid = 8192; //ensure disassociated station is not affected by Raw
+    //m_aid = 8192; //ensure disassociated station is not affected by Raw
+    m_aids.clear();
     packet->AddHeader (disassoc);
     m_dca->Queue (packet, hdr);
 
@@ -1102,7 +1120,10 @@ if (assocVaule < fastAssocThreshold)
   //use the DCF for these regardless of whether we have a QoS
   //association or not.
   m_dca->Queue (packet, hdr);
-  SetState (WAIT_ASSOC_RESP);
+  if (!this->IsAssociated())
+	  SetState(WAIT_ASSOC_RESP);
+  else
+	  SetState(WAIT_ANOTHER_ASSOC_RESP);
 }
 
   if (m_assocRequestEvent.IsRunning ())
@@ -1111,6 +1132,14 @@ if (assocVaule < fastAssocThreshold)
     }
   m_assocRequestEvent = Simulator::Schedule (m_assocRequestTimeout,
                                            &StaWifiMac::AssocRequestTimeout, this);
+}
+
+void
+StaWifiMac::SendAnotherAssociationRequest (void)
+{
+	std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~SendAnotherAssociationRequest~~~~~~~~~~~~~~~~~~~~~~~~~ "
+			<< this->IsAssociated() << " my aid= " << (int)GetAID(0) << std::endl;
+	SendAssociationRequest();
 }
 
 void
@@ -1307,7 +1336,7 @@ StaWifiMac::Enqueue (Ptr<const Packet> packet, Mac48Address to)
   params.DisableAck();
   params.DisableNextData();
   Time txTime = m_low->CalculateOverallTxTime(packet, &hdr, params);
-  std::cout << "Sta aid=" << this->GetAID() << " TX time=" << txTime.GetMicroSeconds() << " us, " << packet->GetSize() << std::endl;*/
+  std::cout << "Sta aid=" << this->GetAID(0) << " TX time=" << txTime.GetMicroSeconds() << " us, " << packet->GetSize() << std::endl;*/
   if (m_qosSupported)
     {
       //Sanity check that the TID is valid
@@ -1331,7 +1360,7 @@ StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
         m_outsideRawEvent.Cancel ();          //avoid error when actual beacon interval become shorter, otherwise, AccessAllowedIfRaw will set again after raw starting
      }
 
-  if (m_aid == 8192) // send assoication request when Staion is not assoicated
+  if (!m_aids.size()) // send assoication request when Staion is not assoicated
     {
       m_dca->AccessAllowedIfRaw (true);
     }
@@ -1524,71 +1553,72 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
         
         UnsetInRAWgroup ();
-        uint8_t * rawassign;
-        rawassign = beacon.GetRPS().GetRawAssignment();
-        uint16_t raw_len = beacon.GetRPS().GetInformationFieldSize();
-        uint16_t rawAssignment_len = 6;
-        if (raw_len % rawAssignment_len !=0)
-          {
-             NS_ASSERT ("RAW configuration incorrect!");
-          }
-        uint8_t RAW_number = raw_len/rawAssignment_len;
+        if (IsAssociated())
+        {
+        	uint8_t * rawassign;
+        	rawassign = beacon.GetRPS().GetRawAssignment();
+        	uint16_t raw_len = beacon.GetRPS().GetInformationFieldSize();
+        	uint16_t rawAssignment_len = 6;
+        	if (raw_len % rawAssignment_len !=0)
+        	{
+        		NS_ASSERT ("RAW configuration incorrect!");
+        	}
+        	uint8_t RAW_number = raw_len/rawAssignment_len;
 
-         uint16_t m_slotDurationCount=0;
-         uint16_t m_slotNum=0;
-         uint64_t m_currentRAW_start=0;
-         uint64_t rawStartOffset = 0;
-         m_lastRawDurationus = MicroSeconds(0);
-    for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
-      {
-        auto ass = beacon.GetRPS().GetRawAssigmentObj(raw_index);
+        	uint16_t m_slotDurationCount=0;
+        	uint16_t m_slotNum=0;
+        	uint64_t m_currentRAW_start=0;
+        	uint64_t rawStartOffset = 0;
+        	m_lastRawDurationus = MicroSeconds(0);
+        	for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
+        	{
+        		auto ass = beacon.GetRPS().GetRawAssigmentObj(raw_index);
 
-        if (ass.GetRawTypeIndex() == 4) // only support Generic Raw (paged STA RAW or not)
-          {
-            m_pagedStaRaw = true;
-          }
-        else
-          {
-            m_pagedStaRaw = false;
-          }
-         m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;//0
-         m_slotDurationCount = ass.GetSlotDurationCount();//200
-         m_slotNum = ass.GetSlotNum();//3
-        m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);//24500
-        m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;//3*24500
-        m_crossSlotBoundaryAllowed = ass.GetSlotCrossBoundary() == 0x0001;
+        		if (ass.GetRawTypeIndex() == 4) // only support Generic Raw (paged STA RAW or not)
+        		{
+        			m_pagedStaRaw = true;
+        		}
+        		else
+        		{
+        			m_pagedStaRaw = false;
+        		}
+        		m_currentRAW_start=m_currentRAW_start+(500 + m_slotDurationCount * 120)*m_slotNum;//0
+        		m_slotDurationCount = ass.GetSlotDurationCount();//200
+        		m_slotNum = ass.GetSlotNum();//3
+        		m_slotDuration = MicroSeconds(500 + m_slotDurationCount * 120);//24500
+        		m_lastRawDurationus = m_lastRawDurationus + m_slotDuration * m_slotNum;//3*24500
+        		m_crossSlotBoundaryAllowed = ass.GetSlotCrossBoundary() == 0x0001;
 
-         if (ass.GetRawGroupPage() == ((GetAID() >> 11 ) & 0x0003)) //in the page indexed
-           {
-               uint16_t statsPerSlot = 0;
-               uint16_t statRawSlot = 0;
+        		if (ass.GetRawGroupPage() == ((GetAID(0) >> 11 ) & 0x0003)) //in the page indexed
+        		{
+        			uint16_t statsPerSlot = 0;
+        			uint16_t statRawSlot = 0;
 
-               Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
-               uint16_t offset = m_rv->GetValue (0, 1023);
-               offset =0; // for test
-               statsPerSlot = (ass.GetRawGroupAIDEnd() - ass.GetRawGroupAIDStart() + 1)/m_slotNum;
-               //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
-               statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
+        			Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
+        			uint16_t offset = m_rv->GetValue (0, 1023);
+        			offset =0; // for test
+        			statsPerSlot = (ass.GetRawGroupAIDEnd() - ass.GetRawGroupAIDStart() + 1)/m_slotNum;
+        			//statRawSlot = ((GetAID(0) & 0x03ff)-raw_start)/statsPerSlot;
+        			statRawSlot = ((GetAID(0) & 0x03ff)+offset)%m_slotNum;
 
-             if ((ass.GetRawGroupAIDStart() <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= ass.GetRawGroupAIDEnd()))
-               {
-                 m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);//
-                 //NS_LOG_DEBUG ("aid=" << GetAID() << ", ass.GetRawStart=" << (int)ass.GetRawStart() << ", m_statSlotStart=" << m_statSlotStart);
+        			if ((ass.GetRawGroupAIDStart() <= (GetAID(0) & 0x03ff)) && ((GetAID(0) & 0x03ff) <= ass.GetRawGroupAIDEnd()))
+        			{
+        				m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);//
+        				//NS_LOG_DEBUG ("aid=" << GetAID(0) << ", ass.GetRawStart=" << (int)ass.GetRawStart() << ", m_statSlotStart=" << m_statSlotStart);
 
-                 SetInRAWgroup ();
-                 m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
+        				SetInRAWgroup ();
+        				m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
 
-                  // NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() <<  ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
-                  //break; //break should not used if multiple RAW is supported
-               }
-               //NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID() = " << GetAID() << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
-           }
-      }
-         m_rawStart = true; //?
-         if (this->IsAssociated())
-                S1gTIMReceived(beacon);
-
-         AuthenticationCtrl AuthenCtrl;
+        				// NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID(0) = " << GetAID(0) <<  ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+        				//break; //break should not used if multiple RAW is supported
+        			}
+        			//NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID(0) = " << GetAID(0) << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
+        		}
+        	}
+        	m_rawStart = true;
+        	S1gTIMReceived(beacon);
+        }
+        AuthenticationCtrl AuthenCtrl;
          AuthenCtrl = beacon.GetAuthCtrl ();
          fasTAssocType = AuthenCtrl.GetControlType ();
          if (!fasTAssocType)  //only support centralized cnotrol
@@ -1657,7 +1687,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         }
       return;
     }
-  else if (hdr->IsAssocResp ())
+  else if (hdr->IsAssocResp () || m_state == WAIT_ANOTHER_ASSOC_RESP)
     {
       if (m_state == WAIT_ASSOC_RESP)
         {
@@ -1669,10 +1699,22 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
             }
           if (assocResp.GetStatusCode ().IsSuccess ())
             {
-        	  SetAID (assocResp.GetAID ());
-              SetState (ASSOCIATED);
-              if (testtrackit)
-	      NS_LOG_DEBUG("[" << this->GetAddress() <<"] is associated and has AID = " << this->GetAID());
+        	  AddAID(assocResp.GetAID());
+        	  SetState (ASSOCIATED);
+        	  if (testtrackit)
+        		  NS_LOG_DEBUG("[" << this->GetAddress() <<"] is associated and has AID = " << this->GetAID(0));
+
+        	  if (GetAID (0) == 1 && Simulator::Now() < Seconds (10))
+        		  Simulator::Schedule(Seconds(10), &StaWifiMac::SendAnotherAssociationRequest, this);
+        	  else if (GetAids ().size() > 1)
+        	  {
+        		  SetState(ASSOCIATED);
+        		  std::cout << "++++++++++++++++++++++++++all AIDs = ";
+        		  for (auto aid : GetAids())
+        			  std::cout << "   " << aid;
+        		  std::cout << std::endl;
+        		  return;
+        	  }
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
                 {

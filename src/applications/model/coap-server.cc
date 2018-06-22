@@ -459,9 +459,12 @@ CoapServer::Send (uint8_t *data, size_t datalen)
 	{
 		++m_sent;
 		bytesSent = p->GetSize();
+		Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+		std::stringstream myaddr;
+		myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
 		if (InetSocketAddress::IsMatchingType (m_from))
 		{
-			NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server sent " << bytesSent << " bytes to " <<
+			NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server=" << myaddr.str() << " sent " << bytesSent << " bytes to " <<
 					InetSocketAddress::ConvertFrom (m_from).GetIpv4 () << " port " <<
 					InetSocketAddress::ConvertFrom (m_from).GetPort () << " Uid: " << p->GetUid() << " seq = " << seqTs.GetSeq());
 		}
@@ -500,12 +503,20 @@ void CoapServer::HandleRead(Ptr<Socket> socket) {
 		SeqTsHeader seqTs;
 		packet->RemoveHeader(seqTs);
 		//uint32_t currentSequenceNumber = seqTs.GetSeq();
-		if (InetSocketAddress::IsMatchingType(m_from)) {
-			NS_LOG_INFO("Server Received " << packetSizeWithSeq << " bytes from " << InetSocketAddress::ConvertFrom (m_from).GetIpv4 () << " at "
-					<< Simulator::Now ().GetSeconds() << "s" << " Uid: " << packet->GetUid () << " seq = " << seqTs.GetSeq() << " ts = " << seqTs.GetTs());
-		} else if (Inet6SocketAddress::IsMatchingType(m_from)) {
-			NS_LOG_INFO("TraceDelay: RX " << packetSizeWithSeq << " bytes from "<< Inet6SocketAddress::ConvertFrom (m_from).GetIpv6 ()
-					<< " Uid: " << packet->GetUid () << " RXtime: " << Simulator::Now () << " seq = " << seqTs.GetSeq() << " ts = " << seqTs.GetTs());
+		Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+		std::stringstream myaddr;
+		myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+		if (InetSocketAddress::IsMatchingType (m_from))
+		{
+			NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server=" << myaddr.str() << " received " << packetSizeWithSeq << " bytes from " <<
+					InetSocketAddress::ConvertFrom (m_from).GetIpv4 () << " port " <<
+					InetSocketAddress::ConvertFrom (m_from).GetPort () << " Uid: " << packet->GetUid () << " RXtime: " << Simulator::Now () << " seq = " << seqTs.GetSeq() << " ts = " << seqTs.GetTs());
+		}
+		else if (Inet6SocketAddress::IsMatchingType (m_from))
+		{
+			NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s server received " << packetSizeWithSeq << " bytes from " <<
+					Inet6SocketAddress::ConvertFrom (m_from).GetIpv6 () << " port " <<
+					Inet6SocketAddress::ConvertFrom (m_from).GetPort () << " Uid: " << packet->GetUid () << " RXtime: " << Simulator::Now () << " seq = " << seqTs.GetSeq() << " ts = " << seqTs.GetTs());
 		}
 #endif
 		packet->RemoveAllPacketTags ();

@@ -547,7 +547,7 @@ DcaTxop::NotifyAccessGranted (void)
                                  &m_currentHdr,
                                  params,
                                  m_transmissionListener);
-      //nrOfTransmissionsDuringRaw++;
+      nrOfTransmissionsDuringRaw++;
       NS_LOG_DEBUG ("tx broadcast");
     }
   else
@@ -586,7 +586,7 @@ DcaTxop::NotifyAccessGranted (void)
 		  }*/
           Low ()->StartTransmission (fragment, &hdr, params,
                                      m_transmissionListener);
-          //nrOfTransmissionsDuringRaw++;
+          nrOfTransmissionsDuringRaw++;
         }
       else
         {
@@ -611,7 +611,7 @@ DcaTxop::NotifyAccessGranted (void)
           }*/
           Low ()->StartTransmission (m_currentPacket, &m_currentHdr,
                                      params, m_transmissionListener);
-          //nrOfTransmissionsDuringRaw++;
+          nrOfTransmissionsDuringRaw++;
         }
     }
 }
@@ -772,7 +772,7 @@ DcaTxop::StartNext (void)
       params.EnableNextData (GetNextFragmentSize ());
     }
   Low ()->StartTransmission (fragment, &hdr, params, m_transmissionListener);
-  //nrOfTransmissionsDuringRaw++;
+  nrOfTransmissionsDuringRaw++;
 }
 
 void

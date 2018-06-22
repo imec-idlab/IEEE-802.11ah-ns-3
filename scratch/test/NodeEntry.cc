@@ -24,7 +24,7 @@ void NodeEntry::SetAssociation(std::string context, Mac48Address address) {
 			"/NodeList/" + std::to_string(this->id)
 	+ "/DeviceList/0/$ns3::WifiNetDevice/Mac/$ns3::StaWifiMac/");
 	auto obj = matches.Get(0)->GetObject<StaWifiMac>();
-	this->aId = obj->GetAID();
+	this->aId = obj->GetAID(0);
 
 	//cout << "Associated with aId " << this->aId;
 

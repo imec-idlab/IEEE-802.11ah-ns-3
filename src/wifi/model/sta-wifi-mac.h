@@ -101,12 +101,9 @@ public:
     void SendAssociationRequest (void);
 
   /**
-   * Get Station AID.
+     * Get i-th Station's AID.
    */
-  uint32_t GetAID (void) const;
-
-    /*void SetPageSlicingSupported (uint8_t support);
-    uint8_t GetPageSlicingSupported (void) const;*/
+    uint32_t GetAID (uint32_t i) const;
 private:
     uint32_t m_staType;
     uint32_t m_channelWidth;
@@ -119,10 +116,14 @@ private:
     ASSOCIATED,
     WAIT_PROBE_RESP,
     WAIT_ASSOC_RESP,
+    WAIT_ANOTHER_ASSOC_RESP,
     WAIT_DISASSOC_ACK,
     BEACON_MISSED,
     REFUSED
   };
+
+  /**/
+  void SendAnotherAssociationRequest (void);
 
   void OnAssociated();
   void OnDeassociated();
@@ -214,11 +215,18 @@ private:
   HtCapabilities GetHtCapabilities (void) const;
   S1gCapabilities GetS1gCapabilities (void) const;
   /**
-   * Set the AID.
+   * Set the i-th AID where i starts from 0.
    *
    * \param aid the AID received from assoc response frame
    */
-  void SetAID (uint32_t aid);
+  void SetAID (uint32_t aid, uint32_t i = 0);
+
+  /*
+   * Get all station's AIDs.
+   * */
+  std::vector<uint32_t> GetAids(void) const;
+
+  void AddAID (uint32_t aid);
 
   void SetRawDuration (Time interval);
   Time GetRawDuration (void) const;
@@ -278,7 +286,8 @@ private:
   EventId m_beaconWatchdog;
   Time m_beaconWatchdogEnd;
   uint32_t m_maxMissedBeacons;
-  uint32_t m_aid;
+  //uint32_t m_aid;
+  std::vector<uint32_t> m_aids;
   bool fasTAssocType;
   uint16_t fastAssocThreshold;
     uint16_t assocVaule;
