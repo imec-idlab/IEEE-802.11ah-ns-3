@@ -1373,8 +1373,8 @@ int main(int argc, char *argv[]) {
 	PacketMetadata::Enable();
 
 	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
-	//LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-	//LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+	LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+	LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
 	LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
 	LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
 

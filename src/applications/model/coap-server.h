@@ -102,6 +102,7 @@ public:
   		  const coap_address_t *dst,
   		  unsigned char *data,
   		  size_t datalen);
+  static uint32_t m_payloadSize; //!< Size of the sent packet (including the SeqTsHeader)
 
 protected:
   virtual void DoDispose (void);
@@ -187,7 +188,6 @@ private:
   std::vector<coap_resource_t*> m_resourceVectorPtr;
   coap_context_t* m_coapCtx;
   uint32_t m_size;//!< Size of the sent packet (including the SeqTsHeader)
-  static uint32_t m_payloadSize; //!< Size of the sent packet (including the SeqTsHeader)
 
   // Control loop atrributes
   static double m_controlValue;

@@ -288,7 +288,7 @@ CoapClient::StartApplication (void)
 	// Prepare context for IPv4 and IPv6
 	if (!m_coapCtx){
 		if (PrepareContext()) {
-			NS_LOG_INFO("CoapClient::Coap context ready.");
+			//NS_LOG_DEBUG("CoapClient::Coap context ready.");
 
 		} else{
 			NS_LOG_WARN("CoapClient::No context available for the interface. Abort.");
@@ -347,7 +347,7 @@ CoapClient::PrepareMsg (void)
 		NS_LOG_WARN("Minimum payload needs to be 14 because we store timing information in that payload.");
 		return;
 	}
-	std::string payload(m_size-2-12, '1');
+	std::string payload(m_size - 2 - 12 - sizeof(coap_hdr_t) - uri.path.length, '1');
 	//std::string payload("6740");
 	m_coapMsg.SetSize(sizeof(coap_hdr_t) + uri.path.length + strlen(payload.c_str()) + 2); //allocate space for the options (uri) and payload
 	m_coapMsg.AddOption(COAP_OPTION_URI_PATH, uri.path.length, uri.path.s);
@@ -420,12 +420,12 @@ CoapClient::Send (uint8_t *data, size_t datalen)
 				  Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
 				  std::stringstream myaddr;
 				  myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
-			      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client=" << myaddr.str() << " sent " << m_size << " bytes to " <<
+			      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client=" << myaddr.str() << " sent " << p->GetSize() << " bytes to " <<
 			                   Ipv4Address::ConvertFrom (m_peerAddress) << " port " << m_peerPort);
 			    }
 			  else if (Ipv6Address::IsMatchingType (m_peerAddress))
 			    {
-			      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << m_size << " bytes to " <<
+			      NS_LOG_INFO ("At time " << Simulator::Now ().GetSeconds () << "s client sent " << p->GetSize() << " bytes to " <<
 			                   Ipv6Address::ConvertFrom (m_peerAddress) << " port " << m_peerPort);
 			    }
 			//NS_LOG_INFO ("At time "<< (Simulator::Now ()).GetSeconds ()<< "s client sent " << p->GetSize() << " bytes to " << peerAddressStringStream.str () << " Uid: " << p->GetUid () << " seq = " << m_sent);
@@ -564,12 +564,11 @@ void CoapClient::HandleRead(Ptr<Socket> socket) {
 	NS_LOG_FUNCTION(this << socket);
 	Ptr<Packet> packet;
 	Address from;
-	while ((packet = socket->RecvFrom(from))) {
+	while ((packet = socket->RecvFrom(from)))
+	{
 		m_packetReceived(packet, from);
 
 #ifdef WITH_SEQ_TS
-		SeqTsHeader seqTs;
-		packet->RemoveHeader(seqTs);
 		if (InetSocketAddress::IsMatchingType (from))
 		{
 			Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
@@ -585,6 +584,8 @@ void CoapClient::HandleRead(Ptr<Socket> socket) {
 					Inet6SocketAddress::ConvertFrom (from).GetIpv6 () << " port " <<
 					Inet6SocketAddress::ConvertFrom (from).GetPort ());
 		}
+		SeqTsHeader seqTs;
+		packet->RemoveHeader(seqTs);
 #endif
 		if (!this->CoapHandleMessage(from, packet)) {
 			NS_LOG_ERROR("Cannot handle message. Abort.");

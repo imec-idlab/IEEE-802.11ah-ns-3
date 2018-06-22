@@ -1415,17 +1415,17 @@ WifiRemoteStationManager::AddStationS1gCapabilities (Mac48Address from, S1gCapab
                 NS_ASSERT ("error on s1gcapabilities.GetChannelWidth ()");
     
         }
-    NS_LOG_UNCOND (",,m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ()<< state->m_channelWidth);
+    NS_LOG_DEBUG (",,m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ()<< state->m_channelWidth);
 
     if (m_wifiPhy->GetChannelWidth () > state->m_channelWidth)
     {
-        NS_LOG_UNCOND (">>m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
+    	NS_LOG_DEBUG (">>m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
         m_wifiPhy->SetChannelWidth (state->m_channelWidth); // take the minimal
     }
     
   if (m_wifiPhy->GetChannelWidth () < state->m_channelWidth)
     {
-        NS_LOG_UNCOND ("..m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
+	  NS_LOG_DEBUG ("..m_wifiPhy->GetChannelWidth () " << m_wifiPhy->GetChannelWidth ());
       state->m_channelWidth = m_wifiPhy->GetChannelWidth (); // take the minimal
     }
     

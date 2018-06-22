@@ -248,8 +248,9 @@ void CoapServer::HndPutControlValue(coap_context_t *ctx UNUSED_PARAM,
 	coap_add_option(response, COAP_OPTION_CONTENT_TYPE, coap_encode_var_bytes(buf, COAP_MEDIATYPE_TEXT_PLAIN), buf);
 	CoapServer::m_sensorValue += 0.001;
 	std::string valueString (std::to_string(CoapServer::m_sensorValue));
-	std::string payload(m_payloadSize+5-12-valueString.size(), 'S');
-	payload+=std::to_string(CoapServer::m_sensorValue);
+	std::string payload(m_payloadSize - sizeof(coap_hdr_t) - 2 - 12 - valueString.size(), 'S');
+	//m_size - 2 - 12 - sizeof(coap_hdr_t) - uri.path.length
+	payload += std::to_string(CoapServer::m_sensorValue);
 	const char* responseData (payload.c_str());
 	coap_add_data(response, strlen(responseData), (unsigned char *)responseData);
 }
@@ -303,10 +304,14 @@ void CoapServer::StartApplication(void) {
 	NS_LOG_FUNCTION(this);
 
 	// Prepare context for IPv4 and IPv6
-	if (!m_coapCtx){
+	if (!m_coapCtx)
+	{
 		if (PrepareContext())
-			NS_LOG_INFO("CoapServer::Coap context ready.");
-		else{
+		{
+			//NS_LOG_DEBUG("CoapServer::Coap context ready.");
+		}
+		else
+		{
 			NS_LOG_WARN("CoapServer::No context available for the interface. Abort.");
 			return;
 		}
