@@ -1704,7 +1704,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         	  if (testtrackit)
         		  NS_LOG_DEBUG("[" << this->GetAddress() <<"] is associated and has AID = " << this->GetAID(0));
 
-        	  if (GetAID (0) == 1 && Simulator::Now() < Seconds (10))
+        	  /*if (GetAID (0) == 1 && Simulator::Now() < Seconds (10))
         		  Simulator::Schedule(Seconds(10), &StaWifiMac::SendAnotherAssociationRequest, this);
         	  else if (GetAids ().size() > 1)
         	  {
@@ -1714,7 +1714,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         			  std::cout << "   " << aid;
         		  std::cout << std::endl;
         		  return;
-        	  }
+        	  }*/
               SupportedRates rates = assocResp.GetSupportedRates ();
               if (m_htSupported)
                 {

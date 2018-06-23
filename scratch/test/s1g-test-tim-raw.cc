@@ -376,11 +376,6 @@ void onSTAAssociated(int i) {
 			if (config.nControlLoops == -1)
 				config.nControlLoops = config.Nsta / 2;//  = 100;
 
-			//config.payloadSize = 100;//  = 15;
-
-			//config.trafficInterval = 1000;//  = 1000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
-			config.trafficIntervalDeviation = config.trafficInterval/2;//  = 100; //1000
-
 			configureCoapServer();
 			configureCoapClients();
 		}
@@ -1140,6 +1135,9 @@ void configureCoapServer() {
 		serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
 		serverApp.Start(Seconds(0));
 	}
+	serverApp = myServer.Install(wifiApNode.Get(0));
+	serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
+	serverApp.Start(Seconds(0));
 }
 
 void configureCoapClients()
@@ -1160,15 +1158,15 @@ void configureCoapClients()
 			}
 			else if (i >= 2*config.nControlLoops)
 			{
-				// Dummy clients for network congestion send packets to some external service over AP
-				CoapClientHelper clientHelperDummy (externalInterfaces.GetAddress(0), 5683); //address of AP
-				//std::cout << " external node address is " << externalInterfaces.GetAddress(0) << std::endl;
+				// Sensors sending uplink traffic to AP
+				//CoapClientHelper clientHelperDummy (externalInterfaces.GetAddress(0), 5683); //address of AP
+				CoapClientHelper clientHelperDummy (apNodeInterface.GetAddress(0), 5683);
 				clientHelperDummy.SetAttribute("MaxPackets", config.maxNumberOfPackets); //4294967295u
-				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval*2)));
+				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
 				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval*2/10)));
 				clientHelperDummy.SetAttribute("PayloadSize", UintegerValue(config.payloadSize));
-				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(1));
-				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1));
+				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(4)); // COAP_REQUEST_DELETE controlValue
+				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1)); // non-confirmable
 				Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
 				ApplicationContainer clientApp = clientHelperDummy.Install(wifiStaNode.Get(i));
@@ -1176,7 +1174,7 @@ void configureCoapClients()
 				clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[i]));
 				nodes[i]->m_nodeType = NodeEntry::DUMMY;
 
-				double random = m_rv->GetValue(0, 3000);
+				double random = m_rv->GetValue(0, config.trafficInterval);
 				clientApp.Start(MilliSeconds(0+random));
 
 			}
@@ -1373,8 +1371,8 @@ int main(int argc, char *argv[]) {
 	PacketMetadata::Enable();
 
 	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
-	LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
-	LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
+	//LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
+	//LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
 	LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
 	LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
 

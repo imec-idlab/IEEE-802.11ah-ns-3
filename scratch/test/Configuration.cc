@@ -7,7 +7,6 @@ Configuration::Configuration() {
 Configuration::Configuration(int argc, char *argv[]) {
     CommandLine cmd;
     /*cmd.AddValue("useIpv6", "Use Ipv6 (true/false)", useV6);
-    cmd.AddValue("nControlLoops", "Number of control loops. If -1 all the stations will be in the loops if NSta is even", nControlLoops);
     cmd.AddValue("CoapPayloadSize", "Size of CoAP payload",coapPayloadSize);
      */
     cmd.AddValue("seed", "random seed", seed);
@@ -35,8 +34,10 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("blockOffset", "The 1st page slice starts with the block with blockOffset", blockOffset);
     cmd.AddValue("timOffset", "Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page", timOffset);
     cmd.AddValue("TrafficInterval", "Traffic interval time in ms", trafficInterval);
+    cmd.AddValue("TrafficIntervalDeviation", "Traffic interval deviation time in ms, each interval will have a random deviation between - dev/2 and + dev/2", trafficIntervalDeviation);
     cmd.AddValue("IpCameraDataRate", "Data rate of the captured stream in kbps", ipcameraDataRate);
     cmd.AddValue("TCPSegmentSize", "TCP Segment size in bytes", TCPSegmentSize);
+    cmd.AddValue("nControlLoops", "Number of control loops. If -1 all the stations will be in the loops if NSta is even", nControlLoops);
 
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
@@ -52,7 +53,6 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("APAlwaysSchedulesForNextSlot", "AP Always schedules for next slot (true/false)", APAlwaysSchedulesForNextSlot);
     cmd.AddValue("APScheduleTransmissionForNextSlotIfLessThan", "AP schedules transmission for next slot if slot time is less than (microseconds)", APScheduleTransmissionForNextSlotIfLessThan);
 
-    cmd.AddValue("TrafficInterval", "Traffic interval time in ms", trafficInterval);
     cmd.AddValue("TrafficIntervalDeviation", "Traffic interval deviation time in ms, each interval will have a random deviation between - dev/2 and + dev/2", trafficIntervalDeviation);
 
 

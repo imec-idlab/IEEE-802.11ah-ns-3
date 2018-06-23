@@ -533,6 +533,7 @@ void NodeEntry::UpdateJitter (Time timeDiff)
 
 	}
 }
+//Called when CoAP packet is received at CLIENT (RTT complete)
 void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
 	auto pCopy = packet->Copy();
 	try {
