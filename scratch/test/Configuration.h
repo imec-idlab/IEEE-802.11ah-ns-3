@@ -85,7 +85,8 @@ struct Configuration {
 	bool S1g1MfieldEnabled=false;
 	string RAWConfigFile = "./OptimalRawGroup/RawConfig-test.txt";
 	string DataMode = "MCS2_0";
-	string OutputPath = "./OptimalRawGroup/resultsenergyconsumption/";
+	string OutputPath = "./OptimalRawGroup/results-coap/";
+	bool PrintStats = false;
 	/*
 	 * Amina's configuration parameters
 	 * */

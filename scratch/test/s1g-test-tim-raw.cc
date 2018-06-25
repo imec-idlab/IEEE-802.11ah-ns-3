@@ -1046,7 +1046,7 @@ void configureTCPEchoClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		//clientApp.Stop(Seconds(simulationTime + 1));
+		clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1093,7 +1093,7 @@ void configureUDPClients() {
 		clientApp.Get(0)->TraceConnectWithoutContext("Tx",
 				MakeCallback(&NodeEntry::OnUdpPacketSent, nodes[it->first]));
 		clientApp.Start(Seconds(1 + randomStart));
-		//clientApp.Stop (Seconds (config.simulationTime+1)); //with this throughput is smaller
+		clientApp.Stop (Seconds (config.simulationTime)); //with this throughput is smaller
 	}
 	AppStartTime = Simulator::Now().GetSeconds() + 1;
 	//Simulator::Stop (Seconds (config.simulationTime+1));
@@ -1118,7 +1118,7 @@ void configureUDPEchoClients() {
 
 		double random = m_rv->GetValue(0, config.trafficInterval);
 		clientApp.Start(MilliSeconds(0 + random));
-		//clientApp.Stop(Seconds(simulationTime + 1));
+		clientApp.Stop(Seconds(config.simulationTime));
 	}
 }
 
@@ -1158,12 +1158,12 @@ void configureCoapClients()
 			}
 			else if (i >= 2*config.nControlLoops)
 			{
-				// Sensors sending uplink traffic to AP
+				// SENSORS sending uplink traffic to AP
 				//CoapClientHelper clientHelperDummy (externalInterfaces.GetAddress(0), 5683); //address of AP
 				CoapClientHelper clientHelperDummy (apNodeInterface.GetAddress(0), 5683);
 				clientHelperDummy.SetAttribute("MaxPackets", config.maxNumberOfPackets); //4294967295u
 				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
-				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval*2/10)));
+				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval/10)));
 				clientHelperDummy.SetAttribute("PayloadSize", UintegerValue(config.payloadSize));
 				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(4)); // COAP_REQUEST_DELETE controlValue
 				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1)); // non-confirmable
@@ -1176,6 +1176,8 @@ void configureCoapClients()
 
 				double random = m_rv->GetValue(0, config.trafficInterval);
 				clientApp.Start(MilliSeconds(0+random));
+				clientApp.Stop(Seconds(config.simulationTime));
+
 
 			}
 
@@ -1210,6 +1212,7 @@ void configureCoapClients()
 
 				double random = m_rv->GetValue(0, 3000);
 				clientApp.Start(MilliSeconds(0+random));
+				clientApp.Stop(Seconds(config.simulationTime));
 			}
 
 		}
@@ -1233,31 +1236,126 @@ void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n)
 	clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[n]));
 	double random = m_rv->GetValue(0, config.trafficInterval);
 	clientApp.Start(MilliSeconds(0+random));
+	clientApp.Stop(Seconds(config.simulationTime));
 
 }
 
+void printStatsToFile (bool print)
+{
+	if (!print)
+		return;
+	ofstream os;
+	//string addressresults = Outputpath + "/moreinfo.txt";
+	string path = "./results-coap/" + config.NSSFile;
+	os.open(path.c_str(), ios::out | ios::trunc);
+
+	os << "Total simulation time ms=" << std::to_string(config.simulationTime + config.CoolDownPeriod) << endl;
+	os << "Time every station associated ms=" << std::to_string(stats.TimeWhenEverySTAIsAssociated.GetMilliSeconds()) << endl;
+	os << "\n";
+	double sTotalDeliveredPackets (0), sTotalSentPackets(0), clTotalSentPackets(0), clTotalDeliveredPackets (0), clTotalRtPackets (0);
+	double sTotalDuplicates (0), clTotalDuplicates (0);
+	double sTotalCollisions (0), clTotalCollisions (0);
+	for (uint32_t i = 0; i < config.Nsta; i++)
+	{
+		if (nodes[i]->m_nodeType == NodeEntry::CLIENT)
+		{
+			clTotalSentPackets += stats.get(i).NumberOfSentPackets;
+			clTotalDeliveredPackets += stats.get(i).NumberOfSuccessfulPackets;
+			clTotalRtPackets += stats.get(i).NumberOfSuccessfulRoundtripPackets;
+			clTotalDuplicates += stats.get(i).NumberOfDuplicatesAtClient + stats.get(i).NumberOfDuplicatesAtServer;
+			clTotalCollisions += stats.get(i).NumberOfCollisions;
+		}
+		else if (nodes[i]->m_nodeType == NodeEntry::DUMMY)
+		{
+			sTotalSentPackets += stats.get(i).NumberOfSentPackets;
+			sTotalDeliveredPackets += stats.get(i).NumberOfSuccessfulPackets;
+			sTotalDuplicates += stats.get(i).NumberOfDuplicatesAtServer;
+			sTotalCollisions += stats.get(i).NumberOfCollisions;
+		}
+	}
+	double sensorThroughput = (sTotalDeliveredPackets + sTotalDuplicates) * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+	double sensorPacketLoss = -1;
+	if (sTotalSentPackets > 0) sensorPacketLoss = (1 - sTotalDeliveredPackets / sTotalSentPackets) * 100;
+	os << "sensorThroughput kbps=" << sensorThroughput << "\n";
+	os << "sensorPacketLoss %=" << sensorPacketLoss << "\n";
+	os << "sensorNumberOfCollisions=" << sTotalCollisions << "\n";
+	double clThroughput = (clTotalDeliveredPackets + clTotalRtPackets + clTotalDuplicates) * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+	double clPacketLoss = -1;
+		if (clTotalDeliveredPackets > 0) clPacketLoss = (clTotalSentPackets - clTotalRtPackets) / (float)(clTotalSentPackets + clTotalDeliveredPackets);
+	os << "clThroughput kbps=" << clThroughput << "\n";
+	os << "clPacketLoss %=" << clPacketLoss << "\n";
+	os << "clNumberOfCollisions=" << clTotalCollisions << "\n";
+	os << "cl global max Latency (C->S) µs=" << std::to_string(NodeEntry::maxLatency.GetMicroSeconds())<< "\n"; // CORRECT
+	os << "cl global min Latency (C->S) µs=" << std::to_string(NodeEntry::minLatency.GetMicroSeconds())<< "\n"; // CORRECT
+
+	for (uint32_t i = 0; i < config.Nsta; i++)
+	{
+		if (nodes[i]->m_nodeType == NodeEntry::CLIENT || nodes[i]->m_nodeType == NodeEntry::DUMMY)
+		{
+			os << "-----------------\n";
+			os << "NodeType=" << std::to_string(nodes[i]->m_nodeType) << "\n";
+			os << "aid=" << std::to_string(i+1) << endl;
+			os << "X: " << nodes[i]->x << ", Y: " << nodes[i]->y << endl;
+			os << "Tx Remaining Queue size=" << nodes[i]->queueLength << endl;
+			os << "Total transmit time=" << std::to_string(stats.get(i).TotalTransmitTime.GetMilliSeconds()) << "ms" << endl;
+			os << "Total receive time=" << std::to_string(stats.get(i).TotalReceiveTime.GetMilliSeconds()) << "ms" << endl;
+			os << "ConsumedEnergy=" << stats.get(i).GetTotalEnergyConsumption() << " mJ\n";
+			os << "Number of packets sent=" << std::to_string(stats.get(i).NumberOfSentPackets) << endl; // CORRECT
+			os << "Number of packets successfuly arrived to the dst=" << std::to_string(stats.get(i).NumberOfSuccessfulPackets) << endl; //CORRECT
+			os << "Number of packets dropped=" << std::to_string(stats.get(i).getNumberOfDroppedPackets()) << endl; // NOT CORRECT
+			os << "Number of roundtrip packets successful=" << std::to_string(stats.get(i).NumberOfSuccessfulRoundtripPackets) << endl; //CORRECT
+			os << "Number of duplicates on server (UL)=" << std::to_string(stats.get(i).NumberOfDuplicatesAtServer) << endl;
+			os << "Number of duplicates on client (DL)=" << std::to_string(stats.get(i).NumberOfDuplicatesAtClient) << endl;
+			os << "Average packet sent/receive time=" << std::to_string(stats.get(i).getAveragePacketSentReceiveTime()) << "ms" << std::endl; // CORRECT
+			os << "Average packet roundtrip time=" << std::to_string(stats.get(i).getAveragePacketRoundTripTime(config.trafficType)) << "ms" << std::endl; //not
+
+			os << "Avg jitter (RTT)=" << std::to_string(stats.get(i).GetAverageJitter()) << "ms" << std::endl; //CORRECT
+			os << "Average inter packet delay at server µs=" << std::to_string(stats.get(i).GetAverageInterPacketDelay(stats.get(i).m_interPacketDelayServer).GetMicroSeconds()) << "\n";
+			os << "Inter-packet-delay at the server standard deviation µs=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayServer) << "\n";
+			os << "Inter-packet-delay at the server standard deviation %=" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer) << "\n";
+			os << "Average inter packet delay at client µs=" << std::to_string(stats.get(i).GetAverageInterPacketDelay(stats.get(i).m_interPacketDelayClient).GetMicroSeconds()) << "\n";
+			os << "Inter-packet-delay at the client standard deviation µs=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayClient) << "\n";
+			os << "Inter-packet-delay at the client standard deviation %=" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient) << "\n";
+			//calculate the deviation between inter packet arrival times at the server
+			os << "Packet loss=" << std::to_string(stats.get(i).GetPacketLoss(config.trafficType)) << "%" << endl; //CORRECT
+
+			os << "\n";
+			os << "Goodput=" << (stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)) << "Kbit" << endl; //CORRECT
+		}
+	}
+	os.close();
+}
+
+
 void printStatistics() {
+
+
 	cout << "Statistics" << endl;
 	cout << "" << endl;
+	cout << "    global max Latency (C->S)= " << std::to_string(NodeEntry::maxLatency.GetMicroSeconds()) << "µs" << endl; // CORRECT
+	cout << "    global min Latency (C->S) = " << std::to_string(NodeEntry::minLatency.GetMicroSeconds()) << "µs" << endl; // CORRECT
+	cout << "    max diference in RTT between 2 subsequent packets = " << std::to_string(NodeEntry::maxJitter.GetMicroSeconds()) << "µs" << endl;
+	cout << "    min diference in RTT between 2 subsequent packets = " << std::to_string(NodeEntry::minJitter.GetMicroSeconds()) << "µs" << endl;
 
 	for (uint32_t i = 0; i < config.Nsta; i++) {
 		if (nodes[i]->m_nodeType == NodeEntry::CLIENT){
 			cout << "Node " << std::to_string(i) << endl;
 			cout << "X: " << nodes[i]->x << ", Y: " << nodes[i]->y << endl;
 			cout << "Tx Remaining Queue size: " << nodes[i]->queueLength << endl;
-			cout << "Tcp congestion window value: " <<  std::to_string(stats.get(i).TCPCongestionWindow) << endl;
+			//cout << "Tcp congestion window value: " <<  std::to_string(stats.get(i).TCPCongestionWindow) << endl;
 			cout << "--------------" << endl;
 			cout << "Total transmit time: " << std::to_string(stats.get(i).TotalTransmitTime.GetMilliSeconds()) << "ms" << endl;
 			cout << "Total receive time: " << std::to_string(stats.get(i).TotalReceiveTime.GetMilliSeconds()) << "ms" << endl;
-			cout << "" << endl;
-			cout << "Total active time: " << std::to_string(stats.get(i).TotalActiveTime.GetMilliSeconds()) << "ms" << endl;
-			cout << "Total doze time: " << std::to_string(stats.get(i).TotalDozeTime.GetMilliSeconds()) << "ms" << endl;
-			cout << "" << endl;
-			cout << "Number of transmissions: " << std::to_string(stats.get(i).NumberOfTransmissions) << endl;
-			cout << "Number of transmissions dropped: " << std::to_string(stats.get(i).NumberOfTransmissionsDropped) << endl;
-			cout << "Number of receives: " << std::to_string(stats.get(i).NumberOfReceives) << endl;
-			cout << "Number of receives dropped: " << std::to_string(stats.get(i).NumberOfReceivesDropped) << endl;
-			cout << "" << endl;
+			cout << "ConsumedEnergy=" << stats.get(i).GetTotalEnergyConsumption() << " mJ\n";
+			//cout << endl;
+			//cout << "Total active time: " << std::to_string(stats.get(i).TotalActiveTime.GetMilliSeconds()) << "ms" << endl;
+			//cout << "Total doze time: " << std::to_string(stats.get(i).TotalDozeTime.GetMilliSeconds()) << "ms" << endl;
+			//cout << "" << endl;
+			//cout << "Number of transmissions: " << std::to_string(stats.get(i).NumberOfTransmissions) << endl;
+			//cout << "Number of transmissions dropped: " << std::to_string(stats.get(i).NumberOfTransmissionsDropped) << endl;
+			//cout << "Number of receives: " << std::to_string(stats.get(i).NumberOfReceives) << endl;
+			//cout << "Number of receives dropped: " << std::to_string(stats.get(i).NumberOfReceivesDropped) << endl;
+			//cout << "" << endl;
 			cout << "Number of packets sent: " << std::to_string(stats.get(i).NumberOfSentPackets) << endl; // CORRECT
 			cout << "Number of packets successfuly arrived to the dst: " << std::to_string(stats.get(i).NumberOfSuccessfulPackets) << endl; //CORRECT
 			cout << "Number of packets dropped: " << std::to_string(stats.get(i).getNumberOfDroppedPackets()) << endl; // NOT CORRECT
@@ -1265,13 +1363,9 @@ void printStatistics() {
 			cout << "Average packet sent/receive time: " << std::to_string(stats.get(i).getAveragePacketSentReceiveTime()) << "ms" << std::endl; // CORRECT
 			cout << "Average packet roundtrip time: " << std::to_string(stats.get(i).getAveragePacketRoundTripTime(config.trafficType)) << "ms" << std::endl; //not
 			// Average packet roundtrip time NOT CORRECT, uracunato je send-rcv vrijeme dropped paketa a dijeljeno je samo sa brojem successfull RTT paketa
-			cout << "IP Camera Data sending rate: " << stats.get(i).getIPCameraSendingRate() << "kbps" << std::endl;
-			cout << "IP Camera Data receiving rate: " << std::to_string(stats.get(i).getIPCameraAPReceivingRate()) << "kbps" << std::endl;
-			cout << endl;
-			cout << "    global max Latency (C->S)= " << std::to_string(NodeEntry::maxLatency.GetMicroSeconds()) << "µs" << endl; // CORRECT
-			cout << "    global min Latency (C->S) = " << std::to_string(NodeEntry::minLatency.GetMicroSeconds()) << "µs" << endl; // CORRECT
-			cout << "    max diference in RTT between 2 subsequent packets = " << std::to_string(NodeEntry::maxJitter.GetMicroSeconds()) << "µs" << endl;
-			cout << "    min diference in RTT between 2 subsequent packets = " << std::to_string(NodeEntry::minJitter.GetMicroSeconds()) << "µs" << endl;
+			//cout << "IP Camera Data sending rate: " << stats.get(i).getIPCameraSendingRate() << "kbps" << std::endl;
+			//cout << "IP Camera Data receiving rate: " << std::to_string(stats.get(i).getIPCameraAPReceivingRate()) << "kbps" << std::endl;
+			//cout << endl;
 			cout << "    Jitter (RTT)= " << std::to_string(stats.get(i).GetAverageJitter()) << "ms" << std::endl; //CORRECT
 			cout << "    Average inter packet delay at server is " << std::to_string(stats.get(i).GetAverageInterPacketDelay(stats.get(i).m_interPacketDelayServer).GetMicroSeconds()) << "µs" << endl;
 			cout << "    Inter-packet-delay at the server standard deviation is " << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayServer) << " which is " << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer) << "%" <<endl;
@@ -1290,12 +1384,12 @@ void printStatistics() {
          }*/
 			cout << endl;
 		}
-		else if (nodes[i]->m_nodeType == NodeEntry::SERVER)
+		/*else if (nodes[i]->m_nodeType == NodeEntry::SERVER)
 		{
 			cout << "Node " << std::to_string(i) << endl;
 			cout << "X: " << nodes[i]->x << ", Y: " << nodes[i]->y << endl;
 			cout << "Tx Remaining Queue size: " << nodes[i]->queueLength << endl;
-		}
+		}*/
 
 		cout << "----------" << endl;
 		cout << "Total simulation time: " << std::to_string(config.simulationTime) << "ms" << endl;
@@ -1311,8 +1405,8 @@ void printStatistics() {
 		cout << "Total packets delivered to dst = " << totalDeliveredPackets << endl;
 		cout << "Total packets round trip completed = " << totalRttPackets << endl;
 
-		double throughput1 = totalDeliveredPackets * config.payloadSize * 8 / (config.simulationTime - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
-		double throughput2 = totalRttPackets * config.payloadSize * 8 / (config.simulationTime - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+		double throughput1 = totalDeliveredPackets * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+		double throughput2 = totalRttPackets * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
 
 		cout << "Total throughput Kbit/s=" << throughput1 + throughput2 << endl;
 
@@ -1373,12 +1467,13 @@ int main(int argc, char *argv[]) {
 	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-	LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
-	LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
+	//LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
+	//LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
 
 	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
 	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("MacLow", LOG_LEVEL_DEBUG);
 
 	bool OutputPosition = true;
 	config = Configuration(argc, argv);
@@ -1400,12 +1495,18 @@ int main(int argc, char *argv[]) {
 	}
 	else if (config.trafficType == "udp" || config.trafficType == "udpecho" || config.trafficType == "coap")
 	{
-	config.NSSFile = config.trafficType + "_" + std::to_string(config.Nsta) + "sta_"
+	config.NSSFile = config.trafficType + "_"
+			+ std::to_string(config.Nsta) + "sta_"
 			+ std::to_string(config.NGroup) + "Group_"
 			+ std::to_string(config.NRawSlotNum) + "slots_"
 			+ std::to_string(config.trafficInterval) + "s_"
-			+ std::to_string(config.payloadSize) + "B_"
-			+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
+			//+ std::to_string(config.payloadSize) + "B_"
+			+ std::to_string(config.BeaconInterval) + "BI_"
+			+ std::to_string(config.simulationTime) + "Tsim_"
+			+ std::to_string(config.seed) + "seed_"
+			+ config.DataMode + "_"
+			+ config.rho + "rho"
+			+ ".nss";
 	}
 
 	stats = Statistics(config.Nsta);
@@ -1703,6 +1804,8 @@ int main(int argc, char *argv[]) {
 	Simulator::Run();
 
 	//printStatistics();
+	printStatsToFile (config.PrintStats);
+
 	// Visualizer throughput
 	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0, totalPacketsEchoed = 0;
 	for (int i = 0; i < config.Nsta; i++)
@@ -1725,11 +1828,11 @@ int main(int argc, char *argv[]) {
 		uint32_t totalPacketsThrough =
 				DynamicCast<UdpServer>(serverApp.Get(0))->GetReceived();
 		throughput = totalPacketsThrough * config.payloadSize * 8
-				/ (config.simulationTime * 1000000.0);
+				/ (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
 		cout << "totalPacketsThrough " << totalPacketsThrough << " ++my "
 				<< totalSuccessfulPackets << endl;
 		cout << "throughput " << throughput << " ++my "
-				<< pay * 8. / (config.simulationTime * 1000000.0) << endl;
+				<< pay * 8. / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0) << endl;
 		std::cout << "datarate" << "\t" << "throughput" << std::endl;
 		std::cout << config.datarate << "\t" << throughput << " Mbit/s"
 				<< std::endl;
@@ -1750,7 +1853,28 @@ int main(int argc, char *argv[]) {
 		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
 		cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
-		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime * 1000000.0);
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
+
+		std::cout << "datarate" << "\t" << "throughput" << std::endl;
+		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
+	}
+	else if (config.trafficType == "coap")
+	{
+		double ulThroughput = 0, dlThroughput = 0;
+		ulThroughput = totalSuccessfulPackets * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		dlThroughput = totalPacketsEchoed * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		cout << "totalPacketsSent " << totalSentPackets << endl;
+		cout << "totalPacketsDelivered " << totalSuccessfulPackets << endl;
+		cout << "totalPacketsEchoed " << totalPacketsEchoed << endl;
+		cout << "UL packets lost " << totalSentPackets - totalSuccessfulPackets << endl;
+		cout << "DL packets lost " << totalSuccessfulPackets - totalPacketsEchoed << endl;
+		cout << "Total packets lost " << totalSentPackets - totalPacketsEchoed << endl;
+
+		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
+				cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
+
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
 		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
 
 		std::cout << "datarate" << "\t" << "throughput" << std::endl;
@@ -1758,6 +1882,7 @@ int main(int argc, char *argv[]) {
 	}
 	cout << "total packet loss % "
 			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
+
 	Simulator::Destroy();
 
 	//Energy consumption per station
@@ -1765,6 +1890,7 @@ int main(int argc, char *argv[]) {
 	timeIdle = timeIdle / config.Nsta;
 	timeTx = timeTx / config.Nsta;
 	timeSleep = timeSleep / config.Nsta;
+
 
 	ofstream risultati;
 	//string addressresults = Outputpath + "/moreinfo.txt";

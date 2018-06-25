@@ -1,0 +1,2609 @@
+Total simulation time ms=9.000000
+Time every station associated ms=2568
+
+sensorThroughput kbps=100.141
+sensorPacketLoss %=0
+clThroughput kbps=0
+clPacketLoss %=-1
+cl global max Latency (C->S) µs=-9223372036854775
+cl global min Latency (C->S) µs=9223372036854775
+-----------------
+NodeType=2
+aid=1
+X: 111.836, Y: 235.319
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1354ms
+ConsumedEnergy=5.24625 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=47.916667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400120
+Inter-packet-delay at the server standard deviation µs=50951.6
+Inter-packet-delay at the server standard deviation %=12.7341
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=2
+X: 35.2911, Y: 168.465
+Tx Remaining Queue size=0
+Total transmit time=27ms
+Total receive time=1219ms
+ConsumedEnergy=6.56047 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=28.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409382
+Inter-packet-delay at the server standard deviation µs=57024.6
+Inter-packet-delay at the server standard deviation %=13.9294
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=3
+X: 62.7537, Y: 344.503
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1583ms
+ConsumedEnergy=8.84652 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=93.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409203
+Inter-packet-delay at the server standard deviation µs=71977.8
+Inter-packet-delay at the server standard deviation %=17.5898
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=4
+X: 94.7186, Y: 127.281
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=879ms
+ConsumedEnergy=3.80613 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=74.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400050
+Inter-packet-delay at the server standard deviation µs=83259.9
+Inter-packet-delay at the server standard deviation %=20.8124
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=5
+X: 130.737, Y: 217.683
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=822ms
+ConsumedEnergy=3.7299 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=54.583333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399427
+Inter-packet-delay at the server standard deviation µs=66193.8
+Inter-packet-delay at the server standard deviation %=16.5722
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=6
+X: 214.945, Y: 83.6709
+Tx Remaining Queue size=0
+Total transmit time=38ms
+Total receive time=1223ms
+ConsumedEnergy=5.03193 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=55.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401959
+Inter-packet-delay at the server standard deviation µs=82064.8
+Inter-packet-delay at the server standard deviation %=20.4162
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=7
+X: 6.7739, Y: 247.099
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1276ms
+ConsumedEnergy=6.77185 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=72.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401456
+Inter-packet-delay at the server standard deviation µs=77880
+Inter-packet-delay at the server standard deviation %=19.3994
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=8
+X: 48.2763, Y: 81.1351
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1866ms
+ConsumedEnergy=8.23763 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=58.384615ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401364
+Inter-packet-delay at the server standard deviation µs=99436.7
+Inter-packet-delay at the server standard deviation %=24.7747
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=9
+X: 70.2338, Y: 143.047
+Tx Remaining Queue size=0
+Total transmit time=52ms
+Total receive time=1115ms
+ConsumedEnergy=3.50367 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=121.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393921
+Inter-packet-delay at the server standard deviation µs=124959
+Inter-packet-delay at the server standard deviation %=31.7218
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=10
+X: 69.3374, Y: 235.759
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=668ms
+ConsumedEnergy=3.17794 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=47.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=384495
+Inter-packet-delay at the server standard deviation µs=41715.1
+Inter-packet-delay at the server standard deviation %=10.8493
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=11
+X: 51.7399, Y: 150.363
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1293ms
+ConsumedEnergy=5.8812 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=50.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393092
+Inter-packet-delay at the server standard deviation µs=73662.2
+Inter-packet-delay at the server standard deviation %=18.7392
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=12
+X: 393.69, Y: 163.805
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1243ms
+ConsumedEnergy=6.82945 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=79.769231ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409394
+Inter-packet-delay at the server standard deviation µs=116089
+Inter-packet-delay at the server standard deviation %=28.3562
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=13
+X: 334.37, Y: 255.217
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1874ms
+ConsumedEnergy=9.00006 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=44.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400932
+Inter-packet-delay at the server standard deviation µs=60142.9
+Inter-packet-delay at the server standard deviation %=15.0008
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=14
+X: 276.276, Y: 47.8681
+Tx Remaining Queue size=0
+Total transmit time=52ms
+Total receive time=779ms
+ConsumedEnergy=3.58678 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=128.416667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400992
+Inter-packet-delay at the server standard deviation µs=119529
+Inter-packet-delay at the server standard deviation %=29.8084
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=15
+X: 72.8101, Y: 137.067
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1183ms
+ConsumedEnergy=3.94525 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=46.083333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400477
+Inter-packet-delay at the server standard deviation µs=91231.3
+Inter-packet-delay at the server standard deviation %=22.7806
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=16
+X: 73.4718, Y: 303.26
+Tx Remaining Queue size=0
+Total transmit time=37ms
+Total receive time=1194ms
+ConsumedEnergy=5.35825 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=57.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391144
+Inter-packet-delay at the server standard deviation µs=59073.9
+Inter-packet-delay at the server standard deviation %=15.1029
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=17
+X: 202.787, Y: 387.532
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1633ms
+ConsumedEnergy=7.07255 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=77.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=384801
+Inter-packet-delay at the server standard deviation µs=109596
+Inter-packet-delay at the server standard deviation %=28.4812
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=18
+X: 194.678, Y: 215.918
+Tx Remaining Queue size=0
+Total transmit time=27ms
+Total receive time=1843ms
+ConsumedEnergy=8.57166 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=28.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400733
+Inter-packet-delay at the server standard deviation µs=31990
+Inter-packet-delay at the server standard deviation %=7.98287
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=19
+X: 155.221, Y: 197.827
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=1126ms
+ConsumedEnergy=3.84837 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=69.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409160
+Inter-packet-delay at the server standard deviation µs=71765.3
+Inter-packet-delay at the server standard deviation %=17.5397
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=20
+X: 55.1907, Y: 193.549
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1185ms
+ConsumedEnergy=4.16777 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=42.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409872
+Inter-packet-delay at the server standard deviation µs=52465.2
+Inter-packet-delay at the server standard deviation %=12.8004
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=21
+X: 123.178, Y: 156.917
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=1051ms
+ConsumedEnergy=5.4942 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=70.692308ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400398
+Inter-packet-delay at the server standard deviation µs=60495.4
+Inter-packet-delay at the server standard deviation %=15.1088
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=22
+X: 110.809, Y: 90.832
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1475ms
+ConsumedEnergy=6.86581 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=63.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401828
+Inter-packet-delay at the server standard deviation µs=57537.2
+Inter-packet-delay at the server standard deviation %=14.3189
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=23
+X: 232.88, Y: 242.816
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1559ms
+ConsumedEnergy=8.62663 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=47.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400359
+Inter-packet-delay at the server standard deviation µs=68392.2
+Inter-packet-delay at the server standard deviation %=17.0827
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=24
+X: 124.241, Y: 25.2905
+Tx Remaining Queue size=0
+Total transmit time=58ms
+Total receive time=1029ms
+ConsumedEnergy=4.43041 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=135.846154ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=383608
+Inter-packet-delay at the server standard deviation µs=125923
+Inter-packet-delay at the server standard deviation %=32.8259
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=25
+X: 125.762, Y: 114.722
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1199ms
+ConsumedEnergy=3.9795 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=30.307692ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=384927
+Inter-packet-delay at the server standard deviation µs=52191.5
+Inter-packet-delay at the server standard deviation %=13.5588
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=26
+X: 180.654, Y: 217.901
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1086ms
+ConsumedEnergy=5.32538 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=44.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393133
+Inter-packet-delay at the server standard deviation µs=36206
+Inter-packet-delay at the server standard deviation %=9.2096
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=27
+X: 199.7, Y: 212.823
+Tx Remaining Queue size=0
+Total transmit time=27ms
+Total receive time=1527ms
+ConsumedEnergy=7.34112 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=40.307692ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=408781
+Inter-packet-delay at the server standard deviation µs=84054.3
+Inter-packet-delay at the server standard deviation %=20.5622
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=28
+X: 228.069, Y: 57.7492
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1617ms
+ConsumedEnergy=8.7464 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=52.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400476
+Inter-packet-delay at the server standard deviation µs=50255.9
+Inter-packet-delay at the server standard deviation %=12.549
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=29
+X: 235.333, Y: 172.468
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=838ms
+ConsumedEnergy=3.10491 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=56.083333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=418481
+Inter-packet-delay at the server standard deviation µs=82785.6
+Inter-packet-delay at the server standard deviation %=19.7824
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=30
+X: 26.5737, Y: 261.663
+Tx Remaining Queue size=0
+Total transmit time=33ms
+Total receive time=893ms
+ConsumedEnergy=3.45226 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=54.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401281
+Inter-packet-delay at the server standard deviation µs=39276.3
+Inter-packet-delay at the server standard deviation %=9.78772
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=31
+X: 30.9442, Y: 214.317
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1361ms
+ConsumedEnergy=5.24099 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=48.333333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399840
+Inter-packet-delay at the server standard deviation µs=90228.3
+Inter-packet-delay at the server standard deviation %=22.5661
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=32
+X: 308.729, Y: 229.439
+Tx Remaining Queue size=0
+Total transmit time=43ms
+Total receive time=1446ms
+ConsumedEnergy=7.71183 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=86.153846ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409568
+Inter-packet-delay at the server standard deviation µs=104746
+Inter-packet-delay at the server standard deviation %=25.5748
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=33
+X: 199.652, Y: 291.502
+Tx Remaining Queue size=0
+Total transmit time=35ms
+Total receive time=1857ms
+ConsumedEnergy=8.42039 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=32.538462ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409722
+Inter-packet-delay at the server standard deviation µs=67047.7
+Inter-packet-delay at the server standard deviation %=16.3642
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=34
+X: 258.282, Y: 90.748
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=902ms
+ConsumedEnergy=3.5933 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=104.250000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409244
+Inter-packet-delay at the server standard deviation µs=200099
+Inter-packet-delay at the server standard deviation %=48.8947
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=35
+X: 374.98, Y: 156.657
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1024ms
+ConsumedEnergy=3.50473 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=43.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399919
+Inter-packet-delay at the server standard deviation µs=56852.6
+Inter-packet-delay at the server standard deviation %=14.216
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=36
+X: 81.8183, Y: 182.813
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1206ms
+ConsumedEnergy=5.41818 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=57.916667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391149
+Inter-packet-delay at the server standard deviation µs=58453.6
+Inter-packet-delay at the server standard deviation %=14.9441
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=37
+X: 186.566, Y: 197.16
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=1249ms
+ConsumedEnergy=7.46581 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=58.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401277
+Inter-packet-delay at the server standard deviation µs=93985.2
+Inter-packet-delay at the server standard deviation %=23.4215
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=38
+X: 352.893, Y: 200.281
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1941ms
+ConsumedEnergy=8.93092 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=53.538462ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393273
+Inter-packet-delay at the server standard deviation µs=77942.2
+Inter-packet-delay at the server standard deviation %=19.8189
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=39
+X: 140.631, Y: 92.8411
+Tx Remaining Queue size=0
+Total transmit time=51ms
+Total receive time=1061ms
+ConsumedEnergy=4.64184 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=134.166667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409292
+Inter-packet-delay at the server standard deviation µs=135825
+Inter-packet-delay at the server standard deviation %=33.1852
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=40
+X: 294.673, Y: 368.193
+Tx Remaining Queue size=0
+Total transmit time=43ms
+Total receive time=743ms
+ConsumedEnergy=3.55204 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=41.416667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399713
+Inter-packet-delay at the server standard deviation µs=53474.6
+Inter-packet-delay at the server standard deviation %=13.3783
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=41
+X: 207.064, Y: 102.684
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1244ms
+ConsumedEnergy=5.8736 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=65.538462ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401032
+Inter-packet-delay at the server standard deviation µs=68006.6
+Inter-packet-delay at the server standard deviation %=16.9579
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=42
+X: 25.8073, Y: 209.456
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1309ms
+ConsumedEnergy=6.90351 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=41.416667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=418841
+Inter-packet-delay at the server standard deviation µs=29280.3
+Inter-packet-delay at the server standard deviation %=6.99079
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=43
+X: 271.814, Y: 284.822
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1839ms
+ConsumedEnergy=8.30849 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=42.076923ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=392362
+Inter-packet-delay at the server standard deviation µs=42784.7
+Inter-packet-delay at the server standard deviation %=10.9044
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=44
+X: 175.837, Y: 261.058
+Tx Remaining Queue size=0
+Total transmit time=38ms
+Total receive time=1119ms
+ConsumedEnergy=4.71167 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=129.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=491793
+Inter-packet-delay at the server standard deviation µs=154831
+Inter-packet-delay at the server standard deviation %=31.483
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=45
+X: 154.892, Y: 129.855
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1101ms
+ConsumedEnergy=3.6222 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=46.583333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401371
+Inter-packet-delay at the server standard deviation µs=88254.2
+Inter-packet-delay at the server standard deviation %=21.9882
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=46
+X: 125.633, Y: 82.9736
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=953ms
+ConsumedEnergy=4.96809 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=48.769231ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401011
+Inter-packet-delay at the server standard deviation µs=77695.6
+Inter-packet-delay at the server standard deviation %=19.3749
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=47
+X: 91.7348, Y: 214.132
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1704ms
+ConsumedEnergy=7.19141 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=43.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=385536
+Inter-packet-delay at the server standard deviation µs=40193.2
+Inter-packet-delay at the server standard deviation %=10.4253
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=48
+X: 332.877, Y: 144.813
+Tx Remaining Queue size=0
+Total transmit time=45ms
+Total receive time=1810ms
+ConsumedEnergy=9.13652 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=102.153846ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=410191
+Inter-packet-delay at the server standard deviation µs=88668.5
+Inter-packet-delay at the server standard deviation %=21.6164
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=49
+X: 218.579, Y: 151.786
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1109ms
+ConsumedEnergy=5.00028 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=109.333333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391528
+Inter-packet-delay at the server standard deviation µs=156231
+Inter-packet-delay at the server standard deviation %=39.9028
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=50
+X: 227.77, Y: 336.436
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1027ms
+ConsumedEnergy=3.76988 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=40.384615ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=418724
+Inter-packet-delay at the server standard deviation µs=47845.6
+Inter-packet-delay at the server standard deviation %=11.4265
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=51
+X: 170.845, Y: 297.689
+Tx Remaining Queue size=0
+Total transmit time=35ms
+Total receive time=1479ms
+ConsumedEnergy=6.04405 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=45.500000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401901
+Inter-packet-delay at the server standard deviation µs=49935.7
+Inter-packet-delay at the server standard deviation %=12.4249
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=52
+X: 280.989, Y: 283.872
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1644ms
+ConsumedEnergy=6.73802 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=43.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=417886
+Inter-packet-delay at the server standard deviation µs=28189.8
+Inter-packet-delay at the server standard deviation %=6.7458
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=53
+X: 110.29, Y: 357.521
+Tx Remaining Queue size=0
+Total transmit time=50ms
+Total receive time=1833ms
+ConsumedEnergy=9.32133 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=72.769231ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=383625
+Inter-packet-delay at the server standard deviation µs=87757.2
+Inter-packet-delay at the server standard deviation %=22.8758
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=54
+X: 183.007, Y: 110.421
+Tx Remaining Queue size=0
+Total transmit time=27ms
+Total receive time=632ms
+ConsumedEnergy=2.72473 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=38.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409234
+Inter-packet-delay at the server standard deviation µs=84071.4
+Inter-packet-delay at the server standard deviation %=20.5436
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=55
+X: 312.659, Y: 301.784
+Tx Remaining Queue size=0
+Total transmit time=35ms
+Total receive time=922ms
+ConsumedEnergy=3.63771 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=59.384615ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391797
+Inter-packet-delay at the server standard deviation µs=88781
+Inter-packet-delay at the server standard deviation %=22.66
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=56
+X: 150.459, Y: 26.6368
+Tx Remaining Queue size=0
+Total transmit time=38ms
+Total receive time=1316ms
+ConsumedEnergy=5.64675 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=61.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=383652
+Inter-packet-delay at the server standard deviation µs=104343
+Inter-packet-delay at the server standard deviation %=27.1974
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=57
+X: 328.108, Y: 103.143
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=1644ms
+ConsumedEnergy=7.03139 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=37.500000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399485
+Inter-packet-delay at the server standard deviation µs=27857
+Inter-packet-delay at the server standard deviation %=6.97322
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=58
+X: 187.566, Y: 195.03
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1796ms
+ConsumedEnergy=8.5868 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=34.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393496
+Inter-packet-delay at the server standard deviation µs=40337.9
+Inter-packet-delay at the server standard deviation %=10.2512
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=59
+X: 29.2276, Y: 119.6
+Tx Remaining Queue size=0
+Total transmit time=49ms
+Total receive time=1224ms
+ConsumedEnergy=4.20276 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=188.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=419893
+Inter-packet-delay at the server standard deviation µs=242205
+Inter-packet-delay at the server standard deviation %=57.6824
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=60
+X: 106.049, Y: 260.022
+Tx Remaining Queue size=0
+Total transmit time=26ms
+Total receive time=1049ms
+ConsumedEnergy=3.09868 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=51.916667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400089
+Inter-packet-delay at the server standard deviation µs=69605.2
+Inter-packet-delay at the server standard deviation %=17.3974
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=61
+X: 350.24, Y: 319.122
+Tx Remaining Queue size=0
+Total transmit time=46ms
+Total receive time=1077ms
+ConsumedEnergy=5.4859 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=77.307692ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400785
+Inter-packet-delay at the server standard deviation µs=98599.1
+Inter-packet-delay at the server standard deviation %=24.6015
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=62
+X: 215.225, Y: 8.67754
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1482ms
+ConsumedEnergy=7.13237 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=75.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=402478
+Inter-packet-delay at the server standard deviation µs=62604.4
+Inter-packet-delay at the server standard deviation %=15.5547
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=63
+X: 130.851, Y: 265.687
+Tx Remaining Queue size=0
+Total transmit time=38ms
+Total receive time=1887ms
+ConsumedEnergy=8.84577 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=53.384615ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=402475
+Inter-packet-delay at the server standard deviation µs=85846.1
+Inter-packet-delay at the server standard deviation %=21.3296
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=64
+X: 177.321, Y: 175.904
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1090ms
+ConsumedEnergy=4.34659 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=68.416667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=418501
+Inter-packet-delay at the server standard deviation µs=90228.8
+Inter-packet-delay at the server standard deviation %=21.56
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=65
+X: 140.083, Y: 338.789
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1119ms
+ConsumedEnergy=3.53988 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=31.076923ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401297
+Inter-packet-delay at the server standard deviation µs=43355.2
+Inter-packet-delay at the server standard deviation %=10.8038
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=66
+X: 54.9471, Y: 284.169
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1283ms
+ConsumedEnergy=5.3908 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=42.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=392919
+Inter-packet-delay at the server standard deviation µs=37056.2
+Inter-packet-delay at the server standard deviation %=9.43101
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=67
+X: 314.868, Y: 210.448
+Tx Remaining Queue size=0
+Total transmit time=31ms
+Total receive time=1699ms
+ConsumedEnergy=7.09819 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=45.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=410135
+Inter-packet-delay at the server standard deviation µs=60907
+Inter-packet-delay at the server standard deviation %=14.8505
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=68
+X: 187.124, Y: 13.3457
+Tx Remaining Queue size=0
+Total transmit time=45ms
+Total receive time=1827ms
+ConsumedEnergy=8.74697 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=51.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400770
+Inter-packet-delay at the server standard deviation µs=49544.3
+Inter-packet-delay at the server standard deviation %=12.3623
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=69
+X: 153.093, Y: 207.629
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=992ms
+ConsumedEnergy=3.30631 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=69.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=410318
+Inter-packet-delay at the server standard deviation µs=199567
+Inter-packet-delay at the server standard deviation %=48.6373
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=70
+X: 300.336, Y: 326.967
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=774ms
+ConsumedEnergy=3.6295 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=64.583333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399784
+Inter-packet-delay at the server standard deviation µs=139431
+Inter-packet-delay at the server standard deviation %=34.8766
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=71
+X: 212.188, Y: 358.295
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1162ms
+ConsumedEnergy=5.82729 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=69.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401055
+Inter-packet-delay at the server standard deviation µs=68412.4
+Inter-packet-delay at the server standard deviation %=17.0581
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=72
+X: 274.877, Y: 239.348
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=1418ms
+ConsumedEnergy=6.86469 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=41.166667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409733
+Inter-packet-delay at the server standard deviation µs=38757.2
+Inter-packet-delay at the server standard deviation %=9.45913
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=73
+X: 138.153, Y: 267.128
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1586ms
+ConsumedEnergy=8.84775 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=76.333333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=382078
+Inter-packet-delay at the server standard deviation µs=115037
+Inter-packet-delay at the server standard deviation %=30.1084
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=74
+X: 195.271, Y: 172.337
+Tx Remaining Queue size=0
+Total transmit time=26ms
+Total receive time=858ms
+ConsumedEnergy=3.99767 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=84.250000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391846
+Inter-packet-delay at the server standard deviation µs=113760
+Inter-packet-delay at the server standard deviation %=29.0318
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=75
+X: 257.576, Y: 47.0006
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=796ms
+ConsumedEnergy=3.94842 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=63.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=410602
+Inter-packet-delay at the server standard deviation µs=106807
+Inter-packet-delay at the server standard deviation %=26.0122
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=76
+X: 294.082, Y: 92.5612
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1151ms
+ConsumedEnergy=5.24125 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=52.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393484
+Inter-packet-delay at the server standard deviation µs=92300.4
+Inter-packet-delay at the server standard deviation %=23.4572
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=77
+X: 137.86, Y: 189.918
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1410ms
+ConsumedEnergy=7.51938 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=76.769231ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409505
+Inter-packet-delay at the server standard deviation µs=58161.9
+Inter-packet-delay at the server standard deviation %=14.203
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=78
+X: 32.3278, Y: 129.66
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1751ms
+ConsumedEnergy=8.76548 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=54.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391377
+Inter-packet-delay at the server standard deviation µs=71050.3
+Inter-packet-delay at the server standard deviation %=18.1539
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=79
+X: 96.678, Y: 46.3058
+Tx Remaining Queue size=0
+Total transmit time=54ms
+Total receive time=686ms
+ConsumedEnergy=3.24969 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=140.384615ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400798
+Inter-packet-delay at the server standard deviation µs=243120
+Inter-packet-delay at the server standard deviation %=60.6591
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=80
+X: 83.2498, Y: 281.998
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=905ms
+ConsumedEnergy=4.31377 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=79.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399691
+Inter-packet-delay at the server standard deviation µs=92835.6
+Inter-packet-delay at the server standard deviation %=23.2268
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=81
+X: 329.879, Y: 78.2757
+Tx Remaining Queue size=0
+Total transmit time=43ms
+Total receive time=1332ms
+ConsumedEnergy=6.22818 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=76.692308ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=393148
+Inter-packet-delay at the server standard deviation µs=106747
+Inter-packet-delay at the server standard deviation %=27.1518
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=82
+X: 154.449, Y: 385.847
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1581ms
+ConsumedEnergy=7.17661 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=100.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=418948
+Inter-packet-delay at the server standard deviation µs=114688
+Inter-packet-delay at the server standard deviation %=27.3752
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=83
+X: 270.141, Y: 94.7814
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=1879ms
+ConsumedEnergy=8.58322 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=76.923077ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400730
+Inter-packet-delay at the server standard deviation µs=76387.6
+Inter-packet-delay at the server standard deviation %=19.0621
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=84
+X: 103.533, Y: 166.59
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=742ms
+ConsumedEnergy=3.37889 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=54.076923ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=410225
+Inter-packet-delay at the server standard deviation µs=73536
+Inter-packet-delay at the server standard deviation %=17.9258
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=85
+X: 270.246, Y: 16.1109
+Tx Remaining Queue size=0
+Total transmit time=39ms
+Total receive time=837ms
+ConsumedEnergy=2.74543 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=41.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=384111
+Inter-packet-delay at the server standard deviation µs=44038.8
+Inter-packet-delay at the server standard deviation %=11.4651
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=86
+X: 279.161, Y: 203.716
+Tx Remaining Queue size=0
+Total transmit time=34ms
+Total receive time=1208ms
+ConsumedEnergy=5.37964 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=69.461538ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400819
+Inter-packet-delay at the server standard deviation µs=55430.4
+Inter-packet-delay at the server standard deviation %=13.8293
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=87
+X: 375.928, Y: 140.684
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=1251ms
+ConsumedEnergy=6.76293 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=20.916667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409205
+Inter-packet-delay at the server standard deviation µs=47087.5
+Inter-packet-delay at the server standard deviation %=11.5071
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=88
+X: 184.907, Y: 121.463
+Tx Remaining Queue size=0
+Total transmit time=30ms
+Total receive time=1866ms
+ConsumedEnergy=8.89102 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=51.583333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=399223
+Inter-packet-delay at the server standard deviation µs=76113.1
+Inter-packet-delay at the server standard deviation %=19.0653
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=89
+X: 28.8425, Y: 243.362
+Tx Remaining Queue size=0
+Total transmit time=54ms
+Total receive time=1137ms
+ConsumedEnergy=4.35671 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=184.750000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=437303
+Inter-packet-delay at the server standard deviation µs=276880
+Inter-packet-delay at the server standard deviation %=63.3153
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=90
+X: 100.697, Y: 70.1717
+Tx Remaining Queue size=0
+Total transmit time=26ms
+Total receive time=843ms
+ConsumedEnergy=3.31877 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=51.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401016
+Inter-packet-delay at the server standard deviation µs=30900.4
+Inter-packet-delay at the server standard deviation %=7.70552
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=91
+X: 142.386, Y: 373.451
+Tx Remaining Queue size=0
+Total transmit time=43ms
+Total receive time=1314ms
+ConsumedEnergy=6.03649 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=1
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=61.230769ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=400814
+Inter-packet-delay at the server standard deviation µs=65281.1
+Inter-packet-delay at the server standard deviation %=16.2871
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=92
+X: 391.639, Y: 159.513
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1533ms
+ConsumedEnergy=6.92951 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=58.083333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409303
+Inter-packet-delay at the server standard deviation µs=74733.5
+Inter-packet-delay at the server standard deviation %=18.2587
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=93
+X: 269.333, Y: 304.196
+Tx Remaining Queue size=0
+Total transmit time=36ms
+Total receive time=1744ms
+ConsumedEnergy=8.90143 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=84.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401158
+Inter-packet-delay at the server standard deviation µs=63716.7
+Inter-packet-delay at the server standard deviation %=15.8832
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=94
+X: 221.03, Y: 369.675
+Tx Remaining Queue size=0
+Total transmit time=54ms
+Total receive time=1063ms
+ConsumedEnergy=3.89171 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=85.615385ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401360
+Inter-packet-delay at the server standard deviation µs=151658
+Inter-packet-delay at the server standard deviation %=37.7861
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=95
+X: 396.938, Y: 215.593
+Tx Remaining Queue size=0
+Total transmit time=28ms
+Total receive time=721ms
+ConsumedEnergy=2.67707 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=32.666667ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409202
+Inter-packet-delay at the server standard deviation µs=74778.5
+Inter-packet-delay at the server standard deviation %=18.2742
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=96
+X: 16.009, Y: 154.426
+Tx Remaining Queue size=0
+Total transmit time=41ms
+Total receive time=1103ms
+ConsumedEnergy=5.67576 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=66.333333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=391537
+Inter-packet-delay at the server standard deviation µs=128053
+Inter-packet-delay at the server standard deviation %=32.7052
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=97
+X: 93.9844, Y: 114.43
+Tx Remaining Queue size=0
+Total transmit time=35ms
+Total receive time=1338ms
+ConsumedEnergy=7.06273 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=57.307692ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=401850
+Inter-packet-delay at the server standard deviation µs=104877
+Inter-packet-delay at the server standard deviation %=26.0986
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit
+-----------------
+NodeType=2
+aid=98
+X: 258.981, Y: 105.871
+Tx Remaining Queue size=0
+Total transmit time=35ms
+Total receive time=1749ms
+ConsumedEnergy=8.20647 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=34.000000ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=409510
+Inter-packet-delay at the server standard deviation µs=47225.1
+Inter-packet-delay at the server standard deviation %=11.5321
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=99
+X: 40.4879, Y: 306.472
+Tx Remaining Queue size=0
+Total transmit time=53ms
+Total receive time=1112ms
+ConsumedEnergy=4.04939 mJ
+Number of packets sent=12
+Number of packets successfuly arrived to the dst=12
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=180.083333ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=419875
+Inter-packet-delay at the server standard deviation µs=162884
+Inter-packet-delay at the server standard deviation %=38.7934
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.791055Kbit
+-----------------
+NodeType=2
+aid=100
+X: 214.477, Y: 32.2041
+Tx Remaining Queue size=0
+Total transmit time=32ms
+Total receive time=948ms
+ConsumedEnergy=3.30707 mJ
+Number of packets sent=13
+Number of packets successfuly arrived to the dst=13
+Number of packets dropped=0
+Number of roundtrip packets successful=0
+Number of duplicates on server (UL)=0
+Number of duplicates on client (DL)=0
+Average packet sent/receive time=40.846154ms
+Average packet roundtrip time=-1.000000ms
+Avg jitter (RTT)=-1ms
+Average inter packet delay at server µs=408172
+Inter-packet-delay at the server standard deviation µs=69052.5
+Inter-packet-delay at the server standard deviation %=16.9175
+Average inter packet delay at client µs=0
+Inter-packet-delay at the client standard deviation µs=-1
+Inter-packet-delay at the client standard deviation %=-1
+Packet loss=0.000000%
+
+Goodput=0.856976Kbit

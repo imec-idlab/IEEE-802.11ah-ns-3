@@ -57,10 +57,12 @@ public:
     // number of drops for any packets for between STA and AP by reason that occurred at AP
     map<DropReason, long> NumberOfDropsByReasonAtAP;
 
+    long NumberOfDuplicatesAtServer = 0;
     long NumberOfSuccessfulPackets = 0;
     long NumberOfSuccessfulPacketsWithSeqHeader = 0;
     long NumberOfSentPackets = 0;
     
+    long NumberOfDuplicatesAtClient = 0;
     long NumberOfSuccessfulRoundtripPackets = 0;
     long NumberOfSuccessfulRoundtripPacketsWithSeqHeader = 0;
 

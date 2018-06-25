@@ -38,7 +38,7 @@ Configuration::Configuration(int argc, char *argv[]) {
     cmd.AddValue("IpCameraDataRate", "Data rate of the captured stream in kbps", ipcameraDataRate);
     cmd.AddValue("TCPSegmentSize", "TCP Segment size in bytes", TCPSegmentSize);
     cmd.AddValue("nControlLoops", "Number of control loops. If -1 all the stations will be in the loops if NSta is even", nControlLoops);
-
+    cmd.AddValue("PrintStats", "Print statistics of each node to ./results-coap/", PrintStats);
 /*
     cmd.AddValue("SlotFormat", "format of NRawSlotCount, -1 will auto calculate based on raw slot num", SlotFormat);
     cmd.AddValue("NRawSlotCount", "RAW slot duration, , -1 will auto calculate based on raw slot num", NRawSlotCount);

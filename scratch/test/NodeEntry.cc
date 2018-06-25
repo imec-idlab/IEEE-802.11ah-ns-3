@@ -535,6 +535,13 @@ void NodeEntry::UpdateJitter (Time timeDiff)
 }
 //Called when CoAP packet is received at CLIENT (RTT complete)
 void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
+
+	if (stats->get(this->id).NumberOfSuccessfulRoundtripPackets >= stats->get(this->id).NumberOfSuccessfulPackets)
+	{
+		std::cout << "++++++++++++++++++++++++++ BUG ACK DL+++++++++++++++++++++++++" << std::endl;
+		stats->get(this->id).NumberOfDuplicatesAtClient++;
+		return;
+	}
 	auto pCopy = packet->Copy();
 	try {
 		SeqTsHeader seqTs;
@@ -614,17 +621,24 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 	auto pCopy = packet->Copy();
 	try {
-
+		if (stats->get(this->id).NumberOfSuccessfulPackets >= stats->get(this->id).NumberOfSentPackets)
+		{
+			std::cout << "++++++++++++++++++++++++++ BUG ACK UL +++++++++++++++++++++++++" << std::endl;
+			stats->get(this->id).NumberOfDuplicatesAtServer++;
+			return;
+		}
 		SeqTsHeader seqTs;
 		pCopy->RemoveHeader(seqTs);
 		// time from the moment client sends a packet to the moment server receives it - latency
 		auto timeDiff = (Simulator::Now() - seqTs.GetTs());
 		this->timeSent = seqTs.GetTs();
-		if (NodeEntry::maxLatency < timeDiff)
-			NodeEntry::maxLatency = timeDiff;
-		if (NodeEntry::minLatency > timeDiff)
-			NodeEntry::minLatency = timeDiff;
-
+		if (this->m_nodeType == NodeEntry::CLIENT)
+		{
+			if (NodeEntry::maxLatency < timeDiff)
+				NodeEntry::maxLatency = timeDiff;
+			if (NodeEntry::minLatency > timeDiff)
+				NodeEntry::minLatency = timeDiff;
+		}
 		//if (seqTs.GetSeq() >= 0) allways true
 		stats->get(this->id).NumberOfSuccessfulPacketsWithSeqHeader++;
 		stats->get(this->id).NumberOfSuccessfulPackets++;
