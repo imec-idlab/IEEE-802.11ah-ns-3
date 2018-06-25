@@ -1853,8 +1853,7 @@ int main(int argc, char *argv[]) {
 		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
 		cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
-		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
-		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / ((config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) * 1000000.0);
 
 		std::cout << "datarate" << "\t" << "throughput" << std::endl;
 		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
