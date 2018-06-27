@@ -1,23 +1,11 @@
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=1078 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" " -j4
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-199-1.txt\"  --TrafficInterval=1324 --CycleTime=128 --nControlLoops=1  " -j4
 
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=931 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" " -j4
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-198-2.txt\"  --TrafficInterval=1470 --CycleTime=128 --nControlLoops=1  " -j4
 
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=683 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" " -j4
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-196-4.txt\"  --TrafficInterval=1894 --CycleTime=128 --nControlLoops=1  " -j4
 
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=931 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=400" -j4
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-194-6.txt\"  --TrafficInterval=2685 --CycleTime=128 --nControlLoops=1  " -j4
 
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=1200 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=400" -j4
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-192-8.txt\"  --TrafficInterval=4682 --CycleTime=128 --nControlLoops=1  " -j4
 
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=2000 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=400" -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=5000 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=400" -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=931 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=100 --DataMode=\"MCS2_8\" " -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=1200 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=100 --DataMode=\"MCS2_8\" " -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=2000 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=100 --DataMode=\"MCS2_8\" " -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=5000 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=100 --DataMode=\"MCS2_8\" " -j4
-
-#time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --TrafficType=\"coap\" --TrafficInterval=931 --nControlLoops=0 --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-200-1-5-102400-0-31.txt\" --rho=100 --DataMode=\"MCS2_8\" "
+time ./waf --run "test --BeaconInterval=102400 --pagePeriod=1 --pageSliceLength=1 --pageSliceCount=0 --simulationTime=500 --payloadSize=64 --rho=400 --TrafficType=\"coap\" --PrintStats=true --RAWConfigFile=\"./OptimalRawGroup/RawConfig-loops-wired/RawConfig-190-10.txt\"  --TrafficInterval=19456 --CycleTime=128 --nControlLoops=1  " -j4
