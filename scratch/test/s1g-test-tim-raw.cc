@@ -1127,17 +1127,33 @@ void configureUDPEchoClients() {
  *
  * */
 void configureCoapServer() {
+	// server to be destination for sensor nodes is at the AP (UL traffic only)
 	CoapServerHelper myServer(5683);
-	for (uint32_t i = 0; i < config.nControlLoops*2; i += 2)
+	/*for (uint32_t i = 0; i < config.nControlLoops*2; i += 2)
 	{
 		serverApp = myServer.Install(wifiStaNode.Get(i));
 		nodes[i]->m_nodeType = NodeEntry::SERVER;
 		serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
 		serverApp.Start(Seconds(0));
-	}
+	}*/
 	serverApp = myServer.Install(wifiApNode.Get(0));
 	serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
 	serverApp.Start(Seconds(0));
+
+	// server to be the destination for coap clients - wired server to the AP
+	// Note: externalNodes.size () = 2; externalNodes[0] is coap server; externalNodes[1] is AP
+	if (config.nControlLoops > 0)
+	{
+		CoapServerHelper clServer(5683);
+		clServer.SetAttribute("ProcessingDelay", TimeValue (MilliSeconds (10)));
+		for (int i = 0; i < config.nControlLoops; i++)
+		{
+			serverApp = clServer.Install(externalNodes.Get(i));
+			serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
+			serverApp.Start(Seconds(0));
+			//serverApp.Stop (Seconds (config.simulationTime));
+		}
+	}
 }
 
 void configureCoapClients()
@@ -1147,16 +1163,19 @@ void configureCoapClients()
 		if (!config.useV6)
 		{
 			// Configure client (cpntroller) that sends PUT control value to the server (process = sensor+actuator)
-			if (i % 2 == 0 && i < 2*config.nControlLoops)
+			if (/*i % 2 == 0 &&*/i < 1*config.nControlLoops) // 1 wifi link so 1* instead of 2*, and no i % 2 == 0 &&
 			{
 				// address of remote node n0 (server)
-				Ptr<Ipv4> ip = wifiStaNode.Get(i)->GetObject<Ipv4>();
+				/*Ptr<Ipv4> ip = wifiStaNode.Get(i)->GetObject<Ipv4>();
 				Ipv4InterfaceAddress iAddr = ip->GetAddress(1,0);
 				CoapClientHelper clientHelper (iAddr.GetLocal(), 5683);
 				configureCoapClientHelper(clientHelper, i+1);
-				nodes[i+1]->m_nodeType = NodeEntry::CLIENT;
+				nodes[i+1]->m_nodeType = NodeEntry::CLIENT;*/
+				CoapClientHelper clientHelper (externalInterfaces.GetAddress(i), 5683);
+				configureCoapClientHelper(clientHelper, i);
+				nodes[i]->m_nodeType = NodeEntry::CLIENT;
 			}
-			else if (i >= 2*config.nControlLoops)
+			else if (i >= 1*config.nControlLoops)// 1 wifi link so 1* instead of 2*
 			{
 				// SENSORS sending uplink traffic to AP
 				//CoapClientHelper clientHelperDummy (externalInterfaces.GetAddress(0), 5683); //address of AP
@@ -1199,8 +1218,8 @@ void configureCoapClients()
 				CoapClientHelper clientHelperDummy (externalInterfaces6.GetAddress(0, 0), 5683); //address of AP
 				//std::cout << " external node address is " << externalInterfaces.GetAddress(0) << std::endl;
 				clientHelperDummy.SetAttribute("MaxPackets", config.maxNumberOfPackets); //4294967295u
-				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval*2)));
-				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval*2)));
+				clientHelperDummy.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
+				clientHelperDummy.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficInterval/10)));
 				clientHelperDummy.SetAttribute("PayloadSize", UintegerValue(config.payloadSize));
 				clientHelperDummy.SetAttribute("RequestMethod", UintegerValue(1));
 				clientHelperDummy.SetAttribute("MessageType", UintegerValue(1));
@@ -1221,20 +1240,20 @@ void configureCoapClients()
 
 void configureCoapClientHelper(CoapClientHelper& clientHelper, uint32_t n)
 {
-	clientHelper.SetAttribute("MaxPackets", config.maxNumberOfPackets);//4294967295u
-	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.trafficInterval)));
-	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.trafficIntervalDeviation)));
+	clientHelper.SetAttribute("MaxPackets", config.maxNumberOfPackets);
+	clientHelper.SetAttribute("Interval", TimeValue(MilliSeconds(config.cycleTime)));
+	clientHelper.SetAttribute("IntervalDeviation", TimeValue(MilliSeconds(config.cycleTime/10)));
 	clientHelper.SetAttribute("PayloadSize", UintegerValue(config.payloadSize));
 	clientHelper.SetAttribute("RequestMethod", UintegerValue(3));
 	clientHelper.SetAttribute("MessageType", UintegerValue(0));
-
+	clientHelper.SetAttribute("CooldownTime", TimeValue(Seconds(config.CoolDownPeriod)));
 
 	Ptr<UniformRandomVariable> m_rv = CreateObject<UniformRandomVariable> ();
 
 	ApplicationContainer clientApp = clientHelper.Install(wifiStaNode.Get(n));
 	clientApp.Get(0)->TraceConnectWithoutContext("Tx", MakeCallback(&NodeEntry::OnCoapPacketSent, nodes[n]));
 	clientApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&NodeEntry::OnCoapPacketReceived, nodes[n]));
-	double random = m_rv->GetValue(0, config.trafficInterval);
+	double random = m_rv->GetValue(0, config.cycleTime);
 	clientApp.Start(MilliSeconds(0+random));
 	clientApp.Stop(Seconds(config.simulationTime));
 
@@ -1255,6 +1274,7 @@ void printStatsToFile (bool print)
 	double sTotalDeliveredPackets (0), sTotalSentPackets(0), clTotalSentPackets(0), clTotalDeliveredPackets (0), clTotalRtPackets (0);
 	double sTotalDuplicates (0), clTotalDuplicates (0);
 	double sTotalCollisions (0), clTotalCollisions (0);
+	//Time clTotalIpdClient (0), clTotalIpdServer (0);
 	for (uint32_t i = 0; i < config.Nsta; i++)
 	{
 		if (nodes[i]->m_nodeType == NodeEntry::CLIENT)
@@ -1264,6 +1284,8 @@ void printStatsToFile (bool print)
 			clTotalRtPackets += stats.get(i).NumberOfSuccessfulRoundtripPackets;
 			clTotalDuplicates += stats.get(i).NumberOfDuplicatesAtClient + stats.get(i).NumberOfDuplicatesAtServer;
 			clTotalCollisions += stats.get(i).NumberOfCollisions;
+			//clTotalIpdClient += std::accumulate(stats.get(i).m_interPacketDelayClient.begin(), stats.get(i).m_interPacketDelayClient.end(), 0);
+			//clTotalIpdServer += std::accumulate(stats.get(i).m_interPacketDelayServer.begin(), stats.get(i).m_interPacketDelayServer.end(), 0);
 		}
 		else if (nodes[i]->m_nodeType == NodeEntry::DUMMY)
 		{
@@ -1273,6 +1295,8 @@ void printStatsToFile (bool print)
 			sTotalCollisions += stats.get(i).NumberOfCollisions;
 		}
 	}
+	//clTotalIpdClient = clTotalIpdClient / clTotalRtPackets;
+	//clTotalIpdServer = clTotalIpdServer / clTotalRtPackets;
 	double sensorThroughput = (sTotalDeliveredPackets + sTotalDuplicates) * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
 	double sensorPacketLoss = -1;
 	if (sTotalSentPackets > 0) sensorPacketLoss = (1 - sTotalDeliveredPackets / sTotalSentPackets) * 100;
@@ -1285,6 +1309,8 @@ void printStatsToFile (bool print)
 	os << "clThroughput kbps=" << clThroughput << "\n";
 	os << "clPacketLoss %=" << clPacketLoss << "\n";
 	os << "clNumberOfCollisions=" << clTotalCollisions << "\n";
+	//os << "clAverageIpdClients ms=" << clTotalIpdClient.GetMilliSeconds() / clTotalRtPackets;
+	//os << "clAverageIpdServers ms=" << clTotalIpdServer.GetMilliSeconds() / clTotalRtPackets;
 	os << "cl global max Latency (C->S) µs=" << std::to_string(NodeEntry::maxLatency.GetMicroSeconds())<< "\n"; // CORRECT
 	os << "cl global min Latency (C->S) µs=" << std::to_string(NodeEntry::minLatency.GetMicroSeconds())<< "\n"; // CORRECT
 
@@ -1318,7 +1344,20 @@ void printStatsToFile (bool print)
 			os << "Inter-packet-delay at the client standard deviation %=" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient) << "\n";
 			//calculate the deviation between inter packet arrival times at the server
 			os << "Packet loss=" << std::to_string(stats.get(i).GetPacketLoss(config.trafficType)) << "%" << endl; //CORRECT
-
+			if (nodes[i]->m_nodeType == NodeEntry::CLIENT)
+			{
+				os << "\n";
+				os << "Inter-packet delay at client ms:\n";
+				for (std::vector<Time>::const_iterator t = stats.get(i).m_interPacketDelayClient.begin(); t != stats.get(i).m_interPacketDelayClient.end(); ++t)
+					os << (*t).GetMilliSeconds()<< " ";
+				os << endl;
+				os << "Inter-packet delay at server:\n";
+				for (std::vector<Time>::const_iterator t = stats.get(i).m_interPacketDelayServer.begin(); t != stats.get(i).m_interPacketDelayServer.end(); ++t)
+					os << (*t).GetMilliSeconds()<< " ";
+				os << endl;
+				os << "Inter-packet delay deviation at client=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayClient) << "==" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient) << endl;
+				os << "Inter-packet delay deviation at server=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayServer) << "==" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer) << endl;
+			}
 			os << "\n";
 			os << "Goodput=" << (stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)) << "Kbit" << endl; //CORRECT
 		}
@@ -1467,8 +1506,8 @@ int main(int argc, char *argv[]) {
 	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-	//LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
-	//LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
+	LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
+	LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
 
 	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
 	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
@@ -1493,7 +1532,7 @@ int main(int argc, char *argv[]) {
 					+ std::to_string(config.ipcameraDataRate) + "Kbps_"
 					+ std::to_string(config.BeaconInterval) + "BI" + ".nss";
 	}
-	else if (config.trafficType == "udp" || config.trafficType == "udpecho" || config.trafficType == "coap")
+	else if (config.trafficType == "udp" || config.trafficType == "udpecho")
 	{
 	config.NSSFile = config.trafficType + "_"
 			+ std::to_string(config.Nsta) + "sta_"
@@ -1508,7 +1547,22 @@ int main(int argc, char *argv[]) {
 			+ config.rho + "rho"
 			+ ".nss";
 	}
-
+	else if (config.trafficType == "coap")
+		{
+		config.NSSFile = config.trafficType + "_"
+				+ std::to_string(config.Nsta) + "sta_"
+				+ std::to_string(config.NGroup) + "Group_"
+				+ std::to_string(config.NRawSlotNum) + "slots_"
+				+ std::to_string(config.trafficInterval) + "s_"
+				+ std::to_string(config.BeaconInterval) + "BI_"
+				+ std::to_string(config.simulationTime) + "Tsim_"
+				+ std::to_string(config.seed) + "seed_"
+				+ config.DataMode + "_"
+				+ config.rho + "rho_"
+				+ std::to_string(config.cycleTime) + "Tl_"
+				+ std::to_string(config.nControlLoops) + "loops"
+				+ ".nss";
+		}
 	stats = Statistics(config.Nsta);
 	eventManager = SimulationEventManager(config.visualizerIP, config.visualizerPort, config.NSSFile);
 	uint32_t totalRawGroups(0);
@@ -1686,16 +1740,21 @@ int main(int argc, char *argv[]) {
 	stack.Install(wifiApNode);
 	stack.Install(wifiStaNode);
 
-	if (config.trafficType == "coap")
+	// wired CoAP server
+	if (config.trafficType == "coap" && config.nControlLoops > 0)
 	{
-		externalNodes.Create(1);
+		externalNodes.Create(config.nControlLoops);
 		externalNodes.Add(wifiApNode.Get(0));
-		PointToPointHelper pointToPoint;
-		pointToPoint.SetDeviceAttribute ("DataRate", StringValue ("5Mbps"));
-		pointToPoint.SetChannelAttribute ("Delay", StringValue ("2ms"));
-		externalDevices = pointToPoint.Install (externalNodes);
+		CsmaHelper ethernet;
+		ethernet.SetChannelAttribute ("DataRate", StringValue ("100Mbps"));
+		ethernet.SetChannelAttribute ("Delay", TimeValue (NanoSeconds (6560)));
+		externalDevices = ethernet.Install (externalNodes);
 		InternetStackHelper stack;
-		stack.Install(externalNodes.Get(0));
+		for (auto it = externalNodes.Begin(); it != std::prev(externalNodes.End()); ++it)
+		{
+			stack.Install(*it);
+		}
+
 	}
 
 	Ipv4AddressHelper address;
@@ -1704,16 +1763,10 @@ int main(int argc, char *argv[]) {
 	staNodeInterface = address.Assign(staDevice);
 	apNodeInterface = address.Assign(apDevice);
 
-	if (config.trafficType == "coap")
+	if (config.trafficType == "coap"  && config.nControlLoops > 0)
 	{
 		address.SetBase("169.200.0.0", "255.255.0.0");
 		externalInterfaces = address.Assign (externalDevices);
-
-		CoapServerHelper myServer(5683);
-		serverApp = myServer.Install(externalNodes.Get(0));
-		//serverApp.Get(0)->TraceConnectWithoutContext("Rx", MakeCallback(&coapPacketReceivedAtServer));
-		serverApp.Start(Seconds(0));
-		serverApp.Stop (Seconds (config.simulationTime));
 	}
 	//trace association
 	std::cout << "Configuring trace sources..." << std::endl;
@@ -1807,12 +1860,16 @@ int main(int argc, char *argv[]) {
 	printStatsToFile (config.PrintStats);
 
 	// Visualizer throughput
-	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0, totalPacketsEchoed = 0;
+	int pay = 0, totalSuccessfulPackets = 0, totalSentPackets = 0, totalPacketsEchoed = 0, rtPacketsDelivered = 0;
 	for (int i = 0; i < config.Nsta; i++)
 	{
 		totalSuccessfulPackets += stats.get(i).NumberOfSuccessfulPackets;
 		totalSentPackets += stats.get(i).NumberOfSentPackets;
 		totalPacketsEchoed += stats.get(i).NumberOfSuccessfulRoundtripPackets;
+		if (config.nControlLoops > 0 && i < config.nControlLoops)
+		{
+			rtPacketsDelivered += stats.get(i).NumberOfSuccessfulPackets;
+		}
 		pay += stats.get(i).TotalPacketPayloadSize;
 		cout << i << " sent: " << stats.get(i).NumberOfSentPackets
 				<< "\t" << "; delivered: " << stats.get(i).NumberOfSuccessfulPackets
@@ -1867,20 +1924,20 @@ int main(int argc, char *argv[]) {
 		cout << "totalPacketsDelivered " << totalSuccessfulPackets << endl;
 		cout << "totalPacketsEchoed " << totalPacketsEchoed << endl;
 		cout << "UL packets lost " << totalSentPackets - totalSuccessfulPackets << endl;
-		cout << "DL packets lost " << totalSuccessfulPackets - totalPacketsEchoed << endl;
-		cout << "Total packets lost " << totalSentPackets - totalPacketsEchoed << endl;
+		cout << "DL packets lost " << rtPacketsDelivered - totalPacketsEchoed << endl;
+		cout << "Total packets lost " << totalSentPackets - totalSuccessfulPackets + rtPacketsDelivered - totalPacketsEchoed << endl;
 
 		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
 				cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
-		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / (config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / ((config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) * 1000000.0);
 		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
 
 		std::cout << "datarate" << "\t" << "throughput" << std::endl;
 		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
 	}
 	cout << "total packet loss % "
-			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
+			<< 100 - 100. * (totalSuccessfulPackets + totalPacketsEchoed) / (totalSentPackets + rtPacketsDelivered) << endl;
 
 	Simulator::Destroy();
 

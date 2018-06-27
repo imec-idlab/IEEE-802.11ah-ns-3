@@ -117,6 +117,7 @@ private:
    */
   ssize_t Send (uint8_t *data, size_t datalen);
   void HandleRead (Ptr<Socket> socket);
+  void DoStopApplication (void);
   uint32_t m_count; //!< Maximum number of packets the application will send
   Time m_interval; //!< Packet inter-send time
   Time m_intervalDeviation;
@@ -145,7 +146,7 @@ private:
   static uint8_t m_tklPrevious;
   uint8_t m_tokenLength;
   uint64_t m_token;
-
+  Time m_cooldownTime;
 };
 
 } // namespace ns3

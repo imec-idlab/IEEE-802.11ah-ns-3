@@ -538,7 +538,7 @@ void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
 
 	if (stats->get(this->id).NumberOfSuccessfulRoundtripPackets >= stats->get(this->id).NumberOfSuccessfulPackets)
 	{
-		std::cout << "++++++++++++++++++++++++++ BUG ACK DL+++++++++++++++++++++++++" << std::endl;
+		std::cout << "++++++++++++++++++++++++++ BUG ACK DL+++++++++++++++++++++++++ " << Simulator::Now().GetSeconds() << std::endl;
 		stats->get(this->id).NumberOfDuplicatesAtClient++;
 		return;
 	}
@@ -623,7 +623,7 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 	try {
 		if (stats->get(this->id).NumberOfSuccessfulPackets >= stats->get(this->id).NumberOfSentPackets)
 		{
-			//std::cout << "++++++++++++++++++++++++++ BUG ACK UL +++++++++++++++++++++++++" << std::endl;
+			std::cout << "++++++++++++++++++++++++++ BUG ACK UL +++++++++++++++++++++++++ " << Simulator::Now().GetSeconds() << std::endl;
 			stats->get(this->id).NumberOfDuplicatesAtServer++;
 			return;
 		}

@@ -29,7 +29,7 @@ struct Configuration {
 	uint32_t nRps;						// Ordinal number of current RPS element; RPS Index
 	uint64_t totalRawSlots = 0;			// Total number of RAW slots in all RAW groups in all RPS elements
 
-	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u //ami
+	UintegerValue maxNumberOfPackets = 4294967295u; ///4294967295u
 	string trafficType = "udpecho"; // important - udp is considered to be only uplink in NodeStatistics::GetPacketLoss tcpipcamera tcpfirmware
 
 	// Page slicing
@@ -94,6 +94,7 @@ struct Configuration {
 	int nControlLoops = -1;//  = 100;
 	//uint32_t coapPayloadSize = 0;//  = 15;
 
+	uint32_t cycleTime;
 	uint32_t trafficInterval = 5000; //ms 55,110,210,310,410,515,615,720,820,950,1024 beacon interval *4
 	uint32_t trafficIntervalDeviation = 1000; //1000 discuss with Jeroen
 
@@ -134,7 +135,7 @@ struct Configuration {
 
 	uint16_t MaxTimeOfPacketsInQueue = 100; //100
 
-	uint16_t CoolDownPeriod = 4; //60
+	uint16_t CoolDownPeriod = 3; //60
 
 	Configuration();
 	Configuration(int argc, char *argv[]);

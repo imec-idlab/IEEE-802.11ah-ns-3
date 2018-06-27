@@ -85,7 +85,7 @@ CoapServer::CoapServer() : m_lossCounter(0) {
 	m_received = 0;
 	m_sent = 0;
 	m_coapCtx = NULL;
-	m_sendEvent = EventId ();
+	//m_sendEvent = EventId ();
 	m_fromSocket = 0;
 }
 
@@ -346,7 +346,7 @@ void CoapServer::StopApplication() {
 		m_socket6->Close ();
 		m_socket6->SetRecvCallback(MakeNullCallback<void, Ptr<Socket> >());
 	}
-	Simulator::Cancel (m_sendEvent);
+	//Simulator::Cancel (m_sendEvent);
 }
 
 void
@@ -383,8 +383,8 @@ CoapServer::coap_transaction_id(const coap_pdu_t *pdu, coap_tid_t *id) {
 	*id = (((h[0] << 8) | h[1]) ^ ((h[2] << 8) | h[3])) & INT_MAX;
 }
 
-ssize_t CoapServer::CoapHandleMessage(/*Ptr<Packet> packet*/){
-	Ptr<Packet> packet = m_packet;
+ssize_t CoapServer::CoapHandleMessage(Ptr<Packet> packet){
+	//Ptr<Packet> packet = m_packet;
 	uint32_t msg_len (packet->GetSize());
 	ssize_t bytesRead(0);
 	uint8_t* msg = new uint8_t[msg_len];
@@ -442,7 +442,7 @@ ssize_t
 CoapServer::Send (uint8_t *data, size_t datalen)
 {
 	NS_LOG_FUNCTION (this);
-	NS_ASSERT (m_sendEvent.IsExpired ());
+	//NS_ASSERT (m_sendEvent.IsExpired ());
 
 	Ptr<Packet> p = Create<Packet> (data, datalen);
 
@@ -494,9 +494,33 @@ CoapServer::Send (uint8_t *data, size_t datalen)
 	return bytesSent;
 }
 
+//int CoapServer::processingPackets = 0;
 // Read from ns3 socket
 void CoapServer::HandleRead(Ptr<Socket> socket) {
 	NS_LOG_FUNCTION(this << socket);
+
+	Ipv4InterfaceAddress iAddr = (GetNode()->GetObject<Ipv4>())->GetAddress(1,0);
+	std::stringstream myaddr;
+	myaddr << Ipv4Address::ConvertFrom (iAddr.GetLocal());
+	int hp = 0;
+	/*if (m_sendEvent.IsRunning())
+	{
+		if (hp == 0)
+		{
+			if (InetSocketAddress::IsMatchingType (m_from))
+			{
+				NS_LOG_UNCOND (Simulator::Now().GetSeconds() << " s: Server " << myaddr.str() << " received a packet while processing the previous one. Waiting to process the previous one...");
+			}
+			else if (Inet6SocketAddress::IsMatchingType (m_from))
+			{
+				NS_LOG_UNCOND (Simulator::Now().GetSeconds() << " s: Server received a packet while processing the previous one. Waiting to process the previous one...");
+			}
+			hp++;
+		}
+		Simulator::Schedule (MilliSeconds (1), &CoapServer::HandleRead, this, socket);
+		return;
+	}*/
+
 	m_fromSocket = socket;
 	Ptr<Packet> packet;
 	while ((packet = socket->RecvFrom(m_from))) {
@@ -528,10 +552,11 @@ void CoapServer::HandleRead(Ptr<Socket> socket) {
 		packet->RemoveAllByteTags ();
 
 		//m_lossCounter.NotifyReceived(currentSequenceNumber);
-		m_packet = packet;
+		//m_packet = packet;
 		m_received++;
+		Simulator::Schedule(m_processingDelay, &CoapServer::CoapHandleMessage, this, packet);
 
-		m_sendEvent = Simulator::Schedule (m_processingDelay, &CoapServer::CoapHandleMessage, this);
+		//m_sendEvent = Simulator::Schedule (m_processingDelay, &CoapServer::CoapHandleMessage, this, packet);
 
 		/*if (!this->CoapHandleMessage(packet)){
 			NS_LOG_ERROR("Cannot handle message. Abort.");

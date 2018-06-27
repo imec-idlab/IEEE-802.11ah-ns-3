@@ -32,8 +32,8 @@
 #include "TCPFirmwareServer.h"
 #include "TCPSensorClient.h"
 #include "TCPSensorServer.h"
-#include "ns3/point-to-point-module.h"
-
+#include "ns3/csma-module.h"
+#include <iterator> //for std::prev
 
 using namespace std;
 using namespace ns3;

@@ -124,7 +124,7 @@ private:
    * \param socket the socket the packet was received to.
    */
   void HandleRead (Ptr<Socket> socket);
-  ssize_t CoapHandleMessage(/*Ptr<Packet> packet*/ void);
+  ssize_t CoapHandleMessage(Ptr<Packet> packet); //void
   ssize_t Send (uint8_t *data, size_t datalen);
   void coap_transaction_id(const coap_pdu_t *pdu, coap_tid_t *id);
 #ifdef __GNUC__
@@ -192,6 +192,7 @@ private:
   // Control loop atrributes
   static double m_controlValue;
   static double m_sensorValue;
+  //static int processingPackets;
 };
 
 } // namespace ns3
