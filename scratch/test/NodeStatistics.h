@@ -102,7 +102,7 @@ public:
     Time APTotalTimeRemainingWhenSendingPacketInSameSlot;
 
     Time getAverageRemainingWhenAPSendingPacketInSameSlot();
-
+    Time EndApplicationTime = Time ();
     long NumberOfCollisions = 0;
     long NumberOfTransmissionsCancelledDueToCrossingRAWBoundary = 0;
 

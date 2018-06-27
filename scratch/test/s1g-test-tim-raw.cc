@@ -1268,7 +1268,7 @@ void printStatsToFile (bool print)
 	string path = "./results-coap/" + config.NSSFile;
 	os.open(path.c_str(), ios::out | ios::trunc);
 
-	os << "Total simulation time ms=" << std::to_string(config.simulationTime + config.CoolDownPeriod) << endl;
+	os << "Total simulation time ms=" << std::to_string(stats.EndApplicationTime.GetSeconds()) << endl;
 	os << "Time every station associated ms=" << std::to_string(stats.TimeWhenEverySTAIsAssociated.GetMilliSeconds()) << endl;
 	os << "\n";
 	double sTotalDeliveredPackets (0), sTotalSentPackets(0), clTotalSentPackets(0), clTotalDeliveredPackets (0), clTotalRtPackets (0);
@@ -1297,13 +1297,13 @@ void printStatsToFile (bool print)
 	}
 	//clTotalIpdClient = clTotalIpdClient / clTotalRtPackets;
 	//clTotalIpdServer = clTotalIpdServer / clTotalRtPackets;
-	double sensorThroughput = (sTotalDeliveredPackets + sTotalDuplicates) * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+	double sensorThroughput = (sTotalDeliveredPackets + sTotalDuplicates) * config.payloadSize * 8 / (stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
 	double sensorPacketLoss = -1;
 	if (sTotalSentPackets > 0) sensorPacketLoss = (1 - sTotalDeliveredPackets / sTotalSentPackets) * 100;
 	os << "sensorThroughput kbps=" << sensorThroughput << "\n";
 	os << "sensorPacketLoss %=" << sensorPacketLoss << "\n";
 	os << "sensorNumberOfCollisions=" << sTotalCollisions << "\n";
-	double clThroughput = (clTotalDeliveredPackets + clTotalRtPackets + clTotalDuplicates) * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
+	double clThroughput = (clTotalDeliveredPackets + clTotalRtPackets + clTotalDuplicates) * config.payloadSize * 8 / (stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) / 1000.0;
 	double clPacketLoss = -1;
 		if (clTotalDeliveredPackets > 0) clPacketLoss = (clTotalSentPackets - clTotalRtPackets) / (float)(clTotalSentPackets + clTotalDeliveredPackets);
 	os << "clThroughput kbps=" << clThroughput << "\n";
@@ -1357,9 +1357,15 @@ void printStatsToFile (bool print)
 				os << endl;
 				os << "Inter-packet delay deviation at client=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayClient) << "==" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayClient) << endl;
 				os << "Inter-packet delay deviation at server=" << stats.get(i).GetInterPacketDelayDeviation(stats.get(i).m_interPacketDelayServer) << "==" << stats.get(i).GetInterPacketDelayDeviationPercentage(stats.get(i).m_interPacketDelayServer) << endl;
+				os << "\n";
+				os << "Goodput=" << (stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)) << "Kbit" << endl; //CORRECT
 			}
-			os << "\n";
-			os << "Goodput=" << (stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)) << "Kbit" << endl; //CORRECT
+			else
+			{
+				os << "\n";
+				os << "Goodput=" << (stats.get(i).getGoodputKbit(stats.TimeWhenEverySTAIsAssociated)) << "Kbit" << endl; //CORRECT
+			}
+
 		}
 	}
 	os.close();
@@ -1918,8 +1924,8 @@ int main(int argc, char *argv[]) {
 	else if (config.trafficType == "coap")
 	{
 		double ulThroughput = 0, dlThroughput = 0;
-		ulThroughput = totalSuccessfulPackets * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
-		dlThroughput = totalPacketsEchoed * config.payloadSize * 8 / (Simulator::Now().GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		ulThroughput = totalSuccessfulPackets * config.payloadSize * 8 / (stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
+		dlThroughput = totalPacketsEchoed * config.payloadSize * 8 / (stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds() * 1000000.0);
 		cout << "totalPacketsSent " << totalSentPackets << endl;
 		cout << "totalPacketsDelivered " << totalSuccessfulPackets << endl;
 		cout << "totalPacketsEchoed " << totalPacketsEchoed << endl;
@@ -1930,10 +1936,9 @@ int main(int argc, char *argv[]) {
 		/*cout << "uplink throughput Mbit/s " << ulThroughput << endl;
 				cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
-		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / ((config.simulationTime + config.CoolDownPeriod - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) * 1000000.0);
-		cout << "total throughput Kbit/s " << throughput * 1000 << endl;
+		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / ((stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) * 1000000.0);
 
-		std::cout << "datarate" << "\t" << "throughput" << std::endl;
+		std::cout << "datarate" << "\t" << "throughput Kbit/s" << std::endl;
 		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
 	}
 	cout << "total packet loss % "

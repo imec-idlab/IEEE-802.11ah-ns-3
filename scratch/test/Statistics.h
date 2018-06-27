@@ -13,6 +13,7 @@ private:
 public:
     Time TotalSimulationTime;
     Time TimeWhenEverySTAIsAssociated;
+    Time EndApplicationTime;
     
     Statistics();
     Statistics(int nrOfNodes);

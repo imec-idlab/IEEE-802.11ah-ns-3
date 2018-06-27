@@ -2,10 +2,12 @@
 
 Statistics::Statistics() {
 	this->TimeWhenEverySTAIsAssociated = Time();
+	this->EndApplicationTime = Time ();
 }
 
 Statistics::Statistics(int nrOfNodes) {
 	this->TimeWhenEverySTAIsAssociated = Time();
+	this->EndApplicationTime = Time ();
     for(int i = 0; i < nrOfNodes; i++)
         this->nodeStatistics.push_back(NodeStatistics());    
 }

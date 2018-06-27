@@ -535,7 +535,8 @@ void NodeEntry::UpdateJitter (Time timeDiff)
 }
 //Called when CoAP packet is received at CLIENT (RTT complete)
 void NodeEntry::OnCoapPacketReceived(Ptr<const Packet> packet, Address from) {
-
+	stats->EndApplicationTime = Simulator::Now();
+	stats->get(this->id).EndApplicationTime = Simulator::Now();
 	if (stats->get(this->id).NumberOfSuccessfulRoundtripPackets >= stats->get(this->id).NumberOfSuccessfulPackets)
 	{
 		std::cout << "++++++++++++++++++++++++++ BUG ACK DL+++++++++++++++++++++++++ " << Simulator::Now().GetSeconds() << std::endl;
@@ -619,6 +620,7 @@ void NodeEntry::OnUdpPacketReceivedAtAP(Ptr<const Packet> packet) {
 
 
 void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
+	stats->get(this->id).EndApplicationTime = Simulator::Now();
 	auto pCopy = packet->Copy();
 	try {
 		if (stats->get(this->id).NumberOfSuccessfulPackets >= stats->get(this->id).NumberOfSentPackets)
@@ -674,7 +676,7 @@ void NodeEntry::OnCoapPacketReceivedAtServer(Ptr<const Packet> packet) {
 			stats->get(this->id).m_prevPacketTimeServer = newNow;
 
 		}
-		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize() - 4 - 7; //deduct coap hdr & opts, only payload here
+		stats->get(this->id).TotalPacketPayloadSize += packet->GetSize(); //deduct coap hdr4 & opts7, only payload here
 		//std::cout << packet->GetSize() << std::endl;
 	} catch (std::runtime_error e) {
 		// packet fragmentation, unable to get header
