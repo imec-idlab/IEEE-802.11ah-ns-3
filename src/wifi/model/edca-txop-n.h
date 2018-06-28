@@ -112,9 +112,6 @@ public:
     uint16_t nrOfTransmissionsDuringRaw = 0;
     bool m_crossSlotBoundaryAllowed;
 
-    Time m_rawDuration;
-    Time m_rawStartedAt;
-
   /**
    * Set MacLow associated with this EdcaTxopN.
    *
@@ -497,10 +494,39 @@ public:
   void SetaccessList (std::map<Mac48Address, bool> list);
   void SetsleepList (std::map<Mac48Address, bool> list);
 
-
+  /*
+   * The static setters use the fact that
+   * private static methods return a non-const reference
+   * so we can assign to it
+   * */
+  static void SetRawStartTime (const Time start);
+  static void SetRawSlotDuration (const Time duration);
+  static void SetCrossSlotBoundary (const bool csb);
+  /*
+   * True getters
+   * Return const Time&, so we cannot assign to it
+   * */
+  static const Time& GetRawStartTime (void);
+  static const Time& GetRawSlotDuration (void);
+  static const bool& GetCrossSlotBoundary (void);
 private:
     TracedCallback<double, double > m_AccessQuest_record;
-    
+
+    static Time& rawDuration()    {
+    	static Time m_rawDuration = Time ();
+    	return m_rawDuration;
+    };
+
+    static Time& rawStartTime ()    {
+    	static Time m_rawStartedAt = Time ();
+    	return m_rawStartedAt;
+    };
+
+    static bool& crossSlotBoundary ()    {
+    	static bool m_csb = true;
+    	return m_csb;
+    };
+
   void DoInitialize ();
   /**
    * This functions are used only to correctly set addresses in a-msdu subframe.
@@ -602,6 +628,8 @@ private:
   TracedCallback<Time,Time> m_transmissionWillCrossRAWBoundary;
 
   std::map<Mac48Address, bool> m_sleepList;
+
+
 };
 
 } //namespace ns3

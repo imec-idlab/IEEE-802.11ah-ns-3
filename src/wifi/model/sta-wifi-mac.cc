@@ -877,6 +877,12 @@ StaWifiMac::RawSlotStartBackoff (void)
     //stationrawslot = true;
     //StartRawbackoff();
     Simulator::Schedule(MicroSeconds(160), &StaWifiMac::StartRawbackoff, this);
+    //m_currentslotDuration -= MicroSeconds(160);
+    /*std::cout << "-+-+-+-++-************* SetRawStartTime = " << Simulator::Now().GetMicroSeconds() << std::endl;
+    m_edca.find (AC_VO)->second->SetRawStartTime (Simulator::Now());
+    m_edca.find (AC_VI)->second->SetRawStartTime (Simulator::Now());
+    m_edca.find (AC_BE)->second->SetRawStartTime (Simulator::Now());
+    m_edca.find (AC_BK)->second->SetRawStartTime (Simulator::Now());*/
 }
 
 void
