@@ -27,6 +27,7 @@
 #include "ns3/attribute-helper.h"
 #include "ns3/wifi-information-element.h"
 #include "ns3/vector.h"
+#include "ns3/nstime.h"
 
 
 namespace ns3 {
@@ -68,7 +69,7 @@ public:
           uint8_t GetSlotCrossBoundary (void) const;
           uint16_t GetSlotDurationCount (void) const;
           uint16_t GetSlotNum (void) const;
-           
+          Time GetSlotDuration (void) const;
           uint8_t GetRawStart (void) const;
           uint32_t GetRawGroup (void) const;
           uint16_t GetChannelInd (void) const;

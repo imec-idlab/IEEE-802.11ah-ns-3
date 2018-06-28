@@ -143,6 +143,12 @@ RPS::RawAssignment::GetSlotNum (void) const
    return m_slotNum;
 }
 
+Time
+RPS::RawAssignment::GetSlotDuration (void) const
+{
+	return MicroSeconds (m_slotDurationCount * 120 + 500);
+}
+
 uint16_t
 RPS::RawAssignment::GetRawSlot (void)
 {

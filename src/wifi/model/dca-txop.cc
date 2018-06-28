@@ -535,14 +535,14 @@ DcaTxop::NotifyAccessGranted (void)
       params.DisableAck ();
       params.DisableNextData ();
       if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-      /*
+
       Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
 
 	  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
-		  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+		  NS_LOG_UNCOND("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 		  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 		  return;
-	  }*/
+	  }
       Low ()->StartTransmission (m_currentPacket,
                                  &m_currentHdr,
                                  params,
@@ -577,13 +577,13 @@ DcaTxop::NotifyAccessGranted (void)
               params.EnableNextData (GetNextFragmentSize ());
             }
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-/*
+
           Time txDuration = Low()->CalculateTransmissionTime(fragment, &hdr, params);
 		  if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {  // don't transmit if it can't be done inside RAW window, the ACK won't be received anyway
-			  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+			  NS_LOG_UNCOND("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
 			  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
 			  return;
-		  }*/
+		  }
           Low ()->StartTransmission (fragment, &hdr, params,
                                      m_transmissionListener);
           nrOfTransmissionsDuringRaw++;
@@ -602,13 +602,13 @@ DcaTxop::NotifyAccessGranted (void)
             }
           params.DisableNextData ();
           if(DEBUG_TRACK_PACKETS) std::cout << "Starting Transmission" << std::endl;
-/*
+
           Time txDuration = Low()->CalculateTransmissionTime(m_currentPacket, &m_currentHdr, params);
           if(!m_crossSlotBoundaryAllowed && txDuration > remainingRawTime) {
-        	  NS_LOG_DEBUG("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
+        	  NS_LOG_UNCOND("TX will take longer (" << txDuration << ") than the remaining RAW time (" << remainingRawTime << "), not transmitting");
         	  m_transmissionWillCrossRAWBoundary(txDuration, remainingRawTime);
         	  return;
-          }*/
+          }
           Low ()->StartTransmission (m_currentPacket, &m_currentHdr,
                                      params, m_transmissionListener);
           nrOfTransmissionsDuringRaw++;

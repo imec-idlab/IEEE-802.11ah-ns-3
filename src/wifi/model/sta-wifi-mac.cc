@@ -186,6 +186,7 @@ StaWifiMac::StaWifiMac ()
   //an infrastructure BSS.
   SetTypeOfStation (STA);
   m_pagedInDtim = false;
+  m_csbAllowedAfterSharedSlot = false;
 }
 
 StaWifiMac::~StaWifiMac ()
@@ -908,12 +909,12 @@ StaWifiMac::InsideBackoff (void)
 void
 StaWifiMac::StartRawbackoff (void)
 {
-  m_pspollDca->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed); //not really start raw useless allowedAccessRaw is true;
-  m_dca->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_VO)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_VI)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_BE)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_BK)->second->RawStart (m_slotDuration, m_crossSlotBoundaryAllowed);
+  m_pspollDca->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed); //not really start raw useless allowedAccessRaw is true;
+  m_dca->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_VO)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_VI)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_BE)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_BK)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
 
 }
 
@@ -935,10 +936,14 @@ StaWifiMac::OutsideRawStartBackoff (void)
   Simulator::Schedule(MicroSeconds(160), &StaWifiMac::RawSlotStartBackoffPostpone, this);
   StaWifiMac::m_pspollDca->OutsideRawStart ();
   m_dca->OutsideRawStart();
-  m_edca.find (AC_VO)->second->OutsideRawStart();
-  m_edca.find (AC_VI)->second->OutsideRawStart();
-  m_edca.find (AC_BE)->second->OutsideRawStart();
-  m_edca.find (AC_BK)->second->OutsideRawStart();
+  // This can only happen after all RAW groups in the beacon interval, therefore shared slot always equals BeaconInterval - m_lastRawDuration (m_lastRawDuration is actually duration of all RAWs in the current RPS)
+  // The standard does not define CSB for shared slot, so we allways allow it
+  // TODO revise this if the next RAW in the next RPS has csb=0, doesn-t make sense to interfere with it from the shared slot
+  // Implementation problem: STA only sees current RPS from the beacon, it cannot know the CSB of the next RAW in the next RPS
+  m_edca.find (AC_VO)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
+  m_edca.find (AC_VI)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
+  m_edca.find (AC_BE)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
+  m_edca.find (AC_BK)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
   /*
   It seems Simulator::ScheduleNow take longer time to execuate than without schedule.
 
@@ -1364,10 +1369,9 @@ StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
     {
       m_dca->AccessAllowedIfRaw (true);
     }
-  else if (m_rawStart & m_inRawGroup && m_pagedStaRaw && m_dataBuffered ) // if m_pagedStaRaw is true, only m_dataBuffered can access channel
+  else if (m_rawStart && m_inRawGroup && m_pagedStaRaw && m_dataBuffered ) // if m_pagedStaRaw is true, only m_dataBuffered can access channel
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-
       m_pspollDca->AccessAllowedIfRaw (true);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
@@ -1379,7 +1383,6 @@ StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
   else if (m_rawStart && m_inRawGroup && !m_pagedStaRaw  )
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-
       m_pspollDca->AccessAllowedIfRaw (false);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
@@ -1391,7 +1394,6 @@ StaWifiMac::S1gBeaconReceived (S1gBeaconHeader beacon)
  else if (m_rawStart && !m_inRawGroup) //|| (m_rawStart && m_inRawGroup && m_pagedStaRaw && !m_dataBuffered)
     {
       m_outsideRawEvent = Simulator::Schedule(m_lastRawDurationus, &StaWifiMac::OutsideRawStartBackoff, this);
-
       m_pspollDca->AccessAllowedIfRaw (false);
       m_dca->AccessAllowedIfRaw (false);
       m_edca.find (AC_VO)->second->AccessAllowedIfRaw (false);
@@ -1570,6 +1572,7 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
         	uint64_t m_currentRAW_start=0;
         	uint64_t rawStartOffset = 0;
         	m_lastRawDurationus = MicroSeconds(0);
+        	m_sharedSlotDuration = MicroSeconds(0);
         	for (uint8_t raw_index=0; raw_index < RAW_number; raw_index++)
         	{
         		auto ass = beacon.GetRPS().GetRawAssigmentObj(raw_index);
@@ -1608,13 +1611,14 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
 
         				SetInRAWgroup ();
         				m_currentslotDuration = m_slotDuration; //To support variable time duration among multiple RAWs
-
         				// NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID(0) = " << GetAID(0) <<  ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
         				//break; //break should not used if multiple RAW is supported
         			}
         			//NS_LOG_DEBUG (Simulator::Now () << ", StaWifiMac:: GetAID(0) = " << GetAID(0) << ", raw_start =" << raw_start << ", raw_end=" << raw_end << ", m_statSlotStart=" << m_statSlotStart << ", m_lastRawDurationus = " << m_lastRawDurationus << ", m_currentslotDuration = " << m_currentslotDuration);
         		}
         	}
+        	m_sharedSlotDuration = MicroSeconds (beacon.GetBeaconCompatibility().GetBeaconInterval ()) - m_lastRawDurationus;
+        	//NS_LOG_UNCOND ("STA m_sharedSlotDuration us=" << m_sharedSlotDuration.GetMicroSeconds() << ", m_lastRawDurationus=" << m_lastRawDurationus.GetMicroSeconds() << ", beaconInterval=" << beacon.GetBeaconCompatibility().GetBeaconInterval ());
         	m_rawStart = true;
         	S1gTIMReceived(beacon);
         }

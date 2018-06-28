@@ -492,7 +492,7 @@ public:
     
   void AccessAllowedIfRaw (bool allowed);
   void RawStart (Time duration, bool crossSlotBoundaryAllowed);
-  void OutsideRawStart (void);
+  void OutsideRawStart (Time duration, bool crossSlotBoundaryAllowed);
   
   void SetaccessList (std::map<Mac48Address, bool> list);
   void SetsleepList (std::map<Mac48Address, bool> list);

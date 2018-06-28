@@ -267,6 +267,7 @@ private:
   void SleepUntilMySlot ();
 
   Time m_lastRawDurationus;
+  Time m_sharedSlotDuration;
   Time m_lastRawStart;
   Time m_rawDuration;
   Time m_slotDuration;
@@ -338,6 +339,7 @@ private:
 
   Time m_maxTimeInQueue;
   bool m_crossSlotBoundaryAllowed;
+  bool m_csbAllowedAfterSharedSlot;
   TracedCallback<bool> m_beaconMissed;
 
   bool testtrackit = false;

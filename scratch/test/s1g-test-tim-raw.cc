@@ -1512,12 +1512,12 @@ int main(int argc, char *argv[]) {
 	//LogComponentEnable ("UdpServer", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoServerApplication", LOG_LEVEL_INFO);
 	//LogComponentEnable ("UdpEchoClientApplication", LOG_LEVEL_INFO);
-	LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
-	LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
+	//LogComponentEnable ("CoapClient", LOG_LEVEL_INFO);
+	//LogComponentEnable ("CoapServer", LOG_LEVEL_INFO);
 
-	//LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
-	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_FUNCTION);
-	//LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
+	LogComponentEnable ("ApWifiMac", LOG_LEVEL_DEBUG);
+	//LogComponentEnable ("StaWifiMac", LOG_LEVEL_DEBUG);
+	LogComponentEnable ("EdcaTxopN", LOG_LEVEL_DEBUG);
 	//LogComponentEnable ("MacLow", LOG_LEVEL_DEBUG);
 
 	bool OutputPosition = true;
@@ -1937,7 +1937,7 @@ int main(int argc, char *argv[]) {
 				cout << "downlink throughput Mbit/s " << dlThroughput << endl;*/
 
 		double throughput = (totalSuccessfulPackets + totalPacketsEchoed) * config.payloadSize * 8 / ((stats.EndApplicationTime.GetSeconds() - stats.TimeWhenEverySTAIsAssociated.GetSeconds()) * 1000000.0);
-
+		cout << "Time apps stoped=" << stats.EndApplicationTime.GetSeconds() << " s" << endl;
 		std::cout << "datarate" << "\t" << "throughput Kbit/s" << std::endl;
 		std::cout << config.datarate << "\t" << throughput * 1000 << " Kbit/s" << std::endl;
 	}
