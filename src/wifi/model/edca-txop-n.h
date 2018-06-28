@@ -110,7 +110,6 @@ public:
     bool AccessIfRaw;
 
     uint16_t nrOfTransmissionsDuringRaw = 0;
-    bool m_crossSlotBoundaryAllowed;
 
   /**
    * Set MacLow associated with this EdcaTxopN.
@@ -488,8 +487,8 @@ public:
   int64_t AssignStreams (int64_t stream);
     
   void AccessAllowedIfRaw (bool allowed);
-  void RawStart (Time duration, bool crossSlotBoundaryAllowed);
-  void OutsideRawStart (Time duration, bool crossSlotBoundaryAllowed);
+  void RawStart (void);
+  void OutsideRawStart (void);
   
   void SetaccessList (std::map<Mac48Address, bool> list);
   void SetsleepList (std::map<Mac48Address, bool> list);

@@ -1182,7 +1182,7 @@ EdcaTxopN::StartAccessIfNeededRaw (void)
 }
 
 void
-EdcaTxopN::RawStart (Time duration, bool crossSlotBoundaryAllowed)
+EdcaTxopN::RawStart ()
 {
   NS_LOG_FUNCTION (this);
 
@@ -1205,7 +1205,7 @@ EdcaTxopN::RawStart (Time duration, bool crossSlotBoundaryAllowed)
 }
 
 void
-EdcaTxopN::OutsideRawStart (Time duration, bool crossSlotBoundaryAllowed)
+EdcaTxopN::OutsideRawStart (void)
 {
   NS_LOG_FUNCTION (this);
   AccessAllowedIfRaw (true); // TODO this is different accross versions

@@ -917,10 +917,10 @@ StaWifiMac::StartRawbackoff (void)
 {
   m_pspollDca->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed); //not really start raw useless allowedAccessRaw is true;
   m_dca->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_VO)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_VI)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_BE)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
-  m_edca.find (AC_BK)->second->RawStart (m_currentslotDuration, m_crossSlotBoundaryAllowed);
+  m_edca.find (AC_VO)->second->RawStart ();
+  m_edca.find (AC_VI)->second->RawStart ();
+  m_edca.find (AC_BE)->second->RawStart ();
+  m_edca.find (AC_BK)->second->RawStart ();
 
 }
 
@@ -942,14 +942,10 @@ StaWifiMac::OutsideRawStartBackoff (void)
   Simulator::Schedule(MicroSeconds(160), &StaWifiMac::RawSlotStartBackoffPostpone, this);
   StaWifiMac::m_pspollDca->OutsideRawStart ();
   m_dca->OutsideRawStart();
-  // This can only happen after all RAW groups in the beacon interval, therefore shared slot always equals BeaconInterval - m_lastRawDuration (m_lastRawDuration is actually duration of all RAWs in the current RPS)
-  // The standard does not define CSB for shared slot, so we allways allow it
-  // TODO revise this if the next RAW in the next RPS has csb=0, doesn-t make sense to interfere with it from the shared slot
-  // Implementation problem: STA only sees current RPS from the beacon, it cannot know the CSB of the next RAW in the next RPS
-  m_edca.find (AC_VO)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
-  m_edca.find (AC_VI)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
-  m_edca.find (AC_BE)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
-  m_edca.find (AC_BK)->second->OutsideRawStart(m_sharedSlotDuration, m_csbAllowedAfterSharedSlot);
+  m_edca.find (AC_VO)->second->OutsideRawStart();
+  m_edca.find (AC_VI)->second->OutsideRawStart();
+  m_edca.find (AC_BE)->second->OutsideRawStart();
+  m_edca.find (AC_BK)->second->OutsideRawStart();
   /*
   It seems Simulator::ScheduleNow take longer time to execuate than without schedule.
 

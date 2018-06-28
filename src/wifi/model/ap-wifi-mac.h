@@ -148,6 +148,7 @@ public:
 private:
   virtual void Receive (Ptr<Packet> packet, const WifiMacHeader *hdr);
 
+  void NotifyEdcaOfCsb (Time rawSlotStart, Time slotDuration, bool csb);
   void OnRAWSlotStart(uint16_t rps, uint8_t rawGroup, uint8_t slot);
   void OnRAWSlotEnd (uint16_t rps, uint8_t rawGroup, uint8_t slot);
   /**
