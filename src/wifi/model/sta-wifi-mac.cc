@@ -1535,9 +1535,9 @@ StaWifiMac::Receive (Ptr<Packet> packet, const WifiMacHeader *hdr)
                offset =0; // for test
                statsPerSlot = (ass.GetRawGroupAIDEnd() - ass.GetRawGroupAIDStart() + 1)/m_slotNum;
                //statRawSlot = ((GetAID() & 0x03ff)-raw_start)/statsPerSlot;
-               statRawSlot = ((GetAID() & 0x03ff)+offset)%m_slotNum;
+               statRawSlot = ((GetAID() & 0x07ff)+offset)%m_slotNum;
 
-             if ((ass.GetRawGroupAIDStart() <= (GetAID() & 0x03ff)) && ((GetAID() & 0x03ff) <= ass.GetRawGroupAIDEnd()))
+             if ((ass.GetRawGroupAIDStart() <= (GetAID() & 0x07ff)) && ((GetAID() & 0x07ff) <= ass.GetRawGroupAIDEnd()))
                {
                  m_statSlotStart = MicroSeconds((500 + m_slotDurationCount * 120)*statRawSlot+m_currentRAW_start);
                  SetInRAWgroup ();

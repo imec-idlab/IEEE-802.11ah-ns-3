@@ -91,7 +91,7 @@ rm -rf OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/si
 mkdir OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/
 fi
 
-Outputpath="./OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/aid-"
+Outputpath="./OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/"
 TrafficPath="./OptimalRawGroup/traffic/data-$NumSta-$traffic.txt"
 
 
@@ -106,7 +106,11 @@ then
 fi
 
 
-./waf --run "tcpfiles --seed=$seed --simulationTime=$simTime --payloadSize=$payloadSize --Nsta=$totalSta --NRawSta=$totalRawstas --BeaconInterval=$BeaconInterval --DataMode=$DataMode --datarate=$datarate  --bandWidth=$bandWidth  --rho=$rho  --TrafficPath=$TrafficPath --S1g1MfieldEnabled=$S1g1MfieldEnabled  --RAWConfigFile=$RAWConfigFile --NRawSlotNum=$NumSlot --NGroup=$NRawGroups --totaltraffic=$traffic --tcpipcameraStart=$tcpipcameraStart --tcpipcameraEnd=$tcpipcameraEnd --udpStart=$udpStart --udpEnd=$udpEnd"  #> ./OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/simlog.txt 2>&1
+#./waf --run "test --seed=$seed --simulationTime=$simTime --payloadSize=$payloadSize --Nsta=$totalSta --NRawSta=$totalRawstas --BeaconInterval=$BeaconInterval --DataMode=$DataMode --datarate=$datarate  --bandWidth=$bandWidth  --rho=$rho  --TrafficPath=$TrafficPath --S1g1MfieldEnabled=$S1g1MfieldEnabled  --RAWConfigFile=$RAWConfigFile --NRawSlotNum=$NumSlot --NGroup=$NRawGroups --totaltraffic=$traffic --tcpipcameraStart=$tcpipcameraStart --tcpipcameraEnd=$tcpipcameraEnd --udpStart=$udpStart --udpEnd=$udpEnd"  #> ./OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/simlog.txt 2>&1
+
+./waf --run "test --seed=$seed --simulationTime=$simTime --payloadSize=$payloadSize --Nsta=$totalSta --NRawSta=$totalRawstas --BeaconInterval=$BeaconInterval --DataMode=$DataMode --datarate=$datarate  --bandWidth=$bandWidth --rho=$rho --Outputpath=$Outputpath --S1g1MfieldEnabled=$S1g1MfieldEnabled --RAWConfigFile=$RAWConfigFile --TrafficPath=$TrafficPath" > ./OptimalRawGroup/traffic-$traffic/NRawGroups$NRawGroups-NumSlot$NumSlot/simResult-$NumSta-seed$seed/simlog.txt 2>&1
+
+
 
 
 

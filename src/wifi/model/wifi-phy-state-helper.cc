@@ -93,6 +93,7 @@ WifiPhyStateHelper::WifiPhyStateHelper ()
     m_endRx (Seconds (0)),
     m_endCcaBusy (Seconds (0)),
     m_endSwitching (Seconds (0)),
+    m_endSleep(Seconds(0)),
     m_startTx (Seconds (0)),
     m_startRx (Seconds (0)),
     m_startCcaBusy (Seconds (0)),
@@ -333,14 +334,18 @@ WifiPhyStateHelper::LogPreviousIdleAndCcaBusyStates (void)
   Time idleStart = Max (m_endCcaBusy, m_endRx);
   idleStart = Max (idleStart, m_endTx);
   idleStart = Max (idleStart, m_endSwitching);
+  //added sleep, also in next if, last condition
+  idleStart = Max(idleStart, m_endSleep);
   NS_ASSERT (idleStart <= now);
   if (m_endCcaBusy > m_endRx
       && m_endCcaBusy > m_endSwitching
-      && m_endCcaBusy > m_endTx)
+      && m_endCcaBusy > m_endTx
+      && m_endCcaBusy > m_endSleep)
     {
       Time ccaBusyStart = Max (m_endTx, m_endRx);
       ccaBusyStart = Max (ccaBusyStart, m_startCcaBusy);
       ccaBusyStart = Max (ccaBusyStart, m_endSwitching);
+      ccaBusyStart = Max(ccaBusyStart, m_endSleep);
       m_stateLogger (ccaBusyStart, idleStart - ccaBusyStart, WifiPhy::CCA_BUSY);
     }
   m_stateLogger (idleStart, now - idleStart, WifiPhy::IDLE);
@@ -563,17 +568,19 @@ WifiPhyStateHelper::SwitchToSleep (void)
 void
 WifiPhyStateHelper::SwitchFromSleep (Time duration)
 {
-  NS_ASSERT (IsStateSleep ());
-  Time now = Simulator::Now ();
-  m_stateLogger (m_startSleep, now - m_startSleep, WifiPhy::SLEEP);
-  m_previousStateChangeTime = now;
-  m_sleeping = false;
-  NotifyWakeup ();
-  //update m_endCcaBusy after the sleep period
-  m_endCcaBusy = std::max (m_endCcaBusy, now + duration);
-  if (m_endCcaBusy > now)
+    NS_ASSERT(IsStateSleep());
+    Time now = Simulator::Now();
+    m_stateLogger(m_startSleep, now - m_startSleep, WifiPhy::SLEEP);
+    m_previousStateChangeTime = now;
+    m_sleeping = false;
+    m_endSleep = now;
+    NotifyWakeup();
+    //update m_endCcaBusy after the sleep period
+    //m_endCcaBusy = std::max (m_endCcaBusy, now + duration); why?
+    m_endCcaBusy = std::max(m_endCcaBusy, now - m_startSleep);
+    if (m_endCcaBusy > now)
     {
-      NotifyMaybeCcaBusyStart (m_endCcaBusy - now);
+        NotifyMaybeCcaBusyStart(m_endCcaBusy - now);
     }
 }
 

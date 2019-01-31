@@ -92,12 +92,12 @@ RPS::RawAssignment::GetRawGroupPage() const {
 
 uint16_t
 RPS::RawAssignment::GetRawGroupAIDStart()  const {
-	return (m_rawgroup >> 2) & 0x000003FF;
+	return (m_rawgroup >> 2) & 0x000007FF;
 }
 
 uint16_t
 RPS::RawAssignment::GetRawGroupAIDEnd()  const {
-	return (m_rawgroup >> 13) & 0x000003FF;
+	return (m_rawgroup >> 13) & 0x000007FF;
 }
 
 

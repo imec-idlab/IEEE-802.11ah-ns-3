@@ -1073,16 +1073,11 @@ void configureUDPEchoClients() {
 	}
 }
 
-Time timeTx;
-Time timeRx;
-Time timeIdle;
-Time timeSleep;
-
-//ns3::int64x64_t throughouputArray [MaxSta];
-Time timeIdleArray[MaxSta];
-Time timeRxArray[MaxSta];
-Time timeTxArray[MaxSta];
-Time timeSleepArray[MaxSta];
+Time timeIdleArray [MaxSta];
+Time timeRxArray [MaxSta];
+Time timeTxArray [MaxSta];
+Time timeSleepArray [MaxSta];
+Time timeCollisionArray [MaxSta];
 double dist[MaxSta];
 
 //it prints the information regarding the state of the device
@@ -1099,24 +1094,29 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 
 	//start calculating energy after complete association
 	if (GetAssocNum() == StaNum) {
-		switch (state) {
-		case WifiPhy::State::IDLE: //Idle
-			timeIdle = timeIdle + duration;
-			timeIdleArray[node] = timeIdleArray[node] + duration;
-			break;
-		case WifiPhy::State::RX: //Rx
-			timeRx = timeRx + duration;
-			timeRxArray[node] = timeRxArray[node] + duration;
-			break;
-		case WifiPhy::State::TX: //Tx
-			timeTx = timeTx + duration;
-			timeTxArray[node] = timeTxArray[node] + duration;
-			break;
-		case WifiPhy::State::SLEEP: //Sleep
-			timeSleep = timeSleep + duration;
-			timeSleepArray[node] = timeSleepArray[node] + duration;
-			break;
-		}
+        switch (state)
+        {
+            case WifiPhy::State::SLEEP: //Sleep
+                timeSleepArray[node] = timeSleepArray[node] + duration;
+                //NS_LOG_UNCOND (to_string(node+1) + ",SLEEP," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+                break;
+            case WifiPhy::State::IDLE: //Idle
+                timeIdleArray[node] = timeIdleArray[node] + duration;
+                //NS_LOG_UNCOND (to_string(node+1) + ",IDLE," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+                break;
+            case WifiPhy::State::TX: //Tx
+                timeTxArray[node] = timeTxArray[node] + duration;
+                //NS_LOG_UNCOND (to_string(node+1) + ",TX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+                break;
+            case WifiPhy::State::RX: //Rx
+                timeRxArray[node] = timeRxArray[node] + duration;
+                //NS_LOG_UNCOND (to_string(node+1) + ",RX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+                break;
+            case WifiPhy::State::CCA_BUSY: //CCA_BUSY
+                timeCollisionArray[node] = timeCollisionArray[node] + duration;
+                //NS_LOG_UNCOND (to_string(node+1) + ",CCA_BUSY," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+                break;
+        }
 	}
 }
 
@@ -1478,48 +1478,28 @@ int main(int argc, char *argv[]) {
 			<< 100 - 100. * totalPacketsEchoed / totalSentPackets << endl;
 	Simulator::Destroy();
 
-	//Energy consumption per station
-	timeRx = timeRx / config.Nsta;
-	timeIdle = timeIdle / config.Nsta;
-	timeTx = timeTx / config.Nsta;
-	timeSleep = timeSleep / config.Nsta;
-
 	ofstream risultati;
-	//string addressresults = Outputpath + "/moreinfo.txt";
 	string addressresults = config.OutputPath + "moreinfo.txt";
 	risultati.open(addressresults.c_str(), ios::out | ios::trunc);
 
-	risultati
-			<< "Sta node#      distance        timerx      timeidle        timetx      timesleep      totenergy"
-			<< std::endl;
-	int i = 0;
-	ns3::int64x64_t totenergycons = 0;
-	string spazio = "         ";
-
-	while (i < config.Nsta) {
-		totenergycons = (timeRxArray[i].GetSeconds() * 4.4)
-				+ (timeIdleArray[i].GetSeconds() * 4.4)
-				+ (timeTxArray[i].GetSeconds() * 7.2);
-		risultati << i << spazio << dist[i] << spazio
-				<< timeRxArray[i].GetSeconds() << spazio
-				<< timeIdleArray[i].GetSeconds() << spazio
-				<< timeTxArray[i].GetSeconds() << spazio
-				<< timeSleepArray[i].GetSeconds() << spazio << totenergycons
-				<< std::endl;
-
-		totenergycons = 0;
-
-		/*
-		 cout << "================== Sleep " << stats.get(i).TotalSleepTime.GetSeconds() << endl;
-		 cout << "================== Tx " << stats.get(i).TotalTxTime.GetSeconds() << endl;
-		 cout << "================== Rx " << stats.get(i).TotalRxTime.GetSeconds() << endl;
-		 cout << "+++++++++++++++++++IDLE " << stats.get(i).TotalIdleTime.GetSeconds() << endl;
-		 cout << "ooooooooooooooooooo TOTENERGY " <<  stats.get(i).GetTotalEnergyConsumption() << " mW" << endl;
-		 cout << "Rx+Idle ENERGY " <<  stats.get(i).EnergyRxIdle << " mW" << endl;
-		 cout << "Tx ENERGY " <<  stats.get(i).EnergyTx << " mW" << endl;*/
-
-		i++;
-	}
+    risultati << "Sta node#\t distance \t timerx \t timeidle \t       timetx \t timesleep \t timecollision" << std::endl;
+    int i = 0;
+    string spazio = "\t\t";
+    
+    while (i < config.Nsta) {
+        risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << spazio << timeIdleArray[i].GetSeconds() << spazio << timeTxArray[i].GetSeconds() << spazio << timeSleepArray[i].GetSeconds() << spazio << timeCollisionArray[i].GetSeconds() << std::endl;
+        
+        /*
+         cout << "================== Sleep " << stats.get(i).TotalSleepTime.GetSeconds() << endl;
+         cout << "================== Tx " << stats.get(i).TotalTxTime.GetSeconds() << endl;
+         cout << "================== Rx " << stats.get(i).TotalRxTime.GetSeconds() << endl;
+         cout << "+++++++++++++++++++IDLE " << stats.get(i).TotalIdleTime.GetSeconds() << endl;
+         cout << "ooooooooooooooooooo TOTENERGY " <<  stats.get(i).GetTotalEnergyConsumption() << " mW" << endl;
+         cout << "Rx+Idle ENERGY " <<  stats.get(i).EnergyRxIdle << " mW" << endl;
+         cout << "Tx ENERGY " <<  stats.get(i).EnergyTx << " mW" << endl;*/
+        
+        i++;
+    }
 
 	risultati.close();
 	return 0;

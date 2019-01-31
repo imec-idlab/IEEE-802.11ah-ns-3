@@ -302,6 +302,7 @@ private:
   Time m_endRx;
   Time m_endCcaBusy;
   Time m_endSwitching;
+  Time m_endSleep;
   Time m_startTx;
   Time m_startRx;
   Time m_startCcaBusy;
