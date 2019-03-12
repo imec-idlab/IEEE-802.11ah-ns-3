@@ -6,7 +6,7 @@ You can find the paper on [ResearchGate](https://www.researchgate.net/publicatio
 ### IEEE 802.11ah ns-3 
 > alpha version
 
-This repository hosts an implementation of the IEEE802.11ah (Wi-Fi HaLow) protocol for the NS-3 network simulator. It comes pre-packaged with NS-3 version 3.23 but multiple modules are updated to the latest 3.25 version to incorporate congestion control fixes for TCP traffic.
+This repository hosts an implementation of the IEEE802.11ah (Wi-Fi HaLow) protocol for the NS-3 network simulator. It comes pre-packaged with NS-3 version 3.23 but multiple modules are updated to the 3.25 version to incorporate congestion control fixes for TCP traffic.
 
 This module includes support for:
 * Restricted Access Window (RAW) with interface for dynamic configuration
