@@ -317,6 +317,7 @@ public:
   PhyMacLowListener (ns3::MacLow *macLow)
     : m_macLow (macLow)
   {
+     listeneraddress = m_macLow->GetAddress();
   }
   virtual void NotifyRxStart (Time duration)
   {
