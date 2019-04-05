@@ -86,7 +86,7 @@ struct Configuration {
 	bool S1g1MfieldEnabled=false;
 	string RAWConfigFile = "./OptimalRawGroup/RawConfig-rca.txt";
 	string DataMode = "MCS2_0"; //TODO copy this from Dwight, OfdmRate7_8MbpsBW2MHz MCS2
-	string OutputPath = "./OptimalRawGroup/resultsenergyconsumption/";
+	string OutputPath = "./OptimalRawGroup/";
 	/*
 	 * Amina's configuration parameters
 	 * */
