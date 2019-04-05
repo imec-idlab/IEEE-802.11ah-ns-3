@@ -1075,12 +1075,18 @@ void configureUDPEchoClients() {
 	}
 }
 
-//ns3::int64x64_t throughouputArray [MaxSta];
-Time timeIdleArray [MaxSta];
-Time timeRxArray [MaxSta];
-Time timeTxArray [MaxSta];
-Time timeSleepArray [MaxSta];
-Time timeCollisionArray [MaxSta];
+Time timeIdleArray[MaxSta];
+Time timeRxArray[MaxSta];
+Time timeTxArray[MaxSta];
+Time timeSleepArray[MaxSta];
+Time timeCollisionArray[MaxSta];
+
+Time timeIdleNotAssociated[MaxSta];
+Time timeRxNotAssociated[MaxSta];
+Time timeTxNotAssociated[MaxSta];
+Time timeSleepNotAssociated[MaxSta];
+Time timeCollisionNotAssociated[MaxSta];
+
 double dist[MaxSta];
 
 //it prints the information regarding the state of the device
@@ -1095,30 +1101,56 @@ void PhyStateTrace(std::string context, Time start, Time duration,
 
 	int node = std::stoi(strNew);
 
-	//start calculating energy after complete association
-	if (GetAssocNum() == StaNum) {
-        switch (state)
-        {
-            case WifiPhy::State::SLEEP: //Sleep
-                timeSleepArray[node] = timeSleepArray[node] + duration;
-                //NS_LOG_UNCOND (to_string(node+1) + ",SLEEP," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
-                break;
-            case WifiPhy::State::IDLE: //Idle
-                timeIdleArray[node] = timeIdleArray[node] + duration;
-                //NS_LOG_UNCOND (to_string(node+1) + ",IDLE," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
-                break;
-            case WifiPhy::State::TX: //Tx
-                timeTxArray[node] = timeTxArray[node] + duration;
-                //NS_LOG_UNCOND (to_string(node+1) + ",TX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
-                break;
-            case WifiPhy::State::RX: //Rx
-                timeRxArray[node] = timeRxArray[node] + duration;
-                //NS_LOG_UNCOND (to_string(node+1) + ",RX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
-                break;
-            case WifiPhy::State::CCA_BUSY: //CCA_BUSY
-                timeCollisionArray[node] = timeCollisionArray[node] + duration;
-                //NS_LOG_UNCOND (to_string(node+1) + ",CCA_BUSY," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
-                break;
+	if (nodes[node]->isAssociated)
+	{
+		switch (state)
+		{
+		case WifiPhy::State::SLEEP: //Sleep
+			timeSleepArray[node] = timeSleepArray[node] + duration;
+			//NS_LOG_UNCOND(to_string(node + 1) + ",SLEEP," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::IDLE: //Idle
+			timeIdleArray[node] = timeIdleArray[node] + duration;
+			//NS_LOG_UNCOND(to_string(node + 1) + ",IDLE," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::TX: //Tx
+			timeTxArray[node] = timeTxArray[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",TX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::RX: //Rx
+			timeRxArray[node] = timeRxArray[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",RX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::CCA_BUSY: //CCA_BUSY
+			timeCollisionArray[node] = timeCollisionArray[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",CCA_BUSY," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		}
+	}
+	else
+	{
+		switch (state)
+		{
+		case WifiPhy::State::SLEEP: //Sleep
+			timeSleepNotAssociated[node] = timeSleepNotAssociated[node] + duration;
+			//NS_LOG_UNCOND(to_string(node + 1) + ",SLEEP," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::IDLE: //Idle
+			timeIdleNotAssociated[node] = timeIdleNotAssociated[node] + duration;
+			//NS_LOG_UNCOND(to_string(node + 1) + ",IDLE," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::TX: //Tx
+			timeTxNotAssociated[node] = timeTxNotAssociated[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",TX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::RX: //Rx
+			timeRxNotAssociated[node] = timeRxNotAssociated[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",RX," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
+		case WifiPhy::State::CCA_BUSY: //CCA_BUSY
+			timeCollisionNotAssociated[node] = timeCollisionNotAssociated[node] + duration;
+			//NS_LOG_UNCOND (to_string(node+1) + ",CCA_BUSY," + to_string(start.GetMicroSeconds()) + " " + to_string(duration.GetMicroSeconds()));
+			break;
 		}
 	}
 }
@@ -1485,13 +1517,13 @@ int main(int argc, char *argv[]) {
     string addressresults = config.OutputPath + "moreinfo.txt";
     risultati.open(addressresults.c_str(), ios::out | ios::trunc);
 
-    risultati << "Sta node#\t distance \t timerx \t timeidle \t       timetx \t timesleep \t timecollision" << std::endl;
+    risultati << "Sta node#,distance,timerx(notassociated),timeidle(notassociated),timetx(notassociated),timesleep(notassociated),timecollision(notassociated)" << std::endl;
     int i = 0;
-    string spazio = "\t\t";
+    string spazio = ",";
     
     while (i < config.Nsta) {
-        risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << spazio << timeIdleArray[i].GetSeconds() << spazio << timeTxArray[i].GetSeconds() << spazio << timeSleepArray[i].GetSeconds() << spazio << timeCollisionArray[i].GetSeconds() << std::endl;
         
+        risultati << i << spazio << dist[i] << spazio << timeRxArray[i].GetSeconds() << ",(" << timeRxNotAssociated[i].GetSeconds() << ")," << timeIdleArray[i].GetSeconds() << ",(" << timeIdleNotAssociated[i].GetSeconds() << ")," << timeTxArray[i].GetSeconds() << ",(" << timeTxNotAssociated[i].GetSeconds() << ")," << timeSleepArray[i].GetSeconds() << ",(" << timeSleepNotAssociated[i].GetSeconds() << ")," << timeCollisionArray[i].GetSeconds() << ",(" << timeCollisionNotAssociated[i].GetSeconds() << ")" << std::endl;
         /*
          cout << "================== Sleep " << stats.get(i).TotalSleepTime.GetSeconds() << endl;
          cout << "================== Tx " << stats.get(i).TotalTxTime.GetSeconds() << endl;
