@@ -49,8 +49,8 @@ struct Configuration {
 
 	uint32_t pagePeriod=2;  	//  Number of Beacon Intervals between DTIM beacons that carry Page Slice element for the associated page
 	uint8_t pageIndex = 0;
-	uint32_t pageSliceLength=6; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
-	uint32_t pageSliceCount=2;  //  Number of TIMs in a single page period (1-31)
+	uint32_t pageSliceLength=8; //  Number of blocks in each TIM for the associated page except for the last TIM (1-31) (value 0 is reserved);
+	uint32_t pageSliceCount=0;  //  Number of TIMs in a single page period (1-31)
 	uint8_t blockOffset = 0;  	//  The 1st page slice starts with the block with blockOffset number
 	uint8_t timOffset = 0;    	//  Offset in number of Beacon Intervals from the DTIM that carries the first page slice of the page
 	/*
