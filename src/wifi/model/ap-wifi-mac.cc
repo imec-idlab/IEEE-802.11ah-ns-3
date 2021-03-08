@@ -618,7 +618,7 @@ ApWifiMac::GetSlotStartTimeFromAid (uint16_t aid) const
 	// For station that does not belong to anz RAW group, return the time after all RAW groups
 	/*currentRAW_start += (500 + slotDurationCount * 120) * slotNum;
 	NS_LOG_DEBUG ("[aid=" << aid << "] is located outside all RAWs. It can start contending " << currentRAW_start << " us after the beacon.");*/
-	NS_ASSERT (x);
+	//NS_ASSERT (x);
 	return MicroSeconds (currentRAW_start);
 }
 
