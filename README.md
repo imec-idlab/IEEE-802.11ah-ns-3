@@ -75,7 +75,7 @@ line 3, line 4 and line 6: configuration of each individual RAW group, including
           * RawControl           Whether RAW can be accessed by any stations within the RAW group or only the paged stations within the RAW group.  
           * CrossSlotBoundary    Whether STAs are allowed to transmit after the assigned RAW slot boundary.
           * SlotFormat           Format of RAW slot count.                 
-          * NRawSlotCount        Used to calculate number of RAW slot duration.   
+          * NRawSlotCount        Used for calculation of RAW slot duration.   
           * NRawSlotNum          Number of slots per RAW group.                     
           * Page                 Page index of the subset of AIDs.
           * Aid_start            Station with the lowest AID allocated in the RAW.
